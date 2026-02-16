@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Bespoke Travel - Italian Experience</title>
+    <title>Bespoke Journeys - Italian Experience</title>
     
-    <!-- Scripts & Styles -->
+    <!-- Scripts & Styles - Solo risorse stabili -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -18,6 +18,7 @@
             --brand-dark: #080808; 
         }
         
+        /* Reset Totale per permettere lo scrolling in Wix Studio */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         html { 
@@ -53,8 +54,10 @@
             transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.5s, backdrop-filter 0.5s, height 0.4s;
         }
 
+        /* Stato Nascosto allo Scroll Down */
         .glass-header.nav-up { transform: translateY(-110%); }
 
+        /* Stato Attivo allo Scroll Up o Top */
         .glass-header.scrolled {
             height: 90px;
             background: rgba(15, 15, 15, 0.45);
@@ -137,97 +140,6 @@
         .swiper-pagination-bullet { width: 10px !important; height: 10px !important; background: rgba(255,255,255,0.2) !important; opacity: 1 !important; border-radius: 5px !important; margin: 0 8px !important; transition: 0.4s ease; }
         .swiper-pagination-bullet-active { background: var(--brand-gold) !important; width: 45px !important; }
 
-        /* --- CONTENT SECTIONS --- */
-        .content-section {
-            width: 100%;
-            padding: 8rem 4rem;
-            background: var(--brand-dark);
-            border-top: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .section-title {
-            font-size: 3.5rem;
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            color: #fff;
-        }
-
-        .section-subtitle {
-            font-size: 1rem;
-            color: var(--brand-gold);
-            text-transform: uppercase;
-            letter-spacing: 0.25em;
-            margin-bottom: 3rem;
-            font-weight: 600;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 3rem;
-            margin-bottom: 4rem;
-        }
-
-        .feature-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(197,160,89,0.15);
-            padding: 2.5rem;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-            border-left: 3px solid rgba(197,160,89,0.3);
-        }
-
-        .feature-card:hover {
-            background: rgba(255,255,255,0.04);
-            border-color: rgba(197,160,89,0.4);
-            border-left: 3px solid var(--brand-gold);
-        }
-
-        .feature-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
-            color: var(--brand-gold);
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
-        }
-
-        .feature-card p {
-            color: #ccc;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            font-weight: 300;
-        }
-
-        .highlight-section {
-            background: linear-gradient(135deg, rgba(197,160,89,0.08) 0%, rgba(197,160,89,0.02) 100%);
-            border-top: 1px solid rgba(255,255,255,0.05);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding: 8rem 4rem;
-            margin: 4rem 0;
-        }
-
-        .cta-button {
-            display: inline-block;
-            padding: 1.2rem 3rem;
-            border: 2px solid var(--brand-gold);
-            color: var(--brand-gold);
-            text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: 0.25em;
-            font-size: 0.75rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            background: transparent;
-        }
-
-        .cta-button:hover {
-            background: var(--brand-gold);
-            color: var(--brand-dark);
-            box-shadow: 0 10px 30px rgba(197,160,89,0.3);
-        }
-
         /* --- FOOTER --- */
         .site-footer { background-color: #000; padding: 6rem 2rem; border-top: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; text-align: center; }
 
@@ -243,9 +155,6 @@
             .nav-container { display: none !important; }
             #central-menu-btn { display: flex !important; margin-top: 12px; }
             .logo-wrap { transform: scale(0.85); }
-            .content-section { padding: 5rem 2rem; }
-            .section-title { font-size: 2.5rem; }
-            .highlight-section { padding: 4rem 2rem; }
         }
 
         @media (max-width: 768px) {
@@ -253,16 +162,14 @@
             .location-section { height: auto; }
             .location-card { height: 55vh; }
             .logo-wrap { transform: scale(0.8); }
-            .features-grid { grid-template-columns: 1fr; gap: 2rem; }
         }
 
+        /* Schermi iPhone SE / 320px */
         @media (max-width: 350px) {
             .logo-wrap { transform: scale(0.68); }
             .glass-header { height: 135px !important; }
             #central-menu-btn { scale: 0.9; margin-top: 8px; }
         }
-
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } }
     </style>
 </head>
 <body>
@@ -273,36 +180,36 @@
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
         <div class="mobile-nav-list">
-            <a href="../../" class="mobile-link">Home</a>
+            <a href="https://www.italianexp.com/" class="mobile-link">Home</a>
             
             <span class="mobile-link">Travel</span>
             <div class="mobile-sub-list">
-                <a href="./" class="mobile-sub-link">Bespoke</a>
-                <a href="../gapyear/" class="mobile-sub-link">Gap Year</a>
-                <a href="../culinary/" class="mobile-sub-link">Culinary Academy</a>
+                <a href="https://www.italianexp.com/travel/bespoke" class="mobile-sub-link">Bespoke</a>
+                <a href="https://www.italianexp.com/travel/gapyear" class="mobile-sub-link">Gap Year</a>
+                <a href="https://www.italianexp.com/travel/culinary" class="mobile-sub-link">Culinary Academy</a>
             </div>
 
             <span class="mobile-link">Recruitment</span>
             <div class="mobile-sub-list">
-                <a href="../../recruitment/employer/" class="mobile-sub-link">Employer</a>
-                <a href="../../recruitment/candidate/" class="mobile-sub-link">Candidate</a>
+                <a href="https://www.italianexp.com/recruitment/employer" class="mobile-sub-link">Employer</a>
+                <a href="https://www.italianexp.com/recruitment/candidate" class="mobile-sub-link">Candidate</a>
             </div>
 
             <span class="mobile-link">Flavors</span>
             <div class="mobile-sub-list">
-                <a href="../../flavors/foryourhome/" class="mobile-sub-link">For your Home</a>
-                <a href="../../flavors/foryourbusiness/" class="mobile-sub-link">For your Business</a>
-                <a href="../../flavors/aziendeitaliane/" class="mobile-sub-link">Aziende Italiane</a>
+                <a href="https://www.italianexp.com/flavors/foryourhome" class="mobile-sub-link">For your Home</a>
+                <a href="https://www.italianexp.com/flavors/foryourbusiness" class="mobile-sub-link">For your Business</a>
+                <a href="https://www.italianexp.com/flavors/aziendeitaliane" class="mobile-sub-link">Aziende Italiane</a>
             </div>
 
-            <a href="../../estates/" class="mobile-link">Estates</a>
-            <a href="../../contact/" class="mobile-link">Contact</a>
+            <a href="https://www.italianexp.com/estetes" class="mobile-link">Estates</a>
+            <a href="https://www.italianexp.com/contact" class="mobile-link">Contact</a>
         </div>
     </div>
 
     <!-- HEADER SMART -->
     <nav class="glass-header" id="main-header">
-        <a href="../../" class="no-underline">
+        <a href="https://www.italianexp.com/" target="_top" class="no-underline">
             <div class="logo-wrap" id="logo-header">
                 <span class="font-it">Italian</span>
                 <div class="font-ex" data-text="EXPERIENCE"></div>
@@ -314,6 +221,7 @@
             </div>
         </a>
 
+        <!-- TASTO MENU CENTRALE (SOLO MOBILE) -->
         <button id="central-menu-btn" aria-label="Open Menu">
             <svg class="menu-icon-svg" viewBox="0 0 24 24" fill="none" stroke-linecap="round">
                 <circle cx="12" cy="12" r="10" stroke="rgba(197, 160, 89, 0.4)" stroke-width="1"/>
@@ -323,37 +231,38 @@
             <span>Menu</span>
         </button>
 
+        <!-- DESKTOP NAV -->
         <div class="nav-container">
-            <a href="../../" class="nav-link">Home</a>
+            <a href="https://www.italianexp.com/" class="nav-link">Home</a>
             
             <div class="dropdown">
-                <a href="../" class="nav-link">Travel <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></a>
+                <a href="https://www.italianexp.com/travel" class="nav-link">Travel <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></a>
                 <div class="dropdown-menu">
-                    <a href="./" class="dropdown-item">Bespoke</a>
-                    <a href="../gapyear/" class="dropdown-item">Gap Year</a>
-                    <a href="../culinary/" class="dropdown-item">Culinary Academy</a>
+                    <a href="https://www.italianexp.com/travel/bespoke" class="dropdown-item">Bespoke</a>
+                    <a href="https://www.italianexp.com/travel/gapyear" class="dropdown-item">Gap Year</a>
+                    <a href="https://www.italianexp.com/travel/culinary" class="dropdown-item">Culinary Academy</a>
                 </div>
             </div>
 
             <div class="dropdown">
-                <a href="../../recruitment/" class="nav-link">Recruitment <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></a>
+                <a href="https://www.italianexp.com/recruitment" class="nav-link">Recruitment <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></a>
                 <div class="dropdown-menu">
-                    <a href="../../recruitment/employer/" class="dropdown-item">Employer</a>
-                    <a href="../../recruitment/candidate/" class="dropdown-item">Candidate</a>
+                    <a href="https://www.italianexp.com/recruitment/employer" class="dropdown-item">Employer</a>
+                    <a href="https://www.italianexp.com/recruitment/candidate" class="dropdown-item">Candidate</a>
                 </div>
             </div>
 
             <div class="dropdown">
-                <a href="../../flavors/" class="nav-link">Flavors <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></a>
+                <a href="https://www.italianexp.com/flavors" class="nav-link">Flavors <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></a>
                 <div class="dropdown-menu">
-                    <a href="../../flavors/foryourhome/" class="dropdown-item">For your Home</a>
-                    <a href="../../flavors/foryourbusiness/" class="dropdown-item">For your Business</a>
-                    <a href="../../flavors/aziendeitaliane/" class="dropdown-item">Aziende Italiane</a>
+                    <a href="https://www.italianexp.com/flavors/foryourhome" class="dropdown-item">For your Home</a>
+                    <a href="https://www.italianexp.com/flavors/foryourbusiness" class="dropdown-item">For your Business</a>
+                    <a href="https://www.italianexp.com/flavors/aziendeitaliane" class="dropdown-item">Aziende Italiane</a>
                 </div>
             </div>
 
-            <a href="../../estates/" class="nav-link">Estates</a>
-            <a href="../../contact/" class="nav-link">Contact</a>
+            <a href="https://www.italianexp.com/estetes" class="nav-link">Estates</a>
+            <a href="https://www.italianexp.com/contact" class="nav-link">Contact</a>
         </div>
     </nav>
 
@@ -361,21 +270,21 @@
     <section class="hero-odyssey">
         <div class="swiper hero-swiper h-full">
             <div class="swiper-wrapper">
-                <div class="swiper-slide hero-slide"><img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1920" alt="Luxury Travel"></div>
-                <div class="swiper-slide hero-slide"><img src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=1920" alt="Italian Coast"></div>
-                <div class="swiper-slide hero-slide"><img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?q=80&w=1920" alt="Bespoke Experience"></div>
+                <div class="swiper-slide hero-slide"><img src="https://images.unsplash.com/photo-1529260830199-42c24126f198?q=80&w=1920" alt="Roma"></div>
+                <div class="swiper-slide hero-slide"><img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?q=80&w=1920" alt="Venezia"></div>
+                <div class="swiper-slide hero-slide"><img src="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=1920" alt="Firenze"></div>
             </div>
             <div class="hero-overlay-content px-6">
-                <h3 class="text-[#c5a059] italic brand-font text-xl md:text-2xl mb-4">Luxury Personalized</h3>
+                <h3 class="text-[#c5a059] italic brand-font text-xl md:text-2xl mb-4">Navigating the Italian Soul</h3>
                 <h1 class="text-white font-bold uppercase tracking-tighter text-4xl md:text-9xl brand-font leading-[0.9] mb-8">
-                    Bespoke <br><span class="italic font-light opacity-80">Travel.</span>
+                    The Italian <br><span class="italic font-light opacity-80">Odyssey.</span>
                 </h1>
                 <div class="w-16 md:w-24 h-px bg-[#c5a059] opacity-40 mb-10 mx-auto"></div>
-                <p class="text-slate-300 text-[0.65rem] md:text-base uppercase tracking-[0.5em] max-w-[280px] md:max-w-none">Curated Itineraries Designed for You</p>
+                <p class="text-slate-300 text-[0.65rem] md:text-base uppercase tracking-[0.5em] max-w-[280px] md:max-w-none">Consulting & Cultural Curation</p>
             </div>
             
             <a href="#advisory" class="absolute bottom-20 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center opacity-70 transition-all hover:opacity-100 hover:translate-y-1" style="animation: float 2s infinite ease-in-out; text-decoration: none;">
-                <span class="text-white text-[0.75rem] uppercase tracking-[0.4em] mb-3 font-light">Discover More</span>
+                <span class="text-white text-[0.75rem] uppercase tracking-[0.4em] mb-3 font-light">Explore</span>
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c5a059" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
             </a>
         </div>
@@ -385,10 +294,10 @@
     <section id="advisory" class="py-32 md:py-48 flex items-center justify-center bg-[#080808]">
         <div class="max-w-4xl px-8 md:px-10 text-center">
             <span class="text-[#c5a059] uppercase tracking-[0.7em] text-[0.55rem] md:text-[0.65rem] font-bold block mb-12">Private Advisory</span>
-            <h2 class="text-4xl md:text-7xl mb-12 italic text-white brand-font leading-tight mx-auto mt-10">Extraordinary Journeys.</h2>
+            <h2 class="text-4xl md:text-7xl mb-12 italic text-white brand-font leading-tight mx-auto mt-10">Extraordinary Life Experiences.</h2>
             <div class="space-y-10 font-light text-lg md:text-xl text-slate-400 leading-relaxed mx-auto mt-10">
-                <p>We create <span class="text-white font-normal">bespoke travel experiences</span> tailored exclusively to your desires, preferences, and cultural interests.</p>
-                <p>Our objective is a <span class="text-[#c5a059] italic">unique and personalized approach</span> to planning every strategic detail of your Italian adventure.</p>
+                <p>We do not just create luxury vacations in Italy, but rather <span class="text-white font-normal">extraordinary and unique life experiences.</span> Each project is a dialogue between your vision and our heritage.</p>
+                <p>Our objective is a <span class="text-[#c5a059] italic">unique and warm personal approach</span> to planning ogni dettaglio strategico del vostro viaggio.</p>
             </div>
         </div>
     </section>
@@ -396,7 +305,7 @@
     <!-- SECTION 3: REGIONAL ATMOSPHERES -->
     <section class="location-section">
         <div class="absolute top-10 left-10 md:top-12 md:left-12 z-20 pointer-events-none">
-            <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.55rem] font-bold block mb-2">Curated Destinations</span>
+            <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.55rem] font-bold block mb-2">A Strategic Survey</span>
             <h2 class="text-3xl md:text-4xl brand-font italic text-white drop-shadow-xl">Regional Atmospheres</h2>
         </div>
         <div class="swiper location-swiper h-full">
@@ -404,7 +313,7 @@
                 <div class="swiper-slide location-card">
                     <img src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=800" alt="Amalfi">
                     <div class="location-info">
-                        <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">Coastal Luxury</span>
+                        <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">Coastal Sanctuary</span>
                         <h4 class="brand-font italic text-3xl md:text-4xl text-white">Amalfi Coast</h4>
                         <div class="w-12 h-[2px] bg-[#c5a059] mt-6"></div>
                     </div>
@@ -412,7 +321,7 @@
                 <div class="swiper-slide location-card">
                     <img src="https://images.unsplash.com/photo-1528114039593-4366cc08227d?q=80&w=800" alt="Toscana">
                     <div class="location-info">
-                        <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">Tuscan Elegance</span>
+                        <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">Rural Continuity</span>
                         <h4 class="brand-font italic text-3xl md:text-4xl text-white">Tuscany</h4>
                         <div class="w-12 h-[2px] bg-[#c5a059] mt-6"></div>
                     </div>
@@ -420,7 +329,7 @@
                 <div class="swiper-slide location-card">
                     <img src="https://images.unsplash.com/photo-1688635629079-d9aca2419551?q=80&w=800" alt="Venezia">
                     <div class="location-info">
-                        <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">Venetian Heritage</span>
+                        <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">Floating Legacy</span>
                         <h4 class="brand-font italic text-3xl md:text-4xl text-white">Venice</h4>
                         <div class="w-12 h-[2px] bg-[#c5a059] mt-6"></div>
                     </div>
@@ -428,7 +337,7 @@
                 <div class="swiper-slide location-card">
                     <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=800" alt="Roma">
                     <div class="location-info">
-                        <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">Eternal City</span>
+                        <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">Urban Antiquity</span>
                         <h4 class="brand-font italic text-3xl md:text-4xl text-white">Rome</h4>
                         <div class="w-12 h-[2px] bg-[#c5a059] mt-6"></div>
                     </div>
@@ -438,78 +347,32 @@
         </div>
     </section>
 
-    <!-- SECTION 4: FEATURES -->
-    <section class="content-section" id="features">
-        <div class="max-w-6xl mx-auto">
-            <div class="section-subtitle">Why Choose Bespoke</div>
-            <h2 class="section-title">Tailored Experiences</h2>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <h3>Private Itineraries</h3>
-                    <p>Every journey uniquely crafted to match your interests, preferences, and travel style—no compromises, just pure personalization.</p>
-                </div>
-
-                <div class="feature-card">
-                    <h3>Expert Curation</h3>
-                    <p>Our seasoned travel consultants bring decades of Mediterranean expertise to every strategic detail and logistical arrangement.</p>
-                </div>
-
-                <div class="feature-card">
-                    <h3>Exclusive Access</h3>
-                    <p>Unlock hidden gems, private events, and transformative experiences unavailable to the general public.</p>
-                </div>
-
-                <div class="feature-card">
-                    <h3>Luxury Accommodations</h3>
-                    <p>Handpicked hotels, villas, and estates that align perfectly with your refined luxury expectations and aesthetic preferences.</p>
-                </div>
-
-                <div class="feature-card">
-                    <h3>24/7 Concierge</h3>
-                    <p>Dedicated support throughout your journey ensures every moment is seamless, curated, and perfectly executed.</p>
-                </div>
-
-                <div class="feature-card">
-                    <h3>Cultural Immersion</h3>
-                    <p>Deep dives into local culture, cuisine, and heritage with authentic, expert-guided experiences that transform perspectives.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 5: DISCOVERY PROCESS -->
+    <!-- SECTION 4: DISCOVERY -->
     <section class="py-32 md:py-48 bg-[#080808]">
         <div class="max-w-6xl mx-auto px-10">
             <div class="grid md:grid-cols-3 gap-20">
                 <div class="border-l border-[#c5a059]/30 pl-10 group">
                     <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic transition-all group-hover:opacity-60">01</span>
                     <h4 class="uppercase tracking-[0.4em] text-[0.65rem] font-bold mb-6 text-[#c5a059]">Discovery Session</h4>
-                    <p class="text-slate-400 text-sm leading-relaxed font-light">Deep exploration of your cultural goals, travel style, and logistical requirements to craft your odyssey.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed font-light">Deep exploration of your cultural goals and logistical requirements to frame the odyssey.</p>
                 </div>
                 <div class="border-l border-[#c5a059]/30 pl-10 group">
                     <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic transition-all group-hover:opacity-60">02</span>
                     <h4 class="uppercase tracking-[0.4em] text-[0.65rem] font-bold mb-6 text-[#c5a059]">Expert Synthesis</h4>
-                    <p class="text-slate-400 text-sm leading-relaxed font-light">Identifying luxury nodes, heritage keys, and exclusive opportunities that align with your unique vision.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed font-light">Identifying hidden luxury nodes and heritage keys that align with your unique vision.</p>
                 </div>
                 <div class="border-l border-[#c5a059]/30 pl-10 group">
                     <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic transition-all group-hover:opacity-60">03</span>
-                    <h4 class="uppercase tracking-[0.4em] text-[0.65rem] font-bold mb-6 text-[#c5a059]">Flawless Execution</h4>
-                    <p class="text-slate-400 text-sm leading-relaxed font-light">Comprehensive coordination and professional guidance through every moment of your Italian escape.</p>
+                    <h4 class="uppercase tracking-[0.4em] text-[0.65rem] font-bold mb-6 text-[#c5a059]">Orientation</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed font-light">Comprehensive strategic overview and professional guidance through the Italian soul.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- SECTION 6: CTA -->
-    <section class="highlight-section text-center">
-        <p class="text-3xl md:text-5xl brand-font italic text-white mb-8">Ready to Begin Your Journey?</p>
-        <a href="../../contact/" class="cta-button">Plan Your Escape</a>
-    </section>
-
     <!-- FOOTER -->
     <footer class="site-footer">
-        <a href="../../" class="no-underline mb-8">
+        <a href="https://www.italianexp.com/" target="_top" class="no-underline mb-8">
             <div class="logo-wrap scale-[0.7] md:scale-[0.8]" id="logo-footer">
                 <span class="font-it">Italian</span>
                 <div class="font-ex" data-text="EXPERIENCE"></div>
@@ -597,5 +460,6 @@
             initLogo('logo-footer');
         });
     </script>
+    <style> @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } } </style>
 </body>
 </html>
