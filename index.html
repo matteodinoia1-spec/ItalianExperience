@@ -529,7 +529,7 @@
         <div class="pillar-inner">
           <span class="label">Bespoke Curation</span>
           <div class="gold-line"></div>
-          <h2 class="title-portal fit-title" data-fit-min="22" data-fit-group="pillars">Travel</h2>
+          <h2 class="title-portal fit-title" data-fit-min="18" data-fit-group="pillars">Travel</h2>
           <p class="description">Elite strategic curation for metropolitan and coastal odysseys.</p>
         </div>
       </a>
@@ -539,7 +539,7 @@
         <div class="pillar-inner">
           <span class="label">Staffing Excellence</span>
           <div class="gold-line"></div>
-          <h2 class="title-portal fit-title" data-fit-min="22" data-fit-group="pillars">Recruitment</h2>
+          <h2 class="title-portal fit-title" data-fit-min="18" data-fit-group="pillars">Recruitment</h2>
           <p class="description">Heritage ambassadors for prestigious hospitality.</p>
         </div>
       </a>
@@ -549,7 +549,7 @@
         <div class="pillar-inner">
           <span class="label">Premium Imports</span>
           <div class="gold-line"></div>
-          <h2 class="title-portal fit-title" data-fit-min="22" data-fit-group="pillars">Flavors</h2>
+          <h2 class="title-portal fit-title" data-fit-min="18" data-fit-group="pillars">Flavors</h2>
           <p class="description">A personally tested selection of authentic culinary staples.</p>
         </div>
       </a>
@@ -559,7 +559,7 @@
         <div class="pillar-inner">
           <span class="label">Asset Strategy</span>
           <div class="gold-line"></div>
-          <h2 class="title-portal fit-title" data-fit-min="22" data-fit-group="pillars">Estates</h2>
+          <h2 class="title-portal fit-title" data-fit-min="18" data-fit-group="pillars">Estates</h2>
           <p class="description">Consultancy for the acquisition of prestigious assets.</p>
         </div>
       </a>
@@ -881,75 +881,93 @@
         }, { passive: true });
       }
 
-      // Pro solution: auto-fit titles with group consistency + aesthetic floor
-      function computeFitPx(el) {
-        if (!el) return null;
+      // Pro solution: auto-fit titles with group consistency
+function computeFitPx(el) {
+  if (!el) return null;
 
-        const minPx = parseFloat(el.getAttribute('data-fit-min') || '20');
-        const parent = el.parentElement;
-        if (!parent) return null;
+  const minPx = parseFloat(el.getAttribute('data-fit-min') || '20');
 
-        if (!el.dataset.fitMaxPx) {
-          const cs = window.getComputedStyle(el);
-          el.dataset.fitMaxPx = String(parseFloat(cs.fontSize) || 28);
-        }
+  const parent = el.closest('.pillar-inner') || el.parentElement;
+  if (!parent) return null;
 
-        const maxPx = parseFloat(el.dataset.fitMaxPx);
-        el.style.fontSize = maxPx + 'px';
+  const pillar = el.closest('.portal-pillar');
+  const baseWidth = pillar ? pillar.clientWidth : parent.clientWidth;
 
-        const maxWidth = parent.clientWidth;
-        if (!maxWidth) return maxPx;
+  const maxWidth = (baseWidth || 0) - 36; // buffer anti-taglio
+  if (!maxWidth || maxWidth <= 0) return null;
 
-        let size = maxPx;
-        let guard = 0;
+  if (!el.dataset.fitMaxPx) {
+    const cs = window.getComputedStyle(el);
+    el.dataset.fitMaxPx = String(parseFloat(cs.fontSize) || 28);
+  }
 
-        while (el.scrollWidth > maxWidth && size > minPx && guard < 180) {
-          size -= 0.5;
-          el.style.fontSize = size + 'px';
-          guard += 1;
-        }
+  const maxPx = parseFloat(el.dataset.fitMaxPx);
+  el.style.fontSize = maxPx + 'px';
 
-        return size;
-      }
+  let size = maxPx;
+  let guard = 0;
 
-      function fitGroup(groupName) {
-        const items = Array.from(document.querySelectorAll(`.fit-title[data-fit-group="${groupName}"]`));
-        if (!items.length) return;
+  while (el.scrollWidth > maxWidth && size > minPx && guard < 240) {
+    size -= 0.5;
+    el.style.fontSize = size + 'px';
+    guard += 1;
+  }
 
-        const sizes = items.map(el => computeFitPx(el)).filter(v => typeof v === 'number');
-        if (!sizes.length) return;
+  return size;
+}
 
-        const uniform = Math.min(...sizes);
+function fitGroup(groupName) {
+  const items = Array.from(
+    document.querySelectorAll(`.fit-title[data-fit-group="${groupName}"]`)
+  );
+  if (!items.length) return;
 
-        const floor = groupName === 'pillars' ? 26 : 20;
-        const finalSize = Math.max(uniform, floor);
+  const sizes = items
+    .map(el => computeFitPx(el))
+    .filter(v => typeof v === 'number' && !Number.isNaN(v));
 
-        items.forEach(el => {
-          const maxPx = parseFloat(el.dataset.fitMaxPx || finalSize);
-          el.style.fontSize = Math.min(maxPx, finalSize) + 'px';
-        });
-      }
+  if (!sizes.length) return;
 
-      function fitAllGroups() {
-        fitGroup('pillars');
-        fitGroup('cards');
-      }
+  const uniform = Math.min(...sizes);
 
-      let fitRaf = 0;
-      function fitAllGroupsRaf() {
-        if (fitRaf) cancelAnimationFrame(fitRaf);
-        fitRaf = requestAnimationFrame(() => {
-          fitAllGroups();
-          fitRaf = 0;
-        });
-      }
+  // floor per evitare che diventino troppo piccole
+  const floor = groupName === 'pillars' ? 22 : 18;
+  const finalSize = Math.max(uniform, floor);
 
-      window.addEventListener('resize', fitAllGroupsRaf, { passive: true });
-      window.addEventListener('orientationchange', fitAllGroupsRaf, { passive: true });
+  items.forEach(el => {
+    const maxPx = parseFloat(el.dataset.fitMaxPx || finalSize);
+    el.style.fontSize = Math.min(maxPx, finalSize) + 'px';
+  });
+}
 
-      fitAllGroups();
-      setTimeout(fitAllGroups, 120);
-    });
+function fitAllGroups() {
+  fitGroup('pillars'); // desktop
+  fitGroup('cards');   // mobile
+}
+
+let fitRaf = 0;
+function fitAllGroupsRaf() {
+  if (fitRaf) cancelAnimationFrame(fitRaf);
+  fitRaf = requestAnimationFrame(() => {
+    fitAllGroups();
+    fitRaf = 0;
+  });
+}
+
+window.addEventListener('resize', fitAllGroupsRaf, { passive: true });
+window.addEventListener('orientationchange', fitAllGroupsRaf, { passive: true });
+
+// run immediato + dopo layout + dopo font
+fitAllGroups();
+setTimeout(fitAllGroups, 200);
+setTimeout(fitAllGroups, 700);
+
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => {
+    fitAllGroups();
+    setTimeout(fitAllGroups, 200);
+  });
+}
   </script>
 </body>
 </html>
