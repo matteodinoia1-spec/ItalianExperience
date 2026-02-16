@@ -35,7 +35,7 @@
     .reveal{opacity:0;transform:translateY(18px);transition:opacity 650ms ease,transform 900ms cubic-bezier(0.2,1,0.3,1)}
     .reveal.active{opacity:1;transform:translateY(0)}
 
-    /* Scroll indicator (no pill, no circle) */
+    /* Scroll indicator */
     @keyframes scrollLine{
       0%{transform:translateY(-18px);opacity:0}
       30%{opacity:1}
@@ -43,7 +43,7 @@
     }
     .scroll-indicator{
       position:absolute;
-      bottom:26px;
+      bottom:46px;
       left:50%;
       transform:translateX(-50%);
       z-index:90;
@@ -51,7 +51,7 @@
       display:flex;
       flex-direction:column;
       align-items:center;
-      gap:10px;
+      gap:14px;
       text-shadow:0 8px 18px rgba(0,0,0,0.7);
     }
     .scroll-indicator span{
@@ -103,12 +103,13 @@
     }
     .tricolore div{flex:1}
 
-    /* Fit titles (pro solution) */
+    /* Fit titles */
     .fit-title{
       white-space:nowrap;
       display:inline-block;
       max-width:100%;
       overflow:visible;
+      transition:font-size 220ms ease;
     }
 
     /* Desktop */
@@ -292,7 +293,7 @@
       backdrop-filter:blur(18px);
     }
 
-    /* Mobile (exact style you sent, card layout) */
+    /* Mobile */
     .portal-container{display:flex;flex-direction:column;width:100%;background:#000}
 
     .portal-card{
@@ -522,7 +523,7 @@
         <div class="pillar-inner">
           <span class="label">Bespoke Curation</span>
           <div class="gold-line"></div>
-          <h2 class="title-portal fit-title" data-fit-min="22">Travel</h2>
+          <h2 class="title-portal fit-title" data-fit-min="22" data-fit-group="pillars">Travel</h2>
           <p class="description">Elite strategic curation for metropolitan and coastal odysseys.</p>
         </div>
       </a>
@@ -532,7 +533,7 @@
         <div class="pillar-inner">
           <span class="label">Staffing Excellence</span>
           <div class="gold-line"></div>
-          <h2 class="title-portal fit-title" data-fit-min="22">Recruitment</h2>
+          <h2 class="title-portal fit-title" data-fit-min="22" data-fit-group="pillars">Recruitment</h2>
           <p class="description">Heritage ambassadors for prestigious hospitality.</p>
         </div>
       </a>
@@ -542,7 +543,7 @@
         <div class="pillar-inner">
           <span class="label">Premium Imports</span>
           <div class="gold-line"></div>
-          <h2 class="title-portal fit-title" data-fit-min="22">Flavors</h2>
+          <h2 class="title-portal fit-title" data-fit-min="22" data-fit-group="pillars">Flavors</h2>
           <p class="description">A personally tested selection of authentic culinary staples.</p>
         </div>
       </a>
@@ -552,7 +553,7 @@
         <div class="pillar-inner">
           <span class="label">Asset Strategy</span>
           <div class="gold-line"></div>
-          <h2 class="title-portal fit-title" data-fit-min="22">Estates</h2>
+          <h2 class="title-portal fit-title" data-fit-min="22" data-fit-group="pillars">Estates</h2>
           <p class="description">Consultancy for the acquisition of prestigious assets.</p>
         </div>
       </a>
@@ -639,7 +640,7 @@
 
         <a href="https://www.italianexp.com/travel" target="_top" class="card-content">
           <span class="card-label">Bespoke Curation</span>
-          <h2 class="card-title fit-title" data-fit-min="20">Travel</h2>
+          <h2 class="card-title fit-title" data-fit-min="20" data-fit-group="cards">Travel</h2>
           <div class="card-accent"></div>
           <p class="card-desc">Elite strategic curation for metropolitan and coastal odysseys.</p>
           <div class="card-cta">Explore <span class="cta-arrow"></span></div>
@@ -650,7 +651,7 @@
         <div class="card-bg"><img src="https://static.wixstatic.com/media/d5773c_ce6809e7acf84e93aaa71ec6bf29062b~mv2.avif" alt="Recruitment" loading="lazy"></div>
         <div class="card-content">
           <span class="card-label">Staffing Excellence</span>
-          <h2 class="card-title fit-title" data-fit-min="20">Recruitment</h2>
+          <h2 class="card-title fit-title" data-fit-min="20" data-fit-group="cards">Recruitment</h2>
           <div class="card-accent"></div>
           <p class="card-desc">Heritage ambassadors for prestigious hospitality.</p>
           <div class="card-cta">Explore <span class="cta-arrow"></span></div>
@@ -661,7 +662,7 @@
         <div class="card-bg"><img src="https://static.wixstatic.com/media/d5773c_0de64c976fdf4528b0862bfb39365431~mv2.avif" alt="Flavors" loading="lazy"></div>
         <div class="card-content">
           <span class="card-label">Premium Imports</span>
-          <h2 class="card-title fit-title" data-fit-min="20">Flavors</h2>
+          <h2 class="card-title fit-title" data-fit-min="20" data-fit-group="cards">Flavors</h2>
           <div class="card-accent"></div>
           <p class="card-desc">A personally tested selection of authentic culinary staples.</p>
           <div class="card-cta">Explore <span class="cta-arrow"></span></div>
@@ -672,7 +673,7 @@
         <div class="card-bg"><img src="https://static.wixstatic.com/media/d5773c_36e1f1c872c7470d9415f71a261afc0b~mv2.jpg" alt="Estates" loading="lazy"></div>
         <div class="card-content">
           <span class="card-label">Asset Strategy</span>
-          <h2 class="card-title fit-title" data-fit-min="20">Estates</h2>
+          <h2 class="card-title fit-title" data-fit-min="20" data-fit-group="cards">Estates</h2>
           <div class="card-accent"></div>
           <p class="card-desc">Consultancy for the acquisition of prestigious assets.</p>
           <div class="card-cta">Explore <span class="cta-arrow"></span></div>
@@ -774,7 +775,11 @@
 
             if (dx < 110) {
               const p = (110 - dx) / 110;
-              l.style.color = (x > lx + 14) ? getComputedStyle(document.documentElement).getPropertyValue('--it-green') : (x < lx - 14 ? getComputedStyle(document.documentElement).getPropertyValue('--it-red') : '#FFF');
+              l.style.color = (x > lx + 14)
+                ? getComputedStyle(document.documentElement).getPropertyValue('--it-green').trim()
+                : (x < lx - 14
+                  ? getComputedStyle(document.documentElement).getPropertyValue('--it-red').trim()
+                  : '#FFF');
               l.style.transform = `scale(${1 + p * 0.42}) translateY(${-p * 10}px)`;
               l.style.zIndex = "20";
             } else {
@@ -822,7 +827,9 @@
           const dist = Math.abs(x - lx);
           if (dist < 85) {
             const p = (85 - dist) / 85;
-            l.style.color = lx < x - 15 ? getComputedStyle(document.documentElement).getPropertyValue('--it-green') : lx > x + 15 ? getComputedStyle(document.documentElement).getPropertyValue('--it-red') : '#FFF';
+            const green = getComputedStyle(document.documentElement).getPropertyValue('--it-green').trim();
+            const red = getComputedStyle(document.documentElement).getPropertyValue('--it-red').trim();
+            l.style.color = lx < x - 15 ? green : lx > x + 15 ? red : '#FFF';
             l.style.transform = `scale(${1 + p * 0.3}) translateY(${-p * 8}px)`;
             l.style.textShadow = `0 0 ${12 * p}px currentColor`;
           } else {
@@ -868,13 +875,13 @@
         }, { passive: true });
       }
 
-      // Pro solution: auto-fit titles without truncation
-      function fitOne(el) {
-        if (!el) return;
+      // Pro solution: auto-fit titles with group consistency + aesthetic floor
+      function computeFitPx(el) {
+        if (!el) return null;
 
         const minPx = parseFloat(el.getAttribute('data-fit-min') || '20');
         const parent = el.parentElement;
-        if (!parent) return;
+        if (!parent) return null;
 
         if (!el.dataset.fitMaxPx) {
           const cs = window.getComputedStyle(el);
@@ -885,33 +892,57 @@
         el.style.fontSize = maxPx + 'px';
 
         const maxWidth = parent.clientWidth;
-        if (!maxWidth) return;
+        if (!maxWidth) return maxPx;
 
         let size = maxPx;
         let guard = 0;
 
-        while (el.scrollWidth > maxWidth && size > minPx && guard < 120) {
+        while (el.scrollWidth > maxWidth && size > minPx && guard < 180) {
           size -= 0.5;
           el.style.fontSize = size + 'px';
           guard += 1;
         }
+
+        return size;
       }
 
-      function fitAll() {
-        document.querySelectorAll('.fit-title').forEach(fitOne);
+      function fitGroup(groupName) {
+        const items = Array.from(document.querySelectorAll(`.fit-title[data-fit-group="${groupName}"]`));
+        if (!items.length) return;
+
+        const sizes = items.map(el => computeFitPx(el)).filter(v => typeof v === 'number');
+        if (!sizes.length) return;
+
+        const uniform = Math.min(...sizes);
+
+        const floor = groupName === 'pillars' ? 26 : 20;
+        const finalSize = Math.max(uniform, floor);
+
+        items.forEach(el => {
+          const maxPx = parseFloat(el.dataset.fitMaxPx || finalSize);
+          el.style.fontSize = Math.min(maxPx, finalSize) + 'px';
+        });
       }
 
-      let r = 0;
-      function fitAllRaf() {
-        if (r) cancelAnimationFrame(r);
-        r = requestAnimationFrame(() => { fitAll(); r = 0; });
+      function fitAllGroups() {
+        fitGroup('pillars');
+        fitGroup('cards');
       }
 
-      window.addEventListener('resize', fitAllRaf, { passive: true });
-      window.addEventListener('orientationchange', fitAllRaf, { passive: true });
+      let fitRaf = 0;
+      function fitAllGroupsRaf() {
+        if (fitRaf) cancelAnimationFrame(fitRaf);
+        fitRaf = requestAnimationFrame(() => {
+          fitAllGroups();
+          fitRaf = 0;
+        });
+      }
 
-      fitAll();
-      setTimeout(fitAll, 120);
+      window.addEventListener('resize', fitAllGroupsRaf, { passive: true });
+      window.addEventListener('orientationchange', fitAllGroupsRaf, { passive: true });
+
+      fitAllGroups();
+      setTimeout(fitAllGroups, 120);
     });
   </script>
 </body>
