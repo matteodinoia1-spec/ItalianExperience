@@ -327,39 +327,58 @@
       padding:0 1.5rem;
     }
 
-    @keyframes floatArrow{
-      0%,100%{transform:translateY(0);opacity:0.6}
-      50%{transform:translateY(12px);opacity:1}
-    }
+@keyframes scrollLine{
+  0%{transform:translateY(-18px);opacity:0}
+  30%{opacity:1}
+  100%{transform:translateY(52px);opacity:0}
+}
 
-    .hero-explore{
-      position:absolute;
-      bottom:70px;
-      left:50%;
-      transform:translateX(-50%);
-      z-index:20;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      text-decoration:none;
-      opacity:0.8;
-      transition:all 0.25s ease;
-    }
-    .hero-explore:hover{
-      opacity:1;
-      transform:translateX(-50%) translateY(4px);
-    }
-    .hero-explore span{
-      font-size:0.7rem;
-      text-transform:uppercase;
-      letter-spacing:0.55em;
-      padding-left:0.55em;
-      color:rgba(255,255,255,0.8);
-      margin-bottom:12px;
-    }
-    .hero-explore svg{
-      animation:floatArrow 2s infinite ease-in-out;
-    }
+.explore-indicator{
+  position:absolute;
+  bottom:46px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:20;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+  text-decoration:none;
+  opacity:0.82;
+  transition:opacity 0.2s ease,transform 0.2s ease;
+}
+.explore-indicator:hover{
+  opacity:1;
+  transform:translateX(-50%) translateY(3px);
+}
+
+.explore-indicator span{
+  font-size:0.65rem;
+  text-transform:uppercase;
+  letter-spacing:0.55em;
+  color:rgba(255,255,255,0.78);
+  padding-left:0.55em;
+  white-space:nowrap;
+  text-shadow:0 8px 18px rgba(0,0,0,0.7);
+}
+
+.scroll-track{
+  width:1px;
+  height:54px;
+  background:rgba(255,255,255,0.25);
+  position:relative;
+  overflow:hidden;
+}
+
+.scroll-dot{
+  width:100%;
+  height:16px;
+  background:var(--brand-gold);
+  position:absolute;
+  top:0;
+  left:0;
+  animation:scrollLine 1.6s infinite ease-in-out;
+}
 
     /* LOCATION SWIPER */
     .location-section{
@@ -627,12 +646,13 @@
         </p>
       </div>
 
-      <a href="#advisory" class="hero-explore">
-        <span>Explore</span>
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c5a059" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
-      </a>
+      <a href="#advisory" class="explore-indicator" aria-label="Explore section">
+  <span>Explore</span>
+  <div class="scroll-track" aria-hidden="true">
+    <div class="scroll-dot"></div>
+  </div>
+</a>
+
     </div>
   </section>
 
