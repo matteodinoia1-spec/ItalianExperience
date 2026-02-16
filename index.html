@@ -2,29 +2,29 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@100;300;400;600&family=Great+Vibes&family=Montserrat:wght@700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700&family=Inter:wght@300;400;600&family=Great+Vibes&family=Montserrat:wght@900&display=swap');
 
     :root {
       --brand-gold: #c5a059;
-      --brand-dark: #000000;
+      --bg: #080808;
+      --it-green: #008C45;
+      --it-red: #CD212A;
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
-      background: #000;
+      background: var(--bg);
       color: #fff;
       font-family: 'Inter', sans-serif;
       overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
       scroll-behavior: auto;
       overscroll-behavior-y: none;
       scroll-snap-type: y mandatory;
@@ -43,24 +43,65 @@
       background: #000;
     }
 
-    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 700ms ease, transform 900ms cubic-bezier(0.2, 1, 0.3, 1); will-change: opacity, transform; }
+    /* Reveal */
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity 650ms ease, transform 900ms cubic-bezier(0.2, 1, 0.3, 1); will-change: opacity, transform; }
     .reveal.active { opacity: 1; transform: translateY(0); }
 
+    /* Scroll indicator */
+    @keyframes scrollLine {
+      0% { transform: translateY(-26px); opacity: 0; }
+      30% { opacity: 1; }
+      100% { transform: translateY(74px); opacity: 0; }
+    }
+    .scroll-indicator { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 50; display: flex; flex-direction: column; align-items: center; gap: 10px; opacity: 0.85; pointer-events: none; }
+    .scroll-indicator span { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.55em; color: rgba(255,255,255,0.7); }
+    .scroll-track { width: 1px; height: 56px; background: rgba(255,255,255,0.25); position: relative; overflow: hidden; }
+    .scroll-dot { width: 100%; height: 18px; background: var(--brand-gold); position: absolute; top: 0; left: 0; animation: scrollLine 1.6s infinite ease-in-out; }
+
+    /* Logo prism */
     .pure-logo {
       display: flex;
       align-items: baseline;
-      gap: 15px;
+      gap: 14px;
       position: relative;
-      cursor: pointer;
       user-select: none;
-      text-rendering: optimizeLegibility;
-      padding: 10px;
+      white-space: nowrap;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8));
     }
-    .font-it { font-family: 'Great Vibes', cursive; color: var(--brand-gold); line-height: 1; white-space: nowrap; z-index: 10; }
-    .font-ex { font-family: 'Montserrat', sans-serif; color: var(--brand-gold); font-weight: 900; display: flex; white-space: nowrap; z-index: 10; letter-spacing: -0.02em; }
+    .font-it {
+      font-family: 'Great Vibes', cursive;
+      color: var(--brand-gold);
+      line-height: 1;
+    }
+    .font-ex {
+      font-family: 'Montserrat', sans-serif;
+      color: var(--brand-gold);
+      font-weight: 900;
+      display: flex;
+      letter-spacing: -0.02em;
+    }
     .letter { display: inline-block; position: relative; transition: transform 180ms ease-out, color 180ms ease-out; will-change: transform, color; }
 
-    .portal-wrapper { display: flex; width: 100%; height: 100%; position: relative; overflow: hidden; }
+    .tricolore {
+      position: absolute;
+      display: flex;
+      height: 4px;
+      width: 120px;
+      bottom: -6px;
+      right: 6px;
+    }
+    .tricolore div { flex: 1; }
+
+    /* Desktop portals */
+    .portal-wrapper {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+    }
+
     .portal-pillar {
       position: relative;
       flex: 1;
@@ -79,7 +120,7 @@
     .portal-pillar:last-child { border-right: none; }
     .portal-pillar:hover { flex: 2.5; }
 
-    .pillar-bg { position: absolute; inset: 0; z-index: 0; transition: transform 1.4s ease, filter 900ms ease; filter: brightness(0.2); }
+    .pillar-bg { position: absolute; inset: 0; z-index: 0; transition: transform 1.4s ease, filter 900ms ease; filter: brightness(0.22); }
     .pillar-bg img { width: 100%; height: 100%; object-fit: cover; }
     .portal-pillar:hover .pillar-bg { filter: brightness(0.45); transform: scale(1.12); }
 
@@ -94,10 +135,12 @@
       opacity: 0.55;
       transition: transform 500ms ease, opacity 500ms ease, letter-spacing 500ms ease, color 500ms ease;
       white-space: nowrap;
+      text-align: center;
     }
     .portal-pillar:hover .label { opacity: 1; transform: scale(1.18); letter-spacing: 0.6em; color: #fff; }
 
-    .title-portal { font-size: clamp(2.2rem, 4.5vw, 5rem); line-height: 1; margin-bottom: 2.5rem; color: #fff; text-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+    .title-portal { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 4.5vw, 5rem); line-height: 1; margin-bottom: 2.2rem; color: #fff; text-shadow: 0 10px 30px rgba(0,0,0,0.6); text-align: center; font-style: italic; }
+
     .description {
       font-size: clamp(0.8rem, 1vw, 1.1rem);
       color: #e0e0e0;
@@ -106,185 +149,365 @@
       opacity: 0;
       overflow: hidden;
       transition: opacity 600ms ease, margin 600ms ease, height 600ms ease;
-      max-width: 320px;
+      max-width: 340px;
       margin: 0 auto;
+      text-align: center;
     }
     .portal-pillar:hover .description { height: auto; opacity: 1; margin-top: 1rem; margin-bottom: 4rem; }
 
     .gold-line { width: 1px; height: 50px; background: var(--brand-gold); margin: 0 auto 2rem auto; transition: height 450ms ease, opacity 450ms ease; opacity: 0.6; }
     .portal-pillar:hover .gold-line { height: 80px; opacity: 1; }
 
-    .essence-section { height: 100%; display: flex; align-items: center; justify-content: center; padding: clamp(2rem, 6vw, 6rem); }
+    /* Section 2 */
+    .essence-inner {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(1.8rem, 6vw, 6rem);
+    }
     .essence-card {
       position: relative;
       z-index: 10;
+      width: 100%;
+      max-width: 1200px;
       background: rgba(10, 10, 10, 0.45);
       backdrop-filter: blur(22px);
       border: 1px solid rgba(197, 160, 89, 0.15);
       padding: clamp(2.2rem, 5vw, 5.5rem);
-      max-width: 1200px;
-      width: 100%;
     }
 
-    .editorial-inner { height: 100%; display: flex; align-items: center; padding: clamp(2rem, 6vw, 6rem); }
-    .footer-inner { height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: clamp(2rem, 6vw, 6rem); }
+    /* Section 3 */
+    .editorial-inner {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding: clamp(2rem, 6vw, 6rem);
+      padding-bottom: 190px;
+      background: #050505;
+    }
 
+    .footer-bar {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(18px);
+    }
+
+    /* Mobile portal cards */
+    .mobile-portal {
+      display: none;
+      height: 100%;
+      position: relative;
+    }
+
+    .mobile-hero {
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 22px 18px 22px 18px;
+    }
+
+    .mobile-bg { position: absolute; inset: 0; z-index: 0; }
+    .mobile-bg img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.35); transform: scale(1.02); }
+
+    .mobile-topfade {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 170px;
+      z-index: 1;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0) 100%);
+    }
+
+    .mobile-logo-wrap {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      justify-content: center;
+      padding-top: 10px;
+    }
+
+    .mobile-logo {
+      transform: scale(0.44);
+      transform-origin: top center;
+      position: relative;
+    }
+
+    .mobile-stack {
+      position: relative;
+      z-index: 5;
+      display: grid;
+      gap: 12px;
+      padding-bottom: 70px;
+    }
+
+    .mcard {
+      border: 1px solid rgba(197, 160, 89, 0.14);
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(10px);
+      border-radius: 18px;
+      padding: 16px 16px 14px 16px;
+      text-decoration: none;
+      color: #fff;
+      display: block;
+    }
+
+    .mcard:active {
+      transform: translateY(-2px);
+      transition: transform 120ms ease;
+    }
+
+    .m-label { color: var(--brand-gold); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.22em; font-weight: 700; opacity: 0.95; }
+    .m-title { font-family: 'Playfair Display', serif; font-size: 1.75rem; font-style: italic; margin-top: 6px; line-height: 1.05; }
+    .m-desc { margin-top: 8px; font-size: 0.88rem; color: rgba(255,255,255,0.78); line-height: 1.5; font-weight: 300; max-width: 30ch; }
+    .m-cta { margin-top: 12px; display: inline-flex; align-items: center; gap: 10px; color: var(--brand-gold); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 700; }
+    .m-arrow { width: 16px; height: 1px; background: var(--brand-gold); position: relative; }
+    .m-arrow:after { content: ""; position: absolute; right: 0; top: 50%; width: 7px; height: 7px; border-right: 1px solid var(--brand-gold); border-top: 1px solid var(--brand-gold); transform: translateY(-50%) rotate(45deg); }
+
+    /* Breakpoints */
     @media (max-width: 768px) {
-      .portal-wrapper { flex-direction: column; }
-      .portal-pillar { border-right: none; border-bottom: 1px solid rgba(197, 160, 89, 0.1); padding: 4.5rem 2rem; }
-      .title-portal { font-size: 3rem; }
-      .essence-card { text-align: center; }
+      .portal-wrapper { display: none; }
+      .mobile-portal { display: block; }
+      .scroll-indicator { bottom: 20px; }
+      .tricolore { width: 92px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      html, body { scroll-behavior: auto; }
-      .portal-pillar, .pillar-bg, .reveal { transition: none; }
+      .reveal { transition: none; }
+      .portal-pillar, .pillar-bg { transition: none; }
+      .scroll-dot { animation: none; }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- 1 -->
+  <!-- SECTION 1 -->
   <section class="snap-section" data-snap>
+    <!-- Desktop -->
     <div class="portal-wrapper">
+
       <div class="absolute top-12 left-12 z-[100] scale-[0.35] md:scale-[0.55] origin-top-left pointer-events-auto">
         <a href="http://www.italianexp.com" target="_top" class="block no-underline">
           <div class="pure-logo" id="logo-main">
             <span class="font-it text-[100px]">Italian</span>
             <div class="font-ex text-[55px]" data-text="EXPERIENCE"></div>
-            <div class="absolute flex h-[4px] bottom-[-2px] right-2 w-[120px]">
-              <div class="bg-[#008C45] flex-1"></div>
-              <div class="bg-white flex-1"></div>
-              <div class="bg-[#CD212A] flex-1"></div>
+            <div class="tricolore">
+              <div style="background: var(--it-green)"></div>
+              <div style="background: #fff"></div>
+              <div style="background: var(--it-red)"></div>
             </div>
           </div>
         </a>
       </div>
 
-      <a href="https://www.italianexp.com/travel" target="_top" class="portal-pillar group">
+      <a href="https://www.italianexp.com/travel" target="_top" class="portal-pillar">
         <div class="pillar-bg"><img src="https://static.wixstatic.com/media/d5773c_5b1c6af4c7044e6c9771c2293bb6297a~mv2.avif" alt="Travel"></div>
-        <div class="relative z-30 text-center">
+        <div class="relative z-30">
           <span class="label">Bespoke Curation</span>
           <div class="gold-line"></div>
-          <h2 class="brand-font title-portal italic">Travel</h2>
+          <h2 class="title-portal">Travel</h2>
           <p class="description">Elite strategic curation for metropolitan and coastal odysseys.</p>
         </div>
       </a>
 
       <a href="https://www.italianexp.com/recruitment" target="_top" class="portal-pillar">
         <div class="pillar-bg"><img src="https://static.wixstatic.com/media/d5773c_453bb04371f74ec090587c4fd9b81ff1~mv2.avif" alt="Recruitment"></div>
-        <div class="relative z-30 text-center">
+        <div class="relative z-30">
           <span class="label">Staffing Excellence</span>
           <div class="gold-line"></div>
-          <h2 class="brand-font title-portal italic">Recruitment</h2>
+          <h2 class="title-portal">Recruitment</h2>
           <p class="description">Heritage ambassadors for prestigious hospitality.</p>
         </div>
       </a>
 
       <a href="https://www.italianexp.com/flavors" target="_top" class="portal-pillar">
         <div class="pillar-bg"><img src="https://static.wixstatic.com/media/d5773c_0de64c976fdf4528b0862bfb39365431~mv2.avif" alt="Flavors"></div>
-        <div class="relative z-30 text-center">
+        <div class="relative z-30">
           <span class="label">Premium Imports</span>
           <div class="gold-line"></div>
-          <h2 class="brand-font title-portal italic">Flavors</h2>
+          <h2 class="title-portal">Flavors</h2>
           <p class="description">A personally tested selection of authentic culinary staples.</p>
         </div>
       </a>
 
       <a href="https://www.italianexp.com/estates" target="_top" class="portal-pillar">
         <div class="pillar-bg"><img src="https://static.wixstatic.com/media/d5773c_36e1f1c872c7470d9415f71a261afc0b~mv2.jpg" alt="Estates"></div>
-        <div class="relative z-30 text-center">
+        <div class="relative z-30">
           <span class="label">Asset Strategy</span>
           <div class="gold-line"></div>
-          <h2 class="brand-font title-portal italic">Estates</h2>
+          <h2 class="title-portal">Estates</h2>
           <p class="description">Consultancy for the acquisition of prestigious assets.</p>
         </div>
       </a>
+
+    </div>
+
+    <!-- Mobile -->
+    <div class="mobile-portal">
+      <div class="mobile-hero">
+        <div class="mobile-topfade"></div>
+
+        <div class="mobile-bg" aria-hidden="true">
+          <img src="https://static.wixstatic.com/media/d5773c_786075d042c4450dad71e9dec1a0b59a~mv2.avif" alt="" loading="eager" />
+        </div>
+
+        <div class="mobile-logo-wrap">
+          <a href="http://www.italianexp.com" target="_top" class="block no-underline">
+            <div class="pure-logo mobile-logo" id="logo-mobile">
+              <span class="font-it text-[92px]">Italian</span>
+              <div class="font-ex text-[46px]" data-text="EXPERIENCE"></div>
+              <div class="tricolore" style="width: 96px; right: 10px;">
+                <div style="background: var(--it-green)"></div>
+                <div style="background: #fff"></div>
+                <div style="background: var(--it-red)"></div>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="mobile-stack">
+          <a class="mcard" href="https://www.italianexp.com/travel" target="_top">
+            <div class="m-label">Bespoke Curation</div>
+            <div class="m-title">Travel</div>
+            <div class="m-desc">Elite strategic curation for metropolitan and coastal odysseys.</div>
+            <div class="m-cta">Explore <span class="m-arrow"></span></div>
+          </a>
+
+          <a class="mcard" href="https://www.italianexp.com/recruitment" target="_top">
+            <div class="m-label">Staffing Excellence</div>
+            <div class="m-title">Recruitment</div>
+            <div class="m-desc">Heritage ambassadors for prestigious hospitality.</div>
+            <div class="m-cta">Explore <span class="m-arrow"></span></div>
+          </a>
+
+          <a class="mcard" href="https://www.italianexp.com/flavors" target="_top">
+            <div class="m-label">Premium Imports</div>
+            <div class="m-title">Flavors</div>
+            <div class="m-desc">A personally tested selection of authentic culinary staples.</div>
+            <div class="m-cta">Explore <span class="m-arrow"></span></div>
+          </a>
+
+          <a class="mcard" href="https://www.italianexp.com/estates" target="_top">
+            <div class="m-label">Asset Strategy</div>
+            <div class="m-title">Estates</div>
+            <div class="m-desc">Consultancy for the acquisition of prestigious assets.</div>
+            <div class="m-cta">Explore <span class="m-arrow"></span></div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-indicator" aria-hidden="true">
+      <span>Scroll</span>
+      <div class="scroll-track"><div class="scroll-dot"></div></div>
     </div>
   </section>
 
-  <!-- 2 -->
+  <!-- SECTION 2 -->
   <section class="snap-section" data-snap>
-    <div class="essence-section">
-      <div class="absolute inset-0">
-        <img src="https://static.wixstatic.com/media/d5773c_290aab9fd26f45a68a9263cc30b2a95a~mv2.avif"
-             class="w-full h-full object-cover brightness-[0.25]"
-             id="essence-parallax"
-             alt="">
-      </div>
+    <div class="absolute inset-0" aria-hidden="true">
+      <img
+        src="https://static.wixstatic.com/media/d5773c_290aab9fd26f45a68a9263cc30b2a95a~mv2.avif"
+        class="w-full h-full object-cover brightness-[0.25]"
+        id="essence-parallax"
+        alt=""
+        loading="lazy"
+      />
+    </div>
 
+    <div class="essence-inner">
       <div class="essence-card reveal">
-        <span class="text-[0.7rem] uppercase tracking-[0.8em] text-[#c5a059] block mb-10">Discovery & Identity</span>
-        <h2 class="brand-font text-5xl md:text-8xl mb-12 leading-[1.05] tracking-tight">
-          Ambassadors of the <br><span class="italic text-[#c5a059]">Italian Soul.</span>
+        <span class="text-[0.7rem] uppercase tracking-[0.8em] text-[#c5a059] block mb-8">Discovery & Identity</span>
+        <h2 class="brand-font text-4xl md:text-8xl mb-8 leading-[1.05] tracking-tight">
+          Ambassadors of the <br /><span class="italic text-[#c5a059]">Italian Soul.</span>
         </h2>
-        <p class="text-slate-200 font-light text-xl md:text-3xl max-w-4xl leading-relaxed mb-16 opacity-90">
+        <p class="text-white/80 font-light text-base md:text-3xl max-w-4xl leading-relaxed mb-10">
           Nati tra le icone dell'ospitalità globale, curiamo esperienze che trascendono il lusso. Non si tratta solo di dove vai, ma dell'eredità che senti.
         </p>
-        <a href="#" class="inline-block border border-[#c5a059] text-[#c5a059] px-16 py-6 text-[0.8rem] uppercase tracking-[0.5em] hover:bg-[#c5a059] hover:text-black transition-all">
+        <a href="#" class="inline-block border border-[#c5a059] text-[#c5a059] px-10 md:px-16 py-4 md:py-6 text-[0.75rem] uppercase tracking-[0.45em] hover:bg-[#c5a059] hover:text-black transition-all">
           Explore Heritage
         </a>
       </div>
     </div>
   </section>
 
-  <!-- 3 -->
+  <!-- SECTION 3 -->
   <section class="snap-section bg-[#050505] border-t border-white/5" data-snap>
     <div class="editorial-inner">
-      <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 md:gap-32 items-center w-full">
+      <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-14 md:gap-28 items-center w-full">
         <div class="reveal">
-          <h3 class="brand-font text-5xl md:text-6xl mb-10 leading-tight">
-            We learned from the best, to give you the <span class="italic">real</span> Italy.
+          <div class="flex items-center gap-3 mb-6 justify-center md:justify-start">
+            <div class="w-10 h-[1px]" style="background: var(--brand-gold)"></div>
+            <span class="uppercase tracking-[0.35em] text-[0.75rem] text-[#c5a059] font-bold">Heritage & Vision</span>
+            <div class="w-10 h-[1px]" style="background: var(--brand-gold)"></div>
+          </div>
+
+          <h3 class="brand-font text-4xl md:text-6xl mb-8 leading-tight text-center md:text-left">
+            We learned from the best, <br />to give you the <span class="italic">real</span> Italy.
           </h3>
-          <p class="text-slate-400 font-light text-2xl leading-relaxed">
+          <p class="text-white/55 font-light text-base md:text-2xl leading-relaxed text-center md:text-left">
             Lavorare al fianco di icone mondiali ci ha insegnato che il lusso è invisibile: si trova nel silenzio perfetto di una tenuta privata.
           </p>
         </div>
 
-        <div class="reveal" style="transition-delay: 0.18s;">
-          <div class="p-10 md:p-16 border border-[#c5a059]/15 bg-black/40 backdrop-blur-2xl">
-            <p class="text-white italic text-4xl brand-font leading-snug">
-              "Il lusso è l'arte di far apparire l'impossibile come qualcosa di assolutamente naturale."
+        <div class="reveal" style="transition-delay: 0.15s;">
+          <div class="p-8 md:p-14 border border-[#c5a059]/15 bg-black/40 backdrop-blur-2xl">
+            <p class="text-white italic text-2xl md:text-4xl brand-font leading-snug">
+              "Heads of state taught us the art of making the impossible happen."
             </p>
-            <div class="mt-12 h-px w-24 bg-[#c5a059]"></div>
+            <div class="mt-10 h-px w-20" style="background: var(--brand-gold)"></div>
           </div>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- 4 footer -->
-  <section class="snap-section bg-black border-t border-white/5" data-snap>
-    <div class="footer-inner">
-      <a href="http://www.italianexp.com" target="_top" class="block no-underline mb-16">
-        <div class="pure-logo scale-90 relative" id="logo-footer">
-          <span class="font-it text-[55px]">Italian</span>
-          <div class="font-ex text-[30px]" data-text="EXPERIENCE"></div>
-          <div class="absolute flex h-[3px] bottom-[-2px] right-1 w-[80px]">
-            <div class="bg-[#008C45] flex-1"></div>
-            <div class="bg-white flex-1"></div>
-            <div class="bg-[#CD212A] flex-1"></div>
+    <!-- Footer inside last section -->
+    <div class="footer-bar">
+      <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col items-center">
+        <a href="http://www.italianexp.com" target="_top" class="block no-underline mb-6">
+          <div class="pure-logo scale-[0.75] relative" id="logo-footer">
+            <span class="font-it text-[64px]">Italian</span>
+            <div class="font-ex text-[34px]" data-text="EXPERIENCE"></div>
+            <div class="tricolore" style="width: 92px; right: 10px;">
+              <div style="background: var(--it-green)"></div>
+              <div style="background: #fff"></div>
+              <div style="background: var(--it-red)"></div>
+            </div>
           </div>
-        </div>
-      </a>
-      <p class="text-slate-600 uppercase tracking-[0.7em] text-[0.7rem] opacity-60 font-light">
-        &copy; Italian Experience - Est. 2026
-      </p>
+        </a>
+
+        <p class="text-white/35 uppercase tracking-[0.45em] text-[0.65rem] font-light text-center">
+          © 2026 Italian Experience · Strategic Advisory
+        </p>
+      </div>
     </div>
   </section>
 
   <script>
-    // Prism logo init
-    function initLogo(id) {
+    // Build EXPERIENCE letters
+    function buildLetters() {
+      document.querySelectorAll('.font-ex').forEach(ex => {
+        const text = ex.getAttribute('data-text') || '';
+        ex.innerHTML = text.split('').map(c => `<span class="letter">${c}</span>`).join('');
+      });
+    }
+
+    // Prism logo mouse effect (desktop only)
+    function initLogoMouse(id) {
       const el = document.getElementById(id);
       if (!el) return;
-      const ex = el.querySelector('.font-ex');
-      const it = el.querySelector('.font-it');
-      ex.innerHTML = ex.dataset.text.split('').map(c => `<span class="letter">${c}</span>`).join('');
-      const letters = el.querySelectorAll('.letter');
 
       if (!window.matchMedia("(pointer: fine)").matches) return;
+
+      const it = el.querySelector('.font-it');
+      const letters = el.querySelectorAll('.letter');
 
       el.addEventListener('mousemove', (e) => {
         const r = el.getBoundingClientRect();
@@ -299,14 +522,14 @@
         it.style.transform = `scale(${1 + pIt * 0.05})`;
 
         letters.forEach(l => {
-          const lRect = l.getBoundingClientRect();
-          const lx = lRect.left + lRect.width / 2 - r.left;
+          const lr = l.getBoundingClientRect();
+          const lx = lr.left + lr.width / 2 - r.left;
           const dx = Math.abs(x - lx);
 
-          if (dx < 120) {
-            const p = (120 - dx) / 120;
-            l.style.color = (x > lx + 15) ? '#008C45' : (x < lx - 15 ? '#CD212A' : '#FFF');
-            l.style.transform = `scale(${1 + p * 0.45}) translateY(${-p * 12}px)`;
+          if (dx < 110) {
+            const p = (110 - dx) / 110;
+            l.style.color = (x > lx + 14) ? getComputedStyle(document.documentElement).getPropertyValue('--it-green') : (x < lx - 14 ? getComputedStyle(document.documentElement).getPropertyValue('--it-red') : '#FFF');
+            l.style.transform = `scale(${1 + p * 0.42}) translateY(${-p * 10}px)`;
             l.style.zIndex = "20";
           } else {
             l.style.color = '';
@@ -328,13 +551,11 @@
     }
 
     // Reveal observer
-    const obs = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) entry.target.classList.add('active');
-      }
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
     }, { threshold: 0.12 });
 
-    // Snap controller: one section per wheel/touch
+    // Snap controller one section per scroll/touch
     const sections = Array.from(document.querySelectorAll('[data-snap]'));
     let index = 0;
     let locked = false;
@@ -348,26 +569,24 @@
       window.setTimeout(() => { locked = false; }, 650);
     }
 
-    // Keep index in sync when user scrolls via scrollbar or momentum
+    // Keep index in sync
     const secObs = new IntersectionObserver((entries) => {
       let best = null;
       for (const e of entries) {
         if (!best || e.intersectionRatio > best.intersectionRatio) best = e;
       }
       if (best && best.isIntersecting) index = sections.indexOf(best.target);
-    }, { threshold: [0.55, 0.65, 0.75] });
+    }, { threshold: [0.55, 0.7, 0.85] });
     sections.forEach(s => secObs.observe(s));
 
-    // Wheel
     window.addEventListener('wheel', (e) => {
       if (locked) { e.preventDefault(); return; }
       const d = e.deltaY;
-      if (Math.abs(d) < 8) return;
+      if (Math.abs(d) < 10) return;
       e.preventDefault();
       scrollToIndex(index + (d > 0 ? 1 : -1));
     }, { passive: false });
 
-    // Touch
     let touchStartY = null;
     window.addEventListener('touchstart', (e) => {
       if (e.touches && e.touches[0]) touchStartY = e.touches[0].clientY;
@@ -383,11 +602,10 @@
       scrollToIndex(index + (dy > 0 ? 1 : -1));
     }, { passive: true });
 
-    // Parallax light, only when section is visible
+    // Parallax light only when section 2 is visible
     const parallaxImg = document.getElementById('essence-parallax');
     const parallaxSection = parallaxImg ? parallaxImg.closest('section') : null;
     let parallaxOn = false;
-    let raf = 0;
 
     if (parallaxSection && parallaxImg) {
       const pObs = new IntersectionObserver((entries) => {
@@ -400,18 +618,21 @@
           const rect = parallaxSection.getBoundingClientRect();
           const vh = window.innerHeight || document.documentElement.clientHeight;
           const progress = (vh - rect.top) / (vh + rect.height);
-          const offset = (progress - 0.5) * 80;
+          const offset = (progress - 0.5) * 70;
           parallaxImg.style.transform = `translateY(${offset}px) scale(1.18)`;
         }
-        raf = requestAnimationFrame(tick);
+        requestAnimationFrame(tick);
       }
-      raf = requestAnimationFrame(tick);
+      requestAnimationFrame(tick);
     }
 
     window.addEventListener('load', () => {
-      initLogo('logo-main');
-      initLogo('logo-footer');
-      document.querySelectorAll('.reveal').forEach(r => obs.observe(r));
+      buildLetters();
+      initLogoMouse('logo-main');
+      initLogoMouse('logo-footer');
+      initLogoMouse('logo-mobile');
+
+      document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
       scrollToIndex(0);
     }, { passive: true });
   </script>
