@@ -8,505 +8,499 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700&family=Inter:wght@300;400;600&family=Great+Vibes&family=Montserrat:wght@900&display=swap');
 
-    :root {
-      --brand-gold: #c5a059;
-      --brand-obsidian: #080808;
-      --it-green: #008C45;
-      --it-red: #CD212A;
+    :root{
+      --brand-gold:#c5a059;
+      --brand-obsidian:#080808;
+      --it-green:#008C45;
+      --it-red:#CD212A;
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      background: var(--brand-obsidian);
-      color: #fff;
-      font-family: 'Inter', sans-serif;
-      overflow-x: hidden;
-      scroll-behavior: smooth;
-      -webkit-font-smoothing: antialiased;
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{
+      margin:0;
+      padding:0;
+      width:100%;
+      background:var(--brand-obsidian);
+      color:#fff;
+      font-family:'Inter',sans-serif;
+      overflow-x:hidden;
+      scroll-behavior:smooth;
+      -webkit-font-smoothing:antialiased;
     }
+    a{color:inherit}
 
-    .brand-font { font-family: 'Playfair Display', serif; }
-    a { color: inherit; }
+    .brand-font{font-family:'Playfair Display',serif}
 
     /* Reveal */
-    .reveal { opacity: 0; transform: translateY(18px); transition: opacity 650ms ease, transform 900ms cubic-bezier(0.2, 1, 0.3, 1); }
-    .reveal.active { opacity: 1; transform: translateY(0); }
+    .reveal{opacity:0;transform:translateY(18px);transition:opacity 650ms ease,transform 900ms cubic-bezier(0.2,1,0.3,1)}
+    .reveal.active{opacity:1;transform:translateY(0)}
 
     /* Scroll indicator (no pill, no circle) */
-    @keyframes scrollLine {
-      0% { transform: translateY(-18px); opacity: 0; }
-      30% { opacity: 1; }
-      100% { transform: translateY(52px); opacity: 0; }
+    @keyframes scrollLine{
+      0%{transform:translateY(-18px);opacity:0}
+      30%{opacity:1}
+      100%{transform:translateY(52px);opacity:0}
     }
-
-    .scroll-indicator {
-      position: absolute;
-      bottom: 26px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 90;
-      pointer-events: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      text-shadow: 0 8px 18px rgba(0,0,0,0.7);
+    .scroll-indicator{
+      position:absolute;
+      bottom:26px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:90;
+      pointer-events:none;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:10px;
+      text-shadow:0 8px 18px rgba(0,0,0,0.7);
     }
-
-    .scroll-indicator span {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.55em;
-      color: rgba(255,255,255,0.78);
-      padding-left: 0.55em;
-      white-space: nowrap;
+    .scroll-indicator span{
+      font-size:0.65rem;
+      text-transform:uppercase;
+      letter-spacing:0.55em;
+      color:rgba(255,255,255,0.78);
+      padding-left:0.55em;
+      white-space:nowrap;
     }
-
-    .scroll-track {
-      width: 1px;
-      height: 54px;
-      background: rgba(255,255,255,0.25);
-      position: relative;
-      overflow: hidden;
+    .scroll-track{
+      width:1px;
+      height:54px;
+      background:rgba(255,255,255,0.25);
+      position:relative;
+      overflow:hidden;
     }
-
-    .scroll-dot {
-      width: 100%;
-      height: 16px;
-      background: var(--brand-gold);
-      position: absolute;
-      top: 0;
-      left: 0;
-      animation: scrollLine 1.6s infinite ease-in-out;
+    .scroll-dot{
+      width:100%;
+      height:16px;
+      background:var(--brand-gold);
+      position:absolute;
+      top:0;
+      left:0;
+      animation:scrollLine 1.6s infinite ease-in-out;
     }
 
     /* Logo */
-    .pure-logo {
-      display: flex;
-      align-items: baseline;
-      gap: 14px;
-      position: relative;
-      user-select: none;
-      white-space: nowrap;
-      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8));
+    .pure-logo{
+      display:flex;
+      align-items:baseline;
+      gap:14px;
+      position:relative;
+      user-select:none;
+      white-space:nowrap;
+      filter:drop-shadow(0 4px 10px rgba(0,0,0,0.8));
     }
-    .font-it { font-family: 'Great Vibes', cursive; color: var(--brand-gold); line-height: 1; }
-    .font-ex { font-family: 'Montserrat', sans-serif; color: var(--brand-gold); font-weight: 900; display: flex; letter-spacing: -0.02em; }
-    .letter { display: inline-block; position: relative; will-change: transform, color; transition: transform 180ms ease-out, color 180ms ease-out; }
+    .font-it{font-family:'Great Vibes',cursive;color:var(--brand-gold);line-height:1}
+    .font-ex{font-family:'Montserrat',sans-serif;color:var(--brand-gold);font-weight:900;display:flex;letter-spacing:-0.02em}
+    .letter{display:inline-block;position:relative;will-change:transform,color;transition:transform 180ms ease-out,color 180ms ease-out}
 
-    .tricolore {
-      position: absolute;
-      display: flex;
-      height: 4px;
-      bottom: -6px;
-      right: 6px;
-      width: clamp(84px, 10vw, 120px);
+    .tricolore{
+      position:absolute;
+      display:flex;
+      height:4px;
+      bottom:-6px;
+      right:6px;
+      width:clamp(84px,10vw,120px);
     }
-    .tricolore div { flex: 1; }
+    .tricolore div{flex:1}
 
-    /* Desktop: Portal pillars */
-    .desktop-only { display: block; }
-    .mobile-only { display: none; }
-
-    .portal-wrapper {
-      display: flex;
-      width: 100%;
-      height: 100vh;
-      height: 100dvh;
-      min-height: 100vh;
-      position: relative;
-      overflow: hidden;
-      background: #000;
+    /* Fit titles (pro solution) */
+    .fit-title{
+      white-space:nowrap;
+      display:inline-block;
+      max-width:100%;
+      overflow:visible;
     }
 
-    .portal-pillar {
-      position: relative;
-      flex: 1;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 5rem 1rem;
-      text-decoration: none;
-      transition: flex 700ms cubic-bezier(0.25, 1, 0.3, 1);
-      border-right: 1px solid rgba(197, 160, 89, 0.15);
-      overflow: hidden;
-      z-index: 10;
-    }
-    .portal-pillar:last-child { border-right: none; }
-    .portal-pillar:hover { flex: 2.5; }
+    /* Desktop */
+    .desktop-only{display:block}
+    .mobile-only{display:none}
 
-    .pillar-bg { position: absolute; inset: 0; z-index: 0; transition: transform 1.4s ease, filter 900ms ease; filter: brightness(0.22); }
-    .pillar-bg img { width: 100%; height: 100%; object-fit: cover; }
-    .portal-pillar:hover .pillar-bg { filter: brightness(0.45); transform: scale(1.12); }
-
-    .pillar-inner { position: relative; z-index: 5; text-align: center; padding-inline: 12px; }
-    .label {
-      color: var(--brand-gold);
-      font-size: clamp(0.62rem, 0.8vw, 0.9rem);
-      text-transform: uppercase;
-      letter-spacing: 0.5em;
-      font-weight: 700;
-      margin-bottom: 1.2rem;
-      opacity: 0.55;
-      transition: transform 500ms ease, opacity 500ms ease, letter-spacing 500ms ease, color 500ms ease;
-      white-space: normal;
-      line-height: 1.3;
-      overflow-wrap: anywhere;
-    }
-    .portal-pillar:hover .label { opacity: 1; transform: scale(1.14); letter-spacing: 0.56em; color: #fff; }
-
-    .gold-line { width: 1px; height: 46px; background: var(--brand-gold); margin: 0 auto 1.6rem auto; opacity: 0.6; transition: height 450ms ease, opacity 450ms ease; }
-    .portal-pillar:hover .gold-line { height: 74px; opacity: 1; }
-
-    /* Titles: NEVER wrap, scale down until readable */
-    .title-portal {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.55rem, 4.2vw, 5rem);
-      line-height: 1.02;
-      margin-bottom: 1.2rem;
-      color: #fff;
-      text-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      font-style: italic;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
+    .portal-wrapper{
+      display:flex;
+      width:100%;
+      height:100vh;
+      height:100dvh;
+      min-height:100vh;
+      position:relative;
+      overflow:hidden;
+      background:#000;
     }
 
-    .description {
-      font-size: clamp(0.82rem, 1vw, 1.1rem);
-      color: rgba(255,255,255,0.82);
-      line-height: 1.6;
-      max-width: 360px;
-      margin: 0 auto;
-      opacity: 0;
-      max-height: 0;
-      overflow: hidden;
-      transition: opacity 600ms ease, max-height 650ms ease, margin 600ms ease;
+    .portal-pillar{
+      position:relative;
+      flex:1;
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      padding:5rem 1rem;
+      text-decoration:none;
+      transition:flex 700ms cubic-bezier(0.25,1,0.3,1);
+      border-right:1px solid rgba(197,160,89,0.15);
+      overflow:hidden;
+      z-index:10;
     }
-    .portal-pillar:hover .description { opacity: 1; max-height: 140px; margin-top: 0.6rem; margin-bottom: 3.2rem; }
+    .portal-pillar:last-child{border-right:none}
+    .portal-pillar:hover{flex:2.5}
 
-    /* Desktop: Essence and Editorial */
-    .essence-section {
-      position: relative;
-      min-height: 100vh;
-      padding: clamp(3rem, 8vw, 7rem) 5%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #000;
-      overflow: hidden;
+    .pillar-bg{position:absolute;inset:0;z-index:0;transition:transform 1.4s ease,filter 900ms ease;filter:brightness(0.22)}
+    .pillar-bg img{width:100%;height:100%;object-fit:cover}
+    .portal-pillar:hover .pillar-bg{filter:brightness(0.45);transform:scale(1.12)}
+
+    .pillar-inner{position:relative;z-index:5;text-align:center;padding-inline:12px}
+
+    .label{
+      color:var(--brand-gold);
+      font-size:clamp(0.62rem,0.8vw,0.9rem);
+      text-transform:uppercase;
+      letter-spacing:0.5em;
+      font-weight:700;
+      margin-bottom:1.2rem;
+      opacity:0.55;
+      transition:transform 500ms ease,opacity 500ms ease,letter-spacing 500ms ease,color 500ms ease;
+      line-height:1.3;
+      overflow-wrap:anywhere;
     }
+    .portal-pillar:hover .label{opacity:1;transform:scale(1.14);letter-spacing:0.56em;color:#fff}
 
-    .essence-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-    .essence-bg img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.25); transform: scale(1.12); }
-
-    .essence-card {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      max-width: 1200px;
-      background: rgba(10, 10, 10, 0.45);
-      backdrop-filter: blur(22px);
-      border: 1px solid rgba(197, 160, 89, 0.15);
-      padding: clamp(2.2rem, 5vw, 5.5rem);
+    .gold-line{
+      width:1px;
+      height:46px;
+      background:var(--brand-gold);
+      margin:0 auto 1.6rem auto;
+      opacity:0.6;
+      transition:height 450ms ease,opacity 450ms ease;
     }
+    .portal-pillar:hover .gold-line{height:74px;opacity:1}
 
-    .essence-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2.2rem, 5.2vw, 5.3rem);
-      line-height: 1.06;
-      letter-spacing: -0.02em;
-      margin: 0 0 1.2rem 0;
-      overflow-wrap: anywhere;
-    }
-
-    .essence-p {
-      font-size: clamp(1rem, 2vw, 1.85rem);
-      line-height: 1.55;
-      color: rgba(255,255,255,0.82);
-      max-width: 60ch;
-      margin: 0 0 2.2rem 0;
-      overflow-wrap: anywhere;
-    }
-
-    .editorial-section {
-      position: relative;
-      background: #050505;
-      border-top: 1px solid rgba(255,255,255,0.06);
-      padding: clamp(3.4rem, 7vw, 7rem) 5%;
-      padding-bottom: 190px;
-      overflow: hidden;
+    .title-portal{
+      font-family:'Playfair Display',serif;
+      font-size:clamp(1.55rem,4.2vw,5rem);
+      line-height:1.02;
+      margin:0 0 1.2rem 0;
+      color:#fff;
+      text-shadow:0 10px 30px rgba(0,0,0,0.6);
+      font-style:italic;
     }
 
-    .editorial-grid {
-      max-width: 1280px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: clamp(2.4rem, 6vw, 7rem);
-      align-items: center;
+    .description{
+      font-size:clamp(0.82rem,1vw,1.1rem);
+      color:rgba(255,255,255,0.82);
+      line-height:1.6;
+      max-width:360px;
+      margin:0 auto;
+      opacity:0;
+      max-height:0;
+      overflow:hidden;
+      transition:opacity 600ms ease,max-height 650ms ease,margin 600ms ease;
+    }
+    .portal-pillar:hover .description{opacity:1;max-height:140px;margin-top:0.6rem;margin-bottom:3.2rem}
+
+    /* Section 2 */
+    .essence-section{
+      position:relative;
+      min-height:100vh;
+      padding:clamp(3rem,8vw,7rem) 5%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#000;
+      overflow:hidden;
+    }
+    .essence-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
+    .essence-bg img{width:100%;height:100%;object-fit:cover;filter:brightness(0.25);transform:scale(1.12)}
+    .essence-card{
+      position:relative;
+      z-index:2;
+      width:100%;
+      max-width:1200px;
+      background:rgba(10,10,10,0.45);
+      backdrop-filter:blur(22px);
+      border:1px solid rgba(197,160,89,0.15);
+      padding:clamp(2.2rem,5vw,5.5rem);
+    }
+    .essence-title{
+      font-family:'Playfair Display',serif;
+      font-size:clamp(2.2rem,5.2vw,5.3rem);
+      line-height:1.06;
+      letter-spacing:-0.02em;
+      margin:0 0 1.2rem 0;
+      overflow-wrap:anywhere;
+    }
+    .essence-p{
+      font-size:clamp(1rem,2vw,1.85rem);
+      line-height:1.55;
+      color:rgba(255,255,255,0.82);
+      max-width:60ch;
+      margin:0 0 2.2rem 0;
+      overflow-wrap:anywhere;
     }
 
-    .editorial-h {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2rem, 3.6vw, 3.75rem);
-      line-height: 1.12;
-      margin: 0 0 1.2rem 0;
-      overflow-wrap: anywhere;
+    /* Section 3 */
+    .editorial-section{
+      position:relative;
+      background:#050505;
+      border-top:1px solid rgba(255,255,255,0.06);
+      padding:clamp(3.4rem,7vw,7rem) 5%;
+      padding-bottom:190px;
+      overflow:hidden;
+    }
+    .editorial-grid{
+      max-width:1280px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:1.1fr 0.9fr;
+      gap:clamp(2.4rem,6vw,7rem);
+      align-items:center;
+    }
+    .editorial-h{
+      font-family:'Playfair Display',serif;
+      font-size:clamp(2rem,3.6vw,3.75rem);
+      line-height:1.12;
+      margin:0 0 1.2rem 0;
+      overflow-wrap:anywhere;
+    }
+    .editorial-p{
+      font-size:clamp(1rem,1.6vw,1.5rem);
+      line-height:1.7;
+      color:rgba(255,255,255,0.55);
+      margin:0;
+      overflow-wrap:anywhere;
+    }
+    .quote-box{
+      padding:clamp(1.8rem,3vw,3.5rem);
+      border:1px solid rgba(197,160,89,0.15);
+      background:rgba(0,0,0,0.38);
+      backdrop-filter:blur(18px);
+    }
+    .quote-text{
+      font-family:'Playfair Display',serif;
+      font-style:italic;
+      font-size:clamp(1.35rem,2.4vw,2.3rem);
+      line-height:1.28;
+      margin:0;
+      overflow-wrap:anywhere;
     }
 
-    .editorial-p {
-      font-size: clamp(1rem, 1.6vw, 1.5rem);
-      line-height: 1.7;
-      color: rgba(255,255,255,0.55);
-      margin: 0;
-      overflow-wrap: anywhere;
+    .footer-bar{
+      position:absolute;
+      left:0;
+      bottom:0;
+      width:100%;
+      border-top:1px solid rgba(255,255,255,0.08);
+      background:rgba(0,0,0,0.45);
+      backdrop-filter:blur(18px);
     }
 
-    .quote-box {
-      padding: clamp(1.8rem, 3vw, 3.5rem);
-      border: 1px solid rgba(197, 160, 89, 0.15);
-      background: rgba(0,0,0,0.38);
-      backdrop-filter: blur(18px);
+    /* Mobile (exact style you sent, card layout) */
+    .portal-container{display:flex;flex-direction:column;width:100%;background:#000}
+
+    .portal-card{
+      position:relative;
+      width:100%;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      padding:2.2rem 1.5rem;
+      text-decoration:none;
+      border-bottom:1px solid rgba(197,160,89,0.12);
+      opacity:0;
+      transform:translateY(20px);
+      transition:opacity 0.6s cubic-bezier(0.25,1,0.5,1),transform 0.6s cubic-bezier(0.25,1,0.5,1);
+    }
+    .portal-card.reveal-active{opacity:1;transform:translateY(0)}
+
+    .portal-card.hero-card{
+      min-height:560px;
+      justify-content:space-between;
+      padding-top:2rem;
+      padding-bottom:3.3rem;
     }
 
-    .quote-text {
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: clamp(1.35rem, 2.4vw, 2.3rem);
-      line-height: 1.28;
-      margin: 0;
-      overflow-wrap: anywhere;
+    .card-bg{position:absolute;inset:0;z-index:0}
+    .card-bg img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      filter:brightness(0.35);
+      transition:transform 1s ease,filter 0.5s ease;
     }
 
-    .footer-bar {
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.45);
-      backdrop-filter: blur(18px);
+    .hero-overlay{
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:180px;
+      background:linear-gradient(to bottom,rgba(0,0,0,0.9) 0%,rgba(0,0,0,0) 100%);
+      z-index:1;
     }
 
-    /* Mobile layout like your original */
-    .portal-container { display: flex; flex-direction: column; width: 100%; background: #000; }
-
-    .portal-card {
-      position: relative;
-      width: 100%;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 2.2rem 1.5rem;
-      text-decoration: none;
-      border-bottom: 1px solid rgba(197, 160, 89, 0.12);
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    .logo-interaction-area{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      width:100%;
+      height:140px;
+      z-index:50;
+      position:relative;
+      touch-action:none;
     }
 
-    .portal-card.reveal-active { opacity: 1; transform: translateY(0); }
-
-    .portal-card.hero-card {
-      min-height: 560px;
-      justify-content: space-between;
-      padding-top: 2rem;
-      padding-bottom: 3.3rem;
+    .pure-logo.mobile-scale{
+      transform:scale(0.42);
+      transform-origin:center center;
+      flex-direction:column;
+      align-items:center;
+      white-space:nowrap;
+    }
+    .pure-logo.mobile-scale .font-it{
+      font-size:clamp(64px,18vw,86px);
+      line-height:0.85;
+    }
+    .pure-logo.mobile-scale .font-ex{
+      font-size:clamp(30px,9.5vw,44px);
+      letter-spacing:2px;
     }
 
-    .card-bg { position: absolute; inset: 0; z-index: 0; }
-    .card-bg img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: brightness(0.35);
-      transition: transform 1s ease, filter 0.5s ease;
+    .tricolore-line{
+      display:flex;
+      height:4px;
+      width:80px;
+      margin-top:12px;
+      position:relative;
+    }
+    .tricolore-line div{flex:1}
+
+    .card-content{position:relative;z-index:10;transition:transform 0.35s ease}
+    .card-label{
+      color:var(--brand-gold);
+      font-size:0.75rem;
+      text-transform:uppercase;
+      letter-spacing:0.25em;
+      font-weight:700;
+      margin-bottom:0.5rem;
+      display:block;
+      overflow-wrap:anywhere;
     }
 
-    .hero-overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 180px;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
-      z-index: 1;
+    .card-title{
+      font-family:'Playfair Display',serif;
+      font-size:clamp(1.55rem,9.2vw,2.4rem);
+      font-style:italic;
+      color:#fff;
+      line-height:1.02;
+      margin:0;
     }
 
-    .logo-interaction-area {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      height: 140px;
-      z-index: 50;
-      position: relative;
-      touch-action: none;
+    .card-accent{
+      width:45px;
+      height:1px;
+      background:var(--brand-gold);
+      margin:14px 0;
+      transition:width 0.35s ease;
     }
 
-    .pure-logo.mobile-scale {
-      transform: scale(0.42);
-      transform-origin: center center;
-      flex-direction: column;
-      align-items: center;
-      white-space: nowrap;
+    .card-desc{
+      font-size:0.9rem;
+      color:rgba(255,255,255,0.78);
+      max-width:34ch;
+      font-weight:300;
+      margin-bottom:1rem;
+      line-height:1.55;
+      overflow-wrap:anywhere;
     }
 
-    .pure-logo.mobile-scale .font-it {
-      font-size: clamp(64px, 18vw, 86px);
-      line-height: 0.85;
+    .card-cta{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      color:var(--brand-gold);
+      font-size:0.75rem;
+      text-transform:uppercase;
+      font-weight:700;
+      letter-spacing:0.15em;
+      white-space:nowrap;
     }
 
-    .pure-logo.mobile-scale .font-ex {
-      font-size: clamp(30px, 9.5vw, 44px);
-      letter-spacing: 2px;
+    .cta-arrow{width:18px;height:1px;background:var(--brand-gold);position:relative}
+    .cta-arrow:after{
+      content:"";
+      position:absolute;
+      right:0;
+      top:50%;
+      width:7px;
+      height:7px;
+      border-right:1px solid var(--brand-gold);
+      border-top:1px solid var(--brand-gold);
+      transform:translateY(-50%) rotate(45deg);
     }
 
-    .tricolore-line {
-      display: flex;
-      height: 4px;
-      width: 80px;
-      margin-top: 12px;
-      position: relative;
-    }
-    .tricolore-line div { flex: 1; }
+    .portal-card:active .card-bg img{transform:scale(1.06);filter:brightness(0.5)}
+    .portal-card:active .card-content{transform:translateY(-4px)}
+    .portal-card:active .card-accent{width:70px}
 
-    .card-content { position: relative; z-index: 10; transition: transform 0.35s ease; }
-    .card-label {
-      color: var(--brand-gold);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.25em;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      display: block;
-      overflow-wrap: anywhere;
+    .mobile-editorial{
+      padding:6rem 1.5rem 5rem 1.5rem;
+      text-align:center;
+      position:relative;
+      background-color:#050505;
+      border-top:1px solid rgba(255,255,255,0.06);
     }
-
-    /* Mobile titles: NEVER wrap, scale down until readable */
-    .card-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.55rem, 9.2vw, 2.4rem);
-      font-style: italic;
-      color: #fff;
-      line-height: 1.02;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
+    .floating-text{
+      position:absolute;
+      top:2rem;
+      left:50%;
+      transform:translateX(-50%);
+      font-size:clamp(3.2rem,18vw,5rem);
+      font-weight:900;
+      color:rgba(255,255,255,0.02);
+      z-index:0;
+      pointer-events:none;
+      white-space:nowrap;
     }
 
-    .card-accent { width: 45px; height: 1px; background: var(--brand-gold); margin: 14px 0; transition: width 0.35s ease; }
-
-    .card-desc {
-      font-size: 0.9rem;
-      color: rgba(255,255,255,0.78);
-      max-width: 34ch;
-      font-weight: 300;
-      margin-bottom: 1rem;
-      line-height: 1.55;
-      overflow-wrap: anywhere;
+    .mobile-footer{
+      padding:4.5rem 1.5rem 5rem 1.5rem;
+      text-align:center;
+      background:#000;
+      border-top:1px solid rgba(255,255,255,0.05);
+    }
+    .copyright{
+      font-size:0.7rem;
+      text-transform:uppercase;
+      letter-spacing:0.15em;
+      color:#444;
+      line-height:2;
+      margin-top:1.5rem;
+      overflow-wrap:anywhere;
     }
 
-    .card-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--brand-gold);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      white-space: nowrap;
+    @media (max-width:768px){
+      .desktop-only{display:none}
+      .mobile-only{display:block}
+      .scroll-indicator{display:none}
     }
 
-    .cta-arrow { width: 18px; height: 1px; background: var(--brand-gold); position: relative; }
-    .cta-arrow:after {
-      content: "";
-      position: absolute;
-      right: 0;
-      top: 50%;
-      width: 7px;
-      height: 7px;
-      border-right: 1px solid var(--brand-gold);
-      border-top: 1px solid var(--brand-gold);
-      transform: translateY(-50%) rotate(45deg);
+    @media (max-width:420px){
+      .portal-card.hero-card{min-height:520px}
+      .card-desc{max-width:30ch}
     }
 
-    .portal-card:active .card-bg img { transform: scale(1.06); filter: brightness(0.5); }
-    .portal-card:active .card-content { transform: translateY(-4px); }
-    .portal-card:active .card-accent { width: 70px; }
-
-    /* Mobile: editorial and footer */
-    .mobile-editorial {
-      padding: 6rem 1.5rem 5rem 1.5rem;
-      text-align: center;
-      position: relative;
-      background-color: #050505;
-      border-top: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .floating-text {
-      position: absolute;
-      top: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: clamp(3.2rem, 18vw, 5rem);
-      font-weight: 900;
-      color: rgba(255,255,255,0.02);
-      z-index: 0;
-      pointer-events: none;
-      white-space: nowrap;
-    }
-
-    .mobile-footer {
-      padding: 4.5rem 1.5rem 5rem 1.5rem;
-      text-align: center;
-      background: #000;
-      border-top: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .copyright {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: #444;
-      line-height: 2;
-      margin-top: 1.5rem;
-      overflow-wrap: anywhere;
-    }
-
-    /* Breakpoints */
-    @media (max-width: 768px) {
-      .desktop-only { display: none; }
-      .mobile-only { display: block; }
-      .scroll-indicator { display: none; }
-    }
-
-    @media (max-width: 420px) {
-      .portal-card.hero-card { min-height: 520px; }
-      .card-desc { max-width: 30ch; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .reveal { transition: none; }
-      .pillar-bg, .portal-pillar, .portal-card { transition: none; }
-      .scroll-dot { animation: none; }
+    @media (prefers-reduced-motion:reduce){
+      .reveal{transition:none}
+      .pillar-bg,.portal-pillar,.portal-card{transition:none}
+      .scroll-dot{animation:none}
     }
   </style>
 </head>
 
 <body>
 
-  <!-- DESKTOP VERSION -->
+  <!-- DESKTOP -->
   <div class="desktop-only">
 
-    <!-- SECTION 1: PILLARS -->
     <section class="portal-wrapper" aria-label="Italian Experience Portal">
 
       <div class="absolute top-12 left-12 z-[100] scale-[0.35] md:scale-[0.55] origin-top-left pointer-events-auto">
@@ -515,58 +509,50 @@
             <span class="font-it text-[100px]">Italian</span>
             <div class="font-ex text-[55px]" data-text="EXPERIENCE"></div>
             <div class="tricolore">
-              <div style="background: var(--it-green)"></div>
-              <div style="background: #fff"></div>
-              <div style="background: var(--it-red)"></div>
+              <div style="background:var(--it-green)"></div>
+              <div style="background:#fff"></div>
+              <div style="background:var(--it-red)"></div>
             </div>
           </div>
         </a>
       </div>
 
       <a href="https://www.italianexp.com/travel" target="_top" class="portal-pillar">
-        <div class="pillar-bg">
-          <img src="https://static.wixstatic.com/media/d5773c_5b1c6af4c7044e6c9771c2293bb6297a~mv2.avif" alt="Travel" loading="eager">
-        </div>
+        <div class="pillar-bg"><img src="https://static.wixstatic.com/media/d5773c_5b1c6af4c7044e6c9771c2293bb6297a~mv2.avif" alt="Travel" loading="eager"></div>
         <div class="pillar-inner">
           <span class="label">Bespoke Curation</span>
           <div class="gold-line"></div>
-          <h2 class="title-portal">Travel</h2>
+          <h2 class="title-portal fit-title" data-fit-min="22">Travel</h2>
           <p class="description">Elite strategic curation for metropolitan and coastal odysseys.</p>
         </div>
       </a>
 
       <a href="https://www.italianexp.com/recruitment" target="_top" class="portal-pillar">
-        <div class="pillar-bg">
-          <img src="https://static.wixstatic.com/media/d5773c_453bb04371f74ec090587c4fd9b81ff1~mv2.avif" alt="Recruitment" loading="lazy">
-        </div>
+        <div class="pillar-bg"><img src="https://static.wixstatic.com/media/d5773c_453bb04371f74ec090587c4fd9b81ff1~mv2.avif" alt="Recruitment" loading="lazy"></div>
         <div class="pillar-inner">
           <span class="label">Staffing Excellence</span>
           <div class="gold-line"></div>
-          <h2 class="title-portal">Recruitment</h2>
+          <h2 class="title-portal fit-title" data-fit-min="22">Recruitment</h2>
           <p class="description">Heritage ambassadors for prestigious hospitality.</p>
         </div>
       </a>
 
       <a href="https://www.italianexp.com/flavors" target="_top" class="portal-pillar">
-        <div class="pillar-bg">
-          <img src="https://static.wixstatic.com/media/d5773c_0de64c976fdf4528b0862bfb39365431~mv2.avif" alt="Flavors" loading="lazy">
-        </div>
+        <div class="pillar-bg"><img src="https://static.wixstatic.com/media/d5773c_0de64c976fdf4528b0862bfb39365431~mv2.avif" alt="Flavors" loading="lazy"></div>
         <div class="pillar-inner">
           <span class="label">Premium Imports</span>
           <div class="gold-line"></div>
-          <h2 class="title-portal">Flavors</h2>
+          <h2 class="title-portal fit-title" data-fit-min="22">Flavors</h2>
           <p class="description">A personally tested selection of authentic culinary staples.</p>
         </div>
       </a>
 
       <a href="https://www.italianexp.com/estates" target="_top" class="portal-pillar">
-        <div class="pillar-bg">
-          <img src="https://static.wixstatic.com/media/d5773c_36e1f1c872c7470d9415f71a261afc0b~mv2.jpg" alt="Estates" loading="lazy">
-        </div>
+        <div class="pillar-bg"><img src="https://static.wixstatic.com/media/d5773c_36e1f1c872c7470d9415f71a261afc0b~mv2.jpg" alt="Estates" loading="lazy"></div>
         <div class="pillar-inner">
           <span class="label">Asset Strategy</span>
           <div class="gold-line"></div>
-          <h2 class="title-portal">Estates</h2>
+          <h2 class="title-portal fit-title" data-fit-min="22">Estates</h2>
           <p class="description">Consultancy for the acquisition of prestigious assets.</p>
         </div>
       </a>
@@ -577,55 +563,35 @@
       </div>
     </section>
 
-    <!-- SECTION 2 -->
     <section class="essence-section" aria-label="The Essence">
       <div class="essence-bg" aria-hidden="true">
-        <img id="essence-parallax"
-             src="https://static.wixstatic.com/media/d5773c_290aab9fd26f45a68a9263cc30b2a95a~mv2.avif"
-             alt=""
-             loading="lazy" />
+        <img id="essence-parallax" src="https://static.wixstatic.com/media/d5773c_290aab9fd26f45a68a9263cc30b2a95a~mv2.avif" alt="" loading="lazy" />
       </div>
 
       <div class="essence-card reveal">
         <span class="text-[0.7rem] uppercase tracking-[0.75em] text-[#c5a059] block mb-8">Discovery & Identity</span>
-
-        <h2 class="essence-title">
-          Ambassadors of the <br><span class="italic" style="color: var(--brand-gold);">Italian Soul.</span>
-        </h2>
-
-        <p class="essence-p">
-          Nati tra le icone dell'ospitalità globale, curiamo esperienze che trascendono il lusso. Non si tratta solo di dove vai, ma dell'eredità che senti.
-        </p>
-
-        <a href="#" class="inline-block border border-[#c5a059] text-[#c5a059] px-10 py-4 text-[0.75rem] uppercase tracking-[0.45em] hover:bg-[#c5a059] hover:text-black transition-all">
-          Explore Heritage
-        </a>
+        <h2 class="essence-title">Ambassadors of the <br><span class="italic" style="color:var(--brand-gold)">Italian Soul.</span></h2>
+        <p class="essence-p">Nati tra le icone dell'ospitalità globale, curiamo esperienze che trascendono il lusso. Non si tratta solo di dove vai, ma dell'eredità che senti.</p>
+        <a href="#" class="inline-block border border-[#c5a059] text-[#c5a059] px-10 py-4 text-[0.75rem] uppercase tracking-[0.45em] hover:bg-[#c5a059] hover:text-black transition-all">Explore Heritage</a>
       </div>
     </section>
 
-    <!-- SECTION 3 -->
     <section class="editorial-section" aria-label="Editorial">
       <div class="editorial-grid">
         <div class="reveal">
           <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-[1px]" style="background: var(--brand-gold)"></div>
+            <div class="w-10 h-[1px]" style="background:var(--brand-gold)"></div>
             <span class="uppercase tracking-[0.35em] text-[0.75rem] text-[#c5a059] font-bold">Heritage & Vision</span>
-            <div class="w-10 h-[1px]" style="background: var(--brand-gold)"></div>
+            <div class="w-10 h-[1px]" style="background:var(--brand-gold)"></div>
           </div>
-
-          <h3 class="editorial-h">
-            We learned from the best, to give you the <span class="italic">real</span> Italy.
-          </h3>
-
-          <p class="editorial-p">
-            Lavorare al fianco di icone mondiali ci ha insegnato che il lusso è invisibile: si trova nel silenzio perfetto di una tenuta privata.
-          </p>
+          <h3 class="editorial-h">We learned from the best, to give you the <span class="italic">real</span> Italy.</h3>
+          <p class="editorial-p">Lavorare al fianco di icone mondiali ci ha insegnato che il lusso è invisibile: si trova nel silenzio perfetto di una tenuta privata.</p>
         </div>
 
-        <div class="reveal" style="transition-delay: 0.12s;">
+        <div class="reveal" style="transition-delay:0.12s">
           <div class="quote-box">
             <p class="quote-text">"Heads of state taught us the art of making the impossible happen."</p>
-            <div class="mt-10 h-px w-20" style="background: var(--brand-gold)"></div>
+            <div class="mt-10 h-px w-20" style="background:var(--brand-gold)"></div>
           </div>
         </div>
       </div>
@@ -636,46 +602,44 @@
             <div class="pure-logo scale-[0.75] relative" id="logo-footer">
               <span class="font-it text-[64px]">Italian</span>
               <div class="font-ex text-[34px]" data-text="EXPERIENCE"></div>
-              <div class="tricolore" style="width: 92px; right: 10px;">
-                <div style="background: var(--it-green)"></div>
-                <div style="background: #fff"></div>
-                <div style="background: var(--it-red)"></div>
+              <div class="tricolore" style="width:92px;right:10px">
+                <div style="background:var(--it-green)"></div>
+                <div style="background:#fff"></div>
+                <div style="background:var(--it-red)"></div>
               </div>
             </div>
           </a>
-
-          <p class="text-white/35 uppercase tracking-[0.45em] text-[0.65rem] font-light text-center">
-            © 2026 Italian Experience · Strategic Advisory
-          </p>
+          <p class="text-white/35 uppercase tracking-[0.45em] text-[0.65rem] font-light text-center">© 2026 Italian Experience · Strategic Advisory</p>
         </div>
       </div>
     </section>
+
   </div>
 
-  <!-- MOBILE VERSION -->
+  <!-- MOBILE -->
   <div class="mobile-only">
+
     <main class="portal-container">
+
       <div class="portal-card hero-card">
         <div class="hero-overlay"></div>
-        <div class="card-bg">
-          <img src="https://static.wixstatic.com/media/d5773c_786075d042c4450dad71e9dec1a0b59a~mv2.avif" alt="Travel" loading="eager">
-        </div>
+        <div class="card-bg"><img src="https://static.wixstatic.com/media/d5773c_786075d042c4450dad71e9dec1a0b59a~mv2.avif" alt="Travel" loading="eager"></div>
 
         <div class="logo-interaction-area interaction-trigger" data-logo-id="logo-hero">
           <div class="pure-logo mobile-scale" id="logo-hero">
             <span class="font-it">Italian</span>
             <div class="font-ex" data-text="EXPERIENCE"></div>
             <div class="tricolore-line">
-              <div style="background: var(--it-green)"></div>
-              <div style="background: #fff"></div>
-              <div style="background: var(--it-red)"></div>
+              <div style="background:var(--it-green)"></div>
+              <div style="background:#fff"></div>
+              <div style="background:var(--it-red)"></div>
             </div>
           </div>
         </div>
 
         <a href="https://www.italianexp.com/travel" target="_top" class="card-content">
           <span class="card-label">Bespoke Curation</span>
-          <h2 class="card-title">Travel</h2>
+          <h2 class="card-title fit-title" data-fit-min="20">Travel</h2>
           <div class="card-accent"></div>
           <p class="card-desc">Elite strategic curation for metropolitan and coastal odysseys.</p>
           <div class="card-cta">Explore <span class="cta-arrow"></span></div>
@@ -683,12 +647,10 @@
       </div>
 
       <a href="https://www.italianexp.com/recruitment" target="_top" class="portal-card">
-        <div class="card-bg">
-          <img src="https://static.wixstatic.com/media/d5773c_ce6809e7acf84e93aaa71ec6bf29062b~mv2.avif" alt="Recruitment" loading="lazy">
-        </div>
+        <div class="card-bg"><img src="https://static.wixstatic.com/media/d5773c_ce6809e7acf84e93aaa71ec6bf29062b~mv2.avif" alt="Recruitment" loading="lazy"></div>
         <div class="card-content">
           <span class="card-label">Staffing Excellence</span>
-          <h2 class="card-title">Recruitment</h2>
+          <h2 class="card-title fit-title" data-fit-min="20">Recruitment</h2>
           <div class="card-accent"></div>
           <p class="card-desc">Heritage ambassadors for prestigious hospitality.</p>
           <div class="card-cta">Explore <span class="cta-arrow"></span></div>
@@ -696,12 +658,10 @@
       </a>
 
       <a href="https://www.italianexp.com/flavors" target="_top" class="portal-card">
-        <div class="card-bg">
-          <img src="https://static.wixstatic.com/media/d5773c_0de64c976fdf4528b0862bfb39365431~mv2.avif" alt="Flavors" loading="lazy">
-        </div>
+        <div class="card-bg"><img src="https://static.wixstatic.com/media/d5773c_0de64c976fdf4528b0862bfb39365431~mv2.avif" alt="Flavors" loading="lazy"></div>
         <div class="card-content">
           <span class="card-label">Premium Imports</span>
-          <h2 class="card-title">Flavors</h2>
+          <h2 class="card-title fit-title" data-fit-min="20">Flavors</h2>
           <div class="card-accent"></div>
           <p class="card-desc">A personally tested selection of authentic culinary staples.</p>
           <div class="card-cta">Explore <span class="cta-arrow"></span></div>
@@ -709,40 +669,39 @@
       </a>
 
       <a href="https://www.italianexp.com/estates" target="_top" class="portal-card">
-        <div class="card-bg">
-          <img src="https://static.wixstatic.com/media/d5773c_36e1f1c872c7470d9415f71a261afc0b~mv2.jpg" alt="Estates" loading="lazy">
-        </div>
+        <div class="card-bg"><img src="https://static.wixstatic.com/media/d5773c_36e1f1c872c7470d9415f71a261afc0b~mv2.jpg" alt="Estates" loading="lazy"></div>
         <div class="card-content">
           <span class="card-label">Asset Strategy</span>
-          <h2 class="card-title">Estates</h2>
+          <h2 class="card-title fit-title" data-fit-min="20">Estates</h2>
           <div class="card-accent"></div>
           <p class="card-desc">Consultancy for the acquisition of prestigious assets.</p>
           <div class="card-cta">Explore <span class="cta-arrow"></span></div>
         </div>
       </a>
+
     </main>
 
     <section class="mobile-editorial">
       <span class="floating-text">LEGACY</span>
       <div class="relative z-10 reveal">
         <div class="flex items-center justify-center gap-3 mb-6">
-          <div class="w-8 h-[1px]" style="background: var(--brand-gold)"></div>
+          <div class="w-8 h-[1px]" style="background:var(--brand-gold)"></div>
           <span class="uppercase tracking-[0.3em] text-[0.75rem] text-[#c5a059] font-bold">Heritage & Vision</span>
-          <div class="w-8 h-[1px]" style="background: var(--brand-gold)"></div>
+          <div class="w-8 h-[1px]" style="background:var(--brand-gold)"></div>
         </div>
 
-        <h2 class="text-3xl brand-font mb-6 leading-tight" style="overflow-wrap:anywhere;">
+        <h2 class="text-3xl brand-font mb-6 leading-tight" style="overflow-wrap:anywhere">
           We learned from the best, <br>to give you the <span class="italic">real</span> Italy.
         </h2>
 
         <div class="space-y-6 text-slate-400 font-light text-sm leading-relaxed px-2">
-          <p class="text-white italic font-normal text-xl brand-font py-4" style="overflow-wrap:anywhere;">
+          <p class="text-white italic font-normal text-xl brand-font py-4" style="overflow-wrap:anywhere">
             "Heads of state taught us the art of making the impossible happen."
           </p>
 
           <div class="pt-6 flex flex-col items-center opacity-40">
-            <div class="w-px h-10" style="background: var(--brand-gold)"></div>
-            <p class="text-[0.65rem] uppercase tracking-[0.2em]" style="overflow-wrap:anywhere;">
+            <div class="w-px h-10" style="background:var(--brand-gold)"></div>
+            <p class="text-[0.65rem] uppercase tracking-[0.2em]" style="overflow-wrap:anywhere">
               Global Trust & Heritage (ICE, 2023)
             </p>
           </div>
@@ -756,14 +715,15 @@
           <span class="font-it">Italian</span>
           <div class="font-ex" data-text="EXPERIENCE"></div>
           <div class="tricolore-line">
-            <div style="background: var(--it-green)"></div>
-            <div style="background: #fff"></div>
-            <div style="background: var(--it-red)"></div>
+            <div style="background:var(--it-green)"></div>
+            <div style="background:#fff"></div>
+            <div style="background:var(--it-red)"></div>
           </div>
         </div>
       </div>
       <p class="copyright">© 2026 Italian Experience · Strategic Advisory</p>
     </footer>
+
   </div>
 
   <script>
@@ -776,23 +736,17 @@
 
       // Reveal
       const obs = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) entry.target.classList.add('active');
-        });
+        entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
       }, { threshold: 0.12 });
-
       document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
       // Mobile cards reveal
       const cardObs = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) entry.target.classList.add('reveal-active');
-        });
+        entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('reveal-active'); });
       }, { threshold: 0.08 });
-
       document.querySelectorAll('.portal-card').forEach(el => cardObs.observe(el));
 
-      // Desktop logo mouse effect
+      // Logo mouse effect (desktop)
       function initLogoMouse(id) {
         const el = document.getElementById(id);
         if (!el) return;
@@ -834,11 +788,7 @@
         el.addEventListener('mouseleave', () => {
           it.style.textShadow = '';
           it.style.transform = '';
-          letters.forEach(l => {
-            l.style.color = '';
-            l.style.transform = '';
-            l.style.zIndex = '';
-          });
+          letters.forEach(l => { l.style.color = ''; l.style.transform = ''; l.style.zIndex = ''; });
         }, { passive: true });
       }
 
@@ -887,15 +837,10 @@
         const logoId = trigger.getAttribute('data-logo-id');
         const logo = document.getElementById(logoId);
         if (!logo) return;
-
         const itWord = logo.querySelector('.font-it');
         itWord.style.transform = '';
         itWord.style.textShadow = '';
-        logo.querySelectorAll('.letter').forEach(l => {
-          l.style.color = '';
-          l.style.transform = '';
-          l.style.textShadow = '';
-        });
+        logo.querySelectorAll('.letter').forEach(l => { l.style.color = ''; l.style.transform = ''; l.style.textShadow = ''; });
       }
 
       document.querySelectorAll('.interaction-trigger').forEach(trigger => {
@@ -904,7 +849,7 @@
         trigger.addEventListener('touchend', () => resetLogo(trigger), { passive: true });
       });
 
-      // Lightweight parallax (desktop only)
+      // Parallax (desktop only)
       const img = document.getElementById('essence-parallax');
       if (img && window.matchMedia("(min-width: 769px)").matches) {
         let raf = 0;
@@ -922,6 +867,51 @@
           });
         }, { passive: true });
       }
+
+      // Pro solution: auto-fit titles without truncation
+      function fitOne(el) {
+        if (!el) return;
+
+        const minPx = parseFloat(el.getAttribute('data-fit-min') || '20');
+        const parent = el.parentElement;
+        if (!parent) return;
+
+        if (!el.dataset.fitMaxPx) {
+          const cs = window.getComputedStyle(el);
+          el.dataset.fitMaxPx = String(parseFloat(cs.fontSize) || 28);
+        }
+
+        const maxPx = parseFloat(el.dataset.fitMaxPx);
+        el.style.fontSize = maxPx + 'px';
+
+        const maxWidth = parent.clientWidth;
+        if (!maxWidth) return;
+
+        let size = maxPx;
+        let guard = 0;
+
+        while (el.scrollWidth > maxWidth && size > minPx && guard < 120) {
+          size -= 0.5;
+          el.style.fontSize = size + 'px';
+          guard += 1;
+        }
+      }
+
+      function fitAll() {
+        document.querySelectorAll('.fit-title').forEach(fitOne);
+      }
+
+      let r = 0;
+      function fitAllRaf() {
+        if (r) cancelAnimationFrame(r);
+        r = requestAnimationFrame(() => { fitAll(); r = 0; });
+      }
+
+      window.addEventListener('resize', fitAllRaf, { passive: true });
+      window.addEventListener('orientationchange', fitAllRaf, { passive: true });
+
+      fitAll();
+      setTimeout(fitAll, 120);
     });
   </script>
 </body>
