@@ -1,234 +1,659 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Travel | Italian Experience</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Travel | Italian Experience</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&family=Great+Vibes&family=Montserrat:wght@700;900&display=swap');
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&family=Great+Vibes&family=Montserrat:wght@700;900&display=swap');
 
-:root{
-  --brand-gold:#c5a059;
-  --brand-obsidian:#080808;
-  --it-green:#008C45;
-  --it-red:#CD212A;
-}
+    :root{
+      --brand-gold:#c5a059;
+      --brand-obsidian:#080808;
+      --it-green:#008C45;
+      --it-red:#CD212A;
+    }
 
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--brand-obsidian);color:#fff;font-family:'Inter',sans-serif;overflow-x:hidden}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html{scroll-behavior:smooth;background:#000}
+    body{background:var(--brand-obsidian);color:#fff;font-family:'Inter',sans-serif;overflow-x:hidden;min-height:100vh;-webkit-font-smoothing:antialiased}
+    a{color:inherit}
 
-.brand-font{font-family:'Playfair Display',serif}
+    .brand-font{font-family:'Playfair Display',serif}
 
-/* HEADER */
-.glass-header{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:110px;
-  padding:0 4rem;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  z-index:9999;
-  transition:all 0.4s ease;
-}
+    /* HEADER */
+    .glass-header{
+      position:fixed;top:0;left:0;width:100%;z-index:9999;
+      height:110px;
+      padding:0 4rem;
+      display:flex;align-items:center;justify-content:space-between;
+      background:transparent;
+      backdrop-filter:blur(0px);
+      transition:transform 0.6s cubic-bezier(0.16,1,0.3,1),background 0.5s,backdrop-filter 0.5s,height 0.4s,padding 0.4s;
+    }
+    .glass-header.nav-up{transform:translateY(-110%)}
+    .glass-header.scrolled{
+      height:90px;
+      padding:0 2rem;
+      background:rgba(15,15,15,0.45);
+      backdrop-filter:blur(40px) saturate(180%);
+      -webkit-backdrop-filter:blur(40px) saturate(180%);
+      border-bottom:1px solid rgba(255,255,255,0.08);
+      box-shadow:0 10px 30px rgba(0,0,0,0.5);
+    }
 
-.glass-header.scrolled{
-  height:90px;
-  background:rgba(15,15,15,0.45);
-  backdrop-filter:blur(40px);
-}
+    /* Logo */
+    .pure-logo{display:flex;align-items:baseline;gap:12px;position:relative;user-select:none;white-space:nowrap;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.8))}
+    .font-it{font-family:'Great Vibes',cursive;color:var(--brand-gold);line-height:1;white-space:nowrap}
+    .font-ex{font-family:'Montserrat',sans-serif;color:var(--brand-gold);font-weight:900;display:flex;letter-spacing:-0.02em}
+    .letter{display:inline-block;position:relative;will-change:transform,color;transition:transform 180ms ease-out,color 180ms ease-out}
+    .tricolore{position:absolute;display:flex;height:4px;bottom:-6px;right:6px;width:clamp(84px,10vw,120px)}
+    .tricolore div{flex:1}
 
-.pure-logo{
-  display:flex;
-  align-items:baseline;
-  gap:12px;
-}
+    /* Desktop nav */
+    .nav-container{display:flex;align-items:center;gap:0.25rem;margin-left:auto;height:100%}
+    .nav-link{
+      color:#fff;text-transform:uppercase;font-size:0.62rem;letter-spacing:0.25em;
+      text-decoration:none;padding:1.2rem 0.8rem;transition:all 0.25s;opacity:0.72;white-space:nowrap;
+      cursor:pointer;display:flex;align-items:center;gap:8px;
+    }
+    .nav-link:hover{color:var(--brand-gold);opacity:1;text-shadow:0 0 10px rgba(197,160,89,0.4)}
+    .nav-link.active{color:var(--brand-gold);opacity:1;text-shadow:0 0 12px rgba(197,160,89,0.35)}
 
-.font-it{
-  font-family:'Great Vibes',cursive;
-  color:var(--brand-gold);
-}
+    .dropdown{position:relative;height:100%;display:flex;align-items:center}
+    .dropdown-menu{
+      position:absolute;top:100%;right:0;min-width:260px;
+      background:rgba(10,10,10,0.96);
+      backdrop-filter:blur(35px);
+      border:1px solid rgba(255,255,255,0.1);
+      opacity:0;visibility:hidden;transform:translateY(10px);
+      transition:all 0.3s ease;
+      padding:1rem 0;
+      box-shadow:0 20px 40px rgba(0,0,0,0.6);
+    }
+    .dropdown:hover .dropdown-menu{opacity:1;visibility:visible;transform:translateY(0)}
+    .dropdown-item{
+      display:block;padding:0.8rem 1.8rem;color:#fff;text-decoration:none;font-size:0.6rem;
+      text-transform:uppercase;letter-spacing:0.15em;opacity:0.65;transition:0.25s
+    }
+    .dropdown-item:hover{color:var(--brand-gold);opacity:1;background:rgba(255,255,255,0.03);padding-left:2.2rem}
 
-.font-ex{
-  font-family:'Montserrat',sans-serif;
-  font-weight:900;
-  color:var(--brand-gold);
-  display:flex;
-}
+    .caret{
+      width:10px;height:10px;opacity:0.4;display:inline-block;transform:translateY(1px);
+    }
 
-.nav-container{
-  display:flex;
-  align-items:center;
-  gap:1rem;
-}
+    /* Mobile menu button */
+    #central-menu-btn{
+      display:none;
+      background:none;border:none;cursor:pointer;outline:none;
+      z-index:10002;transition:all 0.25s ease;
+      align-items:center;gap:10px;
+    }
+    #central-menu-btn span{
+      color:var(--brand-gold);font-size:0.52rem;text-transform:uppercase;letter-spacing:0.4em;
+      font-weight:600;opacity:0.95;
+    }
 
-.nav-link{
-  font-size:0.65rem;
-  text-transform:uppercase;
-  letter-spacing:0.25em;
-  opacity:0.7;
-  transition:0.25s;
-}
+    /* Mobile overlay */
+    #mobile-menu-overlay{
+      position:fixed;inset:0;
+      background:rgba(8,8,8,0.98);
+      backdrop-filter:blur(50px) saturate(160%);
+      z-index:10000;
+      opacity:0;visibility:hidden;
+      transition:opacity 0.35s ease,visibility 0.35s ease;
+      padding:clamp(1.2rem,4vw,2.2rem);
+      overflow-y:auto;
+    }
+    #mobile-menu-overlay.active{opacity:1;visibility:visible}
 
-.nav-link:hover{
-  opacity:1;
-  color:var(--brand-gold);
-}
+    .mobile-close{position:sticky;top:0;display:flex;justify-content:flex-end;z-index:2;padding:0.5rem 0}
 
-.dropdown{
-  position:relative;
-}
+    .mobile-menu{
+      max-width:520px;margin:0 auto;
+      padding:2.2rem 0 3rem 0;
+      display:flex;flex-direction:column;gap:0.4rem;
+      align-items:center;text-align:center;
+    }
 
-.dropdown-menu{
-  position:absolute;
-  top:100%;
-  right:0;
-  min-width:220px;
-  background:#0a0a0a;
-  opacity:0;
-  visibility:hidden;
-  transition:0.3s;
-  padding:1rem 0;
-}
+    .mobile-link{
+      width:100%;
+      display:flex;align-items:center;justify-content:center;
+      padding:14px 10px;
+      color:#fff;text-decoration:none;text-transform:uppercase;
+      letter-spacing:0.35em;font-size:0.72rem;
+      opacity:0.75;transition:opacity 0.2s ease,color 0.2s ease;
+    }
+    .mobile-link:hover{opacity:1;color:var(--brand-gold)}
+    .mobile-link.active{color:var(--brand-gold);opacity:1;text-shadow:0 0 12px rgba(197,160,89,0.35)}
 
-.dropdown:hover .dropdown-menu{
-  opacity:1;
-  visibility:visible;
-}
+    /* Mobile accordion header row: link + chevron button */
+    .mobile-acc-row{
+      width:100%;
+      display:flex;align-items:center;justify-content:center;
+      gap:14px;
+      padding:14px 10px;
+    }
+    .mobile-acc-link{
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;text-decoration:none;text-transform:uppercase;
+      letter-spacing:0.35em;font-size:0.72rem;
+      opacity:0.75;transition:opacity 0.2s ease,color 0.2s ease;
+      padding:0;
+    }
+    .mobile-acc-link:hover{opacity:1;color:var(--brand-gold)}
+    .mobile-acc-link.active{color:var(--brand-gold);opacity:1;text-shadow:0 0 12px rgba(197,160,89,0.35)}
 
-.dropdown-item{
-  display:block;
-  padding:0.6rem 1.4rem;
-  font-size:0.6rem;
-  text-transform:uppercase;
-  letter-spacing:0.15em;
-  opacity:0.6;
-}
+    .mobile-acc-toggle{
+      background:transparent;border:none;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      padding:6px;
+      opacity:0.75;transition:opacity 0.2s ease;
+    }
+    .mobile-acc-toggle:hover{opacity:1}
 
-.dropdown-item:hover{
-  opacity:1;
-  color:var(--brand-gold);
-}
+    .chev{width:14px;height:14px;opacity:0.65;transition:transform 0.25s ease,opacity 0.25s ease;color:#fff}
+    .mobile-acc-toggle[aria-expanded="true"] .chev{transform:rotate(180deg);opacity:1}
+    .mobile-acc-toggle.active .chev{color:var(--brand-gold);opacity:1}
 
-/* MOBILE */
-#central-menu-btn{
-  display:none;
-  background:none;
-  border:none;
-  color:var(--brand-gold);
-}
+    .mobile-sub{
+      width:100%;
+      max-height:0;
+      overflow:hidden;
+      transition:max-height 0.35s ease;
+    }
+    .mobile-sub-inner{
+      padding:4px 0 10px 0;
+      display:flex;flex-direction:column;gap:2px;
+    }
+    .mobile-sublink{
+      display:block;
+      padding:10px 10px;
+      color:#fff;text-decoration:none;text-transform:uppercase;
+      letter-spacing:0.28em;font-size:0.62rem;
+      opacity:0.55;transition:opacity 0.2s ease,color 0.2s ease;
+    }
+    .mobile-sublink:hover{opacity:1;color:var(--brand-gold)}
 
-@media (max-width:1024px){
+    /* HERO */
+    .hero-narrative{
+      width:100%;
+      height:100vh;
+      height:100dvh;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero-bg{
+      position:absolute;inset:0;z-index:0;
+      background:url('https://images.unsplash.com/photo-1529260830199-42c24126f198?auto=format&fit=crop&q=80&w=1920') no-repeat center center;
+      background-size:cover;
+      filter:brightness(0.35);
+      transform:scale(1.02);
+    }
+    .hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(8,8,8,0) 0%,var(--brand-obsidian) 100%)}
+    .hero-content{position:relative;z-index:10;text-align:center;max-width:1100px;padding:0 2rem;display:flex;flex-direction:column;align-items:center}
 
-  .nav-container{
-    display:none;
-  }
+    @keyframes scrollLine{0%{transform:translateY(-18px);opacity:0}30%{opacity:1}100%{transform:translateY(52px);opacity:0}}
+    .explore-indicator{
+      position:absolute;bottom:46px;left:50%;transform:translateX(-50%);
+      z-index:20;display:flex;flex-direction:column;align-items:center;gap:14px;
+      text-decoration:none;opacity:0.82;transition:opacity 0.2s ease,transform 0.2s ease;
+    }
+    .explore-indicator:hover{opacity:1;transform:translateX(-50%) translateY(3px)}
+    .explore-indicator span{
+      font-size:0.65rem;text-transform:uppercase;letter-spacing:0.55em;
+      color:rgba(255,255,255,0.78);padding-left:0.55em;white-space:nowrap;
+      text-shadow:0 8px 18px rgba(0,0,0,0.7);
+    }
+    .scroll-track{width:1px;height:54px;background:rgba(255,255,255,0.25);position:relative;overflow:hidden}
+    .scroll-dot{width:100%;height:16px;background:var(--brand-gold);position:absolute;top:0;left:0;animation:scrollLine 1.6s infinite ease-in-out}
 
-  #central-menu-btn{
-    display:block;
-  }
+    /* SERVICES */
+    .services-horizontal{width:100%;height:850px;display:flex;flex-direction:row;background:var(--brand-obsidian);border-top:1px solid rgba(255,255,255,0.05)}
+    .service-panel{position:relative;flex:1;height:100%;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:6rem 3.5rem;text-decoration:none;transition:flex 0.8s cubic-bezier(0.23,1,0.32,1);border-right:1px solid rgba(197,160,89,0.15)}
+    .service-panel:last-child{border-right:none}
+    .service-panel:hover{flex:1.8}
+    .panel-bg{position:absolute;inset:0;z-index:0;transition:transform 1.5s ease,filter 0.8s ease;filter:grayscale(100%) brightness(0.2)}
+    .panel-bg img{width:100%;height:100%;object-fit:cover}
+    .service-panel:hover .panel-bg{transform:scale(1.1);filter:grayscale(0%) brightness(0.4)}
+    .panel-content{position:relative;z-index:10;pointer-events:none}
+    .gold-line{width:40px;height:2px;background:var(--brand-gold);margin-bottom:2rem;transition:width 0.6s ease}
+    .service-panel:hover .gold-line{width:80px}
+    .btn-panel{display:inline-block;margin-top:3rem;padding:1.2rem 2.5rem;border:1px solid var(--brand-gold);color:var(--brand-gold);font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.25em;transition:all 0.25s ease;background:transparent;pointer-events:auto}
+    .service-panel:hover .btn-panel{background:var(--brand-gold);color:var(--brand-obsidian);box-shadow:0 10px 30px rgba(197,160,89,0.3)}
 
-  .glass-header{
-    height:90px;
-    padding:0 1.5rem;
-  }
-}
-</style>
+    /* Footer */
+    .site-footer{background:#000;padding:6rem 2rem;border-top:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;align-items:center;text-align:center}
+
+    /* Responsive */
+    @media (max-width:1024px){
+      .nav-container{display:none}
+      #central-menu-btn{display:flex}
+      .glass-header{
+        height:90px;
+        padding:0 1.25rem;
+        flex-direction:row;
+        justify-content:space-between;
+      }
+      .glass-header.scrolled{
+        height:80px;
+        padding:0 1.25rem;
+      }
+      .services-horizontal{flex-direction:column;height:auto}
+      .service-panel{height:70vh;width:100%;border-right:none;border-bottom:1px solid rgba(197,160,89,0.1)}
+    }
+    @media (max-width:768px){
+      .explore-indicator{bottom:54px}
+    }
+  </style>
 </head>
 
 <body>
 
-<nav class="glass-header" id="main-header">
+  <!-- MOBILE MENU OVERLAY -->
+  <div id="mobile-menu-overlay" aria-hidden="true">
+    <div class="mobile-close">
+      <button id="close-menu" aria-label="Chiudi menu" class="text-white/80 hover:text-white">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
 
-<a href="../">
-<div class="pure-logo">
-<span class="font-it text-[60px]">Italian</span>
-<div class="font-ex text-[30px]" data-text="EXPERIENCE"></div>
-</div>
-</a>
+    <nav class="mobile-menu" aria-label="Menu mobile">
+      <a href="../" class="mobile-link" data-close data-top="home">Home</a>
 
-<button id="central-menu-btn">Menu</button>
+      <!-- TRAVEL: link attivo + freccia che apre -->
+      <div class="mobile-acc-row">
+        <a href="./" class="mobile-acc-link mobile-acc-link-travel" data-close data-top="travel">Travel</a>
+        <button class="mobile-acc-toggle mobile-acc-toggle-travel" type="button" aria-expanded="true" aria-controls="m-travel" aria-label="Apri Travel">
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m6 9 6 6 6-6"></path>
+          </svg>
+        </button>
+      </div>
+      <div id="m-travel" class="mobile-sub" style="max-height:260px">
+        <div class="mobile-sub-inner">
+          <a href="./bespoke/" class="mobile-sublink" data-close>Bespoke</a>
+          <a href="./gapyear/" class="mobile-sublink" data-close>Gap Years</a>
+          <a href="./culinary/" class="mobile-sublink" data-close>Culinary Academy</a>
+        </div>
+      </div>
 
-<div class="nav-container">
+      <!-- RECRUITMENT -->
+      <div class="mobile-acc-row">
+        <a href="../recruitment/" class="mobile-acc-link mobile-acc-link-recruitment" data-close data-top="recruitment">Recruitment</a>
+        <button class="mobile-acc-toggle mobile-acc-toggle-recruitment" type="button" aria-expanded="false" aria-controls="m-recruitment" aria-label="Apri Recruitment">
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m6 9 6 6 6-6"></path>
+          </svg>
+        </button>
+      </div>
+      <div id="m-recruitment" class="mobile-sub">
+        <div class="mobile-sub-inner">
+          <a href="../recruitment/employer/" class="mobile-sublink" data-close>Employer</a>
+          <a href="../recruitment/candidate/" class="mobile-sublink" data-close>Candidate</a>
+        </div>
+      </div>
 
-<a href="../" class="nav-link">Home</a>
+      <!-- FLAVORS -->
+      <div class="mobile-acc-row">
+        <a href="../flavors/" class="mobile-acc-link mobile-acc-link-flavors" data-close data-top="flavors">Flavors</a>
+        <button class="mobile-acc-toggle mobile-acc-toggle-flavors" type="button" aria-expanded="false" aria-controls="m-flavors" aria-label="Apri Flavors">
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m6 9 6 6 6-6"></path>
+          </svg>
+        </button>
+      </div>
+      <div id="m-flavors" class="mobile-sub">
+        <div class="mobile-sub-inner">
+          <a href="../flavors/for-your-home/" class="mobile-sublink" data-close>For your home</a>
+          <a href="../flavors/for-your-business/" class="mobile-sublink" data-close>For your business</a>
+          <a href="../flavors/aziende-italiane/" class="mobile-sublink" data-close>Aziende Italiane</a>
+        </div>
+      </div>
 
-<div class="dropdown">
-<a href="./" class="nav-link">Travel</a>
-<div class="dropdown-menu">
-<a href="./bespoke/" class="dropdown-item">Bespoke</a>
-<a href="./gapyear/" class="dropdown-item">Gap Years</a>
-<a href="./culinary/" class="dropdown-item">Culinary Academy</a>
-</div>
-</div>
+      <a href="../estates/" class="mobile-link mobile-link-estates" data-close data-top="estates">Estates</a>
+      <a href="../contact/" class="mobile-link mobile-link-contact" data-close data-top="contact">Contact</a>
+    </nav>
+  </div>
 
-<div class="dropdown">
-<a href="../recruitment/" class="nav-link">Recruitment</a>
-<div class="dropdown-menu">
-<a href="../recruitment/employer/" class="dropdown-item">Employer</a>
-<a href="../recruitment/candidate/" class="dropdown-item">Candidate</a>
-</div>
-</div>
+  <!-- HEADER -->
+  <nav class="glass-header" id="main-header" aria-label="Header">
+    <a href="../" class="block no-underline">
+      <div class="pure-logo" id="logo-header">
+        <span class="font-it text-[70px]">Italian</span>
+        <div class="font-ex text-[35px]" data-text="EXPERIENCE"></div>
+        <div class="tricolore" style="width:92px;right:10px">
+          <div style="background:var(--it-green)"></div>
+          <div style="background:#fff"></div>
+          <div style="background:var(--it-red)"></div>
+        </div>
+      </div>
+    </a>
 
-<div class="dropdown">
-<a href="../flavors/" class="nav-link">Flavors</a>
-<div class="dropdown-menu">
-<a href="../flavors/for-your-home/" class="dropdown-item">For your home</a>
-<a href="../flavors/for-your-business/" class="dropdown-item">For your business</a>
-<a href="../flavors/aziende-italiane/" class="dropdown-item">Aziende Italiane</a>
-</div>
-</div>
+    <button id="central-menu-btn" aria-label="Apri menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10" stroke="rgba(197,160,89,0.4)" stroke-width="1" />
+        <line x1="8" y1="10" x2="16" y2="10" stroke="#c5a059" stroke-width="2.5" />
+        <line x1="10" y1="14" x2="14" y2="14" stroke="#c5a059" stroke-width="2.5" />
+      </svg>
+      <span>Menu</span>
+    </button>
 
-<a href="../estates/" class="nav-link">Estates</a>
-<a href="../contact/" class="nav-link">Contact</a>
+    <div class="nav-container" aria-label="Navigazione desktop">
+      <a href="../" class="nav-link nav-link-home">Home</a>
 
-</div>
-</nav>
+      <div class="dropdown">
+        <a href="./" class="nav-link nav-link-travel">
+          Travel
+          <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </a>
+        <div class="dropdown-menu">
+          <a href="./bespoke/" class="dropdown-item">Bespoke</a>
+          <a href="./gapyear/" class="dropdown-item">Gap Years</a>
+          <a href="./culinary/" class="dropdown-item">Culinary Academy</a>
+        </div>
+      </div>
 
-<header class="h-screen flex items-center justify-center text-center relative">
-<div class="absolute inset-0 bg-cover bg-center"
-style="background-image:url('https://images.unsplash.com/photo-1529260830199-42c24126f198?auto=format&fit=crop&q=80&w=1920'); filter:brightness(0.4);">
-</div>
+      <div class="dropdown">
+        <a href="../recruitment/" class="nav-link nav-link-recruitment">
+          Recruitment
+          <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </a>
+        <div class="dropdown-menu">
+          <a href="../recruitment/employer/" class="dropdown-item">Employer</a>
+          <a href="../recruitment/candidate/" class="dropdown-item">Candidate</a>
+        </div>
+      </div>
 
-<div class="relative z-10 px-6">
-<h3 class="text-[#c5a059] italic brand-font text-2xl mb-6">
-A Curated Narrative
-</h3>
+      <div class="dropdown">
+        <a href="../flavors/" class="nav-link nav-link-flavors">
+          Flavors
+          <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </a>
+        <div class="dropdown-menu">
+          <a href="../flavors/for-your-home/" class="dropdown-item">For your home</a>
+          <a href="../flavors/for-your-business/" class="dropdown-item">For your business</a>
+          <a href="../flavors/aziende-italiane/" class="dropdown-item">Aziende Italiane</a>
+        </div>
+      </div>
 
-<h1 class="brand-font text-6xl md:text-8xl leading-[0.9]">
-The Italian<br><span class="italic font-light">Travel.</span>
-</h1>
+      <a href="../estates/" class="nav-link nav-link-estates">Estates</a>
+      <a href="../contact/" class="nav-link nav-link-contact">Contact</a>
+    </div>
+  </nav>
 
-<p class="mt-8 text-sm tracking-[0.4em] uppercase text-slate-400">
-Strategic personal projects across the Mediterranean landscape.
-</p>
-</div>
-</header>
+  <!-- HERO -->
+  <header class="hero-narrative" aria-label="Hero Travel">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-overlay" aria-hidden="true"></div>
 
-<script>
-document.addEventListener("DOMContentLoaded",function(){
+    <div class="hero-content">
+      <h3 class="text-[#c5a059] italic brand-font text-2xl md:text-3xl mb-6">A Curated Narrative</h3>
+      <h1 class="font-bold brand-font text-white uppercase text-6xl md:text-9xl leading-[0.9] mb-10 tracking-tighter">
+        The Italian<br><span class="italic font-light">Travel.</span>
+      </h1>
+      <div class="w-24 h-px bg-[#c5a059] opacity-40 mx-auto mb-10"></div>
+      <p class="text-slate-400 font-light text-base md:text-lg max-w-2xl mx-auto uppercase tracking-[0.4em] leading-relaxed">
+        Strategic personal projects across the Mediterranean landscape.
+      </p>
+    </div>
 
-document.querySelectorAll('.font-ex').forEach(ex=>{
-const text=ex.getAttribute('data-text')||'';
-ex.innerHTML=text.split('').map(c=>`<span>${c}</span>`).join('');
-});
+    <a href="#services" class="explore-indicator" aria-label="Vai ai servizi">
+      <span>Explore Services</span>
+      <div class="scroll-track" aria-hidden="true"><div class="scroll-dot"></div></div>
+    </a>
+  </header>
 
-const header=document.getElementById('main-header');
-window.addEventListener('scroll',()=>{
-if(window.scrollY>50){
-header.classList.add('scrolled');
-}else{
-header.classList.remove('scrolled');
-}
-});
+  <!-- SERVICES -->
+  <section class="services-horizontal" id="services" aria-label="Travel services">
+    <a href="./bespoke/" class="service-panel">
+      <div class="panel-bg" aria-hidden="true"><img src="https://images.unsplash.com/photo-1658163724548-29ef00812a54?q=80&w=1170" alt="Bespoke"></div>
+      <div class="panel-content">
+        <div class="gold-line"></div>
+        <span class="text-[#c5a059] text-[0.65rem] uppercase tracking-[0.4em] mb-3 block font-bold">Signature Series</span>
+        <h2 class="text-4xl md:text-5xl brand-font italic text-white mb-6">Bespoke Travel</h2>
+        <p class="text-slate-400 text-sm font-light leading-relaxed max-w-sm">Private itineraries curated by industry elites.</p>
+        <div class="btn-panel">Explore Leisure</div>
+      </div>
+    </a>
 
-});
-</script>
+    <a href="./gapyear/" class="service-panel">
+      <div class="panel-bg" aria-hidden="true"><img src="https://images.unsplash.com/photo-1569585723035-0e9e6ff87cbf?q=80&w=1200" alt="Gap Years"></div>
+      <div class="panel-content">
+        <div class="gold-line"></div>
+        <span class="text-[#c5a059] text-[0.65rem] uppercase tracking-[0.4em] mb-3 block font-bold">Academic Heritage</span>
+        <h2 class="text-4xl md:text-5xl brand-font italic text-white mb-6">Gap Years</h2>
+        <p class="text-slate-400 text-sm font-light leading-relaxed max-w-sm">Total cultural immersion programs.</p>
+        <div class="btn-panel">Explore Education</div>
+      </div>
+    </a>
 
+    <a href="./culinary/" class="service-panel">
+      <div class="panel-bg" aria-hidden="true"><img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&q=80&w=1200" alt="Culinary Academy"></div>
+      <div class="panel-content">
+        <div class="gold-line"></div>
+        <span class="text-[#c5a059] text-[0.65rem] uppercase tracking-[0.4em] mb-3 block font-bold">Mastery Series</span>
+        <h2 class="text-4xl md:text-5xl brand-font italic text-white mb-6">Culinary Academy</h2>
+        <p class="text-slate-400 text-sm font-light leading-relaxed max-w-sm">Master regional heritage in prestigious kitchens.</p>
+        <div class="btn-panel">Explore Culinary</div>
+      </div>
+    </a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer" aria-label="Footer">
+    <a href="../" class="block no-underline">
+      <div class="pure-logo scale-[0.7] md:scale-[0.8] mb-8" id="logo-footer">
+        <span class="font-it text-[64px]">Italian</span>
+        <div class="font-ex text-[34px]" data-text="EXPERIENCE"></div>
+        <div class="tricolore" style="width:92px;right:10px">
+          <div style="background:var(--it-green)"></div>
+          <div style="background:#fff"></div>
+          <div style="background:var(--it-red)"></div>
+        </div>
+      </div>
+    </a>
+
+    <p class="text-white/20 uppercase tracking-[0.4em] text-[0.6rem]">
+      © ITALIAN RECRUITMENT DBA ITALIAN EXPERIENCE<br>
+      STRATEGIC HOSPITALITY ADVISORY
+    </p>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      /* Build EXPERIENCE letters */
+      document.querySelectorAll('.font-ex').forEach(ex => {
+        const text = ex.getAttribute('data-text') || '';
+        ex.innerHTML = text.split('').map(c => `<span class="letter">${c}</span>`).join('');
+      });
+
+      /* Header smart scroll */
+      let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
+      const header = document.getElementById('main-header');
+
+      window.addEventListener('scroll', () => {
+        const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (currentScrollY > lastScrollY && currentScrollY > 110) header.classList.add('nav-up');
+        else header.classList.remove('nav-up');
+
+        if (currentScrollY > 50) header.classList.add('scrolled');
+        else header.classList.remove('scrolled');
+
+        lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+      }, { passive: true });
+
+      /* Mobile menu open/close */
+      const menuBtn = document.getElementById('central-menu-btn');
+      const closeBtn = document.getElementById('close-menu');
+      const overlay = document.getElementById('mobile-menu-overlay');
+
+      const openMenu = () => {
+        overlay.classList.add('active');
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      };
+      const closeMenu = () => {
+        overlay.classList.remove('active');
+        overlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      };
+
+      menuBtn?.addEventListener('click', (e) => { e.preventDefault(); openMenu(); });
+      closeBtn?.addEventListener('click', (e) => { e.preventDefault(); closeMenu(); });
+
+      overlay.addEventListener('click', (e) => {
+        const t = e.target;
+        if (t && t.closest && t.closest('[data-close]')) closeMenu();
+      }, { passive: true });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeMenu();
+      });
+
+      /* Mobile accordion toggles */
+      const toggles = [
+        { btn: '.mobile-acc-toggle-travel', panel: 'm-travel' },
+        { btn: '.mobile-acc-toggle-recruitment', panel: 'm-recruitment' },
+        { btn: '.mobile-acc-toggle-flavors', panel: 'm-flavors' }
+      ];
+
+      function setPanel(btn, panel, open) {
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) {
+          const inner = panel.querySelector('.mobile-sub-inner');
+          const h = inner ? inner.scrollHeight : 0;
+          panel.style.maxHeight = Math.max(80, h + 14) + 'px';
+        } else {
+          panel.style.maxHeight = '0px';
+        }
+      }
+
+      toggles.forEach(t => {
+        const btn = document.querySelector(t.btn);
+        const panel = document.getElementById(t.panel);
+        if (!btn || !panel) return;
+
+        btn.addEventListener('click', () => {
+          const isOpen = btn.getAttribute('aria-expanded') === 'true';
+          setPanel(btn, panel, !isOpen);
+        });
+
+        if (btn.getAttribute('aria-expanded') === 'true') setPanel(btn, panel, true);
+      });
+
+      function refreshPanels() {
+        toggles.forEach(t => {
+          const btn = document.querySelector(t.btn);
+          const panel = document.getElementById(t.panel);
+          if (!btn || !panel) return;
+          const isOpen = btn.getAttribute('aria-expanded') === 'true';
+          if (isOpen) setPanel(btn, panel, true);
+        });
+      }
+      setTimeout(refreshPanels, 150);
+      setTimeout(refreshPanels, 650);
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => { refreshPanels(); setTimeout(refreshPanels, 150); });
+      }
+
+      /* Active state */
+      const path = window.location.pathname.toLowerCase();
+
+      function setActive(top) {
+        const map = {
+          travel: ['.nav-link-travel', '.mobile-acc-link-travel', '.mobile-acc-toggle-travel'],
+          recruitment: ['.nav-link-recruitment', '.mobile-acc-link-recruitment', '.mobile-acc-toggle-recruitment'],
+          flavors: ['.nav-link-flavors', '.mobile-acc-link-flavors', '.mobile-acc-toggle-flavors'],
+          estates: ['.nav-link-estates', '.mobile-link-estates'],
+          contact: ['.nav-link-contact', '.mobile-link-contact'],
+          home: ['.nav-link-home']
+        };
+
+        (map[top] || []).forEach(sel => {
+          document.querySelectorAll(sel).forEach(el => el.classList.add('active'));
+        });
+      }
+
+      if (path.includes('/travel/')) setActive('travel');
+      else if (path.includes('/recruitment/')) setActive('recruitment');
+      else if (path.includes('/flavors/')) setActive('flavors');
+      else if (path.includes('/estates/')) setActive('estates');
+      else if (path.includes('/contact/')) setActive('contact');
+      else setActive('home');
+
+      /* Logo mouse effect (desktop only) */
+      function initLogoMouse(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (!window.matchMedia('(pointer: fine)').matches) return;
+
+        const it = el.querySelector('.font-it');
+        const letters = el.querySelectorAll('.letter');
+        if (!it || !letters.length) return;
+
+        el.addEventListener('mousemove', (e) => {
+          const r = el.getBoundingClientRect();
+          const x = e.clientX - r.left;
+
+          const itRect = it.getBoundingClientRect();
+          const itX = itRect.left + itRect.width / 2 - r.left;
+          const dIt = Math.abs(x - itX);
+          const pIt = Math.max(0, (200 - dIt) / 200);
+
+          it.style.textShadow = `0 0 ${15 * pIt}px rgba(197,160,89,0.5)`;
+          it.style.transform = `scale(${1 + pIt * 0.05})`;
+
+          letters.forEach(l => {
+            const lr = l.getBoundingClientRect();
+            const lx = lr.left + lr.width / 2 - r.left;
+            const dx = Math.abs(x - lx);
+
+            if (dx < 110) {
+              const p = (110 - dx) / 110;
+              l.style.color = (x > lx + 14)
+                ? getComputedStyle(document.documentElement).getPropertyValue('--it-green').trim()
+                : (x < lx - 14
+                  ? getComputedStyle(document.documentElement).getPropertyValue('--it-red').trim()
+                  : '#FFF');
+              l.style.transform = `scale(${1 + p * 0.42}) translateY(${-p * 10}px)`;
+              l.style.zIndex = '20';
+            } else {
+              l.style.color = '';
+              l.style.transform = '';
+              l.style.zIndex = '10';
+            }
+          });
+        }, { passive: true });
+
+        el.addEventListener('mouseleave', () => {
+          it.style.textShadow = '';
+          it.style.transform = '';
+          letters.forEach(l => { l.style.color = ''; l.style.transform = ''; l.style.zIndex = ''; });
+        }, { passive: true });
+      }
+
+      initLogoMouse('logo-header');
+      initLogoMouse('logo-footer');
+    });
+  </script>
 </body>
 </html>
