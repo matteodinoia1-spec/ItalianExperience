@@ -44,7 +44,12 @@
     }
 
     /* Reveal */
-    .reveal { opacity: 0; transform: translateY(18px); transition: opacity 650ms ease, transform 900ms cubic-bezier(0.2, 1, 0.3, 1); will-change: opacity, transform; }
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 650ms ease, transform 900ms cubic-bezier(0.2, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
     .reveal.active { opacity: 1; transform: translateY(0); }
 
     /* Scroll indicator */
@@ -53,10 +58,57 @@
       30% { opacity: 1; }
       100% { transform: translateY(74px); opacity: 0; }
     }
-    .scroll-indicator { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 50; display: flex; flex-direction: column; align-items: center; gap: 10px; opacity: 0.85; pointer-events: none; }
-    .scroll-indicator span { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.55em; color: rgba(255,255,255,0.7); }
-    .scroll-track { width: 1px; height: 56px; background: rgba(255,255,255,0.25); position: relative; overflow: hidden; }
-    .scroll-dot { width: 100%; height: 18px; background: var(--brand-gold); position: absolute; top: 0; left: 0; animation: scrollLine 1.6s infinite ease-in-out; }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 80;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .scroll-indicator .pill {
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(14px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.55);
+    }
+
+    .scroll-indicator span {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.55em;
+      color: rgba(255,255,255,0.78);
+    }
+
+    .scroll-track {
+      width: 1px;
+      height: 56px;
+      background: rgba(255,255,255,0.22);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scroll-dot {
+      width: 100%;
+      height: 18px;
+      background: var(--brand-gold);
+      position: absolute;
+      top: 0;
+      left: 0;
+      animation: scrollLine 1.6s infinite ease-in-out;
+    }
 
     /* Logo prism */
     .pure-logo {
@@ -68,11 +120,13 @@
       white-space: nowrap;
       filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8));
     }
+
     .font-it {
       font-family: 'Great Vibes', cursive;
       color: var(--brand-gold);
       line-height: 1;
     }
+
     .font-ex {
       font-family: 'Montserrat', sans-serif;
       color: var(--brand-gold);
@@ -80,7 +134,13 @@
       display: flex;
       letter-spacing: -0.02em;
     }
-    .letter { display: inline-block; position: relative; transition: transform 180ms ease-out, color 180ms ease-out; will-change: transform, color; }
+
+    .letter {
+      display: inline-block;
+      position: relative;
+      transition: transform 180ms ease-out, color 180ms ease-out;
+      will-change: transform, color;
+    }
 
     .tricolore {
       position: absolute;
@@ -120,7 +180,13 @@
     .portal-pillar:last-child { border-right: none; }
     .portal-pillar:hover { flex: 2.5; }
 
-    .pillar-bg { position: absolute; inset: 0; z-index: 0; transition: transform 1.4s ease, filter 900ms ease; filter: brightness(0.22); }
+    .pillar-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      transition: transform 1.4s ease, filter 900ms ease;
+      filter: brightness(0.22);
+    }
     .pillar-bg img { width: 100%; height: 100%; object-fit: cover; }
     .portal-pillar:hover .pillar-bg { filter: brightness(0.45); transform: scale(1.12); }
 
@@ -139,7 +205,16 @@
     }
     .portal-pillar:hover .label { opacity: 1; transform: scale(1.18); letter-spacing: 0.6em; color: #fff; }
 
-    .title-portal { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 4.5vw, 5rem); line-height: 1; margin-bottom: 2.2rem; color: #fff; text-shadow: 0 10px 30px rgba(0,0,0,0.6); text-align: center; font-style: italic; }
+    .title-portal {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 4.5vw, 5rem);
+      line-height: 1;
+      margin-bottom: 2.2rem;
+      color: #fff;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      text-align: center;
+      font-style: italic;
+    }
 
     .description {
       font-size: clamp(0.8rem, 1vw, 1.1rem);
@@ -155,7 +230,14 @@
     }
     .portal-pillar:hover .description { height: auto; opacity: 1; margin-top: 1rem; margin-bottom: 4rem; }
 
-    .gold-line { width: 1px; height: 50px; background: var(--brand-gold); margin: 0 auto 2rem auto; transition: height 450ms ease, opacity 450ms ease; opacity: 0.6; }
+    .gold-line {
+      width: 1px;
+      height: 50px;
+      background: var(--brand-gold);
+      margin: 0 auto 2rem auto;
+      transition: height 450ms ease, opacity 450ms ease;
+      opacity: 0.6;
+    }
     .portal-pillar:hover .gold-line { height: 80px; opacity: 1; }
 
     /* Section 2 */
@@ -197,21 +279,16 @@
       backdrop-filter: blur(18px);
     }
 
-    /* Mobile portal cards */
-    .mobile-portal {
-      display: none;
-      height: 100%;
-      position: relative;
-    }
-
+    /* Mobile first section */
+    .mobile-portal { display: none; height: 100%; position: relative; }
     .mobile-hero {
       height: 100%;
       position: relative;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      padding: 22px 18px 22px 18px;
+      justify-content: flex-start;
+      padding: 18px 16px 16px 16px;
     }
 
     .mobile-bg { position: absolute; inset: 0; z-index: 0; }
@@ -230,7 +307,8 @@
       z-index: 5;
       display: flex;
       justify-content: center;
-      padding-top: 10px;
+      padding-top: 6px;
+      padding-bottom: 8px;
     }
 
     .mobile-logo {
@@ -243,8 +321,12 @@
       position: relative;
       z-index: 5;
       display: grid;
-      gap: 12px;
-      padding-bottom: 70px;
+      gap: 14px;
+      max-height: calc(100dvh - 170px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: calc(120px + env(safe-area-inset-bottom));
+      scroll-snap-type: y mandatory;
     }
 
     .mcard {
@@ -256,26 +338,33 @@
       text-decoration: none;
       color: #fff;
       display: block;
+      scroll-snap-align: start;
     }
 
-    .mcard:active {
-      transform: translateY(-2px);
-      transition: transform 120ms ease;
-    }
+    .mcard:active { transform: translateY(-2px); transition: transform 120ms ease; }
 
     .m-label { color: var(--brand-gold); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.22em; font-weight: 700; opacity: 0.95; }
     .m-title { font-family: 'Playfair Display', serif; font-size: 1.75rem; font-style: italic; margin-top: 6px; line-height: 1.05; }
     .m-desc { margin-top: 8px; font-size: 0.88rem; color: rgba(255,255,255,0.78); line-height: 1.5; font-weight: 300; max-width: 30ch; }
     .m-cta { margin-top: 12px; display: inline-flex; align-items: center; gap: 10px; color: var(--brand-gold); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 700; }
     .m-arrow { width: 16px; height: 1px; background: var(--brand-gold); position: relative; }
-    .m-arrow:after { content: ""; position: absolute; right: 0; top: 50%; width: 7px; height: 7px; border-right: 1px solid var(--brand-gold); border-top: 1px solid var(--brand-gold); transform: translateY(-50%) rotate(45deg); }
+    .m-arrow:after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 50%;
+      width: 7px;
+      height: 7px;
+      border-right: 1px solid var(--brand-gold);
+      border-top: 1px solid var(--brand-gold);
+      transform: translateY(-50%) rotate(45deg);
+    }
 
-    /* Breakpoints */
     @media (max-width: 768px) {
       .portal-wrapper { display: none; }
       .mobile-portal { display: block; }
-      .scroll-indicator { bottom: 20px; }
       .tricolore { width: 92px; }
+      .scroll-indicator { bottom: calc(14px + env(safe-area-inset-bottom)); }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -405,8 +494,10 @@
     </div>
 
     <div class="scroll-indicator" aria-hidden="true">
-      <span>Scroll</span>
-      <div class="scroll-track"><div class="scroll-dot"></div></div>
+      <div class="pill">
+        <span>Scroll</span>
+        <div class="scroll-track"><div class="scroll-dot"></div></div>
+      </div>
     </div>
   </section>
 
@@ -468,7 +559,6 @@
       </div>
     </div>
 
-    <!-- Footer inside last section -->
     <div class="footer-bar">
       <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col items-center">
         <a href="http://www.italianexp.com" target="_top" class="block no-underline mb-6">
@@ -491,7 +581,6 @@
   </section>
 
   <script>
-    // Build EXPERIENCE letters
     function buildLetters() {
       document.querySelectorAll('.font-ex').forEach(ex => {
         const text = ex.getAttribute('data-text') || '';
@@ -499,11 +588,9 @@
       });
     }
 
-    // Prism logo mouse effect (desktop only)
     function initLogoMouse(id) {
       const el = document.getElementById(id);
       if (!el) return;
-
       if (!window.matchMedia("(pointer: fine)").matches) return;
 
       const it = el.querySelector('.font-it');
@@ -550,12 +637,10 @@
       }, { passive: true });
     }
 
-    // Reveal observer
     const revealObs = new IntersectionObserver((entries) => {
       entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
     }, { threshold: 0.12 });
 
-    // Snap controller one section per scroll/touch
     const sections = Array.from(document.querySelectorAll('[data-snap]'));
     let index = 0;
     let locked = false;
@@ -569,7 +654,6 @@
       window.setTimeout(() => { locked = false; }, 650);
     }
 
-    // Keep index in sync
     const secObs = new IntersectionObserver((entries) => {
       let best = null;
       for (const e of entries) {
@@ -594,6 +678,13 @@
 
     window.addEventListener('touchend', (e) => {
       if (locked || touchStartY == null) return;
+
+      const isMobile = window.matchMedia("(max-width: 768px)").matches;
+      if (isMobile && index === 0) {
+        touchStartY = null;
+        return;
+      }
+
       const t = e.changedTouches && e.changedTouches[0];
       if (!t) return;
       const dy = touchStartY - t.clientY;
@@ -602,7 +693,6 @@
       scrollToIndex(index + (dy > 0 ? 1 : -1));
     }, { passive: true });
 
-    // Parallax light only when section 2 is visible
     const parallaxImg = document.getElementById('essence-parallax');
     const parallaxSection = parallaxImg ? parallaxImg.closest('section') : null;
     let parallaxOn = false;
