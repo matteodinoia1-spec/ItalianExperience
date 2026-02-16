@@ -162,16 +162,19 @@
     .gold-line { width: 1px; height: 46px; background: var(--brand-gold); margin: 0 auto 1.6rem auto; opacity: 0.6; transition: height 450ms ease, opacity 450ms ease; }
     .portal-pillar:hover .gold-line { height: 74px; opacity: 1; }
 
+    /* Titles: NEVER wrap, scale down until readable */
     .title-portal {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(2rem, 4.2vw, 5rem);
+      font-size: clamp(1.55rem, 4.2vw, 5rem);
       line-height: 1.02;
       margin-bottom: 1.2rem;
       color: #fff;
       text-shadow: 0 10px 30px rgba(0,0,0,0.6);
       font-style: italic;
-      white-space: normal;
-      overflow-wrap: anywhere;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
     }
 
     .description {
@@ -199,20 +202,8 @@
       overflow: hidden;
     }
 
-    .essence-bg {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    .essence-bg img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: brightness(0.25);
-      transform: scale(1.12);
-    }
+    .essence-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+    .essence-bg img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.25); transform: scale(1.12); }
 
     .essence-card {
       position: relative;
@@ -397,22 +388,20 @@
       overflow-wrap: anywhere;
     }
 
+    /* Mobile titles: NEVER wrap, scale down until readable */
     .card-title {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(2rem, 9vw, 2.4rem);
+      font-size: clamp(1.55rem, 9.2vw, 2.4rem);
       font-style: italic;
       color: #fff;
       line-height: 1.02;
-      overflow-wrap: anywhere;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
     }
 
-    .card-accent {
-      width: 45px;
-      height: 1px;
-      background: var(--brand-gold);
-      margin: 14px 0;
-      transition: width 0.35s ease;
-    }
+    .card-accent { width: 45px; height: 1px; background: var(--brand-gold); margin: 14px 0; transition: width 0.35s ease; }
 
     .card-desc {
       font-size: 0.9rem;
@@ -663,7 +652,7 @@
     </section>
   </div>
 
-  <!-- MOBILE VERSION (like your original) -->
+  <!-- MOBILE VERSION -->
   <div class="mobile-only">
     <main class="portal-container">
       <div class="portal-card hero-card">
@@ -856,7 +845,7 @@
       initLogoMouse('logo-main');
       initLogoMouse('logo-footer');
 
-      // Mobile touch logo effect (like your original)
+      // Mobile touch logo effect
       function handleLogoEffect(e, trigger) {
         const logoId = trigger.getAttribute('data-logo-id');
         const logo = document.getElementById(logoId);
