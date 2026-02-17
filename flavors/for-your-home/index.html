@@ -166,6 +166,7 @@
       min-width:260px;
       background:rgba(10,10,10,0.96);
       backdrop-filter:blur(35px);
+      -webkit-backdrop-filter:blur(35px);
       border:1px solid rgba(255,255,255,0.1);
       opacity:0;
       visibility:hidden;
@@ -225,6 +226,7 @@
       inset:0;
       background:rgba(8,8,8,0.98);
       backdrop-filter:blur(50px) saturate(160%);
+      -webkit-backdrop-filter:blur(50px) saturate(160%);
       z-index:10000;
       opacity:0;
       visibility:hidden;
@@ -551,6 +553,9 @@
       animation:scrollLine 1.6s infinite ease-in-out;
     }
 
+    /* INFO SECTION */
+    #info .fa-solid{line-height:1}
+
     /* FOOTER */
     .site-footer{
       background:#000;
@@ -579,12 +584,8 @@
     }
 
     @media (max-width:768px){
-      .coming-sub{
-        font-size:0.95rem;
-      }
-      .coming-actions{
-        gap:10px;
-      }
+      .coming-sub{font-size:0.95rem;}
+      .coming-actions{gap:10px;}
       .btn-gold,
       .btn-outline{
         width:100%;
@@ -616,7 +617,7 @@
     </div>
 
     <nav class="mobile-menu" aria-label="Mobile menu">
-      <a href="https://www.italianexp.com/" class="mobile-link" data-close>Home</a>
+      <a href="/ItalianExperience/" class="mobile-link" data-close>Home</a>
 
       <!-- TRAVEL -->
       <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-travel">
@@ -627,9 +628,9 @@
       </button>
       <div id="m-travel" class="mobile-sub">
         <div class="mobile-sub-inner">
-          <a href="https://www.italianexp.com/travel/bespoke/" class="mobile-sublink" data-close>Bespoke</a>
-          <a href="https://www.italianexp.com/travel/gapyear/" class="mobile-sublink" data-close>gap year</a>
-          <a href="https://www.italianexp.com/travel/culinary/" class="mobile-sublink" data-close>Culinary Academy</a>
+          <a href="/ItalianExperience/travel/bespoke/" class="mobile-sublink" data-close>Bespoke</a>
+          <a href="/ItalianExperience/travel/gapyear/" class="mobile-sublink" data-close>Gap Year</a>
+          <a href="/ItalianExperience/travel/culinary/" class="mobile-sublink" data-close>Culinary Academy</a>
         </div>
       </div>
 
@@ -642,8 +643,8 @@
       </button>
       <div id="m-recruitment" class="mobile-sub">
         <div class="mobile-sub-inner">
-          <a href="https://www.italianexp.com/recruitment/employer/" class="mobile-sublink" data-close>Employer</a>
-          <a href="https://www.italianexp.com/recruitment/candidate/" class="mobile-sublink" data-close>Candidate</a>
+          <a href="/ItalianExperience/recruitment/employer/" class="mobile-sublink" data-close>Employer</a>
+          <a href="/ItalianExperience/recruitment/candidate/" class="mobile-sublink" data-close>Candidate</a>
         </div>
       </div>
 
@@ -656,20 +657,21 @@
       </button>
       <div id="m-flavors" class="mobile-sub">
         <div class="mobile-sub-inner">
-          <a href="https://www.italianexp.com/flavors/for-your-home/" class="mobile-sublink" data-close>For your home</a>
-          <a href="https://www.italianexp.com/flavors/for-your-business/" class="mobile-sublink" data-close>For your business</a>
-          <a href="https://www.italianexp.com/flavors/aziende-italiane/" class="mobile-sublink" data-close>Italian Companies</a>
+          <a href="/ItalianExperience/flavors/" class="mobile-sublink" data-close>Flavors Hub</a>
+          <a href="/ItalianExperience/flavors/for-your-home/" class="mobile-sublink" data-close>For your home</a>
+          <a href="/ItalianExperience/flavors/for-your-business/" class="mobile-sublink" data-close>For your business</a>
+          <a href="/ItalianExperience/flavors/aziende-italiane/" class="mobile-sublink" data-close>Italian Companies</a>
         </div>
       </div>
 
-      <a href="https://www.italianexp.com/estates/" class="mobile-link" data-close>Estates</a>
-      <a href="https://www.italianexp.com/contact/" class="mobile-link" data-close>Contact</a>
+      <a href="/ItalianExperience/estates/" class="mobile-link" data-close>Estates</a>
+      <a href="/ItalianExperience/contact/" class="mobile-link" data-close>Contact</a>
     </nav>
   </div>
 
   <!-- HEADER -->
   <nav class="glass-header" id="main-header" aria-label="Header">
-    <a href="https://www.italianexp.com/" class="no-underline">
+    <a href="/ItalianExperience/" class="no-underline">
       <div class="logo-wrap" id="logo-header">
         <span class="font-it">Italian</span>
         <div class="font-ex" data-text="EXPERIENCE"></div>
@@ -692,51 +694,51 @@
 
     <!-- DESKTOP MENU -->
     <div class="nav-container" aria-label="Desktop navigation">
-      <a href="https://www.italianexp.com/" class="nav-link">Home</a>
+      <a href="/ItalianExperience/" class="nav-link">Home</a>
 
       <div class="dropdown">
-        <a href="https://www.italianexp.com/travel/" class="nav-link">
+        <a href="/ItalianExperience/travel/" class="nav-link">
           Travel
           <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
             <path d="m6 9 6 6 6-6"></path>
           </svg>
         </a>
         <div class="dropdown-menu">
-          <a href="https://www.italianexp.com/travel/bespoke/" class="dropdown-item">Bespoke</a>
-          <a href="https://www.italianexp.com/travel/gapyear/" class="dropdown-item">gap year</a>
-          <a href="https://www.italianexp.com/travel/culinary/" class="dropdown-item">Culinary Academy</a>
+          <a href="/ItalianExperience/travel/bespoke/" class="dropdown-item">Bespoke</a>
+          <a href="/ItalianExperience/travel/gapyear/" class="dropdown-item">Gap Year</a>
+          <a href="/ItalianExperience/travel/culinary/" class="dropdown-item">Culinary Academy</a>
         </div>
       </div>
 
       <div class="dropdown">
-        <a href="https://www.italianexp.com/recruitment/" class="nav-link">
+        <a href="/ItalianExperience/recruitment/" class="nav-link">
           Recruitment
           <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
             <path d="m6 9 6 6 6-6"></path>
           </svg>
         </a>
         <div class="dropdown-menu">
-          <a href="https://www.italianexp.com/recruitment/employer/" class="dropdown-item">Employer</a>
-          <a href="https://www.italianexp.com/recruitment/candidate/" class="dropdown-item">Candidate</a>
+          <a href="/ItalianExperience/recruitment/employer/" class="dropdown-item">Employer</a>
+          <a href="/ItalianExperience/recruitment/candidate/" class="dropdown-item">Candidate</a>
         </div>
       </div>
 
       <div class="dropdown">
-        <a href="https://www.italianexp.com/flavors/" class="nav-link">
+        <a href="/ItalianExperience/flavors/" class="nav-link">
           Flavors
           <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
             <path d="m6 9 6 6 6-6"></path>
           </svg>
         </a>
         <div class="dropdown-menu">
-          <a href="https://www.italianexp.com/flavors/for-your-home/" class="dropdown-item">For your home</a>
-          <a href="https://www.italianexp.com/flavors/for-your-business/" class="dropdown-item">For your business</a>
-          <a href="https://www.italianexp.com/flavors/aziende-italiane/" class="dropdown-item">Italian Companies</a>
+          <a href="/ItalianExperience/flavors/for-your-home/" class="dropdown-item">For your home</a>
+          <a href="/ItalianExperience/flavors/for-your-business/" class="dropdown-item">For your business</a>
+          <a href="/ItalianExperience/flavors/aziende-italiane/" class="dropdown-item">Italian Companies</a>
         </div>
       </div>
 
-      <a href="https://www.italianexp.com/estates/" class="nav-link">Estates</a>
-      <a href="https://www.italianexp.com/contact/" class="nav-link">Contact</a>
+      <a href="/ItalianExperience/estates/" class="nav-link">Estates</a>
+      <a href="/ItalianExperience/contact/" class="nav-link">Contact</a>
     </div>
   </nav>
 
@@ -766,12 +768,12 @@
       </p>
 
       <div class="coming-actions">
-        <a href="https://www.italianexp.com/" class="btn-gold">
+        <a href="/ItalianExperience/" class="btn-gold">
           <i class="fa-solid fa-house"></i>
           Back to Home
         </a>
 
-        <a href="https://www.italianexp.com/contact/" class="btn-outline">
+        <a href="/ItalianExperience/contact/" class="btn-outline">
           <i class="fa-solid fa-envelope"></i>
           Contact Us
         </a>
@@ -826,7 +828,7 @@
 
   <!-- FOOTER -->
   <footer class="site-footer">
-    <a href="https://www.italianexp.com/" class="no-underline mb-8">
+    <a href="/ItalianExperience/" class="no-underline mb-8">
       <div class="logo-wrap scale-[0.7] md:scale-[0.8]" id="logo-footer">
         <span class="font-it">Italian</span>
         <div class="font-ex" data-text="EXPERIENCE"></div>
@@ -839,8 +841,7 @@
     </a>
 
     <p class="text-white/20 uppercase tracking-[0.4em] text-[0.6rem]">
-      © ITALIAN RECRUITMENT DBA ITALIAN EXPERIENCE<br>
-      STRATEGIC HOSPITALITY ADVISORY
+      © 2026 ITALIAN EXPERIENCE · STRATEGIC ADVISORY
     </p>
   </footer>
 
@@ -887,12 +888,12 @@
       });
 
       overlay.addEventListener('click', (e) => {
-  const t = e.target;
-  if (t && t.closest && t.closest('[data-close]')) {
-    overlay.classList.remove('active');
-    overlay.setAttribute('aria-hidden', 'true');
-  }
-}, { passive: true });
+        const t = e.target;
+        if (t && t.closest && t.closest('[data-close]')) {
+          overlay.classList.remove('active');
+          overlay.setAttribute('aria-hidden', 'true');
+        }
+      }, { passive: true });
 
       /* MOBILE ACCORDION */
       const accBtns = Array.from(document.querySelectorAll('.mobile-acc-btn'));
@@ -973,7 +974,7 @@
         }, { passive: true });
       }
 
-            initLogoMouse('logo-header');
+      initLogoMouse('logo-header');
       initLogoMouse('logo-footer');
 
     });
@@ -981,5 +982,3 @@
 
 </body>
 </html>
-
-
