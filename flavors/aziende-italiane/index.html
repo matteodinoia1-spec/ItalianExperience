@@ -3,313 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Expansion Advisory USA - Italian Experience</title>
+  <title>Expansion Advisory USA | Italian Experience</title>
+
+  <meta name="description" content="Consulenza strategica per aziende italiane che vogliono espandersi negli USA. Supporto completo su compliance FDA, U.S. Agent e posizionamento commerciale." />
+  <meta name="keywords" content="Italian Experience, aziende italiane, export USA, FDA, U.S. Agent, consulenza strategica, food business" />
+  <meta name="author" content="Italian Experience" />
+  <meta name="robots" content="index, follow" />
+
+  <link rel="canonical" href="https://www.italianexp.com/flavors/aziende-italiane/" />
+
+  <meta property="og:title" content="Expansion Advisory USA | Italian Experience" />
+  <meta property="og:description" content="Consulenza strategica per aziende italiane che vogliono espandersi negli USA. FDA, U.S. Agent, compliance e posizionamento." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.italianexp.com/flavors/aziende-italiane/" />
+  <meta property="og:image" content="https://www.italianexp.com/assets/preview.jpg" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Expansion Advisory USA | Italian Experience" />
+  <meta name="twitter:description" content="Consulenza strategica per aziende italiane che vogliono espandersi negli USA." />
+  <meta name="twitter:image" content="https://www.italianexp.com/assets/preview.jpg" />
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@200;300;400;600&family=Great+Vibes&family=Montserrat:wght@700;900&display=swap');
-
-    :root{
-      --brand-gold:#c5a059;
-      --brand-dark:#080808;
-      --it-green:#008C45;
-      --it-red:#CD212A;
-    }
-
-    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    html{scroll-behavior:smooth;background:#000}
-
-    body{
-      font-family:'Inter',sans-serif;
-      background:var(--brand-dark);
-      color:#fff;
-      overflow-x:hidden;
-      min-height:100vh;
-      -webkit-font-smoothing:antialiased;
-    }
-
-    a{color:inherit;text-decoration:none}
     .brand-font{font-family:'Playfair Display',serif}
 
-    /* HEADER */
-    .glass-header{
-      position:fixed;
-      top:0;left:0;width:100%;
-      z-index:9999;
-      height:110px;
-      padding:0 4rem;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      background:transparent;
-      backdrop-filter:blur(0px);
-      transition:transform 0.6s cubic-bezier(0.16,1,0.3,1),background 0.5s,backdrop-filter 0.5s,height 0.4s,padding 0.4s;
-    }
-    .glass-header.nav-up{transform:translateY(-110%)}
-    .glass-header.scrolled{
-      height:90px;
-      padding:0 2rem;
-      background:rgba(15,15,15,0.45);
-      backdrop-filter:blur(40px) saturate(180%);
-      -webkit-backdrop-filter:blur(40px) saturate(180%);
-      border-bottom:1px solid rgba(255,255,255,0.08);
-      box-shadow:0 10px 30px rgba(0,0,0,0.5);
-    }
-
-    /* LOGO */
-    .logo-wrap{
-      display:flex;
-      align-items:baseline;
-      gap:8px;
-      position:relative;
-      user-select:none;
-      white-space:nowrap;
-      z-index:10001;
-      cursor:pointer;
-    }
-    .font-it{
-      font-family:'Great Vibes',cursive;
-      color:var(--brand-gold);
-      font-size:70px;
-      line-height:1;
-      white-space:nowrap;
-      transition:0.3s;
-    }
-    .font-ex{
-      font-family:'Montserrat',sans-serif;
-      color:var(--brand-gold);
-      font-weight:900;
-      font-size:35px;
-      line-height:1;
-      letter-spacing:-0.02em;
-      display:flex;
-    }
-    .letter{
-      display:inline-block;
-      position:relative;
-      will-change:transform,color;
-      transition:all 0.25s ease-out;
-    }
-    .tricolore-line{
-      position:absolute;
-      height:2px;
-      width:60px;
-      bottom:-6px;
-      right:0;
-      display:flex;
-      pointer-events:none;
-    }
-
-    /* DESKTOP NAV */
-    .nav-container{
-      display:flex;
-      align-items:center;
-      gap:0.25rem;
-      margin-left:auto;
-      height:100%;
-    }
-    .nav-link{
-      color:#fff;
-      text-transform:uppercase;
-      font-size:0.62rem;
-      letter-spacing:0.25em;
-      padding:1.2rem 0.8rem;
-      transition:all 0.25s;
-      opacity:0.72;
-      white-space:nowrap;
-      cursor:pointer;
-    }
-    .nav-link:hover{
-      color:var(--brand-gold);
-      opacity:1;
-      text-shadow:0 0 10px rgba(197,160,89,0.4);
-    }
-
-    .nav-link.active,
-    .dropdown-item.active,
-    .mobile-link.active,
-    .mobile-sublink.active,
-    .mobile-acc-btn.active{
-      color:var(--brand-gold) !important;
-      opacity:1 !important;
-      text-shadow:0 0 12px rgba(197,160,89,0.35);
-    }
-
-    .dropdown{position:relative;height:100%;display:flex;align-items:center}
-    .dropdown-menu{
-      position:absolute;
-      top:100%;
-      right:0;
-      min-width:260px;
-      background:rgba(10,10,10,0.96);
-      backdrop-filter:blur(35px);
-      -webkit-backdrop-filter:blur(35px);
-      border:1px solid rgba(255,255,255,0.1);
-      opacity:0;
-      visibility:hidden;
-      transform:translateY(10px);
-      transition:all 0.3s ease;
-      padding:1rem 0;
-      box-shadow:0 20px 40px rgba(0,0,0,0.6);
-    }
-    .dropdown:hover .dropdown-menu{
-      opacity:1;
-      visibility:visible;
-      transform:translateY(0);
-    }
-    .dropdown-item{
-      display:block;
-      padding:0.8rem 1.8rem;
-      color:#fff;
-      font-size:0.6rem;
-      text-transform:uppercase;
-      letter-spacing:0.15em;
-      opacity:0.65;
-      transition:0.25s;
-    }
-    .dropdown-item:hover{
-      color:var(--brand-gold);
-      opacity:1;
-      background:rgba(255,255,255,0.03);
-      padding-left:2.2rem;
-    }
-
-    /* MOBILE MENU BUTTON */
-    #central-menu-btn{
-      display:none;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      background:none;
-      border:none;
-      cursor:pointer;
-      outline:none;
-      z-index:10002;
-      transition:all 0.25s ease;
-    }
-    #central-menu-btn span{
-      color:var(--brand-gold);
-      font-size:0.52rem;
-      text-transform:uppercase;
-      letter-spacing:0.4em;
-      margin-top:6px;
-      font-weight:600;
-      opacity:0.95;
-    }
-
-    /* MOBILE OVERLAY MASTER */
-    #mobile-menu-overlay{
-      position:fixed;
-      inset:0;
-      background:rgba(8,8,8,0.98);
-      backdrop-filter:blur(50px) saturate(160%);
-      -webkit-backdrop-filter:blur(50px) saturate(160%);
-      z-index:10000;
-      opacity:0;
-      visibility:hidden;
-      transition:opacity 0.35s ease,visibility 0.35s ease;
-      padding:clamp(1.2rem,4vw,2.2rem);
-      overflow-y:auto;
-    }
-    #mobile-menu-overlay.active{
-      opacity:1;
-      visibility:visible;
-    }
-
-    .mobile-close{
-      position:sticky;
-      top:0;
-      display:flex;
-      justify-content:flex-end;
-      z-index:2;
-      padding:0.5rem 0;
-    }
-
-    .mobile-menu{
-      max-width:520px;
-      margin:0 auto;
-      padding:2.2rem 0 3rem 0;
-      display:flex;
-      flex-direction:column;
-      gap:0.4rem;
-      align-items:center;
-      text-align:center;
-    }
-
-    .mobile-link,
-    .mobile-acc-btn{
-      width:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:12px;
-      padding:14px 10px;
-      color:#fff;
-      text-transform:uppercase;
-      letter-spacing:0.35em;
-      font-size:0.72rem;
-      opacity:0.75;
-      transition:opacity 0.2s ease,color 0.2s ease;
-      background:transparent;
-      border:none;
-      cursor:pointer;
-    }
-    .mobile-link:hover,
-    .mobile-acc-btn:hover{
-      opacity:1;
-      color:var(--brand-gold);
-    }
-
-    .chev{
-      width:14px;
-      height:14px;
-      opacity:0.65;
-      transition:transform 0.25s ease,opacity 0.25s ease;
-    }
-    .mobile-acc-btn[aria-expanded="true"] .chev{
-      transform:rotate(180deg);
-      opacity:1;
-    }
-
-    .mobile-sub{
-      width:100%;
-      max-height:0;
-      overflow:hidden;
-      transition:max-height 0.35s ease;
-    }
-    .mobile-sub-inner{
-      padding:4px 0 10px 0;
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-    }
-    .mobile-sublink{
-      display:block;
-      padding:10px 10px;
-      color:#fff;
-      text-transform:uppercase;
-      letter-spacing:0.28em;
-      font-size:0.62rem;
-      opacity:0.55;
-      transition:opacity 0.2s ease,color 0.2s ease;
-    }
-    .mobile-sublink:hover{
-      opacity:1;
-      color:var(--brand-gold);
-    }
-
-    /* HERO SPLIT */
     .hero-split{
       position:relative;
       width:100%;
-      min-height:100vh;
-      min-height:100dvh;
+      height:100vh;
+      height:100dvh;
       display:flex;
       align-items:center;
       overflow:hidden;
       background:#000;
-      padding-top:110px;
     }
 
     .hero-image{
@@ -318,16 +46,16 @@
       top:0;
       width:55%;
       height:100%;
-      background:url('https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1500&q=80') center/cover no-repeat;
+      background:url("https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1500&q=80") center/cover no-repeat;
       z-index:1;
       filter:brightness(0.35) contrast(1.1);
     }
 
     .hero-image::after{
-      content:'';
+      content:"";
       position:absolute;
       inset:0;
-      background:linear-gradient(to right, var(--brand-dark) 0%, transparent 40%);
+      background:linear-gradient(to right, #080808 0%, transparent 45%);
       z-index:2;
     }
 
@@ -339,11 +67,10 @@
       pointer-events:none;
     }
 
-    /* SCROLL INDICATOR */
-    @keyframes scrollLine {
-      0% { transform: translateY(-18px); opacity: 0; }
-      30% { opacity: 1; }
-      100% { transform: translateY(52px); opacity: 0; }
+    @keyframes scrollLine{
+      0%{transform:translateY(-18px);opacity:0}
+      30%{opacity:1}
+      100%{transform:translateY(52px);opacity:0}
     }
 
     .explore-indicator{
@@ -358,7 +85,7 @@
       gap:14px;
       text-decoration:none;
       opacity:0.82;
-      transition:opacity 0.2s ease, transform 0.2s ease;
+      transition:opacity 0.2s ease,transform 0.2s ease;
       pointer-events:auto;
     }
 
@@ -395,7 +122,6 @@
       animation:scrollLine 1.6s infinite ease-in-out;
     }
 
-    /* SECTION 2 */
     .advisory-section{
       min-height:100vh;
       display:flex;
@@ -474,7 +200,6 @@
       vertical-align:middle;
     }
 
-    /* SECTION 3 */
     .glass-card{
       background:rgba(255,255,255,0.02);
       backdrop-filter:blur(20px);
@@ -492,7 +217,6 @@
       background:rgba(197,160,89,0.04);
     }
 
-    /* SECTION 4 */
     .roadmap-step{
       position:relative;
       padding-left:4rem;
@@ -523,37 +247,7 @@
       box-shadow:0 0 15px rgba(197,160,89,0.2);
     }
 
-    /* FOOTER */
-    .site-footer{
-      background:#000;
-      padding:6rem 2rem;
-      border-top:1px solid rgba(255,255,255,0.05);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      text-align:center;
-    }
-
-    /* RESPONSIVE HEADER MOBILE */
     @media (max-width:1024px){
-      .glass-header{
-        flex-direction:column !important;
-        justify-content:center !important;
-        height:160px !important;
-        padding:1rem 0 !important;
-        gap:10px;
-      }
-      .glass-header.scrolled{height:135px !important;}
-      .logo-wrap{transform:scale(0.82);margin:0 auto;}
-      #central-menu-btn{display:flex !important;margin-top:6px;}
-      .nav-container{display:none !important;}
-
-      .hero-split{
-        padding-top:160px;
-        min-height:100vh;
-        min-height:100dvh;
-      }
-
       .hero-content{
         width:100%;
         padding:0 2rem 130px;
@@ -562,504 +256,269 @@
 
       .hero-image{
         width:100%;
-        filter:brightness(0.65) contrast(1.1);
+        filter:brightness(0.6) contrast(1.1);
       }
 
       .hero-image::after{
-        background:linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.65) 100%);
+        background:linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%);
       }
     }
 
     @media (max-width:768px){
       .hero-content h1{
-        font-size:clamp(1.7rem, 8vw, 2.8rem) !important;
+        font-size:clamp(1.9rem, 9vw, 3.2rem) !important;
         line-height:1.05 !important;
       }
-      .hero-content p{
-        font-size:0.9rem !important;
-        margin-left:auto !important;
-        margin-right:auto !important;
-      }
-    }
-
-    @media (max-width:350px){
-      .logo-wrap{transform:scale(0.68)}
-      .glass-header{height:145px !important}
-      #central-menu-btn{scale:0.9}
-      .hero-split{padding-top:145px}
     }
   </style>
 </head>
 
-<body>
+<body class="bg-[#080808] text-white overflow-x-hidden">
 
-  <!-- MOBILE MENU OVERLAY (MASTER) -->
-  <div id="mobile-menu-overlay" aria-hidden="true">
-    <div class="mobile-close">
-      <button id="close-menu" aria-label="Close menu" class="text-white/80 hover:text-white">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
+  <div id="site-header"></div>
 
-    <nav class="mobile-menu" aria-label="Mobile menu">
-      <a href="/ItalianExperience/" class="mobile-link" data-close>Home</a>
+  <main>
 
-      <!-- TRAVEL -->
-      <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-travel">
-        <span>Travel</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
-      </button>
-      <div id="m-travel" class="mobile-sub">
-        <div class="mobile-sub-inner">
-          <a href="/ItalianExperience/travel/bespoke/" class="mobile-sublink" data-close>Bespoke</a>
-          <a href="/ItalianExperience/travel/gapyear/" class="mobile-sublink" data-close>Gap Year</a>
-          <a href="/ItalianExperience/travel/culinary/" class="mobile-sublink" data-close>Culinary Academy</a>
+    <section class="hero-split" aria-label="Hero aziende italiane">
+      <div class="hero-content">
+        <h3 class="text-[#c5a059] italic brand-font text-2xl mb-4 drop-shadow-xl">
+          Consulenza Strategica
+        </h3>
+
+        <h1 class="text-5xl md:text-8xl font-bold brand-font leading-tight mb-8 text-white drop-shadow-2xl uppercase tracking-tighter">
+          Espandi il tuo Business <br />
+          <span class="italic font-light text-white/80">negli USA.</span>
+        </h1>
+
+        <p class="text-slate-300 font-light text-base md:text-lg max-w-md leading-relaxed mb-4">
+          Trasformiamo l'eccellenza italiana in una storia di successo globale.
+          Navighiamo le complessità tra tradizione e regolamentazione federale per la vostra espansione.
+        </p>
+      </div>
+
+      <div class="hero-image" aria-hidden="true"></div>
+
+      <a href="#advisory" class="explore-indicator" aria-label="Explore section">
+        <span>Inizia l'Espansione</span>
+        <div class="scroll-track" aria-hidden="true">
+          <div class="scroll-dot"></div>
         </div>
-      </div>
+      </a>
+    </section>
 
-      <!-- RECRUITMENT -->
-      <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-recruitment">
-        <span>Recruitment</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
-      </button>
-      <div id="m-recruitment" class="mobile-sub">
-        <div class="mobile-sub-inner">
-          <a href="/ItalianExperience/recruitment/employer/" class="mobile-sublink" data-close>Employer</a>
-          <a href="/ItalianExperience/recruitment/candidate/" class="mobile-sublink" data-close>Candidate</a>
-        </div>
-      </div>
+    <section id="advisory" class="advisory-section">
+      <div class="glow-bg" aria-hidden="true"></div>
 
-      <!-- FLAVORS -->
-      <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-flavors">
-        <span>Flavors</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
-      </button>
-      <div id="m-flavors" class="mobile-sub">
-        <div class="mobile-sub-inner">
-          <a href="/ItalianExperience/flavors/for-your-home/" class="mobile-sublink" data-close>For your home</a>
-          <a href="/ItalianExperience/flavors/for-your-business/" class="mobile-sublink" data-close>For your business</a>
-          <a href="/ItalianExperience/flavors/aziende-italiane/" class="mobile-sublink" data-close>Aziende Italiane</a>
-        </div>
-      </div>
+      <div class="max-w-7xl mx-auto px-6 relative z-10">
+        <div class="grid lg:grid-cols-12 gap-20 items-center">
 
-      <a href="/ItalianExperience/estates/" class="mobile-link" data-close>Estates</a>
-      <a href="/ItalianExperience/contact/" class="mobile-link" data-close>Contact</a>
-    </nav>
-  </div>
+          <div class="lg:col-span-6 space-y-12">
+            <div>
+              <div class="flex items-center mb-8">
+                <span class="gold-line-long"></span>
+                <span class="uppercase tracking-[0.5em] text-[0.65rem] text-[#c5a059] mx-4 font-bold">
+                  Global Heritage & Advisory
+                </span>
+              </div>
 
-  <!-- HEADER (MASTER) -->
-  <nav class="glass-header" id="main-header" aria-label="Header">
-    <a href="/ItalianExperience/" class="no-underline">
-      <div class="logo-wrap" id="logo-header">
-        <span class="font-it">Italian</span>
-        <div class="font-ex" data-text="EXPERIENCE"></div>
-        <div class="tricolore-line">
-          <div style="background:var(--it-green);flex:1"></div>
-          <div style="background:#fff;flex:1"></div>
-          <div style="background:var(--it-red);flex:1"></div>
-        </div>
-      </div>
-    </a>
+              <h2 class="text-5xl md:text-7xl brand-font mb-8 leading-tight text-white">
+                Il Valore di un <br />
+                <span class="italic unesco-text">Patrimonio Mondiale.</span>
+              </h2>
 
-    <button id="central-menu-btn" aria-label="Open menu">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-linecap="round">
-        <circle cx="12" cy="12" r="10" stroke="rgba(197,160,89,0.4)" stroke-width="1"></circle>
-        <line x1="8" y1="10" x2="16" y2="10" stroke="#c5a059" stroke-width="2.5"></line>
-        <line x1="10" y1="14" x2="14" y2="14" stroke="#c5a059" stroke-width="2.5"></line>
-      </svg>
-      <span>Menu</span>
-    </button>
-
-    <!-- DESKTOP MENU (MASTER) -->
-    <div class="nav-container" aria-label="Desktop navigation">
-      <a href="/ItalianExperience/" class="nav-link">Home</a>
-
-      <div class="dropdown">
-        <a href="/ItalianExperience/travel/" class="nav-link">
-          Travel
-          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <path d="m6 9 6 6 6-6"></path>
-          </svg>
-        </a>
-        <div class="dropdown-menu">
-          <a href="/ItalianExperience/travel/bespoke/" class="dropdown-item">Bespoke</a>
-          <a href="/ItalianExperience/travel/gapyear/" class="dropdown-item">Gap Year</a>
-          <a href="/ItalianExperience/travel/culinary/" class="dropdown-item">Culinary Academy</a>
-        </div>
-      </div>
-
-      <div class="dropdown">
-        <a href="/ItalianExperience/recruitment/" class="nav-link">
-          Recruitment
-          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <path d="m6 9 6 6 6-6"></path>
-          </svg>
-        </a>
-        <div class="dropdown-menu">
-          <a href="/ItalianExperience/recruitment/employer/" class="dropdown-item">Employer</a>
-          <a href="/ItalianExperience/recruitment/candidate/" class="dropdown-item">Candidate</a>
-        </div>
-      </div>
-
-      <div class="dropdown">
-        <a href="/ItalianExperience/flavors/" class="nav-link active">
-          Flavors
-          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <path d="m6 9 6 6 6-6"></path>
-          </svg>
-        </a>
-        <div class="dropdown-menu">
-          <a href="/ItalianExperience/flavors/for-your-home/" class="dropdown-item">For your home</a>
-          <a href="/ItalianExperience/flavors/for-your-business/" class="dropdown-item">For your business</a>
-          <a href="/ItalianExperience/flavors/aziende-italiane/" class="dropdown-item active">Aziende Italiane</a>
-        </div>
-      </div>
-
-      <a href="/ItalianExperience/estates/" class="nav-link">Estates</a>
-      <a href="/ItalianExperience/contact/" class="nav-link">Contact</a>
-    </div>
-  </nav>
-
-  <!-- HERO SPLIT -->
-  <section class="hero-split">
-    <div class="hero-content">
-      <h3 class="text-[#c5a059] italic brand-font text-2xl mb-4 drop-shadow-xl">
-        Consulenza Strategica
-      </h3>
-
-      <h1 class="text-5xl md:text-8xl font-bold brand-font leading-tight mb-8 text-white drop-shadow-2xl uppercase tracking-tighter">
-        Espandi il tuo Business <br>
-        <span class="italic font-light text-white/80">negli USA.</span>
-      </h1>
-
-      <p class="text-slate-300 font-light text-base md:text-lg max-w-md leading-relaxed mb-4">
-        Trasformiamo l'eccellenza italiana in una storia di successo globale. Navighiamo le complessità tra tradizione e regolamentazione federale per la vostra espansione.
-      </p>
-    </div>
-
-    <div class="hero-image"></div>
-
-    <a href="#advisory" class="explore-indicator" aria-label="Explore section">
-      <span>Inizia l'Espansione</span>
-      <div class="scroll-track" aria-hidden="true">
-        <div class="scroll-dot"></div>
-      </div>
-    </a>
-  </section>
-
-  <!-- SECTION 2: ADVISORY & HERITAGE -->
-  <section id="advisory" class="advisory-section">
-    <div class="glow-bg"></div>
-
-    <div class="max-w-7xl mx-auto px-6 relative z-10">
-      <div class="grid lg:grid-cols-12 gap-20 items-center">
-
-        <div class="lg:col-span-6 space-y-12">
-          <div>
-            <div class="flex items-center mb-8">
-              <span class="gold-line-long"></span>
-              <span class="uppercase tracking-[0.5em] text-[0.65rem] text-[#c5a059] mx-4 font-bold">Global Heritage & Advisory</span>
+              <p class="text-slate-300 font-light text-lg leading-relaxed">
+                La cucina italiana, candidata come <span class="text-white font-semibold">Patrimonio Immateriale UNESCO</span>,
+                non è solo cibo: è l'asset culturale più potente al mondo.
+                Portiamo questo valore sul mercato americano.
+              </p>
             </div>
 
-            <h2 class="text-5xl md:text-7xl brand-font mb-8 leading-tight text-white">
-              Il Valore di un <br><span class="italic unesco-text">Patrimonio Mondiale.</span>
-            </h2>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="info-badge">
+                <svg class="w-8 h-8 text-[#c5a059] mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <h4 class="text-white font-bold text-xs uppercase tracking-widest mb-2">Full FDA Package</h4>
+                <p class="text-slate-500 text-[0.65rem] leading-relaxed">
+                  Gestiamo la stesura completa della richiesta di certificazione FDA per i tuoi prodotti.
+                </p>
+              </div>
 
-            <p class="text-slate-300 font-light text-lg leading-relaxed">
-              La cucina italiana, candidata come <span class="text-white font-semibold">Patrimonio Immateriale UNESCO</span>, non è solo cibo: è l'asset culturale più potente al mondo. Portiamo questo valore sul mercato americano.
+              <div class="info-badge">
+                <svg class="w-8 h-8 text-[#c5a059] mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <h4 class="text-white font-bold text-xs uppercase tracking-widest mb-2">Zero Compliance Risk</h4>
+                <p class="text-slate-500 text-[0.65rem] leading-relaxed">
+                  Dalla verifica degli ingredienti al labeling normativo, eliminiamo ogni barriera legale.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-6">
+            <div class="export-map-wrapper">
+              <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+                <path d="M50,100 L250,100 L280,180 L250,350 L100,450 L50,400 Z" fill="white" opacity="0.04" />
+                <path d="M500,50 L750,50 L780,200 L700,350 L550,400 L450,250 L480,150 Z" fill="white" opacity="0.04" />
+
+                <g>
+                  <path d="M580,220 Q400,180 200,190" class="route-line" />
+                  <circle cx="200" cy="190" r="4" fill="#c5a059" />
+
+                  <path d="M580,220 Q420,300 220,380" class="route-line" style="animation-delay:-5s" />
+                  <circle cx="220" cy="380" r="4" fill="#c5a059" />
+
+                  <circle cx="580" cy="220" r="8" class="hub-point" />
+
+                  <circle cx="580" cy="220" r="15" fill="none" stroke="#c5a059" stroke-width="0.5" stroke-opacity="0.5">
+                    <animate attributeName="r" from="8" to="35" dur="3s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" from="0.5" to="0" dur="3s" repeatCount="indefinite" />
+                  </circle>
+
+                  <text x="600" y="225" fill="#c5a059" font-size="22" font-weight="700" class="brand-font italic uppercase">Italia</text>
+                  <text x="110" y="185" fill="white" font-size="12" opacity="0.5" class="uppercase tracking-widest font-bold">New York</text>
+                  <text x="135" y="385" fill="white" font-size="12" opacity="0.5" class="uppercase tracking-widest font-bold">Miami</text>
+                </g>
+              </svg>
+
+              <div class="mt-12 pt-8 border-t border-white/5 grid grid-cols-2 gap-8 text-center md:text-left">
+                <div>
+                  <span class="block text-[#c5a059] font-bold text-3xl brand-font">93%</span>
+                  <span class="text-[0.65rem] uppercase tracking-widest text-slate-500 leading-relaxed">
+                    Brand Awareness USA
+                  </span>
+                </div>
+
+                <div>
+                  <span class="block text-[#c5a059] font-bold text-3xl brand-font">UNESCO</span>
+                  <span class="text-[0.65rem] uppercase tracking-widest text-slate-500 leading-relaxed">
+                    Patrimonio Mondiale
+                  </span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="py-32 px-6 bg-[#0c0c0c]">
+      <div class="max-w-7xl mx-auto text-center mb-24">
+        <span class="text-[#c5a059] uppercase tracking-[0.6em] text-[0.65rem] font-bold block mb-4">
+          La Nostra Metodologia
+        </span>
+        <h2 class="text-4xl md:text-6xl brand-font italic text-white uppercase tracking-tighter">
+          Percorsi Professionali
+        </h2>
+      </div>
+
+      <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
+        <div class="glass-card">
+          <h3 class="text-2xl brand-font text-[#c5a059] mb-6 italic">Ingresso Strategico</h3>
+          <p class="text-slate-400 text-sm font-light leading-relaxed">
+            Oltre la logistica, progettiamo il vostro ingresso nel mercato. Analizziamo modelli di prezzo e reti di distribuzione
+            per garantire l'integrità del marchio.
+          </p>
+        </div>
+
+        <div class="glass-card border-t-2 border-[#c5a059]">
+          <h3 class="text-2xl brand-font text-[#c5a059] mb-6 italic">Agente Ufficiale U.S.</h3>
+          <p class="text-slate-400 text-sm font-light leading-relaxed">
+            Forniamo il ponte legale obbligatorio. Operiamo come vostro Agente Ufficiale 24 ore su 24
+            per tutte le comunicazioni dirette con la FDA.
+          </p>
+        </div>
+
+        <div class="glass-card">
+          <h3 class="text-2xl brand-font text-[#c5a059] mb-6 italic">Consulenza Normativa</h3>
+          <p class="text-slate-400 text-sm font-light leading-relaxed">
+            Revisioni complesse delle tabelle nutrizionali e registrazioni degli impianti.
+            Gestiamo l'attrito tecnico affinché possiate concentrarvi sulla vostra maestria.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-32 px-6 bg-[#080808]">
+      <div class="max-w-4xl mx-auto">
+        <div class="mb-24 text-center md:text-left">
+          <span class="gold-line-long"></span>
+          <span class="uppercase tracking-[0.5em] text-[0.65rem] text-[#c5a059] mx-4 font-bold">
+            Il Vostro Viaggio
+          </span>
+          <h2 class="text-4xl md:text-6xl brand-font italic mt-8 text-white uppercase tracking-tighter">
+            Fasi del Successo.
+          </h2>
+        </div>
+
+        <div class="space-y-0 relative">
+
+          <div class="roadmap-step">
+            <div class="roadmap-number">01</div>
+            <h4 class="text-xl brand-font text-white mb-4 italic">Valutazione e Conformità</h4>
+            <p class="text-slate-400 text-sm font-light leading-relaxed max-w-2xl">
+              Audit completo dei prodotti e verifica dei requisiti FDA/USDA. Analisi dei gap tecnici per garantire un accesso fluido
+              senza intoppi legali.
             </p>
           </div>
 
-          <div class="grid md:grid-cols-2 gap-6">
-            <div class="info-badge">
-              <svg class="w-8 h-8 text-[#c5a059] mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              <h4 class="text-white font-bold text-xs uppercase tracking-widest mb-2">Full FDA Package</h4>
-              <p class="text-slate-500 text-[0.65rem] leading-relaxed">Gestiamo la stesura completa della richiesta di certificazione FDA per i tuoi prodotti.</p>
-            </div>
-
-            <div class="info-badge">
-              <svg class="w-8 h-8 text-[#c5a059] mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              <h4 class="text-white font-bold text-xs uppercase tracking-widest mb-2">Zero Compliance Risk</h4>
-              <p class="text-slate-500 text-[0.65rem] leading-relaxed">Dalla verifica degli ingredienti al labeling normativo, eliminiamo ogni barriera legale.</p>
-            </div>
+          <div class="roadmap-step">
+            <div class="roadmap-number">02</div>
+            <h4 class="text-xl brand-font text-white mb-4 italic">Architettura di Canale</h4>
+            <p class="text-slate-400 text-sm font-light leading-relaxed max-w-2xl">
+              Selezione dei partner logistici e definizione del modello di posizionamento. Creiamo le fondamenta operative per la vostra presenza stabile.
+            </p>
           </div>
-        </div>
 
-        <div class="lg:col-span-6">
-          <div class="export-map-wrapper">
-            <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
-              <path d="M50,100 L250,100 L280,180 L250,350 L100,450 L50,400 Z" fill="white" opacity="0.04" />
-              <path d="M500,50 L750,50 L780,200 L700,350 L550,400 L450,250 L480,150 Z" fill="white" opacity="0.04" />
-              <g>
-                <path d="M580,220 Q400,180 200,190" class="route-line" />
-                <circle cx="200" cy="190" r="4" fill="#c5a059" />
-                <path d="M580,220 Q420,300 220,380" class="route-line" style="animation-delay: -5s" />
-                <circle cx="220" cy="380" r="4" fill="#c5a059" />
-                <circle cx="580" cy="220" r="8" class="hub-point" />
-                <circle cx="580" cy="220" r="15" fill="none" stroke="#c5a059" stroke-width="0.5" stroke-opacity="0.5">
-                  <animate attributeName="r" from="8" to="35" dur="3s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" from="0.5" to="0" dur="3s" repeatCount="indefinite" />
-                </circle>
-
-                <text x="600" y="225" fill="#c5a059" font-size="22" font-weight="700" class="brand-font italic uppercase">Italia</text>
-                <text x="110" y="185" fill="white" font-size="12" opacity="0.5" class="uppercase tracking-widest font-bold">New York</text>
-                <text x="135" y="385" fill="white" font-size="12" opacity="0.5" class="uppercase tracking-widest font-bold">Miami</text>
-              </g>
-            </svg>
-
-            <div class="mt-12 pt-8 border-t border-white/5 grid grid-cols-2 gap-8 text-center md:text-left">
-              <div>
-                <span class="block text-[#c5a059] font-bold text-3xl brand-font">93%</span>
-                <span class="text-[0.65rem] uppercase tracking-widest text-slate-500 leading-relaxed">Brand Awareness USA</span>
-              </div>
-              <div>
-                <span class="block text-[#c5a059] font-bold text-3xl brand-font">UNESCO</span>
-                <span class="text-[0.65rem] uppercase tracking-widest text-slate-500 leading-relaxed">Patrimonio Mondiale</span>
-              </div>
-            </div>
-
+          <div class="roadmap-step">
+            <div class="roadmap-number">03</div>
+            <h4 class="text-xl brand-font text-white mb-4 italic">Lancio e Gestione Agente</h4>
+            <p class="text-slate-400 text-sm font-light leading-relaxed max-w-2xl">
+              Attivazione del ruolo di U.S. Agent e supporto continuo. Monitoraggio delle normative in evoluzione per proteggere la vostra eccellenza nel tempo.
+            </p>
           </div>
-        </div>
 
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 3: METHODOLOGY -->
-  <section class="py-32 px-6 bg-[#0c0c0c]">
-    <div class="max-w-7xl mx-auto text-center mb-24">
-      <span class="text-[#c5a059] uppercase tracking-[0.6em] text-[0.65rem] font-bold block mb-4">La Nostra Metodologia</span>
-      <h2 class="text-4xl md:text-6xl brand-font italic text-white uppercase tracking-tighter text-shadow-xl">Percorsi Professionali</h2>
-    </div>
-
-    <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
-      <div class="glass-card">
-        <h3 class="text-2xl brand-font text-[#c5a059] mb-6 italic">Ingresso Strategico</h3>
-        <p class="text-slate-400 text-sm font-light leading-relaxed">Oltre la logistica, progettiamo il vostro ingresso nel mercato. Analizziamo modelli di prezzo e reti di distribuzione per garantire l'integrità del marchio.</p>
-      </div>
-
-      <div class="glass-card border-t-2 border-[#c5a059]">
-        <h3 class="text-2xl brand-font text-[#c5a059] mb-6 italic">Agente Ufficiale U.S.</h3>
-        <p class="text-slate-400 text-sm font-light leading-relaxed">Forniamo il ponte legale obbligatorio. Operiamo come vostro Agente Ufficiale 24 ore su 24 per tutte le comunicazioni dirette con la FDA.</p>
-      </div>
-
-      <div class="glass-card">
-        <h3 class="text-2xl brand-font text-[#c5a059] mb-6 italic">Consulenza Normativa</h3>
-        <p class="text-slate-400 text-sm font-light leading-relaxed">Revisioni complesse delle tabelle nutrizionali e registrazioni degli impianti. Gestiamo l'attrito tecnico affinché possiate concentrarvi sulla vostra maestria.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 4: ROADMAP -->
-  <section class="py-32 px-6 bg-[#080808]">
-    <div class="max-w-4xl mx-auto">
-      <div class="mb-24 text-center md:text-left">
-        <span class="gold-line-long"></span>
-        <span class="uppercase tracking-[0.5em] text-[0.65rem] text-[#c5a059] mx-4 font-bold">Il Vostro Viaggio</span>
-        <h2 class="text-4xl md:text-6xl brand-font italic mt-8 text-white uppercase tracking-tighter">Fasi del Successo.</h2>
-      </div>
-
-      <div class="space-y-0 relative">
-        <div class="roadmap-step">
-          <div class="roadmap-number">01</div>
-          <h4 class="text-xl brand-font text-white mb-4 italic">Valutazione e Conformità</h4>
-          <p class="text-slate-400 text-sm font-light leading-relaxed max-w-2xl">Audit completo dei prodotti e verifica dei requisiti FDA/USDA. Analisi dei gap tecnici per garantire un accesso fluido senza intoppi legali.</p>
-        </div>
-
-        <div class="roadmap-step">
-          <div class="roadmap-number">02</div>
-          <h4 class="text-xl brand-font text-white mb-4 italic">Architettura di Canale</h4>
-          <p class="text-slate-400 text-sm font-light leading-relaxed max-w-2xl">Selezione dei partner logistici e definizione del modello di posizionamento. Creiamo le fondamenta operative per la vostra presenza stabile.</p>
-        </div>
-
-        <div class="roadmap-step">
-          <div class="roadmap-number">03</div>
-          <h4 class="text-xl brand-font text-white mb-4 italic">Lancio e Gestione Agente</h4>
-          <p class="text-slate-400 text-sm font-light leading-relaxed max-w-2xl">Attivazione del ruolo di U.S. Agent e supporto continuo. Monitoraggio delle normative in evoluzione per proteggere la vostra eccellenza nel tempo.</p>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- FOOTER (MASTER) -->
-  <footer class="site-footer">
-    <a href="/ItalianExperience/" class="no-underline mb-8">
-      <div class="logo-wrap scale-[0.7] md:scale-[0.8]" id="logo-footer">
-        <span class="font-it">Italian</span>
-        <div class="font-ex" data-text="EXPERIENCE"></div>
-        <div class="tricolore-line">
-          <div style="background:var(--it-green);flex:1"></div>
-          <div style="background:#fff;flex:1"></div>
-          <div style="background:var(--it-red);flex:1"></div>
-        </div>
-      </div>
-    </a>
+  </main>
 
-    <p class="text-white/20 uppercase tracking-[0.4em] text-[0.6rem]">
-      © 2026 ITALIAN EXPERIENCE · STRATEGIC ADVISORY
-    </p>
-  </footer>
+  <div id="site-footer"></div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    (function () {
+      const base = "/ItalianExperience";
+      const headerMount = document.getElementById("site-header");
+      const footerMount = document.getElementById("site-footer");
 
-      /* INIT LOGO LETTERS */
-      document.querySelectorAll('.font-ex').forEach(ex => {
-        const text = ex.getAttribute('data-text') || '';
-        ex.innerHTML = text.split('').map(c => `<span class="letter">${c}</span>`).join('');
-      });
+      function inject(el, html) { if (el) el.innerHTML = html; }
 
-      /* SMART HEADER */
-      let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
-      const header = document.getElementById('main-header');
-
-      window.addEventListener('scroll', () => {
-        const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
-
-        if (currentScrollY > lastScrollY && currentScrollY > 100) header.classList.add('nav-up');
-        else header.classList.remove('nav-up');
-
-        if (currentScrollY > 50) header.classList.add('scrolled');
-        else header.classList.remove('scrolled');
-
-        lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
-      }, { passive: true });
-
-      /* MOBILE MENU */
-      const menuBtn = document.getElementById('central-menu-btn');
-      const closeBtn = document.getElementById('close-menu');
-      const overlay = document.getElementById('mobile-menu-overlay');
-
-      menuBtn?.addEventListener('click', (e) => {
-        e.preventDefault();
-        overlay.classList.add('active');
-        overlay.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-      });
-
-      closeBtn?.addEventListener('click', (e) => {
-        e.preventDefault();
-        overlay.classList.remove('active');
-        overlay.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-      });
-
-      overlay.addEventListener('click', (e) => {
-        const t = e.target;
-        if (t && t.closest && t.closest('[data-close]')) {
-          overlay.classList.remove('active');
-          overlay.setAttribute('aria-hidden', 'true');
-          document.body.style.overflow = '';
-        }
-      }, { passive: true });
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && overlay.classList.contains('active')) {
-          overlay.classList.remove('active');
-          overlay.setAttribute('aria-hidden', 'true');
-          document.body.style.overflow = '';
-        }
-      });
-
-      /* MOBILE ACCORDION */
-      const accBtns = Array.from(document.querySelectorAll('.mobile-acc-btn'));
-
-      function setAcc(btn, open) {
-        const id = btn.getAttribute('aria-controls');
-        const panel = id ? document.getElementById(id) : null;
-
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-
-        if (!panel) return;
-
-        if (open) {
-          const inner = panel.querySelector('.mobile-sub-inner');
-          const h = inner ? inner.scrollHeight : 0;
-          panel.style.maxHeight = Math.max(80, h + 14) + 'px';
-        } else {
-          panel.style.maxHeight = '0px';
-        }
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const s = document.createElement("script");
+          s.src = src;
+          s.defer = true;
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
       }
 
-      accBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const isOpen = btn.getAttribute('aria-expanded') === 'true';
-          setAcc(btn, !isOpen);
-        });
-      });
+      Promise.all([
+        fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
+        fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
+      ]).then(async ([h, f]) => {
+        inject(headerMount, h);
+        inject(footerMount, f);
 
-      /* OPEN DEFAULT ACCORDIONS */
-      setTimeout(() => {
-        accBtns.forEach(btn => {
-          const isOpen = btn.getAttribute('aria-expanded') === 'true';
-          if (isOpen) setAcc(btn, true);
-        });
-      }, 150);
-
-      /* LOGO MOUSE EFFECT */
-      function initLogoMouse(id) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        if (!window.matchMedia('(pointer: fine)').matches) return;
-
-        const it = el.querySelector('.font-it');
-        const letters = el.querySelectorAll('.letter');
-        if (!it || !letters.length) return;
-
-        el.addEventListener('mousemove', (e) => {
-          const r = el.getBoundingClientRect();
-          const x = e.clientX - r.left;
-
-          const itRect = it.getBoundingClientRect();
-          const itX = itRect.left + itRect.width / 2 - r.left;
-          const dIt = Math.abs(x - itX);
-          const pIt = Math.max(0, (200 - dIt) / 200);
-
-          it.style.textShadow = `0 0 ${15 * pIt}px rgba(197,160,89,0.5)`;
-          it.style.transform = `scale(${1 + pIt * 0.05})`;
-
-          letters.forEach(l => {
-            const lr = l.getBoundingClientRect();
-            const lx = lr.left + lr.width / 2 - r.left;
-            const dx = Math.abs(x - lx);
-
-            if (dx < 110) {
-              const p = (110 - dx) / 110;
-              l.style.color = (x > lx + 14) ? '#008C45' : (x < lx - 14 ? '#CD212A' : '#FFF');
-              l.style.transform = `scale(${1 + p * 0.42}) translateY(${-p * 10}px)`;
-              l.style.zIndex = '20';
-            } else {
-              l.style.color = '';
-              l.style.transform = '';
-              l.style.zIndex = '10';
-            }
-          });
-        }, { passive: true });
-
-        el.addEventListener('mouseleave', () => {
-          it.style.textShadow = '';
-          it.style.transform = '';
-          letters.forEach(l => { l.style.color = ''; l.style.transform = ''; l.style.zIndex = ''; });
-        }, { passive: true });
-      }
-
-      initLogoMouse('logo-header');
-      initLogoMouse('logo-footer');
-
-    });
+        await loadScript(base + "/assets/js/site.js");
+        if (window.IEInit) window.IEInit(document);
+      }).catch(err => console.error(err));
+    })();
   </script>
 
 </body>
