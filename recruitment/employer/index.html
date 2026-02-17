@@ -1,313 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Employer | Italian Experience</title>
 
+  <meta name="description" content="Employer program overview by Italian Experience. A strategic cultural exchange approach to build authentic hospitality teams and optimize operational costs." />
+  <meta name="keywords" content="Italian Experience, recruitment, employer, hospitality staffing, cultural program, Q1 visa, Italian staff, USA restaurants" />
+  <meta name="author" content="Italian Experience" />
+  <meta name="robots" content="index, follow" />
+
+  <link rel="canonical" href="https://www.italianexp.com/recruitment/employer/" />
+
+  <meta property="og:title" content="Employer | Italian Experience" />
+  <meta property="og:description" content="A strategic cultural program designed for premium hospitality brands seeking authentic Italian talent and operational stability." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.italianexp.com/recruitment/employer/" />
+
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@100;300;400;600&family=Great+Vibes&family=Montserrat:wght@700;900&display=swap');
-
-    :root{
-      --brand-gold:#c5a059;
-      --brand-dark:#080808;
-      --it-green:#008C45;
-      --it-red:#CD212A;
-    }
-
-    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    html{scroll-behavior:smooth;background:#000}
-    body{
-      background:var(--brand-dark);
-      color:#fff;
-      font-family:'Inter',sans-serif;
-      overflow-x:hidden;
-      min-height:100vh;
-      -webkit-font-smoothing:antialiased;
-    }
-
-    a{color:inherit;text-decoration:none}
-    .brand-font{font-family:'Playfair Display',serif}
-
-    /* HEADER */
-    .glass-header{
-      position:fixed;
-      top:0;left:0;width:100%;
-      z-index:9999;
-      height:110px;
-      padding:0 4rem;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      background:transparent;
-      backdrop-filter:blur(0px);
-      transition:transform 0.6s cubic-bezier(0.16,1,0.3,1),background 0.5s,backdrop-filter 0.5s,height 0.4s,padding 0.4s;
-    }
-    .glass-header.nav-up{transform:translateY(-110%)}
-    .glass-header.scrolled{
-      height:90px;
-      padding:0 2rem;
-      background:rgba(15,15,15,0.45);
-      backdrop-filter:blur(40px) saturate(180%);
-      -webkit-backdrop-filter:blur(40px) saturate(180%);
-      border-bottom:1px solid rgba(255,255,255,0.08);
-      box-shadow:0 10px 30px rgba(0,0,0,0.5);
-    }
-
-    /* LOGO */
-    .logo-wrap{
-      display:flex;
-      align-items:baseline;
-      gap:8px;
-      position:relative;
-      user-select:none;
-      white-space:nowrap;
-      z-index:10001;
-    }
-    .font-it{
-      font-family:'Great Vibes',cursive;
-      color:var(--brand-gold);
-      font-size:70px;
-      line-height:1;
-      white-space:nowrap;
-      transition:0.3s;
-    }
-    .font-ex{
-      font-family:'Montserrat',sans-serif;
-      color:var(--brand-gold);
-      font-weight:900;
-      font-size:35px;
-      line-height:1;
-      letter-spacing:-0.02em;
-      display:flex;
-    }
-    .letter{
-      display:inline-block;
-      position:relative;
-      will-change:transform,color;
-      transition:all 0.25s ease-out;
-    }
-    .tricolore-line{
-      position:absolute;
-      height:2px;
-      width:60px;
-      bottom:-6px;
-      right:0;
-      display:flex;
-      pointer-events:none;
-    }
-
-    /* DESKTOP NAV */
-    .nav-container{
-      display:flex;
-      align-items:center;
-      gap:0.25rem;
-      margin-left:auto;
-      height:100%;
-    }
-    .nav-link{
-      color:#fff;
-      text-transform:uppercase;
-      font-size:0.62rem;
-      letter-spacing:0.25em;
-      padding:1.2rem 0.8rem;
-      transition:all 0.25s;
-      opacity:0.72;
-      white-space:nowrap;
-      cursor:pointer;
-    }
-    .nav-link:hover{
-      color:var(--brand-gold);
-      opacity:1;
-      text-shadow:0 0 10px rgba(197,160,89,0.4);
-    }
-
-    /* ACTIVE STATE */
-    .nav-link.active,
-    .dropdown-item.active,
-    .mobile-link.active,
-    .mobile-sublink.active,
-    .mobile-acc-btn.active{
-      color:var(--brand-gold) !important;
-      opacity:1 !important;
-      text-shadow:0 0 12px rgba(197,160,89,0.35);
-    }
-
-    .dropdown{position:relative;height:100%;display:flex;align-items:center}
-    .dropdown-menu{
-      position:absolute;
-      top:100%;
-      right:0;
-      min-width:260px;
-      background:rgba(10,10,10,0.96);
-      backdrop-filter:blur(35px);
-      border:1px solid rgba(255,255,255,0.1);
-      opacity:0;
-      visibility:hidden;
-      transform:translateY(10px);
-      transition:all 0.3s ease;
-      padding:1rem 0;
-      box-shadow:0 20px 40px rgba(0,0,0,0.6);
-    }
-    .dropdown:hover .dropdown-menu{
-      opacity:1;
-      visibility:visible;
-      transform:translateY(0);
-    }
-    .dropdown-item{
-      display:block;
-      padding:0.8rem 1.8rem;
-      color:#fff;
-      font-size:0.6rem;
-      text-transform:uppercase;
-      letter-spacing:0.15em;
-      opacity:0.65;
-      transition:0.25s;
-    }
-    .dropdown-item:hover{
-      color:var(--brand-gold);
-      opacity:1;
-      background:rgba(255,255,255,0.03);
-      padding-left:2.2rem;
-    }
-
-    /* ACTIVE DROPDOWN ITEM LOOK */
-    .dropdown-item.active{
-      color:var(--brand-gold);
-      opacity:1;
-      background:transparent;
-      padding-left:2.2rem;
-    }
-
-    /* MOBILE MENU BUTTON */
-    #central-menu-btn{
-      display:none;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      background:none;
-      border:none;
-      cursor:pointer;
-      outline:none;
-      z-index:10002;
-      transition:all 0.25s ease;
-    }
-    #central-menu-btn span{
-      color:var(--brand-gold);
-      font-size:0.52rem;
-      text-transform:uppercase;
-      letter-spacing:0.4em;
-      margin-top:6px;
-      font-weight:600;
-      opacity:0.95;
-    }
-
-    /* MOBILE OVERLAY */
-    #mobile-menu-overlay{
-      position:fixed;
-      inset:0;
-      background:rgba(8,8,8,0.98);
-      backdrop-filter:blur(50px) saturate(160%);
-      z-index:10000;
-      opacity:0;
-      visibility:hidden;
-      transition:opacity 0.35s ease,visibility 0.35s ease;
-      padding:clamp(1.2rem,4vw,2.2rem);
-      overflow-y:auto;
-    }
-    #mobile-menu-overlay.active{
-      opacity:1;
-      visibility:visible;
-    }
-
-    .mobile-close{
-      position:sticky;
-      top:0;
-      display:flex;
-      justify-content:flex-end;
-      z-index:2;
-      padding:0.5rem 0;
-    }
-
-    .mobile-menu{
-      max-width:520px;
-      margin:0 auto;
-      padding:2.2rem 0 3rem 0;
-      display:flex;
-      flex-direction:column;
-      gap:0.4rem;
-      align-items:center;
-      text-align:center;
-    }
-
-    .mobile-link,
-    .mobile-acc-btn{
-      width:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:12px;
-      padding:14px 10px;
-      color:#fff;
-      text-transform:uppercase;
-      letter-spacing:0.35em;
-      font-size:0.72rem;
-      opacity:0.75;
-      transition:opacity 0.2s ease,color 0.2s ease;
-      background:transparent;
-      border:none;
-      cursor:pointer;
-    }
-    .mobile-link:hover,
-    .mobile-acc-btn:hover{
-      opacity:1;
-      color:var(--brand-gold);
-    }
-
-    .chev{
-      width:14px;
-      height:14px;
-      opacity:0.65;
-      transition:transform 0.25s ease,opacity 0.25s ease;
-    }
-    .mobile-acc-btn[aria-expanded="true"] .chev{
-      transform:rotate(180deg);
-      opacity:1;
-    }
-
-    .mobile-sub{
-      width:100%;
-      max-height:0;
-      overflow:hidden;
-      transition:max-height 0.35s ease;
-    }
-    .mobile-sub-inner{
-      padding:4px 0 10px 0;
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-    }
-    .mobile-sublink{
-      display:block;
-      padding:10px 10px;
-      color:#fff;
-      text-transform:uppercase;
-      letter-spacing:0.28em;
-      font-size:0.62rem;
-      opacity:0.55;
-      transition:opacity 0.2s ease,color 0.2s ease;
-    }
-    .mobile-sublink:hover{
-      opacity:1;
-      color:var(--brand-gold);
-    }
-
-    /* HERO (100VH REAL) */
     .hero-staffing{
       width:100%;
       height:100vh;
@@ -317,7 +32,12 @@
       background:#000;
     }
 
-    .hero-swiper{width:100%;height:100%}
+    .hero-swiper,
+    .hero-swiper .swiper-wrapper,
+    .hero-swiper .swiper-slide{
+      width:100%;
+      height:100%;
+    }
 
     .hero-slide img{
       width:100%;
@@ -327,7 +47,10 @@
       transform:scale(1.1);
       transition:transform 8s ease-in-out;
     }
-    .swiper-slide-active img{transform:scale(1)}
+
+    .swiper-slide-active img{
+      transform:scale(1);
+    }
 
     .hero-content{
       position:absolute;
@@ -342,7 +65,6 @@
       padding:0 1.5rem;
     }
 
-    /* EXPLORE INDICATOR (LINE STYLE) */
     @keyframes scrollLine{
       0%{transform:translateY(-18px);opacity:0}
       30%{opacity:1}
@@ -364,6 +86,7 @@
       transition:opacity 0.2s ease,transform 0.2s ease;
       pointer-events:auto;
     }
+
     .explore-indicator:hover{
       opacity:1;
       transform:translateX(-50%) translateY(3px);
@@ -397,7 +120,6 @@
       animation:scrollLine 1.6s infinite ease-in-out;
     }
 
-    /* BENTO CARD */
     .bento-card{
       background:rgba(255,255,255,0.02);
       border:1px solid rgba(255,255,255,0.05);
@@ -405,6 +127,7 @@
       transition:all 0.5s cubic-bezier(0.2,1,0.3,1);
       height:100%;
     }
+
     .bento-card:hover{
       border-color:var(--brand-gold);
       transform:translateY(-10px);
@@ -412,32 +135,33 @@
       background:rgba(197,160,89,0.04);
     }
 
-    /* ICON EFFECT PREMIUM */
     .bento-icon{
       transition:transform 0.55s cubic-bezier(0.2,1,0.3,1),filter 0.55s ease;
       filter:drop-shadow(0 0 0 rgba(197,160,89,0));
     }
+
     .bento-card:hover .bento-icon{
       transform:translateY(-4px) scale(1.06);
       filter:drop-shadow(0 0 14px rgba(197,160,89,0.35));
     }
 
-    /* INFO BOX */
     .info-box{
       border-left:2px solid var(--brand-gold);
       background:rgba(255,255,255,0.02);
       padding:1.5rem;
       transition:all 0.3s ease;
     }
+
     .info-box:hover{
       background:rgba(197,160,89,0.05);
       transform:translateX(5px);
     }
 
-    /* CHART */
-    .chart-container{width:100%;height:280px}
+    .chart-container{
+      width:100%;
+      height:280px;
+    }
 
-    /* LEGAL */
     .legal-notice{
       font-size:0.6rem;
       line-height:2;
@@ -451,662 +175,351 @@
       padding-left:2rem;
     }
 
-    /* FOOTER */
-    .site-footer{
-      background:#000;
-      padding:6rem 2rem;
-      border-top:1px solid rgba(255,255,255,0.05);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      text-align:center;
-    }
-
-    /* RESPONSIVE HEADER MOBILE PERFECT */
-    @media (max-width:1024px){
-      .glass-header{
-        flex-direction:column !important;
-        justify-content:center !important;
-        height:160px !important;
-        padding:1rem 0 !important;
-        gap:10px;
-      }
-      .glass-header.scrolled{
-        height:135px !important;
-      }
-
-      .logo-wrap{
-        transform:scale(0.82);
-        margin:0 auto;
-      }
-
-      #central-menu-btn{
-        display:flex !important;
-        margin-top:6px;
-      }
-
-      .nav-container{display:none !important;}
-    }
-
     @media (max-width:768px){
       .chart-container{height:240px}
     }
-
-    @media (max-width:350px){
-      .logo-wrap{transform:scale(0.68)}
-      .glass-header{height:145px !important}
-      #central-menu-btn{scale:0.9}
-    }
   </style>
+
+  <script src="/ItalianExperience/assets/js/site.js" defer></script>
 </head>
 
 <body>
 
-  <div id="mobile-menu-overlay" aria-hidden="true">
-    <div class="mobile-close">
-      <button id="close-menu" aria-label="Chiudi menu" class="text-white/80 hover:text-white">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
+  <div id="site-header"></div>
 
-    <nav class="mobile-menu" aria-label="Menu mobile">
+  <main>
 
-      <a href="/ItalianExperience/" class="mobile-link" data-close>Home</a>
-
-      <button class="mobile-acc-btn mobile-acc-travel" type="button" aria-expanded="false" aria-controls="m-travel">
-        <span>Travel</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
-      </button>
-
-      <div id="m-travel" class="mobile-sub">
-        <div class="mobile-sub-inner">
-          <a href="/ItalianExperience/travel/" class="mobile-sublink" data-close>Travel</a>
-          <a href="/ItalianExperience/travel/bespoke/" class="mobile-sublink" data-close>Bespoke</a>
-          <a href="/ItalianExperience/travel/gapyear/" class="mobile-sublink" data-close>Gap Year</a>
-          <a href="/ItalianExperience/travel/culinary/" class="mobile-sublink" data-close>Culinary Academy</a>
-        </div>
-      </div>
-
-      <button class="mobile-acc-btn mobile-acc-recruitment active" type="button" aria-expanded="true" aria-controls="m-recruitment">
-        <span>Recruitment</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
-      </button>
-
-      <div id="m-recruitment" class="mobile-sub" style="max-height:220px">
-        <div class="mobile-sub-inner">
-          <a href="/ItalianExperience/recruitment/" class="mobile-sublink" data-close>Recruitment</a>
-          <a href="/ItalianExperience/recruitment/employer/" class="mobile-sublink active" data-close>Employer</a>
-          <a href="/ItalianExperience/recruitment/candidate/" class="mobile-sublink" data-close>Candidate</a>
-        </div>
-      </div>
-
-      <button class="mobile-acc-btn mobile-acc-flavors" type="button" aria-expanded="false" aria-controls="m-flavors">
-        <span>Flavors</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
-      </button>
-
-      <div id="m-flavors" class="mobile-sub">
-        <div class="mobile-sub-inner">
-          <a href="/ItalianExperience/flavors/" class="mobile-sublink" data-close>Flavors</a>
-          <a href="/ItalianExperience/flavors/for-your-home/" class="mobile-sublink" data-close>For your home</a>
-          <a href="/ItalianExperience/flavors/for-your-business/" class="mobile-sublink" data-close>For your business</a>
-          <a href="/ItalianExperience/flavors/aziende-italiane/" class="mobile-sublink" data-close>Aziende Italiane</a>
-        </div>
-      </div>
-
-      <a href="/ItalianExperience/estates/" class="mobile-link" data-close>Estates</a>
-      <a href="/ItalianExperience/contact/" class="mobile-link" data-close>Contact</a>
-
-    </nav>
-  </div>
-
-  <nav class="glass-header" id="main-header" aria-label="Header">
-
-    <a href="/ItalianExperience/" class="no-underline">
-      <div class="logo-wrap" id="logo-header">
-        <span class="font-it">Italian</span>
-        <div class="font-ex" data-text="EXPERIENCE"></div>
-        <div class="tricolore-line">
-          <div style="background:var(--it-green);flex:1"></div>
-          <div style="background:#fff;flex:1"></div>
-          <div style="background:var(--it-red);flex:1"></div>
-        </div>
-      </div>
-    </a>
-
-    <button id="central-menu-btn" aria-label="Apri menu">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-linecap="round">
-        <circle cx="12" cy="12" r="10" stroke="rgba(197,160,89,0.4)" stroke-width="1"></circle>
-        <line x1="8" y1="10" x2="16" y2="10" stroke="#c5a059" stroke-width="2.5"></line>
-        <line x1="10" y1="14" x2="14" y2="14" stroke="#c5a059" stroke-width="2.5"></line>
-      </svg>
-      <span>Menu</span>
-    </button>
-
-    <div class="nav-container" aria-label="Navigazione desktop">
-      <a href="/ItalianExperience/" class="nav-link">Home</a>
-
-      <div class="dropdown">
-        <a href="/ItalianExperience/travel/" class="nav-link nav-link-travel">
-          Travel
-          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <path d="m6 9 6 6 6-6"></path>
-          </svg>
-        </a>
-        <div class="dropdown-menu">
-          <a href="/ItalianExperience/travel/bespoke/" class="dropdown-item">Bespoke</a>
-          <a href="/ItalianExperience/travel/gapyear/" class="dropdown-item">Gap Year</a>
-          <a href="/ItalianExperience/travel/culinary/" class="dropdown-item">Culinary Academy</a>
-        </div>
-      </div>
-
-      <div class="dropdown">
-        <a href="/ItalianExperience/recruitment/" class="nav-link nav-link-recruitment active">
-          Recruitment
-          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <path d="m6 9 6 6 6-6"></path>
-          </svg>
-        </a>
-        <div class="dropdown-menu">
-          <a href="/ItalianExperience/recruitment/employer/" class="dropdown-item active">Employer</a>
-          <a href="/ItalianExperience/recruitment/candidate/" class="dropdown-item">Candidate</a>
-        </div>
-      </div>
-
-      <div class="dropdown">
-        <a href="/ItalianExperience/flavors/" class="nav-link nav-link-flavors">
-          Flavors
-          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <path d="m6 9 6 6 6-6"></path>
-          </svg>
-        </a>
-        <div class="dropdown-menu">
-          <a href="/ItalianExperience/flavors/for-your-home/" class="dropdown-item">For your home</a>
-          <a href="/ItalianExperience/flavors/for-your-business/" class="dropdown-item">For your business</a>
-          <a href="/ItalianExperience/flavors/aziende-italiane/" class="dropdown-item">Aziende Italiane</a>
-        </div>
-      </div>
-
-      <a href="/ItalianExperience/estates/" class="nav-link nav-link-estates">Estates</a>
-      <a href="/ItalianExperience/contact/" class="nav-link nav-link-contact">Contact</a>
-    </div>
-  </nav>
-
-  <header class="hero-staffing">
-    <div class="swiper hero-swiper h-full">
-      <div class="swiper-wrapper">
-        <div class="swiper-slide hero-slide">
-          <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1920" alt="Hospitality" loading="lazy">
-        </div>
-        <div class="swiper-slide hero-slide">
-          <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1920" alt="Team" loading="lazy">
-        </div>
-        <div class="swiper-slide hero-slide">
-          <img src="https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?auto=format&fit=crop&q=80&w=1920" alt="NYC" loading="lazy">
-        </div>
-        <div class="swiper-slide hero-slide">
-          <img src="https://images.unsplash.com/photo-1541614101331-1a5a3a194e92?auto=format&fit=crop&q=80&w=1920" alt="Chef" loading="lazy">
-        </div>
-      </div>
-
-      <div class="hero-content">
-        <h3 class="text-[#c5a059] italic brand-font text-xl md:text-2xl mb-4 tracking-wide">
-          Bespoke Strategic Alignment
-        </h3>
-
-        <h1 class="text-4xl md:text-6xl font-bold brand-font leading-[1.1] mb-8 text-white uppercase tracking-tighter">
-          Master Talent Curators <br>& <span class="italic font-light opacity-80">Cultural Architects.</span>
-        </h1>
-
-        <div class="w-16 h-px bg-[#c5a059] mx-auto mb-8 opacity-40"></div>
-
-        <p class="text-slate-400 font-light text-sm md:text-base max-w-2xl mx-auto leading-relaxed uppercase tracking-[0.3em]">
-          Orchestrating the perfect synergy between prestigious brands and exceptional human potential.
-        </p>
-      </div>
-
-      <a href="#evolution" class="explore-indicator" aria-label="Explore section">
-        <span>Explore</span>
-        <div class="scroll-track" aria-hidden="true">
-          <div class="scroll-dot"></div>
-        </div>
-      </a>
-    </div>
-  </header>
-
-  <section id="evolution" class="py-32 px-6">
-    <div class="max-w-7xl mx-auto">
-      <div class="grid lg:grid-cols-2 gap-16 items-center">
-
-        <div>
-          <h4 class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.65rem] font-bold mb-6">
-            The Evolution of Excellence
-          </h4>
-
-          <h2 class="brand-font text-5xl md:text-7xl italic leading-tight mb-8 text-white">
-            From Staffing <br>to Immersion.
-          </h2>
-
-          <p class="text-slate-400 font-light text-lg leading-relaxed mb-8">
-            Traditional recruitment fills slots; we create legacies. Transitioning your venue into a curated
-            <strong>Cultural Program</strong> is a brand revolution.
-          </p>
-
-          <p class="text-slate-500 font-light leading-relaxed mb-10 italic border-l border-[#c5a059] pl-6">
-            "We adopt the high-performance model utilized by global icons like <strong>Disney World</strong>,
-            ensuring that every interaction resonates with genuine heritage."
-          </p>
+    <header class="hero-staffing" aria-label="Employer hero">
+      <div class="swiper hero-swiper">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide hero-slide">
+            <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1920" alt="Hospitality" loading="lazy" />
+          </div>
+          <div class="swiper-slide hero-slide">
+            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1920" alt="Team" loading="lazy" />
+          </div>
+          <div class="swiper-slide hero-slide">
+            <img src="https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?auto=format&fit=crop&q=80&w=1920" alt="New York City" loading="lazy" />
+          </div>
+          <div class="swiper-slide hero-slide">
+            <img src="https://images.unsplash.com/photo-1541614101331-1a5a3a194e92?auto=format&fit=crop&q=80&w=1920" alt="Chef" loading="lazy" />
+          </div>
         </div>
 
-        <div class="bento-card">
-          <h3 class="text-[#c5a059] brand-font text-2xl mb-8 italic">
-            Our Program Maker Services
+        <div class="hero-content">
+          <h3 class="text-[#c5a059] italic brand-font text-xl md:text-2xl mb-4 tracking-wide">
+            Bespoke Strategic Alignment
           </h3>
 
-          <ul class="space-y-6">
-            <li class="flex items-center gap-4 text-slate-400 text-sm">
-              <svg class="w-4 h-4 text-[#c5a059]" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
-              </svg>
-              Complete Needs & Culture Analysis
-            </li>
+          <h1 class="text-4xl md:text-6xl font-bold brand-font leading-[1.1] mb-8 text-white uppercase tracking-tighter">
+            Master Talent Curators <br />
+            & <span class="italic font-light opacity-80">Cultural Architects.</span>
+          </h1>
 
-            <li class="flex items-center gap-4 text-slate-400 text-sm">
-              <svg class="w-4 h-4 text-[#c5a059]" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
-              </svg>
-              Exclusive Sourcing of Native Italian Talent
-            </li>
+          <div class="w-16 h-px bg-[#c5a059] mx-auto mb-8 opacity-40"></div>
 
-            <li class="flex items-center gap-4 text-slate-400 text-sm">
-              <svg class="w-4 h-4 text-[#c5a059]" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
-              </svg>
-              Multi-level Vetting (Video & Phone Screening)
-            </li>
-
-            <li class="flex items-center gap-4 text-slate-400 text-sm">
-              <svg class="w-4 h-4 text-[#c5a059]" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
-              </svg>
-              Rigorous Reference & Professional Checks
-            </li>
-
-            <li class="flex items-center gap-4 text-slate-400 text-sm">
-              <svg class="w-4 h-4 text-[#c5a059]" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
-              </svg>
-              Post-Employment Coaching & Follow-up
-            </li>
-          </ul>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <section class="py-32 px-6 bg-[#0c0c0c]">
-    <div class="max-w-6xl mx-auto text-center">
-      <h4 class="text-[#c5a059] uppercase tracking-[0.6em] text-[0.65rem] font-bold mb-16">
-        Critical Brand Analysis
-      </h4>
-
-      <div class="space-y-24">
-        <div class="group cursor-default transition-all duration-700 hover:scale-[1.03]">
-          <h2 class="brand-font text-4xl md:text-6xl text-slate-600 transition-colors group-hover:text-white">
-            Is your heritage <span class="italic text-slate-400">lost in translation?</span>
-          </h2>
-        </div>
-
-        <div class="group cursor-default transition-all duration-700 hover:scale-[1.03]">
-          <h2 class="brand-font text-4xl md:text-6xl text-slate-600 transition-colors group-hover:text-white">
-            Is your staff a <span class="text-[#c5a059]">cost</span> or a <span class="italic text-slate-400">cultural asset?</span>
-          </h2>
-        </div>
-
-        <div class="group cursor-default transition-all duration-700 hover:scale-[1.03]">
-          <h2 class="brand-font text-4xl md:text-6xl text-slate-600 transition-colors group-hover:text-white">
-            Are you selling <span class="italic text-slate-400">food</span>, or a <span class="text-[#c5a059]">Legacy?</span>
-          </h2>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="py-32 px-6">
-    <div class="max-w-7xl mx-auto">
-      <div class="text-center mb-20">
-        <h4 class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.65rem] font-bold mb-4">
-          Strategic Synergies
-        </h4>
-        <h2 class="brand-font text-4xl md:text-6xl italic text-white">
-          Why this program is the <span class="text-[#c5a059]">Right Fit.</span>
-        </h2>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-8">
-
-        <div class="bento-card">
-          <svg class="bento-icon w-10 h-10 text-[#c5a059] mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9-9c1.657 0 3 4.03 3 9s-1.343 9-3 9m0-18c-1.657 0-3 4.03-3 9s1.343 9 3 9"
-              stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
-          </svg>
-
-          <h3 class="brand-font text-2xl mb-4 text-white italic">Elite Authenticity</h3>
-          <p class="text-slate-500 text-sm font-light leading-relaxed">
-            Turn your venue into a destination. Our ambassadors bring the stories, the accent,
-            and the soul of Italy directly to your tables.
+          <p class="text-slate-400 font-light text-sm md:text-base max-w-2xl mx-auto leading-relaxed uppercase tracking-[0.3em]">
+            Orchestrating the perfect synergy between prestigious brands and exceptional human potential.
           </p>
         </div>
 
-        <div class="bento-card">
-          <svg class="bento-icon w-10 h-10 text-[#c5a059] mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.407 2.64 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.407-2.64-1M12 16v1m4-12H8a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2z"
-              stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
-          </svg>
-
-          <h3 class="brand-font text-2xl mb-4 text-white italic">Financial Mastery</h3>
-          <p class="text-slate-500 text-sm font-light leading-relaxed">
-            Optimizing operational costs via FICA tax exemptions (~7.65%) while increasing perceived service value.
-          </p>
-        </div>
-
-        <div class="bento-card">
-          <svg class="bento-icon w-10 h-10 text-[#c5a059] mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-              stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
-          </svg>
-
-          <h3 class="brand-font text-2xl mb-4 text-white italic">Operational Stability</h3>
-          <p class="text-slate-500 text-sm font-light leading-relaxed">
-            Stop the hiring cycle. Our professionals commit to 12-15 month missions, ensuring long-term consistency.
-          </p>
-        </div>
-
+        <a href="#evolution" class="explore-indicator" aria-label="Explore section">
+          <span>Explore</span>
+          <div class="scroll-track" aria-hidden="true">
+            <div class="scroll-dot"></div>
+          </div>
+        </a>
       </div>
-    </div>
-  </section>
+    </header>
 
-  <section class="py-32 px-6 bg-[#0c0c0c]">
-    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
+    <section id="evolution" class="py-32 px-6">
+      <div class="max-w-7xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
 
-      <div>
-        <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.65rem] font-bold mb-4 block">
-          Data Justification
-        </span>
-
-        <h2 class="brand-font text-5xl md:text-6xl mb-12 italic text-white leading-tight">
-          Economic <br>Harmony.
-        </h2>
-
-        <div class="space-y-6">
-          <div class="info-box">
-            <h4 class="font-bold text-white uppercase text-[0.65rem] tracking-widest mb-2">
-              IRS §3121 Compliance
+          <div>
+            <h4 class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.65rem] font-bold mb-6">
+              The Evolution of Excellence
             </h4>
-            <p class="text-slate-500 font-light text-sm leading-relaxed">
-              Our cultural framework provides a <strong>~7.65% direct reduction</strong> in employer-side payroll tax burden.
+
+            <h2 class="brand-font text-5xl md:text-7xl italic leading-tight mb-8 text-white">
+              From Staffing <br />
+              to Immersion.
+            </h2>
+
+            <p class="text-slate-400 font-light text-lg leading-relaxed mb-8">
+              Traditional recruitment fills slots; we create legacies. Transitioning your venue into a curated
+              <strong>Cultural Program</strong> is a brand revolution.
+            </p>
+
+            <p class="text-slate-500 font-light leading-relaxed mb-10 italic border-l border-[#c5a059] pl-6">
+              "We adopt the high-performance model utilized by global icons like <strong>Disney World</strong>,
+              ensuring that every interaction resonates with genuine heritage."
             </p>
           </div>
 
-          <div class="info-box" style="border-color:#333;">
-            <h4 class="font-bold text-white uppercase text-[0.65rem] tracking-widest mb-2">
-              Turnkey Recruitment
-            </h4>
-            <p class="text-slate-500 font-light text-sm leading-relaxed">
-              We manage the complexity: Italy-based selection, visa coordination, and relocation support.
-            </p>
+          <div class="bento-card">
+            <h3 class="text-[#c5a059] brand-font text-2xl mb-8 italic">
+              Our Program Maker Services
+            </h3>
+
+            <ul class="space-y-6">
+              <li class="flex items-center gap-4 text-slate-400 text-sm">
+                <svg class="w-4 h-4 text-[#c5a059]" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                </svg>
+                Complete Needs & Culture Analysis
+              </li>
+
+              <li class="flex items-center gap-4 text-slate-400 text-sm">
+                <svg class="w-4 h-4 text-[#c5a059]" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                </svg>
+                Exclusive Sourcing of Native Italian Talent
+              </li>
+
+              <li class="flex items-center gap-4 text-slate-400 text-sm">
+                <svg class="w-4 h-4 text-[#c5a059]" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                </svg>
+                Multi-level Vetting (Video & Phone Screening)
+              </li>
+
+              <li class="flex items-center gap-4 text-slate-400 text-sm">
+                <svg class="w-4 h-4 text-[#c5a059]" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                </svg>
+                Rigorous Reference & Professional Checks
+              </li>
+
+              <li class="flex items-center gap-4 text-slate-400 text-sm">
+                <svg class="w-4 h-4 text-[#c5a059]" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                </svg>
+                Post-Employment Coaching & Follow-up
+              </li>
+            </ul>
           </div>
+
         </div>
       </div>
+    </section>
 
-      <div class="bg-[#080808] p-10 border border-white/5 shadow-2xl">
-        <h4 class="text-center brand-font italic text-xl mb-10 text-white">
-          Payroll Contribution Analysis
+    <section class="py-32 px-6 bg-[#0c0c0c]">
+      <div class="max-w-6xl mx-auto text-center">
+        <h4 class="text-[#c5a059] uppercase tracking-[0.6em] text-[0.65rem] font-bold mb-16">
+          Critical Brand Analysis
         </h4>
 
-        <div class="chart-container">
-          <canvas id="payrollChart"></canvas>
-        </div>
-
-        <div class="mt-12 grid grid-cols-2 gap-6 text-center">
-          <div class="bg-white/5 p-6 border border-white/5">
-            <span class="text-[0.5rem] text-slate-500 uppercase block mb-2 tracking-widest">Standard Cost</span>
-            <span class="text-2xl font-bold text-white">7.65%</span>
+        <div class="space-y-24">
+          <div class="group cursor-default transition-all duration-700 hover:scale-[1.03]">
+            <h2 class="brand-font text-4xl md:text-6xl text-slate-600 transition-colors group-hover:text-white">
+              Is your heritage <span class="italic text-slate-400">lost in translation?</span>
+            </h2>
           </div>
 
-          <div class="bg-[#c5a059]/10 p-6 border border-[#c5a059]/20">
-            <span class="text-[0.5rem] text-[#c5a059] uppercase block mb-2 tracking-widest">Our Program</span>
-            <span class="text-2xl font-bold text-[#c5a059]">0.00%</span>
+          <div class="group cursor-default transition-all duration-700 hover:scale-[1.03]">
+            <h2 class="brand-font text-4xl md:text-6xl text-slate-600 transition-colors group-hover:text-white">
+              Is your staff a <span class="text-[#c5a059]">cost</span> or a <span class="italic text-slate-400">cultural asset?</span>
+            </h2>
+          </div>
+
+          <div class="group cursor-default transition-all duration-700 hover:scale-[1.03]">
+            <h2 class="brand-font text-4xl md:text-6xl text-slate-600 transition-colors group-hover:text-white">
+              Are you selling <span class="italic text-slate-400">food</span>, or a <span class="text-[#c5a059]">Legacy?</span>
+            </h2>
           </div>
         </div>
       </div>
+    </section>
 
-    </div>
-  </section>
+    <section class="py-32 px-6">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-20">
+          <h4 class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.65rem] font-bold mb-4">
+            Strategic Synergies
+          </h4>
+          <h2 class="brand-font text-4xl md:text-6xl italic text-white">
+            Why this program is the <span class="text-[#c5a059]">Right Fit.</span>
+          </h2>
+        </div>
 
-  <section class="py-20 px-6">
-    <div class="max-w-4xl mx-auto text-center">
-      <h5 class="text-[#c5a059] font-bold uppercase text-[0.6rem] tracking-[0.4em] mb-8">
-        Governance & Standards
-      </h5>
+        <div class="grid md:grid-cols-3 gap-8">
 
-      <div class="legal-notice">
-        Italian Recruitment LLC DBA Italian Experience is a strategic consultancy and is not a law firm.
-        We do not provide legal advice, immigration counsel, or regulated legal services.
-        Employers must engage their own counsel for formal compliance opinions.
-      </div>
-    </div>
-  </section>
+          <div class="bento-card">
+            <svg class="bento-icon w-10 h-10 text-[#c5a059] mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9-9c1.657 0 3 4.03 3 9s-1.343 9-3 9m0-18c-1.657 0-3 4.03-3 9s1.343 9 3 9"
+                stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+            </svg>
 
-  <footer class="site-footer">
-    <a href="/ItalianExperience/" class="no-underline mb-8">
-      <div class="logo-wrap scale-[0.7] md:scale-[0.8]" id="logo-footer">
-        <span class="font-it">Italian</span>
-        <div class="font-ex" data-text="EXPERIENCE"></div>
-        <div class="tricolore-line">
-          <div style="background:var(--it-green);flex:1"></div>
-          <div style="background:#fff;flex:1"></div>
-          <div style="background:var(--it-red);flex:1"></div>
+            <h3 class="brand-font text-2xl mb-4 text-white italic">Elite Authenticity</h3>
+            <p class="text-slate-500 text-sm font-light leading-relaxed">
+              Turn your venue into a destination. Our ambassadors bring the stories, the accent,
+              and the soul of Italy directly to your tables.
+            </p>
+          </div>
+
+          <div class="bento-card">
+            <svg class="bento-icon w-10 h-10 text-[#c5a059] mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.407 2.64 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.407-2.64-1M12 16v1m4-12H8a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2z"
+                stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+            </svg>
+
+            <h3 class="brand-font text-2xl mb-4 text-white italic">Financial Mastery</h3>
+            <p class="text-slate-500 text-sm font-light leading-relaxed">
+              Optimizing operational costs via FICA tax exemptions (~7.65%) while increasing perceived service value.
+            </p>
+          </div>
+
+          <div class="bento-card">
+            <svg class="bento-icon w-10 h-10 text-[#c5a059] mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+            </svg>
+
+            <h3 class="brand-font text-2xl mb-4 text-white italic">Operational Stability</h3>
+            <p class="text-slate-500 text-sm font-light leading-relaxed">
+              Stop the hiring cycle. Our professionals commit to 12-15 month missions, ensuring long-term consistency.
+            </p>
+          </div>
+
         </div>
       </div>
-    </a>
+    </section>
 
-    <p class="text-white/20 uppercase tracking-[0.4em] text-[0.6rem]">
-      © 2026 ITALIAN EXPERIENCE · STRATEGIC ADVISORY
-    </p>
-  </footer>
+    <section class="py-32 px-6 bg-[#0c0c0c]">
+      <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
+
+        <div>
+          <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.65rem] font-bold mb-4 block">
+            Data Justification
+          </span>
+
+          <h2 class="brand-font text-5xl md:text-6xl mb-12 italic text-white leading-tight">
+            Economic <br />
+            Harmony.
+          </h2>
+
+          <div class="space-y-6">
+            <div class="info-box">
+              <h4 class="font-bold text-white uppercase text-[0.65rem] tracking-widest mb-2">
+                IRS §3121 Compliance
+              </h4>
+              <p class="text-slate-500 font-light text-sm leading-relaxed">
+                Our cultural framework provides a <strong>~7.65% direct reduction</strong> in employer-side payroll tax burden.
+              </p>
+            </div>
+
+            <div class="info-box" style="border-color:#333;">
+              <h4 class="font-bold text-white uppercase text-[0.65rem] tracking-widest mb-2">
+                Turnkey Recruitment
+              </h4>
+              <p class="text-slate-500 font-light text-sm leading-relaxed">
+                We manage the complexity: Italy-based selection, visa coordination, and relocation support.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-[#080808] p-10 border border-white/5 shadow-2xl">
+          <h4 class="text-center brand-font italic text-xl mb-10 text-white">
+            Payroll Contribution Analysis
+          </h4>
+
+          <div class="chart-container">
+            <canvas id="payrollChart"></canvas>
+          </div>
+
+          <div class="mt-12 grid grid-cols-2 gap-6 text-center">
+            <div class="bg-white/5 p-6 border border-white/5">
+              <span class="text-[0.5rem] text-slate-500 uppercase block mb-2 tracking-widest">Standard Cost</span>
+              <span class="text-2xl font-bold text-white">7.65%</span>
+            </div>
+
+            <div class="bg-[#c5a059]/10 p-6 border border-[#c5a059]/20">
+              <span class="text-[0.5rem] text-[#c5a059] uppercase block mb-2 tracking-widest">Our Program</span>
+              <span class="text-2xl font-bold text-[#c5a059]">0.00%</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="py-20 px-6">
+      <div class="max-w-4xl mx-auto text-center">
+        <h5 class="text-[#c5a059] font-bold uppercase text-[0.6rem] tracking-[0.4em] mb-8">
+          Governance & Standards
+        </h5>
+
+        <div class="legal-notice">
+          Italian Recruitment LLC DBA Italian Experience is a strategic consultancy and is not a law firm.
+          We do not provide legal advice, immigration counsel, or regulated legal services.
+          Employers must engage their own counsel for formal compliance opinions.
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-
-      // Build EXPERIENCE letters
-      document.querySelectorAll('.font-ex').forEach(ex => {
-        const text = ex.getAttribute('data-text') || '';
-        ex.innerHTML = text.split('').map(c => `<span class="letter">${c}</span>`).join('');
-      });
-
-      // Header smart scroll
-      let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
-      const header = document.getElementById('main-header');
-
-      window.addEventListener('scroll', () => {
-        const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
-
-        if (currentScrollY > lastScrollY && currentScrollY > 100) header.classList.add('nav-up');
-        else header.classList.remove('nav-up');
-
-        if (currentScrollY > 50) header.classList.add('scrolled');
-        else header.classList.remove('scrolled');
-
-        lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
-      }, { passive: true });
-
-      // Mobile menu open/close
-      const menuBtn = document.getElementById('central-menu-btn');
-      const closeBtn = document.getElementById('close-menu');
-      const overlay = document.getElementById('mobile-menu-overlay');
-
-      menuBtn?.addEventListener('click', (e) => {
-        e.preventDefault();
-        overlay.classList.add('active');
-        overlay.setAttribute('aria-hidden', 'false');
-      });
-
-      closeBtn?.addEventListener('click', (e) => {
-        e.preventDefault();
-        overlay.classList.remove('active');
-        overlay.setAttribute('aria-hidden', 'true');
-      });
-
-      overlay.addEventListener('click', (e) => {
-        const t = e.target;
-        if (t && t.closest && t.closest('[data-close]')) {
-          overlay.classList.remove('active');
-          overlay.setAttribute('aria-hidden', 'true');
-        }
-      }, { passive: true });
-
-      // Mobile accordion
-      const accBtns = Array.from(document.querySelectorAll('.mobile-acc-btn'));
-
-      function setAcc(btn, open) {
-        const id = btn.getAttribute('aria-controls');
-        const panel = id ? document.getElementById(id) : null;
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        if (!panel) return;
-
-        if (open) {
-          const inner = panel.querySelector('.mobile-sub-inner');
-          const h = inner ? inner.scrollHeight : 0;
-          panel.style.maxHeight = Math.max(80, h + 14) + 'px';
-        } else {
-          panel.style.maxHeight = '0px';
-        }
+    document.addEventListener("DOMContentLoaded", () => {
+      if (typeof Swiper !== "undefined") {
+        new Swiper(".hero-swiper", {
+          loop: true,
+          effect: "fade",
+          speed: 2200,
+          autoplay: { delay: 5200, disableOnInteraction: false }
+        });
       }
 
-      accBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const isOpen = btn.getAttribute('aria-expanded') === 'true';
-          setAcc(btn, !isOpen);
-        });
-      });
+      const canvas = document.getElementById("payrollChart");
+      if (canvas && typeof Chart !== "undefined") {
+        const ctx = canvas.getContext("2d");
 
-      setTimeout(() => {
-        accBtns.forEach(btn => {
-          const isOpen = btn.getAttribute('aria-expanded') === 'true';
-          if (isOpen) setAcc(btn, true);
-        });
-      }, 150);
-
-      // Prism effect (desktop only)
-      function initLogoMouse(id) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        if (!window.matchMedia('(pointer: fine)').matches) return;
-
-        const it = el.querySelector('.font-it');
-        const letters = el.querySelectorAll('.letter');
-        if (!it || !letters.length) return;
-
-        el.addEventListener('mousemove', (e) => {
-          const r = el.getBoundingClientRect();
-          const x = e.clientX - r.left;
-
-          const itRect = it.getBoundingClientRect();
-          const itX = itRect.left + itRect.width / 2 - r.left;
-          const dIt = Math.abs(x - itX);
-          const pIt = Math.max(0, (200 - dIt) / 200);
-
-          it.style.textShadow = `0 0 ${15 * pIt}px rgba(197,160,89,0.5)`;
-          it.style.transform = `scale(${1 + pIt * 0.05})`;
-
-          letters.forEach(l => {
-            const lr = l.getBoundingClientRect();
-            const lx = lr.left + lr.width / 2 - r.left;
-            const dx = Math.abs(x - lx);
-
-            if (dx < 110) {
-              const p = (110 - dx) / 110;
-              l.style.color = (x > lx + 14) ? '#008C45' : (x < lx - 14 ? '#CD212A' : '#FFF');
-              l.style.transform = `scale(${1 + p * 0.42}) translateY(${-p * 10}px)`;
-              l.style.zIndex = '20';
-            } else {
-              l.style.color = '';
-              l.style.transform = '';
-              l.style.zIndex = '10';
-            }
-          });
-        }, { passive: true });
-
-        el.addEventListener('mouseleave', () => {
-          it.style.textShadow = '';
-          it.style.transform = '';
-          letters.forEach(l => { l.style.color = ''; l.style.transform = ''; l.style.zIndex = ''; });
-        }, { passive: true });
-      }
-
-      initLogoMouse('logo-header');
-      initLogoMouse('logo-footer');
-
-      // Swiper Hero
-      new Swiper('.hero-swiper', {
-        loop: true,
-        effect: 'fade',
-        speed: 2200,
-        autoplay: { delay: 5200, disableOnInteraction: false }
-      });
-
-      // Chart
-      const ctx = document.getElementById('payrollChart').getContext('2d');
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Standard Payroll', 'Our Program'],
-          datasets: [{
-            data: [7.65, 0],
-            backgroundColor: ['rgba(255, 255, 255, 0.12)', '#c5a059'],
-            borderColor: ['rgba(255, 255, 255, 0.25)', '#c5a059'],
-            borderWidth: 1,
-            borderRadius: 3,
-            barThickness: 50
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 10,
-              grid: { color: 'rgba(255,255,255,0.04)' },
-              ticks: { color: '#666', font: { size: 10 } }
-            },
-            x: {
-              grid: { display: false },
-              ticks: { color: '#999', font: { size: 10, weight: 'bold' } }
-            }
+        new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: ["Standard Payroll", "Our Program"],
+            datasets: [{
+              data: [7.65, 0],
+              backgroundColor: ["rgba(255, 255, 255, 0.12)", "#c5a059"],
+              borderColor: ["rgba(255, 255, 255, 0.25)", "#c5a059"],
+              borderWidth: 1,
+              borderRadius: 3,
+              barThickness: 50
+            }]
           },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              backgroundColor: '#0f0f0f',
-              borderColor: '#c5a059',
-              borderWidth: 1
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 10,
+                grid: { color: "rgba(255,255,255,0.04)" },
+                ticks: { color: "#666", font: { size: 10 } }
+              },
+              x: {
+                grid: { display: false },
+                ticks: { color: "#999", font: { size: 10, weight: "bold" } }
+              }
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: "#0f0f0f",
+                borderColor: "#c5a059",
+                borderWidth: 1
+              }
             }
           }
-        }
-      });
-
+        });
+      }
     });
   </script>
 
