@@ -89,18 +89,128 @@
         .dropdown-item { display: block; padding: 0.8rem 2rem; color: #fff; text-decoration: none; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.6; transition: 0.3s; }
         .dropdown-item:hover { color: var(--brand-gold); opacity: 1; background: rgba(255,255,255,0.03); padding-left: 2.5rem; }
 
-        /* --- MOBILE OVERLAY --- */
+        /* --- MOBILE OVERLAY (MASTER UPDATED) --- */
         #mobile-menu-overlay {
-            position: fixed; inset: 0; background: rgba(8, 8, 8, 0.98);
-            backdrop-filter: blur(50px) saturate(160%); z-index: 10000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            opacity: 0; visibility: hidden; transition: all 0.5s ease; overflow-y: auto;
+            position: fixed;
+            inset: 0;
+            background: rgba(8, 8, 8, 0.98);
+            backdrop-filter: blur(55px) saturate(170%);
+            -webkit-backdrop-filter: blur(55px) saturate(170%);
+            z-index: 10000;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+            overflow-y: auto;
+            padding: 5rem 1.5rem;
         }
-        #mobile-menu-overlay.active { opacity: 1; visibility: visible; }
-        .mobile-nav-list { display: flex; flex-direction: column; align-items: center; width: 100%; text-align: center; padding: 4rem 0; }
-        .mobile-link { font-size: 1.1rem; color: #fff; text-transform: uppercase; letter-spacing: 0.4em; margin: 1.2rem 0; text-decoration: none; font-weight: 200; transition: color 0.3s; }
-        .mobile-sub-list { display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem; border-top: 1px solid rgba(197, 160, 89, 0.15); padding-top: 0.5rem; width: 75%; }
-        .mobile-sub-link { font-size: 0.7rem; color: var(--brand-gold); text-transform: uppercase; letter-spacing: 0.25em; margin: 0.5rem 0; text-decoration: none; opacity: 0.6; }
+
+        #mobile-menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-nav-list {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 520px;
+            text-align: center;
+            gap: 1.2rem;
+        }
+
+        .mobile-link {
+            font-size: 1.05rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.35em;
+            text-decoration: none;
+            font-weight: 200;
+            transition: all 0.35s ease;
+            opacity: 0.9;
+            padding: 0.5rem 0;
+        }
+
+        .mobile-link:hover {
+            color: var(--brand-gold);
+            opacity: 1;
+        }
+
+        .mobile-dropdown {
+            width: 100%;
+            border-top: 1px solid rgba(197, 160, 89, 0.12);
+            padding-top: 1.2rem;
+            margin-top: 0.8rem;
+        }
+
+        .mobile-dropdown-btn {
+            width: 100%;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.05rem;
+            text-transform: uppercase;
+            letter-spacing: 0.35em;
+            font-weight: 200;
+            padding: 0.6rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .mobile-dropdown-btn:hover {
+            color: var(--brand-gold);
+            opacity: 1;
+        }
+
+        .mobile-dropdown-icon {
+            width: 16px;
+            height: 16px;
+            opacity: 0.5;
+            transition: transform 0.35s ease;
+        }
+
+        .mobile-sub-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.7rem;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.45s ease;
+            padding-top: 0;
+        }
+
+        .mobile-sub-list.open {
+            max-height: 400px;
+            opacity: 1;
+            padding-top: 1.2rem;
+        }
+
+        .mobile-sub-link {
+            font-size: 0.72rem;
+            color: var(--brand-gold);
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            text-decoration: none;
+            opacity: 0.65;
+            transition: all 0.3s ease;
+            padding: 0.3rem 0;
+        }
+
+        .mobile-sub-link:hover { opacity: 1; }
+
+        .rotate-icon { transform: rotate(180deg); }
 
         /* --- SECTION 1: HERO SPLIT --- */
         .hero-split { 
@@ -253,32 +363,57 @@
 </head>
 <body class="custom-scrollbar">
 
-    <!-- MOBILE MENU OVERLAY -->
+    <!-- MOBILE MENU OVERLAY (UPDATED MASTER) -->
     <div id="mobile-menu-overlay">
-        <button id="close-menu" class="absolute top-8 right-8 text-white focus:outline-none">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <button id="close-menu" class="absolute top-8 right-8 text-white focus:outline-none" aria-label="Close menu">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
         </button>
+
         <div class="mobile-nav-list">
             <a href="https://www.italianexp.com/" class="mobile-link">Home</a>
-            
-            <span class="mobile-link">Travel</span>
-            <div class="mobile-sub-list">
-                <a href="https://www.italianexp.com/travel/bespoke" class="mobile-sub-link">Bespoke</a>
-                <a href="https://www.italianexp.com/travel/gapyear" class="mobile-sub-link">Gap Year</a>
-                <a href="https://www.italianexp.com/travel/culinary" class="mobile-sub-link">Culinary Academy</a>
+
+            <div class="mobile-dropdown">
+                <button class="mobile-dropdown-btn" type="button" data-dropdown="travel">
+                    Travel
+                    <svg class="mobile-dropdown-icon" id="icon-travel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m6 9 6 6 6-6"></path>
+                    </svg>
+                </button>
+                <div class="mobile-sub-list" id="dropdown-travel">
+                    <a href="https://www.italianexp.com/travel/bespoke" class="mobile-sub-link">Bespoke</a>
+                    <a href="https://www.italianexp.com/travel/gapyear" class="mobile-sub-link">Gap Year</a>
+                    <a href="https://www.italianexp.com/travel/culinary" class="mobile-sub-link">Culinary Academy</a>
+                </div>
             </div>
 
-            <span class="mobile-link">Recruitment</span>
-            <div class="mobile-sub-list">
-                <a href="https://www.italianexp.com/recruitment/employer" class="mobile-sub-link">Employer</a>
-                <a href="https://www.italianexp.com/recruitment/candidate" class="mobile-sub-link">Candidate</a>
+            <div class="mobile-dropdown">
+                <button class="mobile-dropdown-btn" type="button" data-dropdown="recruitment">
+                    Recruitment
+                    <svg class="mobile-dropdown-icon" id="icon-recruitment" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m6 9 6 6 6-6"></path>
+                    </svg>
+                </button>
+                <div class="mobile-sub-list" id="dropdown-recruitment">
+                    <a href="https://www.italianexp.com/recruitment/employer" class="mobile-sub-link">Employer</a>
+                    <a href="https://www.italianexp.com/recruitment/candidate" class="mobile-sub-link">Candidate</a>
+                </div>
             </div>
 
-            <span class="mobile-link">Flavors</span>
-            <div class="mobile-sub-list">
-                <a href="https://www.italianexp.com/flavors/foryourhome" class="mobile-sub-link">For your Home</a>
-                <a href="https://www.italianexp.com/flavors/foryourbusiness" class="mobile-sub-link">For your Business</a>
-                <a href="https://www.italianexp.com/flavors/aziendeitaliane" class="mobile-sub-link">Aziende Italiane</a>
+            <div class="mobile-dropdown">
+                <button class="mobile-dropdown-btn" type="button" data-dropdown="flavors">
+                    Flavors
+                    <svg class="mobile-dropdown-icon" id="icon-flavors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m6 9 6 6 6-6"></path>
+                    </svg>
+                </button>
+                <div class="mobile-sub-list" id="dropdown-flavors">
+                    <a href="https://www.italianexp.com/flavors/foryourhome" class="mobile-sub-link">For your Home</a>
+                    <a href="https://www.italianexp.com/flavors/foryourbusiness" class="mobile-sub-link">For your Business</a>
+                    <a href="https://www.italianexp.com/flavors/aziendeitaliane" class="mobile-sub-link">Aziende Italiane</a>
+                </div>
             </div>
 
             <a href="https://www.italianexp.com/estetes" class="mobile-link">Estates</a>
@@ -499,13 +634,39 @@
             lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
         }, { passive: true });
 
-        // 2. MOBILE MENU
+        // 2. MOBILE MENU OPEN/CLOSE
         const menuBtn = document.getElementById('central-menu-btn');
         const overlay = document.getElementById('mobile-menu-overlay');
         const closeBtn = document.getElementById('close-menu');
-        menuBtn.onclick = () => overlay.classList.add('active');
-        closeBtn.onclick = () => overlay.classList.remove('active');
-        overlay.onclick = (e) => { if(e.target.closest('.mobile-link')) overlay.classList.remove('active'); };
+
+        menuBtn.addEventListener('click', () => overlay.classList.add('active'));
+        closeBtn.addEventListener('click', () => overlay.classList.remove('active'));
+
+        // CLOSE MENU ON LINK CLICK
+        overlay.addEventListener('click', (e) => {
+            if (e.target.closest('a')) overlay.classList.remove('active');
+        });
+
+        // MOBILE DROPDOWNS
+        const dropdownButtons = document.querySelectorAll('.mobile-dropdown-btn');
+
+        dropdownButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const key = btn.getAttribute('data-dropdown');
+                const list = document.getElementById('dropdown-' + key);
+                const icon = document.getElementById('icon-' + key);
+
+                const isOpen = list.classList.contains('open');
+
+                document.querySelectorAll('.mobile-sub-list').forEach(el => el.classList.remove('open'));
+                document.querySelectorAll('.mobile-dropdown-icon').forEach(ic => ic.classList.remove('rotate-icon'));
+
+                if (!isOpen) {
+                    list.classList.add('open');
+                    icon.classList.add('rotate-icon');
+                }
+            });
+        });
 
         // 3. LOGO PRISM LOGIC
         function initLogo(id) {
@@ -539,9 +700,18 @@
                     } else { l.style.color = ''; l.style.transform = ''; l.style.textShadow = ''; }
                 });
             });
-            el.addEventListener('mouseleave', () => { it.style.textShadow = ''; it.style.transform = ''; letters.forEach(l => { l.style.color = ''; l.style.transform = ''; l.style.textShadow = ''; }); });
+
+            el.addEventListener('mouseleave', () => { 
+                it.style.textShadow = ''; 
+                it.style.transform = ''; 
+                letters.forEach(l => { l.style.color = ''; l.style.transform = ''; l.style.textShadow = ''; }); 
+            });
         }
-        window.onload = () => { initLogo('logo-header'); initLogo('logo-footer'); };
+
+        window.onload = () => { 
+            initLogo('logo-header'); 
+            initLogo('logo-footer'); 
+        };
     </script>
 </body>
 </html>
