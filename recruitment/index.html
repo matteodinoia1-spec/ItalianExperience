@@ -7,7 +7,6 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
@@ -299,17 +298,16 @@
       color:var(--brand-gold);
     }
 
-    /* HERO SPLIT SECTION */
+    /* HERO */
     .hero-recruitment{
       width:100%;
       min-height:100vh;
       min-height:100dvh;
       display:flex;
-      align-items:stretch;
-      justify-content:center;
       position:relative;
       overflow:hidden;
       padding-top:110px;
+      background:#000;
     }
 
     .hero-bg-left,.hero-bg-right{
@@ -323,14 +321,15 @@
       transition:opacity 0.8s ease,transform 1.2s ease;
       z-index:0;
     }
+
     .hero-bg-left{
       left:0;
-      background-image:url('https://images.unsplash.com/photo-1556745753-b2904692b3cd?auto=format&fit=crop&w=1200&q=80');
+      background-image:url('https://images.unsplash.com/photo-1556745753-b2904692b3cd?auto=format&fit=crop&w=1400&q=80');
       border-right:1px solid rgba(255,255,255,0.08);
     }
     .hero-bg-right{
       right:0;
-      background-image:url('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=80');
+      background-image:url('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1400&q=80');
     }
 
     .floating-text{
@@ -345,41 +344,51 @@
       white-space:nowrap;
       letter-spacing:-0.02em;
     }
-
     .panel-employer .floating-text{left:-5%;text-align:left}
     .panel-candidate .floating-text{right:-5%;text-align:right}
 
     .panel-col{
       position:relative;
       height:100%;
+      min-height:calc(100vh - 110px);
       display:flex;
-      flex-direction:column;
       justify-content:center;
       align-items:center;
-      transition:all 0.6s ease;
       overflow:hidden;
+      border-left:1px solid rgba(255,255,255,0.06);
     }
+    .panel-col:first-child{border-left:none}
 
     .content-main{
       position:relative;
       z-index:10;
-      transition:opacity 0.5s ease,transform 0.5s ease;
+      transition:opacity 0.45s ease,transform 0.45s ease;
+      text-align:center;
+      max-width:520px;
       padding:0 2rem;
     }
 
     .details-overlay{
       position:absolute;
       inset:0;
-      background:rgba(8,8,8,0.98);
+      background:rgba(8,8,8,0.97);
       z-index:50;
-      display:none;
+      display:flex;
       flex-direction:column;
       justify-content:center;
       align-items:center;
       padding:3rem 2rem;
       opacity:0;
-      transition:opacity 0.5s ease;
+      visibility:hidden;
+      transform:scale(1.02);
+      transition:opacity 0.35s ease,transform 0.35s ease,visibility 0.35s ease;
       overflow-y:auto;
+    }
+
+    .details-overlay.active{
+      opacity:1;
+      visibility:visible;
+      transform:scale(1);
     }
 
     .btn-luxury{
@@ -389,13 +398,12 @@
       letter-spacing:3px;
       font-size:0.65rem;
       text-transform:uppercase;
-      transition:all 0.4s;
+      transition:all 0.35s ease;
       cursor:pointer;
       background:transparent;
       font-weight:600;
       margin-top:2rem;
       display:inline-block;
-      text-decoration:none;
       pointer-events:auto;
     }
     .btn-luxury:hover{
@@ -431,9 +439,7 @@
       transition:all 0.3s ease;
       pointer-events:auto;
       background:transparent;
-      border-top:none;
-      border-left:none;
-      border-right:none;
+      border:none;
       cursor:pointer;
     }
     .btn-close-overlay:hover{
@@ -449,10 +455,6 @@
       margin:1rem auto;
     }
 
-    .custom-scrollbar::-webkit-scrollbar{width:4px}
-    .custom-scrollbar::-webkit-scrollbar-track{background:transparent}
-    .custom-scrollbar::-webkit-scrollbar-thumb{background:var(--brand-gold);border-radius:10px}
-
     /* FOOTER */
     .site-footer{
       background:#000;
@@ -464,7 +466,7 @@
       text-align:center;
     }
 
-    /* MOBILE */
+    /* RESPONSIVE HEADER MOBILE */
     @media (max-width:1024px){
       .glass-header{
         flex-direction:column !important;
@@ -473,35 +475,48 @@
         padding:1rem 0 !important;
         gap:10px;
       }
-      .glass-header.scrolled{
-        height:135px !important;
-      }
-      .logo-wrap{
-        transform:scale(0.82);
-        margin:0 auto;
-      }
-      #central-menu-btn{
-        display:flex !important;
-        margin-top:6px;
-      }
+      .glass-header.scrolled{height:135px !important;}
+      .logo-wrap{transform:scale(0.82);margin:0 auto;}
+      #central-menu-btn{display:flex !important;margin-top:6px;}
       .nav-container{display:none !important;}
-      .hero-recruitment{padding-top:160px}
+      .hero-recruitment{padding-top:160px;}
     }
 
+    /* MOBILE HERO FIX: keep images visible */
     @media (max-width:768px){
       .hero-recruitment{
         flex-direction:column;
         min-height:auto;
         overflow:visible;
       }
+
       .hero-bg-left,.hero-bg-right{
-        display:none;
-      }
-      .panel-col{
-        min-height:88vh;
         width:100%;
-        border-bottom:1px solid rgba(255,255,255,0.1);
+        height:50%;
+        opacity:0.22;
       }
+
+      .hero-bg-left{
+        top:0;
+        left:0;
+        border-right:none;
+        border-bottom:1px solid rgba(255,255,255,0.08);
+      }
+
+      .hero-bg-right{
+        bottom:0;
+        top:auto;
+        right:0;
+      }
+
+      .panel-col{
+        width:100%;
+        min-height:88vh;
+        border-left:none;
+        border-top:1px solid rgba(255,255,255,0.06);
+      }
+      .panel-col:first-child{border-top:none;}
+
       .panel-employer .floating-text,
       .panel-candidate .floating-text{
         left:50%;
@@ -520,7 +535,7 @@
   </style>
 </head>
 
-<body class="custom-scrollbar">
+<body>
 
   <!-- MOBILE MENU OVERLAY -->
   <div id="mobile-menu-overlay" aria-hidden="true">
@@ -534,7 +549,6 @@
     </div>
 
     <nav class="mobile-menu" aria-label="Menu mobile">
-
       <a href="../" class="mobile-link" data-close>Home</a>
 
       <button class="mobile-acc-btn mobile-acc-travel" type="button" aria-expanded="false" aria-controls="m-travel">
@@ -543,7 +557,6 @@
           <path d="m6 9 6 6 6-6"></path>
         </svg>
       </button>
-
       <div id="m-travel" class="mobile-sub">
         <div class="mobile-sub-inner">
           <a href="../travel/" class="mobile-sublink" data-close>Travel Home</a>
@@ -553,16 +566,15 @@
         </div>
       </div>
 
-      <button class="mobile-acc-btn mobile-acc-recruitment" type="button" aria-expanded="true" aria-controls="m-recruitment">
+      <button class="mobile-acc-btn mobile-acc-recruitment active" type="button" aria-expanded="true" aria-controls="m-recruitment">
         <span>Recruitment</span>
         <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="m6 9 6 6 6-6"></path>
         </svg>
       </button>
-
       <div id="m-recruitment" class="mobile-sub" style="max-height:260px">
         <div class="mobile-sub-inner">
-          <a href="./" class="mobile-sublink" data-close>Recruitment Home</a>
+          <a href="./" class="mobile-sublink active" data-close>Recruitment Home</a>
           <a href="./employer/" class="mobile-sublink" data-close>Employer</a>
           <a href="./candidate/" class="mobile-sublink" data-close>Candidate</a>
         </div>
@@ -574,7 +586,6 @@
           <path d="m6 9 6 6 6-6"></path>
         </svg>
       </button>
-
       <div id="m-flavors" class="mobile-sub">
         <div class="mobile-sub-inner">
           <a href="../flavors/" class="mobile-sublink" data-close>Flavors Home</a>
@@ -586,7 +597,6 @@
 
       <a href="../estates/" class="mobile-link" data-close>Estates</a>
       <a href="../contact/" class="mobile-link" data-close>Contact</a>
-
     </nav>
   </div>
 
@@ -615,7 +625,7 @@
     </button>
 
     <div class="nav-container" aria-label="Navigazione desktop">
-      <a href="../" class="nav-link nav-link-home">Home</a>
+      <a href="../" class="nav-link">Home</a>
 
       <div class="dropdown">
         <a href="../travel/" class="nav-link nav-link-travel">
@@ -658,13 +668,13 @@
         </div>
       </div>
 
-      <a href="../estates/" class="nav-link nav-link-estates">Estates</a>
-      <a href="../contact/" class="nav-link nav-link-contact">Contact</a>
+      <a href="../estates/" class="nav-link">Estates</a>
+      <a href="../contact/" class="nav-link">Contact</a>
     </div>
   </nav>
 
-  <!-- HERO SPLIT -->
-  <section class="hero-recruitment custom-scrollbar">
+  <!-- HERO -->
+  <section class="hero-recruitment">
     <div class="hero-bg-left" id="bg-left"></div>
     <div class="hero-bg-right" id="bg-right"></div>
 
@@ -674,8 +684,10 @@
       <div class="panel-col panel-employer" id="panel-employer">
         <span class="floating-text">EMPLOYER</span>
 
-        <div class="content-main text-center px-6" id="content-employer-main">
-          <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.6rem] mb-4 block font-bold">Strategic Partnership</span>
+        <div class="content-main" id="content-employer-main">
+          <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.6rem] mb-4 block font-bold">
+            Strategic Partnership
+          </span>
 
           <h2 class="text-5xl md:text-7xl brand-font mb-6 italic text-white">
             I am an <br>Employer
@@ -691,9 +703,9 @@
           </div>
         </div>
 
-        <div class="details-overlay custom-scrollbar" id="details-employer">
+        <div class="details-overlay" id="details-employer">
           <h3 class="text-[#c5a059] brand-font italic text-3xl mb-4">Why Choose Us</h3>
-          <p class="text-[0.65rem] text-slate-400 mb-8 max-w-md mx-auto leading-relaxed">
+          <p class="text-[0.65rem] text-slate-400 mb-8 max-w-md mx-auto leading-relaxed text-center">
             We handle the entire recruitment cycle, allowing you to focus on your core operations while we increase your company's global competitiveness.
           </p>
 
@@ -702,7 +714,7 @@
               <i class="fas fa-search-plus text-[#c5a059] text-sm mt-1"></i>
               <div>
                 <h4 class="text-[0.65rem] font-bold uppercase tracking-wider text-white">Needs Analysis</h4>
-                <p class="text-[0.55rem] text-slate-500 italic">Customized approach to fit your specific customer culture.</p>
+                <p class="text-[0.55rem] text-slate-500 italic">Customized approach to fit your specific culture.</p>
               </div>
             </div>
 
@@ -710,7 +722,7 @@
               <i class="fas fa-video text-[#c5a059] text-sm mt-1"></i>
               <div>
                 <h4 class="text-[0.65rem] font-bold uppercase tracking-wider text-white">Vetted Screening</h4>
-                <p class="text-[0.55rem] text-slate-500 italic">Rigorous phone & video evaluations for every candidate.</p>
+                <p class="text-[0.55rem] text-slate-500 italic">Rigorous phone & video evaluations.</p>
               </div>
             </div>
 
@@ -718,7 +730,7 @@
               <i class="fas fa-check-double text-[#c5a059] text-sm mt-1"></i>
               <div>
                 <h4 class="text-[0.65rem] font-bold uppercase tracking-wider text-white">Reference Checks</h4>
-                <p class="text-[0.55rem] text-slate-500 italic">Thorough background verification for quality assurance.</p>
+                <p class="text-[0.55rem] text-slate-500 italic">Thorough verification for quality assurance.</p>
               </div>
             </div>
 
@@ -726,7 +738,7 @@
               <i class="fas fa-piggy-bank text-[#c5a059] text-sm mt-1"></i>
               <div>
                 <h4 class="text-[0.65rem] font-bold uppercase tracking-wider text-white">FICA Tax Savings</h4>
-                <p class="text-[0.55rem] text-slate-500 italic">Total exemption through our cultural exchange framework.</p>
+                <p class="text-[0.55rem] text-slate-500 italic">Total exemption through cultural exchange.</p>
               </div>
             </div>
           </div>
@@ -735,7 +747,7 @@
             <canvas id="employerChart"></canvas>
           </div>
 
-          <button class="btn-close-overlay" onclick="hideDetails('employer')">Return to Menu</button>
+          <button class="btn-close-overlay" onclick="hideDetails('employer')">Return</button>
         </div>
       </div>
 
@@ -743,15 +755,17 @@
       <div class="panel-col panel-candidate" id="panel-candidate">
         <span class="floating-text">CANDIDATE</span>
 
-        <div class="content-main text-center px-6" id="content-candidate-main">
-          <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.6rem] mb-4 block font-bold">Career Mastery</span>
+        <div class="content-main" id="content-candidate-main">
+          <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.6rem] mb-4 block font-bold">
+            Career Mastery
+          </span>
 
           <h2 class="text-5xl md:text-7xl brand-font mb-6 italic text-white">
             I am a <br>Candidate
           </h2>
 
           <p class="text-slate-400 font-light text-sm max-w-xs mx-auto mb-8 leading-relaxed">
-            Dedicated to assisting elite candidates in launching prestigious international and local careers through curated opportunities.
+            Dedicated to assisting elite candidates in launching prestigious careers through curated opportunities.
           </p>
 
           <a href="./candidate/" class="btn-luxury">Live the Dream</a>
@@ -760,10 +774,10 @@
           </div>
         </div>
 
-        <div class="details-overlay custom-scrollbar" id="details-candidate">
+        <div class="details-overlay" id="details-candidate">
           <h3 class="text-[#c5a059] brand-font italic text-3xl mb-4">Candidate Solutions</h3>
-          <p class="text-[0.65rem] text-slate-400 mb-8 max-w-md mx-auto leading-relaxed">
-            Whether you are aiming for a life-changing international cultural program or a strategic local career move, we provide end-to-end support.
+          <p class="text-[0.65rem] text-slate-400 mb-8 max-w-md mx-auto leading-relaxed text-center">
+            Whether you are aiming for an international cultural program or a strategic local career move, we provide end-to-end support.
           </p>
 
           <div class="w-full max-w-md space-y-6 text-left mb-8">
@@ -776,7 +790,7 @@
               <div class="pb-6">
                 <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-1">Interview & Selection</h4>
                 <p class="text-[0.6rem] text-slate-400 italic">
-                  Individual screening sessions to evaluate your profile, language skills, and discuss professional expectations.
+                  Individual screening sessions to evaluate your profile and expectations.
                 </p>
               </div>
             </div>
@@ -788,20 +802,18 @@
               </div>
               <div class="pb-6">
                 <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-1">Strategic Placement</h4>
+
                 <div class="mt-2 space-y-2">
                   <div class="bg-white/5 p-2 border-l-2 border-[#c5a059]">
                     <p class="text-[0.55rem] font-bold text-white uppercase tracking-tighter">International Pathway</p>
-                    <p class="text-[0.5rem] text-slate-500">
-                      Cultural programs with visa support, housing, and travel logistics.
-                    </p>
+                    <p class="text-[0.5rem] text-slate-500">Visa programs, housing, and travel logistics.</p>
                   </div>
                   <div class="bg-white/5 p-2 border-l-2 border-slate-500">
                     <p class="text-[0.55rem] font-bold text-white uppercase tracking-tighter">Local Opportunities</p>
-                    <p class="text-[0.5rem] text-slate-500">
-                      Direct recruitment for specialized roles within the Italian market.
-                    </p>
+                    <p class="text-[0.5rem] text-slate-500">Direct recruitment within Italy and Europe.</p>
                   </div>
                 </div>
+
               </div>
             </div>
 
@@ -811,9 +823,9 @@
                 <div class="w-px h-full bg-white/10 mt-2"></div>
               </div>
               <div class="pb-6">
-                <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-1">Total Logistics & Support</h4>
+                <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-1">Total Support</h4>
                 <p class="text-[0.6rem] text-slate-400 italic">
-                  For international programs: travel package, medical insurance, and airport-to-housing shuttle services.
+                  Insurance, group departures, and full relocation guidance.
                 </p>
               </div>
             </div>
@@ -825,14 +837,14 @@
               <div>
                 <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-1">Career Evolution</h4>
                 <p class="text-[0.6rem] text-slate-400 italic">
-                  Continuous follow-up and access to an online profile for career growth within internationally recognized companies.
+                  Continuous follow-up and career development access.
                 </p>
               </div>
             </div>
 
           </div>
 
-          <button class="btn-close-overlay" onclick="hideDetails('candidate')">Back to Journey</button>
+          <button class="btn-close-overlay" onclick="hideDetails('candidate')">Return</button>
         </div>
       </div>
 
@@ -862,13 +874,11 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-      /* Build EXPERIENCE letters */
       document.querySelectorAll('.font-ex').forEach(ex => {
         const text = ex.getAttribute('data-text') || '';
         ex.innerHTML = text.split('').map(c => `<span class="letter">${c}</span>`).join('');
       });
 
-      /* Header smart scroll */
       let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
       const header = document.getElementById('main-header');
 
@@ -884,7 +894,6 @@
         lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
       }, { passive: true });
 
-      /* Mobile menu open/close */
       const menuBtn = document.getElementById('central-menu-btn');
       const closeBtn = document.getElementById('close-menu');
       const overlay = document.getElementById('mobile-menu-overlay');
@@ -909,7 +918,6 @@
         }
       }, { passive: true });
 
-      /* Mobile accordion */
       const accBtns = Array.from(document.querySelectorAll('.mobile-acc-btn'));
 
       function setAcc(btn, open) {
@@ -941,7 +949,6 @@
         });
       }, 150);
 
-      /* Prism effect */
       function initLogoMouse(id) {
         const el = document.getElementById(id);
         if (!el) return;
@@ -991,61 +998,25 @@
       initLogoMouse('logo-header');
       initLogoMouse('logo-footer');
 
-      /* AUTO ACTIVE LINKS */
-      (function setActiveNavLinks(){
-        const currentPath = window.location.pathname.replace(/\/$/, "");
-
-        document.querySelectorAll(".dropdown-item, .nav-link, .mobile-link, .mobile-sublink").forEach(link => {
-          const href = link.getAttribute("href");
-          if (!href) return;
-
-          const temp = document.createElement("a");
-          temp.href = href;
-
-          const linkPath = temp.pathname.replace(/\/$/, "");
-
-          if (linkPath === currentPath) {
-            link.classList.add("active");
-          }
-        });
-
-        if (currentPath.includes("/travel")) {
-          document.querySelectorAll(".nav-link-travel, .mobile-acc-travel").forEach(el => el.classList.add("active"));
-        }
-        if (currentPath.includes("/recruitment")) {
-          document.querySelectorAll(".nav-link-recruitment, .mobile-acc-recruitment").forEach(el => el.classList.add("active"));
-        }
-        if (currentPath.includes("/flavors")) {
-          document.querySelectorAll(".nav-link-flavors, .mobile-acc-flavors").forEach(el => el.classList.add("active"));
-        }
-      })();
-
     });
 
-    /* PANEL EFFECTS + CHART */
     let employerChart = null;
 
     function showDetails(type) {
       const mainContent = document.getElementById(`content-${type}-main`);
       const detailsPanel = document.getElementById(`details-${type}`);
+      const bg = document.getElementById(type === 'employer' ? 'bg-left' : 'bg-right');
 
       mainContent.style.opacity = '0';
-      mainContent.style.transform = 'translateY(-20px)';
+      mainContent.style.transform = 'translateY(-18px)';
 
-      const bg = document.getElementById(type === 'employer' ? 'bg-left' : 'bg-right');
-      bg.style.opacity = '0.5';
+      bg.style.opacity = '0.55';
       bg.style.transform = 'scale(1.05)';
 
       setTimeout(() => {
-        mainContent.style.display = 'none';
-        detailsPanel.style.display = 'flex';
-
-        setTimeout(() => {
-          detailsPanel.style.opacity = '1';
-          if(type === 'employer' && !employerChart) initChart();
-        }, 50);
-
-      }, 400);
+        detailsPanel.classList.add("active");
+        if(type === 'employer' && !employerChart) initChart();
+      }, 250);
     }
 
     function hideDetails(type) {
@@ -1053,20 +1024,15 @@
       const detailsPanel = document.getElementById(`details-${type}`);
       const bg = document.getElementById(type === 'employer' ? 'bg-left' : 'bg-right');
 
-      detailsPanel.style.opacity = '0';
+      detailsPanel.classList.remove("active");
+
       bg.style.opacity = '0.28';
       bg.style.transform = 'scale(1)';
 
       setTimeout(() => {
-        detailsPanel.style.display = 'none';
-        mainContent.style.display = 'block';
-
-        setTimeout(() => {
-          mainContent.style.opacity = '1';
-          mainContent.style.transform = 'translateY(0)';
-        }, 50);
-
-      }, 400);
+        mainContent.style.opacity = '1';
+        mainContent.style.transform = 'translateY(0)';
+      }, 280);
     }
 
     function initChart() {
