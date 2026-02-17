@@ -1,112 +1,135 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // Build EXPERIENCE letters
-  document.querySelectorAll('.font-ex').forEach(ex => {
-    const text = ex.getAttribute('data-text') || '';
-    ex.innerHTML = text.split('').map(c => `<span class="letter">${c}</span>`).join('');
-  });
-
-  // Header smart scroll
-  const header = document.getElementById('main-header');
-  let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
-
-  window.addEventListener('scroll', () => {
-    const y = window.pageYOffset || document.documentElement.scrollTop;
-
-    if (y > lastScrollY && y > 100) header?.classList.add('nav-up');
-    else header?.classList.remove('nav-up');
-
-    if (y > 50) header?.classList.add('scrolled');
-    else header?.classList.remove('scrolled');
-
-    lastScrollY = y <= 0 ? 0 : y;
-  }, { passive: true });
-
-  // Mobile menu open/close
-  const menuBtn = document.getElementById('central-menu-btn');
-  const closeBtn = document.getElementById('close-menu');
-  const overlay = document.getElementById('mobile-menu-overlay');
-
-  const lockBody = (locked) => {
-    document.body.classList.toggle('menu-open', locked);
-  };
-
-  const openMenu = () => {
-    if (!overlay) return;
-    overlay.classList.add('active');
-    overlay.setAttribute('aria-hidden', 'false');
-    lockBody(true);
-  };
-
-  const closeMenu = () => {
-    if (!overlay) return;
-    overlay.classList.remove('active');
-    overlay.setAttribute('aria-hidden', 'true');
-    lockBody(false);
-  };
-
-  menuBtn?.addEventListener('click', (e) => { e.preventDefault(); openMenu(); });
-  closeBtn?.addEventListener('click', (e) => { e.preventDefault(); closeMenu(); });
-
-  overlay?.addEventListener('click', (e) => {
-    const t = e.target;
-    if (t && t.closest && t.closest('[data-close]')) closeMenu();
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeMenu();
-  });
-
-  // Mobile accordion
-  const accBtns = Array.from(document.querySelectorAll('.mobile-acc-btn'));
-
-  const setAcc = (btn, open) => {
-    const id = btn.getAttribute('aria-controls');
-    const panel = id ? document.getElementById(id) : null;
-    if (!panel) return;
-
-    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-
-    if (open) {
-      panel.hidden = false;
-      const inner = panel.querySelector('.mobile-sub-inner');
-      const h = inner ? inner.scrollHeight : 0;
-      panel.style.maxHeight = Math.max(80, h + 16) + 'px';
-    } else {
-      panel.style.maxHeight = '0px';
-      window.setTimeout(() => { panel.hidden = true; }, 260);
-    }
-  };
-
-  accBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const isOpen = btn.getAttribute('aria-expanded') === 'true';
-      setAcc(btn, !isOpen);
+(function () {
+  function buildExperienceLetters(root) {
+    (root || document).querySelectorAll('.font-ex').forEach(ex => {
+      const text = ex.getAttribute('data-text') || '';
+      ex.innerHTML = text.split('').map(c => `<span class="letter">${c}</span>`).join('');
     });
-  });
-
-  // Active states (desktop + mobile)
-  const path = (window.location.pathname || '').toLowerCase();
-
-  const section =
-    path.includes('/travel/') ? 'travel' :
-    path.includes('/recruitment/') ? 'recruitment' :
-    path.includes('/flavors/') ? 'flavors' :
-    path.includes('/estates/') ? 'estates' :
-    path.includes('/contact/') ? 'contact' :
-    'home';
-
-  document.querySelectorAll(`[data-nav="${section}"]`).forEach(el => el.classList.add('active'));
-
-  // Optional: auto-open the matching accordion on mobile
-  const map = { travel: 'm-travel', recruitment: 'm-recruitment', flavors: 'm-flavors' };
-  const panelId = map[section];
-  if (panelId) {
-    const btn = document.querySelector(`.mobile-acc-btn[aria-controls="${panelId}"]`);
-    if (btn) setAcc(btn, true);
   }
 
-  // Logo prism mouse effect (desktop only)
-  const initLogoMouse = (id) => {
+  function initHeaderSmartScroll() {
+    const header = document.getElementById('main-header');
+    if (!header) return;
+
+    let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+    window.addEventListener('scroll', () => {
+      const y = window.pageYOffset || document.documentElement.scrollTop;
+
+      if (y > lastScrollY && y > 100) header.classList.add('nav-up');
+      else header.classList.remove('nav-up');
+
+      if (y > 50) header.classList.add('scrolled');
+      else header.classList.remove('scrolled');
+
+      lastScrollY = y <= 0 ? 0 : y;
+    }, { passive: true });
+  }
+
+  function initMobileMenu() {
+    const menuBtn = document.getElementById('central-menu-btn');
+    const closeBtn = document.getElementById('close-menu');
+    const overlay = document.getElementById('mobile-menu-overlay');
+
+    if (!menuBtn || !closeBtn || !overlay) return;
+
+    const lockBody = (locked) => {
+      document.body.classList.toggle('menu-open', locked);
+    };
+
+    const openMenu = () => {
+      overlay.classList.add('active');
+      overlay.setAttribute('aria-hidden', 'false');
+      lockBody(true);
+    };
+
+    const closeMenu = () => {
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+      lockBody(false);
+    };
+
+    menuBtn.addEventListener('click', (e) => { e.preventDefault(); openMenu(); });
+    closeBtn.addEventListener('click', (e) => { e.preventDefault(); closeMenu(); });
+
+    overlay.addEventListener('click', (e) => {
+      const t = e.target;
+      if (t && t.closest && t.closest('[data-close]')) closeMenu();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
+    });
+  }
+
+  function initMobileAccordion() {
+    const accBtns = Array.from(document.querySelectorAll('.mobile-acc-btn'));
+    if (!accBtns.length) return;
+
+    const setAcc = (btn, open) => {
+      const id = btn.getAttribute('aria-controls');
+      const panel = id ? document.getElementById(id) : null;
+      if (!panel) return;
+
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+
+      if (open) {
+        panel.hidden = false;
+        const inner = panel.querySelector('.mobile-sub-inner');
+        const h = inner ? inner.scrollHeight : 0;
+        panel.style.maxHeight = Math.max(80, h + 16) + 'px';
+      } else {
+        panel.style.maxHeight = '0px';
+        window.setTimeout(() => { panel.hidden = true; }, 260);
+      }
+    };
+
+    accBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const isOpen = btn.getAttribute('aria-expanded') === 'true';
+        setAcc(btn, !isOpen);
+      });
+    });
+
+    const refreshOpen = () => {
+      accBtns.forEach(btn => {
+        const isOpen = btn.getAttribute('aria-expanded') === 'true';
+        if (isOpen) setAcc(btn, true);
+      });
+    };
+
+    refreshOpen();
+    setTimeout(refreshOpen, 150);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => setTimeout(refreshOpen, 120));
+    }
+  }
+
+  function initActiveNav() {
+    const path = (window.location.pathname || '').toLowerCase();
+
+    const section =
+      path.includes('/travel/') ? 'travel' :
+      path.includes('/recruitment/') ? 'recruitment' :
+      path.includes('/flavors/') ? 'flavors' :
+      path.includes('/estates/') ? 'estates' :
+      path.includes('/contact/') ? 'contact' :
+      'home';
+
+    document.querySelectorAll(`[data-nav="${section}"]`).forEach(el => el.classList.add('active'));
+
+    const map = { travel: 'm-travel', recruitment: 'm-recruitment', flavors: 'm-flavors' };
+    const panelId = map[section];
+    if (panelId) {
+      const btn = document.querySelector(`.mobile-acc-btn[aria-controls="${panelId}"]`);
+      if (btn) {
+        btn.setAttribute('aria-expanded', 'true');
+        const panel = document.getElementById(panelId);
+        if (panel) panel.hidden = false;
+      }
+    }
+  }
+
+  function initLogoMouse(id) {
     const el = document.getElementById(id);
     if (!el) return;
     if (!window.matchMedia('(pointer: fine)').matches) return;
@@ -114,6 +137,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const it = el.querySelector('.font-it');
     const letters = el.querySelectorAll('.letter');
     if (!it || !letters.length) return;
+
+    const green = getComputedStyle(document.documentElement).getPropertyValue('--it-green').trim();
+    const red = getComputedStyle(document.documentElement).getPropertyValue('--it-red').trim();
 
     el.addEventListener('mousemove', (e) => {
       const r = el.getBoundingClientRect();
@@ -126,9 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       it.style.textShadow = `0 0 ${15 * pIt}px rgba(197,160,89,0.5)`;
       it.style.transform = `scale(${1 + pIt * 0.05})`;
-
-      const green = getComputedStyle(document.documentElement).getPropertyValue('--it-green').trim();
-      const red = getComputedStyle(document.documentElement).getPropertyValue('--it-red').trim();
 
       letters.forEach(l => {
         const lr = l.getBoundingClientRect();
@@ -153,8 +176,21 @@ document.addEventListener('DOMContentLoaded', () => {
       it.style.transform = '';
       letters.forEach(l => { l.style.color = ''; l.style.transform = ''; l.style.zIndex = ''; });
     });
-  };
+  }
 
-  initLogoMouse('logo-header');
-  initLogoMouse('logo-footer');
-});
+  function IEInit(root) {
+    buildExperienceLetters(root);
+    initActiveNav();
+    initMobileAccordion();
+    initMobileMenu();
+    initHeaderSmartScroll();
+    initLogoMouse('logo-header');
+    initLogoMouse('logo-footer');
+  }
+
+  window.IEInit = IEInit;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    IEInit(document);
+  });
+})();
