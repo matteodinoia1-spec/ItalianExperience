@@ -235,4 +235,116 @@
   <section class="py-32 px-8 flex items-center justify-center bg-[#080808]">
     <div class="max-w-6xl w-full text-center">
       <div class="mb-20">
-        <span
+        <span class="text-[#c5a059] uppercase tracking-[0.6em] text-[0.65rem] font-bold block mb-8">
+          Strategic Food Curation
+        </span>
+
+        <h2 class="text-5xl md:text-7xl mb-10 italic text-white brand-font leading-tight">
+          The Gastronomic Legacy.
+        </h2>
+
+        <div class="w-16 h-px bg-[#c5a059] opacity-40 mx-auto"></div>
+      </div>
+
+      <div class="split-content">
+        <div class="mb-20 lg:mb-0">
+          <span class="text-[#c5a059] text-[0.55rem] uppercase tracking-[0.4em] mb-6 block opacity-70 font-bold">
+            Italiano
+          </span>
+
+          <p class="text-slate-200 text-xl md:text-2xl leading-relaxed font-light">
+            Non curiamo semplicemente spedizioni, ma <span class="text-[#c5a059] font-normal italic">storie di eccellenza.</span>
+            Dall'artigianato locale alle tavole internazionali, ogni fase della catena del valore è studiata per portare
+            l'autentico gusto italiano nel mondo.
+          </p>
+        </div>
+
+        <div>
+          <span class="text-slate-500 text-[0.55rem] uppercase tracking-[0.4em] mb-6 block font-bold">
+            English
+          </span>
+
+          <p class="text-slate-500 text-xl md:text-2xl leading-relaxed font-light italic">
+            We don’t just manage shipments; we curate <span class="text-slate-300 font-normal italic">stories of excellence.</span>
+            From local craftsmanship to international tables, every stage of the value chain is designed to bring authentic Italian flavor to the world.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 px-8 lg:px-20 bg-[#000]">
+    <div class="max-w-4xl mx-auto">
+      <div class="disclosure-container">
+        <h5 class="font-bold uppercase text-[0.6rem] tracking-[0.4em] mb-8 text-slate-400 italic">
+          Strategic Disclosure | Informativa Strategica
+        </h5>
+
+        <div class="legal-notice-text">
+          <div class="mb-4">
+            Italian Recruitment LLC DBA Italian Experience opera come consulente strategico per l'eccellenza alimentare.
+            Non siamo un semplice distributore, ma un partner per la curatela del prodotto e l'internazionalizzazione.
+            Tutti i processi logistici e di vendita sono gestiti in conformità con le normative internazionali e partner certificati FDA.
+          </div>
+
+          <div class="lang-divider"></div>
+
+          <div class="text-slate-600">
+            Italian Recruitment LLC DBA Italian Experience operates as a strategic consultant for food excellence.
+            We are not a mere distributor, but a partner for product curation and internationalization.
+            All logistical and sales processes are managed in compliance with international regulations and FDA-certified partners.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+
+  <script>
+    (function () {
+      const base = "/ItalianExperience";
+      const headerMount = document.getElementById("site-header");
+      const footerMount = document.getElementById("site-footer");
+
+      function inject(el, html) {
+        if (!el) return;
+        el.innerHTML = html;
+      }
+
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const s = document.createElement("script");
+          s.src = src;
+          s.defer = true;
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+
+      Promise.all([
+        fetch(base + "/partial/header.html").then(r => {
+          if (!r.ok) throw new Error("Header fetch failed: " + r.status);
+          return r.text();
+        }),
+        fetch(base + "/partial/footer.html").then(r => {
+          if (!r.ok) throw new Error("Footer fetch failed: " + r.status);
+          return r.text();
+        })
+      ]).then(async ([h, f]) => {
+        inject(headerMount, h);
+        inject(footerMount, f);
+
+        await loadScript(base + "/assets/js/site.js");
+
+        if (window.IEInit) window.IEInit(document);
+        else console.warn("IEInit non trovato. Controlla assets/js/site.js");
+      }).catch((err) => {
+        console.error(err);
+      });
+    })();
+  </script>
+
+</body>
+</html>
