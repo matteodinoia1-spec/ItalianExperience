@@ -5,299 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Gap Year | Italian Experience</title>
 
+  <meta name="description" content="Structured gap year programs in Italy combining language mastery, cultural immersion, academic growth, and curated personal development experiences." />
+  <meta name="keywords" content="Italian Experience, gap year Italy, study abroad Italy, cultural immersion, academic program Italy, semester abroad" />
+  <meta name="author" content="Italian Experience" />
+  <meta name="robots" content="index, follow" />
+
+  <link rel="canonical" href="https://www.italianexp.com/travel/gapyear/" />
+
+  <meta property="og:title" content="Gap Year | Italian Experience" />
+  <meta property="og:description" content="Structured gap year programs in Italy combining language mastery, cultural immersion, academic growth, and curated personal development experiences." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.italianexp.com/travel/gapyear/" />
+
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
+
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@100;300;400;600&family=Great+Vibes&family=Montserrat:wght@700;900&display=swap');
-
-    :root{
-      --brand-gold:#c5a059;
-      --brand-dark:#080808;
-      --it-green:#008C45;
-      --it-red:#CD212A;
-    }
-
-    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    html{scroll-behavior:smooth;background:#000}
-    body{
-      background:var(--brand-dark);
-      color:#fff;
-      font-family:'Inter',sans-serif;
-      overflow-x:hidden;
-      min-height:100vh;
-      -webkit-font-smoothing:antialiased;
-    }
-
-    a{color:inherit;text-decoration:none}
     .brand-font{font-family:'Playfair Display',serif}
 
-    /* HEADER */
-    .glass-header{
-      position:fixed;
-      top:0;left:0;width:100%;
-      z-index:9999;
-      height:110px;
-      padding:0 4rem;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      background:transparent;
-      backdrop-filter:blur(0px);
-      transition:transform 0.6s cubic-bezier(0.16,1,0.3,1),background 0.5s,backdrop-filter 0.5s,height 0.4s,padding 0.4s;
-    }
-    .glass-header.nav-up{transform:translateY(-110%)}
-    .glass-header.scrolled{
-      height:90px;
-      padding:0 2rem;
-      background:rgba(15,15,15,0.45);
-      backdrop-filter:blur(40px) saturate(180%);
-      -webkit-backdrop-filter:blur(40px) saturate(180%);
-      border-bottom:1px solid rgba(255,255,255,0.08);
-      box-shadow:0 10px 30px rgba(0,0,0,0.5);
-    }
-
-    /* LOGO */
-    .logo-wrap{
-      display:flex;
-      align-items:baseline;
-      gap:8px;
-      position:relative;
-      user-select:none;
-      white-space:nowrap;
-      z-index:10001;
-    }
-    .font-it{
-      font-family:'Great Vibes',cursive;
-      color:var(--brand-gold);
-      font-size:70px;
-      line-height:1;
-      white-space:nowrap;
-      transition:0.3s;
-    }
-    .font-ex{
-      font-family:'Montserrat',sans-serif;
-      color:var(--brand-gold);
-      font-weight:900;
-      font-size:35px;
-      line-height:1;
-      letter-spacing:-0.02em;
-      display:flex;
-    }
-    .letter{
-      display:inline-block;
-      position:relative;
-      will-change:transform,color;
-      transition:all 0.25s ease-out;
-    }
-    .tricolore-line{
-      position:absolute;
-      height:2px;
-      width:60px;
-      bottom:-6px;
-      right:0;
-      display:flex;
-      pointer-events:none;
-    }
-
-    /* DESKTOP NAV */
-    .nav-container{
-      display:flex;
-      align-items:center;
-      gap:0.25rem;
-      margin-left:auto;
-      height:100%;
-    }
-    .nav-link{
-      color:#fff;
-      text-transform:uppercase;
-      font-size:0.62rem;
-      letter-spacing:0.25em;
-      padding:1.2rem 0.8rem;
-      transition:all 0.25s;
-      opacity:0.72;
-      white-space:nowrap;
-      cursor:pointer;
-    }
-    .nav-link:hover{
-      color:var(--brand-gold);
-      opacity:1;
-      text-shadow:0 0 10px rgba(197,160,89,0.4);
-    }
-
-    .nav-link.active,
-    .dropdown-item.active,
-    .mobile-link.active,
-    .mobile-sublink.active,
-    .mobile-acc-btn.active{
-      color:var(--brand-gold) !important;
-      opacity:1 !important;
-      text-shadow:0 0 12px rgba(197,160,89,0.35);
-    }
-
-    .dropdown{position:relative;height:100%;display:flex;align-items:center}
-    .dropdown-menu{
-      position:absolute;
-      top:100%;
-      right:0;
-      min-width:260px;
-      background:rgba(10,10,10,0.96);
-      backdrop-filter:blur(35px);
-      border:1px solid rgba(255,255,255,0.1);
-      opacity:0;
-      visibility:hidden;
-      transform:translateY(10px);
-      transition:all 0.3s ease;
-      padding:1rem 0;
-      box-shadow:0 20px 40px rgba(0,0,0,0.6);
-    }
-    .dropdown:hover .dropdown-menu{
-      opacity:1;
-      visibility:visible;
-      transform:translateY(0);
-    }
-    .dropdown-item{
-      display:block;
-      padding:0.8rem 1.8rem;
-      color:#fff;
-      font-size:0.6rem;
-      text-transform:uppercase;
-      letter-spacing:0.15em;
-      opacity:0.65;
-      transition:0.25s;
-    }
-    .dropdown-item:hover{
-      color:var(--brand-gold);
-      opacity:1;
-      background:rgba(255,255,255,0.03);
-      padding-left:2.2rem;
-    }
-
-    /* MOBILE MENU BUTTON */
-    #central-menu-btn{
-      display:none;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      background:none;
-      border:none;
-      cursor:pointer;
-      outline:none;
-      z-index:10002;
-      transition:all 0.25s ease;
-    }
-    #central-menu-btn span{
-      color:var(--brand-gold);
-      font-size:0.52rem;
-      text-transform:uppercase;
-      letter-spacing:0.4em;
-      margin-top:6px;
-      font-weight:600;
-      opacity:0.95;
-    }
-
-    /* MOBILE OVERLAY */
-    #mobile-menu-overlay{
-      position:fixed;
-      inset:0;
-      background:rgba(8,8,8,0.98);
-      backdrop-filter:blur(50px) saturate(160%);
-      z-index:10000;
-      opacity:0;
-      visibility:hidden;
-      transition:opacity 0.35s ease,visibility 0.35s ease;
-      padding:clamp(1.2rem,4vw,2.2rem);
-      overflow-y:auto;
-    }
-    #mobile-menu-overlay.active{
-      opacity:1;
-      visibility:visible;
-    }
-
-    .mobile-close{
-      position:sticky;
-      top:0;
-      display:flex;
-      justify-content:flex-end;
-      z-index:2;
-      padding:0.5rem 0;
-    }
-
-    .mobile-menu{
-      max-width:520px;
-      margin:0 auto;
-      padding:2.2rem 0 3rem 0;
-      display:flex;
-      flex-direction:column;
-      gap:0.4rem;
-      align-items:center;
-      text-align:center;
-    }
-
-    .mobile-link,
-    .mobile-acc-btn{
-      width:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:12px;
-      padding:14px 10px;
-      color:#fff;
-      text-transform:uppercase;
-      letter-spacing:0.35em;
-      font-size:0.72rem;
-      opacity:0.75;
-      transition:opacity 0.2s ease,color 0.2s ease;
-      background:transparent;
-      border:none;
-      cursor:pointer;
-    }
-    .mobile-link:hover,
-    .mobile-acc-btn:hover{
-      opacity:1;
-      color:var(--brand-gold);
-    }
-
-    .chev{
-      width:14px;
-      height:14px;
-      opacity:0.65;
-      transition:transform 0.25s ease,opacity 0.25s ease;
-    }
-    .mobile-acc-btn[aria-expanded="true"] .chev{
-      transform:rotate(180deg);
-      opacity:1;
-    }
-
-    .mobile-sub{
-      width:100%;
-      max-height:0;
-      overflow:hidden;
-      transition:max-height 0.35s ease;
-    }
-    .mobile-sub-inner{
-      padding:4px 0 10px 0;
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-    }
-    .mobile-sublink{
-      display:block;
-      padding:10px 10px;
-      color:#fff;
-      text-transform:uppercase;
-      letter-spacing:0.28em;
-      font-size:0.62rem;
-      opacity:0.55;
-      transition:opacity 0.2s ease,color 0.2s ease;
-    }
-    .mobile-sublink:hover{
-      opacity:1;
-      color:var(--brand-gold);
-    }
-
-    /* HERO */
     .hero-odyssey{
       width:100%;
       height:100vh;
@@ -306,7 +35,14 @@
       overflow:hidden;
       background:#000;
     }
-    .hero-swiper{width:100%;height:100%}
+
+    .hero-swiper,
+    .hero-swiper .swiper-wrapper,
+    .hero-swiper .swiper-slide{
+      width:100%;
+      height:100%;
+    }
+
     .hero-slide img{
       width:100%;
       height:100%;
@@ -315,7 +51,11 @@
       transform:scale(1.1);
       transition:transform 8s ease-in-out;
     }
-    .swiper-slide-active img{transform:scale(1)}
+
+    .swiper-slide-active img{
+      transform:scale(1);
+    }
+
     .hero-overlay-content{
       position:absolute;
       inset:0;
@@ -329,7 +69,6 @@
       padding:0 1.5rem;
     }
 
-    /* EXPLORE INDICATOR */
     @keyframes scrollLine{
       0%{transform:translateY(-18px);opacity:0}
       30%{opacity:1}
@@ -350,6 +89,7 @@
       opacity:0.82;
       transition:opacity 0.2s ease,transform 0.2s ease;
     }
+
     .explore-indicator:hover{
       opacity:1;
       transform:translateX(-50%) translateY(3px);
@@ -383,7 +123,6 @@
       animation:scrollLine 1.6s infinite ease-in-out;
     }
 
-    /* PROGRAM CARDS */
     .program-card{
       background:#121212;
       border:1px solid rgba(197,160,89,0.15);
@@ -393,39 +132,44 @@
       align-items:center;
       text-align:center;
     }
+
     .program-card:hover{
       border-color:var(--brand-gold);
       transform:translateY(-10px);
       box-shadow:0 20px 40px rgba(0,0,0,0.5);
     }
+
     .enroll-btn{
       border:1px solid var(--brand-gold);
       color:var(--brand-gold);
       transition:all 0.3s ease;
       text-decoration:none;
     }
+
     .enroll-btn:hover{
       background:var(--brand-gold);
-      color:var(--brand-dark);
+      color:var(--brand-obsidian);
     }
 
-    /* LOCATION SWIPER */
     .atmospheres-section{
       height:850px;
       position:relative;
       border-y:1px solid rgba(255,255,255,0.05);
     }
+
     .location-swiper{
       width:100%;
       height:100%;
       padding-bottom:4rem;
     }
+
     .location-card{
       position:relative;
       height:100%;
       overflow:hidden;
       cursor:grab;
     }
+
     .location-card img{
       width:100%;
       height:100%;
@@ -433,10 +177,12 @@
       filter:brightness(0.45);
       transition:1.2s ease;
     }
+
     .location-card:hover img{
       filter:brightness(0.8);
       transform:scale(1.05);
     }
+
     .location-info{
       position:absolute;
       bottom:0;
@@ -456,213 +202,38 @@
       border-radius:5px !important;
       margin:0 8px !important;
     }
+
     .swiper-pagination-bullet-active{
       background:var(--brand-gold) !important;
       width:40px !important;
     }
 
-    /* FOOTER */
-    .site-footer{
-      background:#000;
-      padding:6rem 2rem;
-      border-top:1px solid rgba(255,255,255,0.05);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      text-align:center;
-    }
-
-    /* RESPONSIVE HEADER MOBILE PERFECT */
-    @media (max-width:1024px){
-      .glass-header{
-        flex-direction:column !important;
-        justify-content:center !important;
-        height:160px !important;
-        padding:1rem 0 !important;
-        gap:10px;
-      }
-      .glass-header.scrolled{
-        height:135px !important;
-      }
-
-      .logo-wrap{
-        transform:scale(0.82);
-        margin:0 auto;
-      }
-
-      #central-menu-btn{
-        display:flex !important;
-        margin-top:6px;
-      }
-
-      .nav-container{display:none !important;}
-    }
-
     @media (max-width:768px){
+      .explore-indicator{bottom:54px}
       .atmospheres-section{height:auto;}
       .location-card{height:60vh;}
-    }
-
-    @media (max-width:350px){
-      .logo-wrap{transform:scale(0.68)}
-      .glass-header{height:145px !important}
-      #central-menu-btn{scale:0.9}
     }
   </style>
 </head>
 
-<body>
+<body class="bg-[#080808] text-white overflow-x-hidden">
 
-  <div id="mobile-menu-overlay" aria-hidden="true">
-    <div class="mobile-close">
-      <button id="close-menu" aria-label="Chiudi menu" class="text-white/80 hover:text-white">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
+  <div id="site-header"></div>
 
-    <nav class="mobile-menu" aria-label="Menu mobile">
-
-      <a href="/ItalianExperience/" class="mobile-link" data-close>Home</a>
-
-      <button class="mobile-acc-btn mobile-acc-travel active" type="button" aria-expanded="true" aria-controls="m-travel">
-        <span>Travel</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
-      </button>
-
-      <div id="m-travel" class="mobile-sub" style="max-height:260px">
-        <div class="mobile-sub-inner">
-          <a href="/ItalianExperience/travel/bespoke/" class="mobile-sublink" data-close>Bespoke</a>
-          <a href="/ItalianExperience/travel/gapyear/" class="mobile-sublink active" data-close>Gap Year</a>
-          <a href="/ItalianExperience/travel/culinary-academy/" class="mobile-sublink" data-close>Culinary Academy</a>
-        </div>
-      </div>
-
-      <button class="mobile-acc-btn mobile-acc-recruitment" type="button" aria-expanded="false" aria-controls="m-recruitment">
-        <span>Recruitment</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
-      </button>
-
-      <div id="m-recruitment" class="mobile-sub">
-        <div class="mobile-sub-inner">
-          <a href="/ItalianExperience/recruitment/employer/" class="mobile-sublink" data-close>Employer</a>
-          <a href="/ItalianExperience/recruitment/candidate/" class="mobile-sublink" data-close>Candidate</a>
-        </div>
-      </div>
-
-      <button class="mobile-acc-btn mobile-acc-flavors" type="button" aria-expanded="false" aria-controls="m-flavors">
-        <span>Flavors</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
-      </button>
-
-      <div id="m-flavors" class="mobile-sub">
-        <div class="mobile-sub-inner">
-          <a href="/ItalianExperience/flavors/for-your-home/" class="mobile-sublink" data-close>For your home</a>
-          <a href="/ItalianExperience/flavors/for-your-business/" class="mobile-sublink" data-close>For your business</a>
-          <a href="/ItalianExperience/flavors/aziende-italiane/" class="mobile-sublink" data-close>Aziende Italiane</a>
-        </div>
-      </div>
-
-      <a href="/ItalianExperience/estates/" class="mobile-link" data-close>Estates</a>
-      <a href="/ItalianExperience/contact/" class="mobile-link" data-close>Contact</a>
-
-    </nav>
-  </div>
-
-  <nav class="glass-header" id="main-header" aria-label="Header">
-
-    <a href="/ItalianExperience/" class="no-underline">
-      <div class="logo-wrap" id="logo-header">
-        <span class="font-it">Italian</span>
-        <div class="font-ex" data-text="EXPERIENCE"></div>
-        <div class="tricolore-line">
-          <div style="background:var(--it-green);flex:1"></div>
-          <div style="background:#fff;flex:1"></div>
-          <div style="background:var(--it-red);flex:1"></div>
-        </div>
-      </div>
-    </a>
-
-    <button id="central-menu-btn" aria-label="Apri menu">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-linecap="round">
-        <circle cx="12" cy="12" r="10" stroke="rgba(197,160,89,0.4)" stroke-width="1"></circle>
-        <line x1="8" y1="10" x2="16" y2="10" stroke="#c5a059" stroke-width="2.5"></line>
-        <line x1="10" y1="14" x2="14" y2="14" stroke="#c5a059" stroke-width="2.5"></line>
-      </svg>
-      <span>Menu</span>
-    </button>
-
-    <div class="nav-container" aria-label="Navigazione desktop">
-      <a href="/ItalianExperience/" class="nav-link">Home</a>
-
-      <div class="dropdown">
-        <a href="/ItalianExperience/travel/" class="nav-link nav-link-travel active">
-          Travel
-          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <path d="m6 9 6 6 6-6"></path>
-          </svg>
-        </a>
-        <div class="dropdown-menu">
-          <a href="/ItalianExperience/travel/bespoke/" class="dropdown-item">Bespoke</a>
-          <a href="/ItalianExperience/travel/gapyear/" class="dropdown-item active">Gap Year</a>
-          <a href="/ItalianExperience/travel/culinary-academy/" class="dropdown-item">Culinary Academy</a>
-        </div>
-      </div>
-
-      <div class="dropdown">
-        <a href="/ItalianExperience/recruitment/" class="nav-link nav-link-recruitment">
-          Recruitment
-          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <path d="m6 9 6 6 6-6"></path>
-          </svg>
-        </a>
-        <div class="dropdown-menu">
-          <a href="/ItalianExperience/recruitment/employer/" class="dropdown-item">Employer</a>
-          <a href="/ItalianExperience/recruitment/candidate/" class="dropdown-item">Candidate</a>
-        </div>
-      </div>
-
-      <div class="dropdown">
-        <a href="/ItalianExperience/flavors/" class="nav-link nav-link-flavors">
-          Flavors
-          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <path d="m6 9 6 6 6-6"></path>
-          </svg>
-        </a>
-        <div class="dropdown-menu">
-          <a href="/ItalianExperience/flavors/for-your-home/" class="dropdown-item">For your home</a>
-          <a href="/ItalianExperience/flavors/for-your-business/" class="dropdown-item">For your business</a>
-          <a href="/ItalianExperience/flavors/aziende-italiane/" class="dropdown-item">Aziende Italiane</a>
-        </div>
-      </div>
-
-      <a href="/ItalianExperience/estates/" class="nav-link nav-link-estates">Estates</a>
-      <a href="/ItalianExperience/contact/" class="nav-link nav-link-contact">Contact</a>
-    </div>
-  </nav>
-
-  <section class="hero-odyssey">
-    <div class="swiper hero-swiper h-full">
+  <header class="hero-odyssey" aria-label="Gap Year Hero">
+    <div class="swiper hero-swiper">
       <div class="swiper-wrapper">
 
         <div class="swiper-slide hero-slide">
-          <img src="https://images.unsplash.com/photo-1543269664-56d93c1b41a6?q=80&w=1920&auto=format&fit=crop" alt="Academic" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1543269664-56d93c1b41a6?q=80&w=1920&auto=format&fit=crop" alt="Academic life in Italy" loading="lazy">
         </div>
 
         <div class="swiper-slide hero-slide">
-          <img src="https://images.unsplash.com/photo-1528114039593-4366cc08227d?q=80&w=1920&auto=format&fit=crop" alt="Florence" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1528114039593-4366cc08227d?q=80&w=1920&auto=format&fit=crop" alt="Florence study experience" loading="lazy">
         </div>
 
         <div class="swiper-slide hero-slide">
-          <img src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=1920&auto=format&fit=crop" alt="Study" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=1920&auto=format&fit=crop" alt="Cultural learning experience" loading="lazy">
         </div>
 
       </div>
@@ -678,7 +249,7 @@
 
         <div class="w-16 md:w-24 h-px bg-[#c5a059] opacity-40 mb-10 mx-auto"></div>
 
-        <p class="text-slate-300 text-[0.65rem] md:text-base uppercase tracking-[0.5em] max-w-[340px] md:max-w-none">
+        <p class="text-slate-300 text-[0.65rem] md:text-base uppercase tracking-[0.5em] max-w-[440px] md:max-w-none">
           Structured Gap Year & Deep Cultural Mastery
         </p>
       </div>
@@ -691,363 +262,305 @@
       </a>
 
     </div>
-  </section>
+  </header>
 
-  <section id="growth" class="py-32 md:py-48 flex items-center justify-center bg-[#080808]">
-    <div class="max-w-4xl px-8 md:px-10 text-center">
-      <span class="text-[#c5a059] uppercase tracking-[0.7em] text-[0.55rem] md:text-[0.65rem] font-bold block mb-12">
-        Personal Growth
-      </span>
+  <main>
 
-      <h2 class="text-4xl md:text-7xl mb-12 italic text-white brand-font leading-tight mx-auto mt-10">
-        Extraordinary Life Experiences.
-      </h2>
+    <section id="growth" class="py-32 md:py-48 flex items-center justify-center bg-[#080808]">
+      <div class="max-w-4xl px-8 md:px-10 text-center">
+        <span class="text-[#c5a059] uppercase tracking-[0.7em] text-[0.55rem] md:text-[0.65rem] font-bold block mb-12">
+          Personal Growth
+        </span>
 
-      <div class="space-y-10 font-light text-lg md:text-xl text-slate-400 leading-relaxed mx-auto mt-10">
-        <p>
-          We do not just create luxury vacations in Italy, but rather
-          <span class="text-white font-normal">extraordinary and unique life experiences.</span>
-          Each of our educational programs is different simply because our students build it together with us.
+        <h2 class="text-4xl md:text-7xl mb-12 italic text-white brand-font leading-tight mx-auto mt-10">
+          Extraordinary Life Experiences.
+        </h2>
+
+        <div class="space-y-10 font-light text-lg md:text-xl text-slate-400 leading-relaxed mx-auto mt-10">
+          <p>
+            We do not just create academic stays in Italy, but rather
+            <span class="text-white font-normal">transformational cultural experiences.</span>
+            Each educational program is co-designed with you, aligning personal growth with real immersion.
+          </p>
+
+          <p>
+            Our objective is to provide a
+            <span class="text-[#c5a059] italic">friendly, unique and warm personal approach</span>
+            to planning every detail of your academic journey.
+          </p>
+
+          <h3 class="text-[#c5a059] italic text-3xl md:text-4xl brand-font mt-16">
+            Are you ready to experience the most beautiful
+            <span class="hidden md:inline"><br></span>
+            and captivating year of your life?
+          </h3>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-32 px-6 md:px-20 bg-[#080808]">
+      <div class="max-w-7xl mx-auto text-center">
+
+        <h2 class="brand-font text-4xl md:text-6xl text-white mb-6 italic">
+          A Unique Life Experience
+        </h2>
+
+        <p class="text-slate-400 font-light max-w-2xl mx-auto mb-20 text-sm md:text-base leading-relaxed tracking-wide">
+          Live in Italy for a summer, a semester, or a full year. With curated programs, we help you experience the most meaningful time of your life.
         </p>
 
-        <p>
-          Our objective is to provide a
-          <span class="text-[#c5a059] italic">friendly, unique and warm personal approach</span>
-          to discussing, creating, and planning every detail of your academic stay.
-        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
 
-        <h3 class="text-[#c5a059] italic text-3xl md:text-4xl brand-font mt-16">
-          Are you ready to experience the most beautiful <br class="hidden md:block">
-          and captivating year of your life?
-        </h3>
-      </div>
-    </div>
-  </section>
+          <div class="program-card p-12">
+            <div class="w-20 h-20 mb-8 flex items-center justify-center rounded-full bg-[#f4b45f]/10">
+              <svg viewBox="0 0 100 100" class="w-12 h-12 text-[#f4b45f] fill-current">
+                <path d="M50 0 L65 35 L100 50 L65 65 L50 100 L35 65 L0 50 L35 35 Z"></path>
+              </svg>
+            </div>
 
-  <section class="py-32 px-6 md:px-20 bg-[#080808]">
-    <div class="max-w-7xl mx-auto text-center">
+            <h3 class="brand-font text-2xl text-white uppercase tracking-widest mb-2 italic">
+              Discovery
+            </h3>
 
-      <h2 class="brand-font text-4xl md:text-6xl text-white mb-6 italic">
-        A unique life experience
-      </h2>
+            <p class="text-[#c5a059] text-xs mb-6 font-bold uppercase tracking-widest">
+              1 to 3 Months
+            </p>
 
-      <p class="text-slate-400 font-light max-w-2xl mx-auto mb-20 text-sm md:text-base leading-relaxed tracking-wide">
-        Live in Italy for a summer, a semester, or a whole year. With our curated programs, we help you live the best time of your life.
-      </p>
+            <p class="text-slate-500 text-sm font-light leading-relaxed mb-10">
+              Immerse yourself in Italian culture while exploring hidden gems and experiencing authentic local life.
+            </p>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-
-        <div class="program-card p-12">
-          <div class="w-20 h-20 mb-8 flex items-center justify-center rounded-full bg-[#f4b45f]/10">
-            <svg viewBox="0 0 100 100" class="w-12 h-12 text-[#f4b45f] fill-current">
-              <path d="M50 0 L65 35 L100 50 L65 65 L50 100 L35 65 L0 50 L35 35 Z" />
-            </svg>
+            <a href="/ItalianExperience/contact/" class="enroll-btn py-3 px-10 text-[0.65rem] font-bold uppercase tracking-[0.2em] mt-auto">
+              Enroll today
+            </a>
           </div>
-          <h3 class="brand-font text-2xl text-white uppercase tracking-widest mb-2 italic">Discovery</h3>
-          <p class="text-[#c5a059] text-xs mb-6 font-bold uppercase tracking-widest">1 to 3 Months</p>
-          <p class="text-slate-500 text-sm font-light leading-relaxed mb-10">
-            Immerse yourself in vibrant Italian culture while exploring hidden gems and savoring local cuisine.
-          </p>
-          <a href="/ItalianExperience/contact/" class="enroll-btn py-3 px-10 text-[0.65rem] font-bold uppercase tracking-[0.2em] mt-auto">
-            Enroll today
-          </a>
-        </div>
 
-        <div class="program-card p-12">
-          <div class="w-20 h-20 mb-8 flex items-center justify-center rounded-full bg-[#5fa490]/10">
-            <svg viewBox="0 0 100 100" class="w-12 h-12 text-[#5fa490] fill-current">
-              <circle cx="50" cy="50" r="10"/>
-              <g stroke="currentColor" stroke-width="3">
-                <line x1="50" y1="20" x2="50" y2="5"/>
-                <line x1="50" y1="80" x2="50" y2="95"/>
-                <line x1="20" y1="50" x2="5" y2="50"/>
-                <line x1="80" y1="50" x2="95" y2="50"/>
-              </g>
-            </svg>
+          <div class="program-card p-12">
+            <div class="w-20 h-20 mb-8 flex items-center justify-center rounded-full bg-[#5fa490]/10">
+              <svg viewBox="0 0 100 100" class="w-12 h-12 text-[#5fa490] fill-current">
+                <circle cx="50" cy="50" r="10"></circle>
+                <g stroke="currentColor" stroke-width="3">
+                  <line x1="50" y1="20" x2="50" y2="5"></line>
+                  <line x1="50" y1="80" x2="50" y2="95"></line>
+                  <line x1="20" y1="50" x2="5" y2="50"></line>
+                  <line x1="80" y1="50" x2="95" y2="50"></line>
+                </g>
+              </svg>
+            </div>
+
+            <h3 class="brand-font text-2xl text-white uppercase tracking-widest mb-2 italic">
+              Semester
+            </h3>
+
+            <p class="text-[#c5a059] text-xs mb-6 font-bold uppercase tracking-widest">
+              4 to 7 Months
+            </p>
+
+            <p class="text-slate-500 text-sm font-light leading-relaxed mb-10">
+              Strengthen your language and cultural knowledge while integrating into authentic Italian daily life.
+            </p>
+
+            <a href="/ItalianExperience/contact/" class="enroll-btn py-3 px-10 text-[0.65rem] font-bold uppercase tracking-[0.2em] mt-auto">
+              Enroll today
+            </a>
           </div>
-          <h3 class="brand-font text-2xl text-white uppercase tracking-widest mb-2 italic">Semester</h3>
-          <p class="text-[#c5a059] text-xs mb-6 font-bold uppercase tracking-widest">4 to 7 Months</p>
-          <p class="text-slate-500 text-sm font-light leading-relaxed mb-10">
-            Deepen your language and cultural knowledge, and immerse yourself in the fascinating Italian daily life.
-          </p>
-          <a href="/ItalianExperience/contact/" class="enroll-btn py-3 px-10 text-[0.65rem] font-bold uppercase tracking-[0.2em] mt-auto">
-            Enroll today
-          </a>
-        </div>
 
-        <div class="program-card p-12">
-          <div class="w-20 h-20 mb-8 flex items-center justify-center rounded-full bg-[#e89088]/10">
-            <svg viewBox="0 0 100 100" class="w-12 h-12 text-[#e89088] fill-current">
-              <path d="M50 5 L58 18 L73 15 L78 30 L93 30 L90 45 L100 55 L90 65 L93 80 L78 80 L73 95 L58 92 L50 100 L42 92 L27 95 L22 80 L7 80 L10 65 L0 55 L10 45 L7 30 L22 30 L27 15 L42 18 Z" />
-            </svg>
+          <div class="program-card p-12">
+            <div class="w-20 h-20 mb-8 flex items-center justify-center rounded-full bg-[#e89088]/10">
+              <svg viewBox="0 0 100 100" class="w-12 h-12 text-[#e89088] fill-current">
+                <path d="M50 5 L58 18 L73 15 L78 30 L93 30 L90 45 L100 55 L90 65 L93 80 L78 80 L73 95 L58 92 L50 100 L42 92 L27 95 L22 80 L7 80 L10 65 L0 55 L10 45 L7 30 L22 30 L27 15 L42 18 Z"></path>
+              </svg>
+            </div>
+
+            <h3 class="brand-font text-2xl text-white uppercase tracking-widest mb-2 italic">
+              Gap Year
+            </h3>
+
+            <p class="text-[#c5a059] text-xs mb-6 font-bold uppercase tracking-widest">
+              8 to 12 Months
+            </p>
+
+            <p class="text-slate-500 text-sm font-light leading-relaxed mb-10">
+              Combine language, cultural immersion, and personal development. Discover Italy in its most authentic form.
+            </p>
+
+            <a href="/ItalianExperience/contact/" class="enroll-btn py-3 px-10 text-[0.65rem] font-bold uppercase tracking-[0.2em] mt-auto">
+              Enroll today
+            </a>
           </div>
-          <h3 class="brand-font text-2xl text-white uppercase tracking-widest mb-2 italic">Gap Year</h3>
-          <p class="text-[#c5a059] text-xs mb-6 font-bold uppercase tracking-widest">8 to 12 Months</p>
-          <p class="text-slate-500 text-sm font-light leading-relaxed mb-10">
-            Combine language study, cultural exploration and personal growth: discover Italy in its most authentic form.
-          </p>
-          <a href="/ItalianExperience/contact/" class="enroll-btn py-3 px-10 text-[0.65rem] font-bold uppercase tracking-[0.2em] mt-auto">
-            Enroll today
-          </a>
-        </div>
 
-      </div>
-    </div>
-  </section>
-
-  <section class="atmospheres-section">
-    <div class="absolute top-10 left-10 md:top-12 md:left-12 z-20 pointer-events-none">
-      <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.6rem] font-bold block mb-2">
-        The Student Landscape
-      </span>
-      <h2 class="text-3xl md:text-4xl brand-font italic text-white drop-shadow-xl">
-        Academic Atmospheres
-      </h2>
-    </div>
-
-    <div class="swiper location-swiper h-full">
-      <div class="swiper-wrapper">
-
-        <div class="swiper-slide location-card">
-          <img src="https://images.unsplash.com/photo-1514890547357-a9ee2887ad85?auto=format&fit=crop&w=800" alt="Venice">
-          <div class="location-info">
-            <span class="text-[#c5a059] uppercase tracking-widest text-[0.6rem] mb-2 block">Linguistic Mastery</span>
-            <h4 class="text-4xl md:text-5xl brand-font italic text-white leading-none">Venice</h4>
-          </div>
-        </div>
-
-        <div class="swiper-slide location-card">
-          <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800" alt="Tuscany">
-          <div class="location-info">
-            <span class="text-[#c5a059] uppercase tracking-widest text-[0.6rem] mb-2 block">Heritage Internships</span>
-            <h4 class="text-4xl md:text-5xl brand-font italic text-white leading-none">Tuscany</h4>
-          </div>
-        </div>
-
-        <div class="swiper-slide location-card">
-          <img src="https://images.unsplash.com/photo-1556654846-95f2694301a5?auto=format&fit=crop&w=800" alt="Bologna">
-          <div class="location-info">
-            <span class="text-[#c5a059] uppercase tracking-widest text-[0.6rem] mb-2 block">Urban Immersion</span>
-            <h4 class="text-4xl md:text-5xl brand-font italic text-white leading-none">Bologna</h4>
-          </div>
-        </div>
-
-        <div class="swiper-slide location-card">
-          <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800" alt="Rome">
-          <div class="location-info">
-            <span class="text-[#c5a059] uppercase tracking-widest text-[0.6rem] mb-2 block">Classical Studies</span>
-            <h4 class="text-4xl md:text-5xl brand-font italic text-white leading-none">Rome</h4>
-          </div>
-        </div>
-
-      </div>
-      <div class="swiper-pagination"></div>
-    </div>
-  </section>
-
-  <section class="py-32 md:py-48 bg-[#080808]">
-    <div class="container mx-auto px-10 max-w-6xl">
-      <div class="grid md:grid-cols-3 gap-16">
-
-        <div class="border-l border-[#c5a059]/30 pl-8">
-          <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic">01</span>
-          <h4 class="uppercase tracking-[0.3em] text-xs font-bold mb-6 text-[#c5a059]">
-            Discovery Session
-          </h4>
-          <p class="text-slate-500 text-sm leading-relaxed font-light">
-            Assessing your academic goals and cultural interests to build a tailored educational project.
-          </p>
-        </div>
-
-        <div class="border-l border-[#c5a059]/30 pl-8">
-          <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic">02</span>
-          <h4 class="uppercase tracking-[0.3em] text-xs font-bold mb-6 text-[#c5a059]">
-            Sourcing & Housing
-          </h4>
-          <p class="text-slate-500 text-sm leading-relaxed font-light">
-            Connecting you with prestigious language schools and sourcing exclusive residential apartments.
-          </p>
-        </div>
-
-        <div class="border-l border-[#c5a059]/30 pl-8">
-          <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic">03</span>
-          <h4 class="uppercase tracking-[0.3em] text-xs font-bold mb-6 text-[#c5a059]">
-            Concierge Support
-          </h4>
-          <p class="text-slate-500 text-sm leading-relaxed font-light">
-            Dedicated logistics management throughout your stay to ensure a seamless academic transition.
-          </p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <footer class="site-footer">
-    <a href="/ItalianExperience/" class="no-underline mb-8">
-      <div class="logo-wrap scale-[0.7] md:scale-[0.8]" id="logo-footer">
-        <span class="font-it">Italian</span>
-        <div class="font-ex" data-text="EXPERIENCE"></div>
-        <div class="tricolore-line">
-          <div style="background:var(--it-green);flex:1"></div>
-          <div style="background:#fff;flex:1"></div>
-          <div style="background:var(--it-red);flex:1"></div>
         </div>
       </div>
-    </a>
+    </section>
 
-    <p class="text-white/20 uppercase tracking-[0.4em] text-[0.6rem]">
-      © 2026 ITALIAN EXPERIENCE · STRATEGIC ADVISORY
-    </p>
-  </footer>
+    <section class="atmospheres-section" aria-label="Academic Atmospheres">
+      <div class="absolute top-10 left-10 md:top-12 md:left-12 z-20 pointer-events-none">
+        <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.6rem] font-bold block mb-2">
+          The Student Landscape
+        </span>
+        <h2 class="text-3xl md:text-4xl brand-font italic text-white drop-shadow-xl">
+          Academic Atmospheres
+        </h2>
+      </div>
+
+      <div class="swiper location-swiper">
+        <div class="swiper-wrapper">
+
+          <div class="swiper-slide location-card">
+            <img src="https://images.unsplash.com/photo-1514890547357-a9ee2887ad85?auto=format&fit=crop&w=800" alt="Venice" loading="lazy">
+            <div class="location-info">
+              <span class="text-[#c5a059] uppercase tracking-widest text-[0.6rem] mb-2 block">
+                Linguistic Mastery
+              </span>
+              <h4 class="text-4xl md:text-5xl brand-font italic text-white leading-none">
+                Venice
+              </h4>
+            </div>
+          </div>
+
+          <div class="swiper-slide location-card">
+            <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800" alt="Tuscany" loading="lazy">
+            <div class="location-info">
+              <span class="text-[#c5a059] uppercase tracking-widest text-[0.6rem] mb-2 block">
+                Heritage Internships
+              </span>
+              <h4 class="text-4xl md:text-5xl brand-font italic text-white leading-none">
+                Tuscany
+              </h4>
+            </div>
+          </div>
+
+          <div class="swiper-slide location-card">
+            <img src="https://images.unsplash.com/photo-1556654846-95f2694301a5?auto=format&fit=crop&w=800" alt="Bologna" loading="lazy">
+            <div class="location-info">
+              <span class="text-[#c5a059] uppercase tracking-widest text-[0.6rem] mb-2 block">
+                Urban Immersion
+              </span>
+              <h4 class="text-4xl md:text-5xl brand-font italic text-white leading-none">
+                Bologna
+              </h4>
+            </div>
+          </div>
+
+          <div class="swiper-slide location-card">
+            <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800" alt="Rome" loading="lazy">
+            <div class="location-info">
+              <span class="text-[#c5a059] uppercase tracking-widest text-[0.6rem] mb-2 block">
+                Classical Studies
+              </span>
+              <h4 class="text-4xl md:text-5xl brand-font italic text-white leading-none">
+                Rome
+              </h4>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="swiper-pagination"></div>
+      </div>
+    </section>
+
+    <section class="py-32 md:py-48 bg-[#080808]">
+      <div class="container mx-auto px-10 max-w-6xl">
+        <div class="grid md:grid-cols-3 gap-16">
+
+          <div class="border-l border-[#c5a059]/30 pl-8">
+            <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic">
+              01
+            </span>
+            <h4 class="uppercase tracking-[0.3em] text-xs font-bold mb-6 text-[#c5a059]">
+              Discovery Session
+            </h4>
+            <p class="text-slate-500 text-sm leading-relaxed font-light">
+              Assessing your academic goals and cultural interests to build a tailored educational project.
+            </p>
+          </div>
+
+          <div class="border-l border-[#c5a059]/30 pl-8">
+            <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic">
+              02
+            </span>
+            <h4 class="uppercase tracking-[0.3em] text-xs font-bold mb-6 text-[#c5a059]">
+              Sourcing & Housing
+            </h4>
+            <p class="text-slate-500 text-sm leading-relaxed font-light">
+              Connecting you with prestigious schools and sourcing residential solutions aligned with your program.
+            </p>
+          </div>
+
+          <div class="border-l border-[#c5a059]/30 pl-8">
+            <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic">
+              03
+            </span>
+            <h4 class="uppercase tracking-[0.3em] text-xs font-bold mb-6 text-[#c5a059]">
+              Concierge Support
+            </h4>
+            <p class="text-slate-500 text-sm leading-relaxed font-light">
+              Dedicated assistance throughout your stay to ensure a seamless academic transition.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="site-footer"></div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-
-      document.querySelectorAll('.font-ex').forEach(ex => {
-        const text = ex.getAttribute('data-text') || '';
-        ex.innerHTML = text.split('').map(c => `<span class="letter">${c}</span>`).join('');
-      });
-
-      let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
-      const header = document.getElementById('main-header');
-
-      window.addEventListener('scroll', () => {
-        const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
-
-        if (currentScrollY > lastScrollY && currentScrollY > 100) header.classList.add('nav-up');
-        else header.classList.remove('nav-up');
-
-        if (currentScrollY > 50) header.classList.add('scrolled');
-        else header.classList.remove('scrolled');
-
-        lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
-      }, { passive: true });
-
-      const menuBtn = document.getElementById('central-menu-btn');
-      const closeBtn = document.getElementById('close-menu');
-      const overlay = document.getElementById('mobile-menu-overlay');
-
-      menuBtn?.addEventListener('click', (e) => {
-        e.preventDefault();
-        overlay.classList.add('active');
-        overlay.setAttribute('aria-hidden', 'false');
-      });
-
-      closeBtn?.addEventListener('click', (e) => {
-        e.preventDefault();
-        overlay.classList.remove('active');
-        overlay.setAttribute('aria-hidden', 'true');
-      });
-
-      overlay.addEventListener('click', (e) => {
-        const t = e.target;
-        if (t && t.closest && t.closest('[data-close]')) {
-          overlay.classList.remove('active');
-          overlay.setAttribute('aria-hidden', 'true');
-        }
-      }, { passive: true });
-
-      const accBtns = Array.from(document.querySelectorAll('.mobile-acc-btn'));
-
-      function setAcc(btn, open) {
-        const id = btn.getAttribute('aria-controls');
-        const panel = id ? document.getElementById(id) : null;
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        if (!panel) return;
-
-        if (open) {
-          const inner = panel.querySelector('.mobile-sub-inner');
-          const h = inner ? inner.scrollHeight : 0;
-          panel.style.maxHeight = Math.max(80, h + 14) + 'px';
-        } else {
-          panel.style.maxHeight = '0px';
-        }
-      }
-
-      accBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const isOpen = btn.getAttribute('aria-expanded') === 'true';
-          setAcc(btn, !isOpen);
-        });
-      });
-
-      setTimeout(() => {
-        accBtns.forEach(btn => {
-          const isOpen = btn.getAttribute('aria-expanded') === 'true';
-          if (isOpen) setAcc(btn, true);
-        });
-      }, 150);
-
-      function initLogoMouse(id) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        if (!window.matchMedia('(pointer: fine)').matches) return;
-
-        const it = el.querySelector('.font-it');
-        const letters = el.querySelectorAll('.letter');
-        if (!it || !letters.length) return;
-
-        el.addEventListener('mousemove', (e) => {
-          const r = el.getBoundingClientRect();
-          const x = e.clientX - r.left;
-
-          const itRect = it.getBoundingClientRect();
-          const itX = itRect.left + itRect.width / 2 - r.left;
-          const dIt = Math.abs(x - itX);
-          const pIt = Math.max(0, (200 - dIt) / 200);
-
-          it.style.textShadow = `0 0 ${15 * pIt}px rgba(197,160,89,0.5)`;
-          it.style.transform = `scale(${1 + pIt * 0.05})`;
-
-          letters.forEach(l => {
-            const lr = l.getBoundingClientRect();
-            const lx = lr.left + lr.width / 2 - r.left;
-            const dx = Math.abs(x - lx);
-
-            if (dx < 110) {
-              const p = (110 - dx) / 110;
-              l.style.color = (x > lx + 14) ? '#008C45' : (x < lx - 14 ? '#CD212A' : '#FFF');
-              l.style.transform = `scale(${1 + p * 0.42}) translateY(${-p * 10}px)`;
-              l.style.zIndex = '20';
-            } else {
-              l.style.color = '';
-              l.style.transform = '';
-              l.style.zIndex = '10';
-            }
-          });
-        }, { passive: true });
-
-        el.addEventListener('mouseleave', () => {
-          it.style.textShadow = '';
-          it.style.transform = '';
-          letters.forEach(l => { l.style.color = ''; l.style.transform = ''; l.style.zIndex = ''; });
-        }, { passive: true });
-      }
-
-      initLogoMouse('logo-header');
-      initLogoMouse('logo-footer');
-
-      new Swiper('.hero-swiper', {
+    document.addEventListener("DOMContentLoaded", () => {
+      new Swiper(".hero-swiper", {
         loop: true,
-        effect: 'fade',
+        effect: "fade",
         speed: 2000,
         autoplay: { delay: 5000, disableOnInteraction: false }
       });
 
-      new Swiper('.location-swiper', {
+      new Swiper(".location-swiper", {
         slidesPerView: 1,
         loop: true,
         speed: 1000,
         autoplay: { delay: 4000 },
-        pagination: { el: '.swiper-pagination', clickable: true },
+        pagination: { el: ".swiper-pagination", clickable: true },
         breakpoints: {
           768: { slidesPerView: 2 },
           1024: { slidesPerView: 3 }
         }
       });
-
     });
+  </script>
+
+  <script>
+    (function () {
+      const base = "/ItalianExperience";
+      const headerMount = document.getElementById("site-header");
+      const footerMount = document.getElementById("site-footer");
+
+      function inject(el, html) { if (el) el.innerHTML = html; }
+
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const s = document.createElement("script");
+          s.src = src;
+          s.defer = true;
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+
+      Promise.all([
+        fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
+        fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
+      ]).then(async ([h, f]) => {
+        inject(headerMount, h);
+        inject(footerMount, f);
+
+        await loadScript(base + "/assets/js/site.js");
+        if (window.IEInit) window.IEInit(document);
+      }).catch(err => console.error(err));
+    })();
   </script>
 
 </body>
