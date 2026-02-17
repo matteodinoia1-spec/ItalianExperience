@@ -115,7 +115,7 @@
     .scroll-dot{
       width:100%;
       height:16px;
-      background:var(--brand-gold);
+      background:var(--brand-gold, #c5a059);
       position:absolute;
       top:0;
       left:0;
@@ -131,7 +131,7 @@
     }
 
     .bento-card:hover{
-      border-color:var(--brand-gold);
+      border-color:var(--brand-gold, #c5a059);
       transform:translateY(-10px);
       box-shadow:0 20px 40px rgba(0,0,0,0.5);
       background:rgba(197,160,89,0.04);
@@ -148,7 +148,7 @@
     }
 
     .info-box{
-      border-left:2px solid var(--brand-gold);
+      border-left:2px solid var(--brand-gold, #c5a059);
       background:rgba(255,255,255,0.02);
       padding:1.5rem;
       transition:all 0.3s ease;
@@ -177,7 +177,23 @@
       padding-left:2rem;
     }
 
+    .process-step{
+      position:relative;
+    }
+
+    .process-step::after{
+      content:'';
+      position:absolute;
+      top:0;
+      left:-20px;
+      width:1px;
+      height:100%;
+      background:linear-gradient(to bottom, #c5a059 0%, transparent 100%);
+      opacity:0.3;
+    }
+
     @media (max-width:768px){
+      .process-step::after{display:none}
       .chart-container{height:240px}
     }
   </style>
@@ -225,7 +241,7 @@
         </p>
       </div>
 
-      <a href="#evolution" class="explore-indicator" aria-label="Explore section">
+      <a href="#intro" class="explore-indicator" aria-label="Explore section">
         <span>Explore</span>
         <div class="scroll-track" aria-hidden="true">
           <div class="scroll-dot"></div>
@@ -233,6 +249,39 @@
       </a>
 
     </header>
+
+    <section id="intro" class="py-24 px-6 bg-[#080808]">
+      <div class="max-w-7xl mx-auto">
+
+        <h2 class="brand-font text-3xl md:text-5xl text-white uppercase tracking-wider mb-6">
+          Find Your Next <br />
+          <span class="text-[#c5a059] italic">Italian Talent</span>
+        </h2>
+
+        <div class="w-24 h-1 bg-[#c5a059] mb-12"></div>
+
+        <div class="grid md:grid-cols-2 gap-12 lg:gap-24 text-slate-400 font-light leading-relaxed">
+          <div>
+            <p class="text-lg md:text-xl text-white mb-6">
+              The direct connection between your business and the <strong>best young food professionals from Italy</strong>.
+            </p>
+            <p class="mb-6">
+              Are you looking for qualified, motivated Italian staff ready to work in the United States?
+            </p>
+          </div>
+
+          <div class="space-y-6 text-sm md:text-base md:border-l md:border-[#c5a059]/30 md:pl-6">
+            <p>
+              Our <em class="text-[#c5a059]">Hospitality Talent Connection</em> division offers you a clear and structured solution to find the right professionals for your business.
+            </p>
+            <p>
+              Whether you run a restaurant, bar, bakery, gelato shop, or any food & beverage business in the U.S., <strong>Italian Experience</strong> gives you access to a highly selected pool of young Italian talents, trained in some of the most respected culinary schools in Italy.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
 
     <section id="evolution" class="py-32 px-6">
       <div class="max-w-7xl mx-auto">
@@ -306,7 +355,62 @@
       </div>
     </section>
 
-    <section class="py-32 px-6 bg-[#0c0c0c]">
+    <section class="py-32 px-6 bg-[#0c0c0c] relative">
+      <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-20">
+          <h2 class="brand-font text-3xl md:text-5xl text-white uppercase tracking-wider mb-4">
+            How The Program Works
+          </h2>
+          <p class="text-slate-400 italic font-light text-base md:text-lg max-w-3xl mx-auto">
+            We’ve built a structured process to make international hiring simple, efficient, and tailored to your needs.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-12 lg:gap-16">
+
+          <div class="process-step group">
+            <h3 class="brand-font text-xl md:text-2xl text-white uppercase mb-6 tracking-wide group-hover:text-[#c5a059] transition-colors duration-300">
+              <span class="text-[#c5a059] mr-2">1.</span> We Start <br class="hidden lg:block"/>With You
+            </h3>
+            <p class="text-slate-400 font-light text-sm leading-7">
+              We begin by listening to you. We conduct an interview to understand the roles you're looking to fill, the challenges with your current team, and the key skills that matter most to your success.
+            </p>
+            <p class="text-slate-400 font-light text-sm leading-7 mt-4 border-l border-[#c5a059]/30 pl-3 italic">
+              This allows us to identify and present only candidates who are <strong>genuinely aligned</strong> with your business.
+            </p>
+          </div>
+
+          <div class="process-step group">
+            <h3 class="brand-font text-xl md:text-2xl text-white uppercase mb-6 tracking-wide group-hover:text-[#c5a059] transition-colors duration-300">
+              <span class="text-[#c5a059] mr-2">2.</span> We Assess <br class="hidden lg:block"/>Visa Feasibility
+            </h3>
+            <p class="text-slate-400 font-light text-sm leading-7">
+              Not sure if you can sponsor a foreign worker? We help you evaluate whether a U.S. work visa (J-1, H-1B, O-1, etc.) is a viable option for your company.
+            </p>
+            <p class="text-slate-400 font-light text-sm leading-7 mt-4">
+              You'll have the support of two specialized law firms, one based in Miami and one in Italy, working in synergy to offer you <strong>complete and personalized legal guidance</strong> throughout the process.
+            </p>
+          </div>
+
+          <div class="process-step group">
+            <h3 class="brand-font text-xl md:text-2xl text-white uppercase mb-6 tracking-wide group-hover:text-[#c5a059] transition-colors duration-300">
+              <span class="text-[#c5a059] mr-2">3.</span> We Select The <br class="hidden lg:block"/>Right Candidates
+            </h3>
+            <p class="text-slate-400 font-light text-sm leading-7">
+              We collaborate with some of the <strong>top Italian culinary and hospitality schools</strong> to identify motivated, well-trained professionals between 18 and 40 years old who are eager to work in the United States.
+            </p>
+            <p class="text-slate-400 font-light text-sm leading-7 mt-4">
+              We carefully evaluate both hard and soft skills, as well as English proficiency (and Spanish, if required).
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="py-32 px-6 bg-[#080808]">
       <div class="max-w-6xl mx-auto text-center">
         <h4 class="text-[#c5a059] uppercase tracking-[0.6em] text-[0.65rem] font-bold mb-16">
           Critical Brand Analysis
@@ -469,63 +573,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      if (typeof Swiper !== "undefined") {
-        new Swiper(".hero-swiper", {
-          loop: true,
-          effect: "fade",
-          speed: 2200,
-          autoplay: { delay: 5200, disableOnInteraction: false }
-        });
-      }
-
-      const canvas = document.getElementById("payrollChart");
-      if (canvas && typeof Chart !== "undefined") {
-        const ctx = canvas.getContext("2d");
-
-        new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: ["Standard Payroll", "Our Program"],
-            datasets: [{
-              data: [7.65, 0],
-              backgroundColor: ["rgba(255, 255, 255, 0.12)", "#c5a059"],
-              borderColor: ["rgba(255, 255, 255, 0.25)", "#c5a059"],
-              borderWidth: 1,
-              borderRadius: 3,
-              barThickness: 50
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
-                max: 10,
-                grid: { color: "rgba(255,255,255,0.04)" },
-                ticks: { color: "#666", font: { size: 10 } }
-              },
-              x: {
-                grid: { display: false },
-                ticks: { color: "#999", font: { size: 10, weight: "bold" } }
-              }
-            },
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                backgroundColor: "#0f0f0f",
-                borderColor: "#c5a059",
-                borderWidth: 1
-              }
-            }
-          }
-        });
-      }
-    });
-  </script>
-
-  <script>
     (function () {
       const base = "/ItalianExperience";
       const headerMount = document.getElementById("site-header");
@@ -544,6 +591,61 @@
         });
       }
 
+      function initEmployerPage(){
+        if (typeof Swiper !== "undefined") {
+          new Swiper(".hero-swiper", {
+            loop: true,
+            effect: "fade",
+            speed: 2200,
+            autoplay: { delay: 5200, disableOnInteraction: false }
+          });
+        }
+
+        const canvas = document.getElementById("payrollChart");
+        if (canvas && typeof Chart !== "undefined") {
+          const ctx = canvas.getContext("2d");
+
+          new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: ["Standard Payroll", "Our Program"],
+              datasets: [{
+                data: [7.65, 0],
+                backgroundColor: ["rgba(255, 255, 255, 0.12)", "#c5a059"],
+                borderColor: ["rgba(255, 255, 255, 0.25)", "#c5a059"],
+                borderWidth: 1,
+                borderRadius: 3,
+                barThickness: 50
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  max: 10,
+                  grid: { color: "rgba(255,255,255,0.04)" },
+                  ticks: { color: "#666", font: { size: 10 } }
+                },
+                x: {
+                  grid: { display: false },
+                  ticks: { color: "#999", font: { size: 10, weight: "bold" } }
+                }
+              },
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  backgroundColor: "#0f0f0f",
+                  borderColor: "#c5a059",
+                  borderWidth: 1
+                }
+              }
+            }
+          });
+        }
+      }
+
       Promise.all([
         fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
         fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
@@ -553,6 +655,8 @@
 
         await loadScript(base + "/assets/js/site.js");
         if (window.IEInit) window.IEInit(document);
+
+        initEmployerPage();
       }).catch(err => console.error(err));
     })();
   </script>
