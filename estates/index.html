@@ -28,6 +28,7 @@
       -webkit-font-smoothing:antialiased;
     }
 
+    a{color:inherit;text-decoration:none}
     .serif-font,.brand-font{font-family:'Playfair Display',serif}
 
     /* ============================================================
@@ -430,6 +431,7 @@
     .glass-card{
       background:rgba(255,255,255,0.03);
       backdrop-filter:blur(15px);
+      -webkit-backdrop-filter:blur(15px);
       border:1px solid rgba(197,160,89,0.15);
       transition:all 0.5s ease;
       padding:2.5rem;
@@ -528,7 +530,7 @@
     </div>
 
     <nav class="mobile-menu" aria-label="Mobile menu">
-      <a href="https://www.italianexp.com/" class="mobile-link" data-close>Home</a>
+      <a href="/ItalianExperience/" class="mobile-link" data-close>Home</a>
 
       <!-- TRAVEL -->
       <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-travel">
@@ -539,9 +541,9 @@
       </button>
       <div id="m-travel" class="mobile-sub">
         <div class="mobile-sub-inner">
-          <a href="https://www.italianexp.com/travel/bespoke/" class="mobile-sublink" data-close>Bespoke</a>
-          <a href="https://www.italianexp.com/travel/gapyear/" class="mobile-sublink" data-close>Gap Year</a>
-          <a href="https://www.italianexp.com/travel/culinary/" class="mobile-sublink" data-close>Culinary Academy</a>
+          <a href="/ItalianExperience/travel/bespoke/" class="mobile-sublink" data-close>Bespoke</a>
+          <a href="/ItalianExperience/travel/gapyear/" class="mobile-sublink" data-close>Gap Year</a>
+          <a href="/ItalianExperience/travel/culinary/" class="mobile-sublink" data-close>Culinary Academy</a>
         </div>
       </div>
 
@@ -554,8 +556,8 @@
       </button>
       <div id="m-recruitment" class="mobile-sub">
         <div class="mobile-sub-inner">
-          <a href="https://www.italianexp.com/recruitment/employer/" class="mobile-sublink" data-close>Employer</a>
-          <a href="https://www.italianexp.com/recruitment/candidate/" class="mobile-sublink" data-close>Candidate</a>
+          <a href="/ItalianExperience/recruitment/employer/" class="mobile-sublink" data-close>Employer</a>
+          <a href="/ItalianExperience/recruitment/candidate/" class="mobile-sublink" data-close>Candidate</a>
         </div>
       </div>
 
@@ -568,33 +570,33 @@
       </button>
       <div id="m-flavors" class="mobile-sub">
         <div class="mobile-sub-inner">
-          <a href="https://www.italianexp.com/flavors/for-your-home/" class="mobile-sublink" data-close>For your home</a>
-          <a href="https://www.italianexp.com/flavors/for-your-business/" class="mobile-sublink" data-close>For your business</a>
-          <a href="https://www.italianexp.com/flavors/aziende-italiane/" class="mobile-sublink" data-close>Italian Companies</a>
+          <a href="/ItalianExperience/flavors/for-your-home/" class="mobile-sublink" data-close>For your home</a>
+          <a href="/ItalianExperience/flavors/for-your-business/" class="mobile-sublink" data-close>For your business</a>
+          <a href="/ItalianExperience/flavors/aziende-italiane/" class="mobile-sublink" data-close>Italian Companies</a>
         </div>
       </div>
 
-      <a href="https://www.italianexp.com/estates/" class="mobile-link active" data-close>Estates</a>
-      <a href="https://www.italianexp.com/contact/" class="mobile-link" data-close>Contact</a>
+      <a href="/ItalianExperience/estates/" class="mobile-link active" data-close>Estates</a>
+      <a href="/ItalianExperience/contact/" class="mobile-link" data-close>Contact</a>
     </nav>
   </div>
 
   <!-- HEADER -->
-  <nav class="glass-header" id="main-header">
-    <a href="https://www.italianexp.com/" target="_top" class="no-underline block">
+  <nav class="glass-header" id="main-header" aria-label="Header">
+    <a href="/ItalianExperience/" class="no-underline block">
       <div class="logo-wrap" id="logo-header">
         <span class="font-it">Italian</span>
         <div class="font-ex" data-text="EXPERIENCE"></div>
         <div class="tricolore-line">
-          <div class="bg-[#008C45] flex-1"></div>
-          <div class="bg-white flex-1"></div>
-          <div class="bg-[#CD212A] flex-1"></div>
+          <div style="background:var(--it-green);flex:1"></div>
+          <div style="background:#fff;flex:1"></div>
+          <div style="background:var(--it-red);flex:1"></div>
         </div>
       </div>
     </a>
 
     <button id="central-menu-btn" aria-label="Open menu">
-      <svg class="menu-icon-svg" viewBox="0 0 24 24" fill="none" stroke-linecap="round">
+      <svg class="menu-icon-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-linecap="round">
         <circle cx="12" cy="12" r="10" stroke="rgba(197,160,89,0.4)" stroke-width="1"/>
         <line x1="8" y1="10" x2="16" y2="10" stroke="#c5a059" stroke-width="2.5"/>
         <line x1="10" y1="14" x2="14" y2="14" stroke="#c5a059" stroke-width="2.5"/>
@@ -603,52 +605,52 @@
     </button>
 
     <!-- DESKTOP NAV -->
-    <div class="nav-container">
-      <a href="https://www.italianexp.com/" class="nav-link">Home</a>
+    <div class="nav-container" aria-label="Desktop navigation">
+      <a href="/ItalianExperience/" class="nav-link">Home</a>
 
       <div class="dropdown">
-        <a href="https://www.italianexp.com/travel/" class="nav-link">
+        <a href="/ItalianExperience/travel/" class="nav-link">
           Travel
           <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
             <path d="m6 9 6 6 6-6"/>
           </svg>
         </a>
         <div class="dropdown-menu">
-          <a href="https://www.italianexp.com/travel/bespoke/" class="dropdown-item">Bespoke</a>
-          <a href="https://www.italianexp.com/travel/gapyear/" class="dropdown-item">Gap Year</a>
-          <a href="https://www.italianexp.com/travel/culinary/" class="dropdown-item">Culinary Academy</a>
+          <a href="/ItalianExperience/travel/bespoke/" class="dropdown-item">Bespoke</a>
+          <a href="/ItalianExperience/travel/gapyear/" class="dropdown-item">Gap Year</a>
+          <a href="/ItalianExperience/travel/culinary/" class="dropdown-item">Culinary Academy</a>
         </div>
       </div>
 
       <div class="dropdown">
-        <a href="https://www.italianexp.com/recruitment/" class="nav-link">
+        <a href="/ItalianExperience/recruitment/" class="nav-link">
           Recruitment
           <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
             <path d="m6 9 6 6 6-6"/>
           </svg>
         </a>
         <div class="dropdown-menu">
-          <a href="https://www.italianexp.com/recruitment/employer/" class="dropdown-item">Employer</a>
-          <a href="https://www.italianexp.com/recruitment/candidate/" class="dropdown-item">Candidate</a>
+          <a href="/ItalianExperience/recruitment/employer/" class="dropdown-item">Employer</a>
+          <a href="/ItalianExperience/recruitment/candidate/" class="dropdown-item">Candidate</a>
         </div>
       </div>
 
       <div class="dropdown">
-        <a href="https://www.italianexp.com/flavors/" class="nav-link">
+        <a href="/ItalianExperience/flavors/" class="nav-link">
           Flavors
           <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
             <path d="m6 9 6 6 6-6"/>
           </svg>
         </a>
         <div class="dropdown-menu">
-          <a href="https://www.italianexp.com/flavors/for-your-home/" class="dropdown-item">For your home</a>
-          <a href="https://www.italianexp.com/flavors/for-your-business/" class="dropdown-item">For your business</a>
-          <a href="https://www.italianexp.com/flavors/aziende-italiane/" class="dropdown-item">Italian Companies</a>
+          <a href="/ItalianExperience/flavors/for-your-home/" class="dropdown-item">For your home</a>
+          <a href="/ItalianExperience/flavors/for-your-business/" class="dropdown-item">For your business</a>
+          <a href="/ItalianExperience/flavors/aziende-italiane/" class="dropdown-item">Italian Companies</a>
         </div>
       </div>
 
-      <a href="https://www.italianexp.com/estates/" class="nav-link active">Estates</a>
-      <a href="https://www.italianexp.com/contact/" class="nav-link">Contact</a>
+      <a href="/ItalianExperience/estates/" class="nav-link active">Estates</a>
+      <a href="/ItalianExperience/contact/" class="nav-link">Contact</a>
     </div>
   </nav>
 
@@ -672,9 +674,9 @@
       </p>
     </div>
 
-    <a href="#framework" class="explore-indicator">
+    <a href="#framework" class="explore-indicator" aria-label="Explore the strategy">
       <span class="explore-text">Explore the Strategy</span>
-      <div class="scroll-track">
+      <div class="scroll-track" aria-hidden="true">
         <div class="scroll-dot"></div>
       </div>
     </a>
@@ -795,21 +797,20 @@
 
   <!-- FOOTER -->
   <footer class="site-footer">
-    <a href="https://www.italianexp.com/" target="_top" class="no-underline block mb-8">
+    <a href="/ItalianExperience/" class="no-underline block mb-8">
       <div class="logo-wrap scale-[0.7] md:scale-[0.8] origin-center" id="logo-footer">
         <span class="font-it text-[70px]">Italian</span>
         <div class="font-ex text-[35px]" data-text="EXPERIENCE"></div>
         <div class="tricolore-line">
-          <div class="bg-[#008C45] flex-1"></div>
-          <div class="bg-white flex-1"></div>
-          <div class="bg-[#CD212A] flex-1"></div>
+          <div style="background:var(--it-green);flex:1"></div>
+          <div style="background:#fff;flex:1"></div>
+          <div style="background:var(--it-red);flex:1"></div>
         </div>
       </div>
     </a>
 
     <p class="footer-copyright">
-      &copy; ITALIAN RECRUITMENT DBA ITALIAN EXPERIENCE<br>
-      STRATEGIC HOSPITALITY ADVISORY
+      © 2026 ITALIAN EXPERIENCE · STRATEGIC ADVISORY
     </p>
   </footer>
 
@@ -843,25 +844,28 @@
       const closeBtn = document.getElementById('close-menu');
       const overlay = document.getElementById('mobile-menu-overlay');
 
-      menuBtn?.addEventListener('click', (e) => {
-        e.preventDefault();
+      function openMenu(){
         overlay.classList.add('active');
-        overlay.setAttribute('aria-hidden', 'false');
-      });
-
-      closeBtn?.addEventListener('click', (e) => {
-        e.preventDefault();
+        overlay.setAttribute('aria-hidden','false');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeMenu(){
         overlay.classList.remove('active');
-        overlay.setAttribute('aria-hidden', 'true');
-      });
+        overlay.setAttribute('aria-hidden','true');
+        document.body.style.overflow = '';
+      }
+
+      menuBtn?.addEventListener('click', (e) => { e.preventDefault(); openMenu(); });
+      closeBtn?.addEventListener('click', (e) => { e.preventDefault(); closeMenu(); });
 
       overlay.addEventListener('click', (e) => {
         const t = e.target;
-        if (t && t.closest && t.closest('[data-close]')) {
-          overlay.classList.remove('active');
-          overlay.setAttribute('aria-hidden', 'true');
-        }
-      }, { passive: true });
+        if (t && t.closest && t.closest('[data-close]')) closeMenu();
+      }, { passive:true });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.classList.contains('active')) closeMenu();
+      });
 
       /* MOBILE ACCORDION */
       const accBtns = Array.from(document.querySelectorAll('.mobile-acc-btn'));
@@ -926,7 +930,7 @@
               l.style.zIndex = '10';
             }
           });
-        }, { passive: true });
+        }, { passive:true });
 
         el.addEventListener('mouseleave', () => {
           it.style.textShadow = '';
@@ -936,7 +940,7 @@
             l.style.transform = '';
             l.style.zIndex = '';
           });
-        }, { passive: true });
+        }, { passive:true });
       }
 
       initLogoMouse('logo-header');
