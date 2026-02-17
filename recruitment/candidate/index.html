@@ -344,7 +344,7 @@
       z-index: 20;
       pointer-events: auto;
     }
-    .explore-indicator:hover { opacity: 1; transform: translate(-50%, 5px); }
+    .explore-indicator:hover { opacity: 1; }
     .explore-text {
       color: #fff;
       font-size: 0.65rem;
@@ -615,13 +615,13 @@
 
     <!-- SCROLL DOWN -->
     <a href="#ambassador" class="explore-indicator">
-      <span class="explore-text">Scroll Down</span>
-      <svg class="w-8 h-8 text-[#c5a059] animate-bounce opacity-80" fill="none" stroke="currentColor" stroke-width="1.8"
-        viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M7 10l5 5 5-5" />
-      </svg>
-    </a>
-  </section>
+  <span class="explore-text">Explore</span>
+
+  <div class="flex flex-col items-center gap-2">
+    <div class="w-[1px] h-16 bg-[#c5a059]/70 animate-pulse"></div>
+    <div class="w-[5px] h-[5px] rounded-full bg-[#c5a059]/80"></div>
+  </div>
+</a>
 
   <!-- SECTION: AMBASSADOR -->
   <section id="ambassador" class="py-28 px-6">
