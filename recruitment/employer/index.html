@@ -23,6 +23,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
   <style>
+    .brand-font{font-family:'Playfair Display',serif}
+
     .hero-staffing{
       width:100%;
       height:100vh;
@@ -179,17 +181,16 @@
       .chart-container{height:240px}
     }
   </style>
-
-  <script src="/ItalianExperience/assets/js/site.js" defer></script>
 </head>
 
-<body>
+<body class="bg-[#080808] text-white overflow-x-hidden">
 
   <div id="site-header"></div>
 
   <main>
 
     <header class="hero-staffing" aria-label="Employer hero">
+
       <div class="swiper hero-swiper">
         <div class="swiper-wrapper">
           <div class="swiper-slide hero-slide">
@@ -205,31 +206,32 @@
             <img src="https://images.unsplash.com/photo-1541614101331-1a5a3a194e92?auto=format&fit=crop&q=80&w=1920" alt="Chef" loading="lazy" />
           </div>
         </div>
-
-        <div class="hero-content">
-          <h3 class="text-[#c5a059] italic brand-font text-xl md:text-2xl mb-4 tracking-wide">
-            Bespoke Strategic Alignment
-          </h3>
-
-          <h1 class="text-4xl md:text-6xl font-bold brand-font leading-[1.1] mb-8 text-white uppercase tracking-tighter">
-            Master Talent Curators <br />
-            & <span class="italic font-light opacity-80">Cultural Architects.</span>
-          </h1>
-
-          <div class="w-16 h-px bg-[#c5a059] mx-auto mb-8 opacity-40"></div>
-
-          <p class="text-slate-400 font-light text-sm md:text-base max-w-2xl mx-auto leading-relaxed uppercase tracking-[0.3em]">
-            Orchestrating the perfect synergy between prestigious brands and exceptional human potential.
-          </p>
-        </div>
-
-        <a href="#evolution" class="explore-indicator" aria-label="Explore section">
-          <span>Explore</span>
-          <div class="scroll-track" aria-hidden="true">
-            <div class="scroll-dot"></div>
-          </div>
-        </a>
       </div>
+
+      <div class="hero-content">
+        <h3 class="text-[#c5a059] italic brand-font text-xl md:text-2xl mb-4 tracking-wide">
+          Bespoke Strategic Alignment
+        </h3>
+
+        <h1 class="text-4xl md:text-6xl font-bold brand-font leading-[1.1] mb-8 text-white uppercase tracking-tighter">
+          Master Talent Curators <br />
+          & <span class="italic font-light opacity-80">Cultural Architects.</span>
+        </h1>
+
+        <div class="w-16 h-px bg-[#c5a059] mx-auto mb-8 opacity-40"></div>
+
+        <p class="text-slate-400 font-light text-sm md:text-base max-w-2xl mx-auto leading-relaxed uppercase tracking-[0.3em]">
+          Orchestrating the perfect synergy between prestigious brands and exceptional human potential.
+        </p>
+      </div>
+
+      <a href="#evolution" class="explore-indicator" aria-label="Explore section">
+        <span>Explore</span>
+        <div class="scroll-track" aria-hidden="true">
+          <div class="scroll-dot"></div>
+        </div>
+      </a>
+
     </header>
 
     <section id="evolution" class="py-32 px-6">
@@ -521,6 +523,38 @@
         });
       }
     });
+  </script>
+
+  <script>
+    (function () {
+      const base = "/ItalianExperience";
+      const headerMount = document.getElementById("site-header");
+      const footerMount = document.getElementById("site-footer");
+
+      function inject(el, html) { if (el) el.innerHTML = html; }
+
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const s = document.createElement("script");
+          s.src = src;
+          s.defer = true;
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+
+      Promise.all([
+        fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
+        fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
+      ]).then(async ([h, f]) => {
+        inject(headerMount, h);
+        inject(footerMount, f);
+
+        await loadScript(base + "/assets/js/site.js");
+        if (window.IEInit) window.IEInit(document);
+      }).catch(err => console.error(err));
+    })();
   </script>
 
 </body>
