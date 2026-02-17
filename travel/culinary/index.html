@@ -26,16 +26,24 @@
   <script src="/ItalianExperience/assets/js/site.js" defer></script>
 
   <style>
+    :root{ --header-h:110px; }
+    @media (max-width:1024px){ :root{ --header-h:160px; } }
+    @media (max-width:350px){ :root{ --header-h:145px; } }
+
     .hero-culinary{
       width:100%;
-      min-height:100svh;
-      min-height:100dvh;
+      min-height:calc(100svh - var(--header-h));
+      min-height:calc(100dvh - var(--header-h));
+      padding-top:var(--header-h);
       position:relative;
       overflow:hidden;
       background:#000;
     }
 
-    .hero-swiper{width:100%;height:100%}
+    .hero-swiper{
+      width:100%;
+      height:100%;
+    }
 
     .hero-slide img{
       width:100%;
@@ -46,7 +54,9 @@
       transition:transform 8s ease-in-out;
     }
 
-    .swiper-slide-active img{transform:scale(1)}
+    .swiper-slide-active img{
+      transform:scale(1);
+    }
 
     .hero-overlay-content{
       position:absolute;
