@@ -13,663 +13,629 @@
 
   <link rel="canonical" href="https://www.italianexp.com/recruitment/candidate/" />
 
-  <!-- Open Graph -->
   <meta property="og:title" content="Candidate Journey | Italian Experience" />
   <meta property="og:description" content="A premium cultural exchange journey designed for Italian hospitality professionals. Visa support, placement, and full guidance." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.italianexp.com/recruitment/candidate/" />
   <meta property="og:image" content="https://www.italianexp.com/assets/preview.jpg" />
 
-  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Candidate Journey | Italian Experience" />
   <meta name="twitter:description" content="A premium cultural exchange journey designed for Italian hospitality professionals." />
   <meta name="twitter:image" content="https://www.italianexp.com/assets/preview.jpg" />
 
-  <!-- Scripts -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@100;300;400;600&family=Great+Vibes&family=Montserrat:wght@700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@100;300;400;500;600&family=Great+Vibes&family=Montserrat:wght@700;900&display=swap');
 
-    :root {
-      --brand-gold: #c5a059;
-      --brand-dark: #080808;
+    :root{
+      --brand-gold:#c5a059;
+      --brand-dark:#080808;
+      --it-green:#008C45;
+      --it-red:#CD212A;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; background-color: #000; }
-    body {
-      background-color: var(--brand-dark);
-      color: #fff;
-      font-family: 'Inter', sans-serif;
-      overflow-x: hidden;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html{scroll-behavior:smooth;background-color:#000}
+    body{
+      background-color:var(--brand-dark);
+      color:#fff;
+      font-family:'Inter',sans-serif;
+      overflow-x:hidden;
+      min-height:100vh;
+      -webkit-font-smoothing:antialiased;
     }
 
-    .brand-font { font-family: 'Playfair Display', serif; }
+    .brand-font{font-family:'Playfair Display',serif}
 
-    /* HEADER */
-    .glass-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 9000;
-      background: transparent;
-      backdrop-filter: blur(0px);
-      padding: 0 4rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      height: 110px;
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.5s, backdrop-filter 0.5s, height 0.4s;
+    /* HEADER MASTER */
+    .glass-header{
+      position:fixed;
+      top:0;left:0;width:100%;
+      z-index:9999;
+      height:110px;
+      padding:0 4rem;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      background:transparent;
+      backdrop-filter:blur(0px);
+      transition:transform 0.6s cubic-bezier(0.16,1,0.3,1),background 0.5s,backdrop-filter 0.5s,height 0.4s,padding 0.4s;
+    }
+    .glass-header.nav-up{transform:translateY(-110%)}
+    .glass-header.scrolled{
+      height:90px;
+      padding:0 2rem;
+      background:rgba(15,15,15,0.45);
+      backdrop-filter:blur(40px) saturate(180%);
+      -webkit-backdrop-filter:blur(40px) saturate(180%);
+      border-bottom:1px solid rgba(255,255,255,0.08);
+      box-shadow:0 10px 30px rgba(0,0,0,0.5);
     }
 
-    .glass-header.nav-up { transform: translateY(-110%); }
-
-    .glass-header.scrolled {
-      height: 90px;
-      background: rgba(15, 15, 15, 0.45);
-      backdrop-filter: blur(40px) saturate(180%);
-      -webkit-backdrop-filter: blur(40px) saturate(180%);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      padding: 0 2rem;
+    .logo-wrap{
+      display:flex;
+      align-items:baseline;
+      gap:8px;
+      position:relative;
+      cursor:pointer;
+      user-select:none;
+      transition:all 0.4s ease;
+      z-index:10001;
+      white-space:nowrap;
     }
 
-    /* LOGO */
-    .logo-wrap {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      position: relative;
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.4s ease;
-      z-index: 9010;
+    .font-it{
+      font-family:'Great Vibes',cursive;
+      color:var(--brand-gold);
+      font-size:70px;
+      line-height:1;
+      white-space:nowrap;
+      transition:0.3s;
     }
 
-    .font-it {
-      font-family: 'Great Vibes', cursive;
-      color: var(--brand-gold);
-      font-size: 70px;
-      line-height: 1;
-      white-space: nowrap;
+    .font-ex{
+      font-family:'Montserrat',sans-serif;
+      color:var(--brand-gold);
+      font-weight:900;
+      font-size:35px;
+      line-height:1;
+      letter-spacing:-0.02em;
+      display:flex;
     }
 
-    .font-ex {
-      font-family: 'Montserrat', sans-serif;
-      color: var(--brand-gold);
-      font-weight: 900;
-      font-size: 35px;
-      line-height: 1;
-      letter-spacing: -0.02em;
-      display: flex;
+    .letter{
+      display:inline-block;
+      position:relative;
+      will-change:transform,color;
+      transition:all 0.25s ease-out;
     }
 
-    .letter {
-      display: inline-block;
-      position: relative;
-      will-change: transform, color;
-      transition: all 0.25s ease-out;
+    .tricolore-line{
+      position:absolute;
+      height:2px;
+      width:60px;
+      bottom:-6px;
+      right:0;
+      display:flex;
+      pointer-events:none;
     }
 
-    .tricolore-line {
-      position: absolute;
-      height: 2px;
-      width: 60px;
-      bottom: -6px;
-      right: 0;
-      display: flex;
-      pointer-events: none;
+    .nav-container{
+      display:flex;
+      align-items:center;
+      gap:0.25rem;
+      margin-left:auto;
+      height:100%;
     }
 
-    /* DESKTOP NAV */
-    .nav-container {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-left: auto;
-      height: 100%;
+    .nav-link{
+      color:#fff;
+      text-transform:uppercase;
+      font-size:0.62rem;
+      letter-spacing:0.25em;
+      text-decoration:none;
+      padding:1.2rem 0.8rem;
+      transition:all 0.25s;
+      opacity:0.72;
+      white-space:nowrap;
+      cursor:pointer;
     }
 
-    .nav-link {
-      color: #fff;
-      text-transform: uppercase;
-      font-size: 0.62rem;
-      letter-spacing: 0.25em;
-      text-decoration: none;
-      padding: 1rem 0.8rem;
-      transition: all 0.3s;
-      opacity: 0.7;
-      white-space: nowrap;
-      cursor: pointer;
+    .nav-link:hover{
+      color:var(--brand-gold);
+      opacity:1;
+      text-shadow:0 0 10px rgba(197,160,89,0.4);
     }
 
-    .nav-link:hover {
-      color: var(--brand-gold);
-      opacity: 1;
-      text-shadow: 0 0 10px rgba(197, 160, 89, 0.4);
+    .nav-link.active,
+    .dropdown-item.active,
+    .mobile-link.active,
+    .mobile-sublink.active,
+    .mobile-acc-btn.active{
+      color:var(--brand-gold) !important;
+      opacity:1 !important;
+      text-shadow:0 0 12px rgba(197,160,89,0.35);
     }
 
-    .nav-link.active {
-      color: var(--brand-gold);
-      opacity: 1;
-      text-shadow: 0 0 12px rgba(197, 160, 89, 0.35);
+    .dropdown{
+      position:relative;
+      height:100%;
+      display:flex;
+      align-items:center;
     }
 
-    .dropdown {
-      position: relative;
-      height: 100%;
-      display: flex;
-      align-items: center;
+    .dropdown-menu{
+      position:absolute;
+      top:100%;
+      right:0;
+      background:rgba(10,10,10,0.96);
+      backdrop-filter:blur(35px);
+      -webkit-backdrop-filter:blur(35px);
+      border:1px solid rgba(255,255,255,0.1);
+      min-width:260px;
+      opacity:0;
+      visibility:hidden;
+      transform:translateY(10px);
+      transition:all 0.3s ease;
+      padding:1rem 0;
+      box-shadow:0 20px 40px rgba(0,0,0,0.6);
     }
 
-    .dropdown-menu {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      background: rgba(10, 10, 10, 0.96);
-      backdrop-filter: blur(35px);
-      border: 1px solid rgba(255,255,255,0.1);
-      min-width: 230px;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(10px);
-      transition: all 0.4s ease;
-      padding: 1.2rem 0;
-      border-radius: 2px;
+    .dropdown:hover .dropdown-menu{
+      opacity:1;
+      visibility:visible;
+      transform:translateY(0);
     }
 
-    .dropdown:hover .dropdown-menu {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
+    .dropdown-item{
+      display:block;
+      padding:0.8rem 1.8rem;
+      color:#fff;
+      text-decoration:none;
+      font-size:0.6rem;
+      text-transform:uppercase;
+      letter-spacing:0.15em;
+      opacity:0.65;
+      transition:0.25s;
     }
 
-    .dropdown-item {
-      display: block;
-      padding: 0.8rem 2rem;
-      color: #fff;
-      text-decoration: none;
-      font-size: 0.6rem;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      opacity: 0.6;
-      transition: 0.3s;
-    }
-
-    .dropdown-item:hover {
-      color: var(--brand-gold);
-      opacity: 1;
-      background: rgba(255,255,255,0.03);
-      padding-left: 2.5rem;
-    }
-
-    .dropdown-item.active {
-      color: var(--brand-gold);
-      opacity: 1;
+    .dropdown-item:hover{
+      color:var(--brand-gold);
+      opacity:1;
+      background:rgba(255,255,255,0.03);
+      padding-left:2.2rem;
     }
 
     /* MOBILE MENU BUTTON */
-    #central-menu-btn {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: none;
-      border: none;
-      cursor: pointer;
-      outline: none;
-      z-index: 9020;
+    #central-menu-btn{
+      display:none;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      background:none;
+      border:none;
+      cursor:pointer;
+      outline:none;
+      z-index:10002;
+      transition:all 0.25s ease;
     }
 
-    #central-menu-btn span {
-      color: var(--brand-gold);
-      font-size: 0.52rem;
-      text-transform: uppercase;
-      letter-spacing: 0.4em;
-      margin-top: 5px;
-      font-weight: 600;
-      opacity: 0.9;
+    #central-menu-btn span{
+      color:var(--brand-gold);
+      font-size:0.52rem;
+      text-transform:uppercase;
+      letter-spacing:0.4em;
+      margin-top:6px;
+      font-weight:600;
+      opacity:0.95;
     }
 
-    /* MOBILE OVERLAY MENU */
-    #mobile-menu-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(8, 8, 8, 0.98);
-      backdrop-filter: blur(50px) saturate(160%);
-      z-index: 10000;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.5s ease;
-      overflow-y: auto;
-      padding: 4rem 0;
+    /* MOBILE OVERLAY MASTER ACCORDION */
+    #mobile-menu-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(8,8,8,0.98);
+      backdrop-filter:blur(50px) saturate(160%);
+      -webkit-backdrop-filter:blur(50px) saturate(160%);
+      z-index:10000;
+      opacity:0;
+      visibility:hidden;
+      transition:opacity 0.35s ease,visibility 0.35s ease;
+      padding:clamp(1.2rem,4vw,2.2rem);
+      overflow-y:auto;
     }
 
-    #mobile-menu-overlay.active {
-      opacity: 1;
-      visibility: visible;
+    #mobile-menu-overlay.active{
+      opacity:1;
+      visibility:visible;
     }
 
-    .mobile-nav-list {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      text-align: center;
-      padding: 2rem 0;
-      gap: 1.2rem;
+    .mobile-close{
+      position:sticky;
+      top:0;
+      display:flex;
+      justify-content:flex-end;
+      z-index:2;
+      padding:0.5rem 0;
     }
 
-    .mobile-main-link {
-      font-size: 1.05rem;
-      color: #fff;
-      text-transform: uppercase;
-      letter-spacing: 0.4em;
-      text-decoration: none;
-      font-weight: 200;
-      transition: color 0.3s;
-      opacity: 0.85;
+    .mobile-menu{
+      max-width:520px;
+      margin:0 auto;
+      padding:2.2rem 0 3rem 0;
+      display:flex;
+      flex-direction:column;
+      gap:0.4rem;
+      align-items:center;
+      text-align:center;
     }
 
-    .mobile-main-link:hover {
-      color: var(--brand-gold);
-      opacity: 1;
+    .mobile-link,
+    .mobile-acc-btn{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      padding:14px 10px;
+      color:#fff;
+      text-transform:uppercase;
+      letter-spacing:0.35em;
+      font-size:0.72rem;
+      opacity:0.75;
+      transition:opacity 0.2s ease,color 0.2s ease;
+      background:transparent;
+      border:none;
+      cursor:pointer;
     }
 
-    .mobile-main-link.active {
-      color: var(--brand-gold);
-      opacity: 1;
+    .mobile-link:hover,
+    .mobile-acc-btn:hover{
+      opacity:1;
+      color:var(--brand-gold);
     }
 
-    .mobile-dropdown-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      width: 100%;
-      font-size: 1.05rem;
-      color: #fff;
-      text-transform: uppercase;
-      letter-spacing: 0.4em;
-      font-weight: 200;
-      opacity: 0.85;
-      transition: color 0.3s, opacity 0.3s;
+    .chev{
+      width:14px;
+      height:14px;
+      opacity:0.65;
+      transition:transform 0.25s ease,opacity 0.25s ease;
     }
 
-    .mobile-dropdown-btn:hover {
-      color: var(--brand-gold);
-      opacity: 1;
+    .mobile-acc-btn[aria-expanded="true"] .chev{
+      transform:rotate(180deg);
+      opacity:1;
     }
 
-    .mobile-dropdown-btn.active {
-      color: var(--brand-gold);
-      opacity: 1;
+    .mobile-sub{
+      width:100%;
+      max-height:0;
+      overflow:hidden;
+      transition:max-height 0.35s ease;
     }
 
-    .mobile-dropdown-arrow {
-      width: 18px;
-      height: 18px;
-      color: var(--brand-gold);
-      opacity: 0.7;
-      transition: transform 0.3s ease;
-      flex-shrink: 0;
+    .mobile-sub-inner{
+      padding:4px 0 10px 0;
+      display:flex;
+      flex-direction:column;
+      gap:2px;
     }
 
-    .mobile-submenu {
-      width: 80%;
-      max-width: 360px;
-      margin: 0 auto;
-      padding-top: 0.8rem;
-      border-top: 1px solid rgba(197, 160, 89, 0.15);
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.65rem;
+    .mobile-sublink{
+      display:block;
+      padding:10px 10px;
+      color:#fff;
+      text-transform:uppercase;
+      letter-spacing:0.28em;
+      font-size:0.62rem;
+      opacity:0.55;
+      transition:opacity 0.2s ease,color 0.2s ease;
+      text-decoration:none;
     }
 
-    .mobile-submenu.open {
-      display: flex;
+    .mobile-sublink:hover{
+      opacity:1;
+      color:var(--brand-gold);
     }
 
-    .mobile-sub-link {
-      font-size: 0.72rem;
-      color: var(--brand-gold);
-      text-transform: uppercase;
-      letter-spacing: 0.25em;
-      text-decoration: none;
-      opacity: 0.55;
-      transition: 0.3s;
-      padding: 0.25rem 0;
+    /* HERO SPLIT */
+    .hero-split-container{
+      width:100%;
+      height:100vh;
+      height:100dvh;
+      position:relative;
+      overflow:hidden;
+      background:#000;
     }
 
-    .mobile-sub-link:hover { opacity: 1; }
-
-    .mobile-sub-link.active {
-      opacity: 1;
-      color: var(--brand-gold);
+    .hero-split-bg{
+      position:absolute;
+      inset:0;
+      display:flex;
+      z-index:0;
+      width:100%;
     }
 
-    /* HERO */
-    .hero-split-container {
-      width: 100%;
-      height: 100vh;
-      height: 100dvh;
-      position: relative;
-      overflow: hidden;
-      background: #000;
+    .hero-side{
+      position:absolute;
+      top:0;
+      bottom:0;
+      width:65%;
+      background-size:cover;
+      background-position:center;
+      transition:all 1.2s cubic-bezier(0.16,1,0.3,1);
+      filter:brightness(0.35) contrast(1.1);
     }
 
-    .hero-split-bg {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      z-index: 0;
-      width: 100%;
+    .side-italy{
+      left:0;
+      background-image:url('https://images.unsplash.com/photo-1531572753322-ad063cecc140?auto=format&fit=crop&w=1400&q=80');
+      -webkit-mask-image:linear-gradient(to right, black 50%, transparent 100%);
+      mask-image:linear-gradient(to right, black 50%, transparent 100%);
     }
 
-    .hero-side {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 65%;
-      background-size: cover;
-      background-position: center;
-      transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-      filter: brightness(0.35) contrast(1.1);
+    .side-usa{
+      right:0;
+      background-image:url('https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=1400&q=80');
+      -webkit-mask-image:linear-gradient(to left, black 50%, transparent 100%);
+      mask-image:linear-gradient(to left, black 50%, transparent 100%);
     }
 
-    .side-italy {
-      left: 0;
-      background-image: url('https://images.unsplash.com/photo-1531572753322-ad063cecc140?auto=format&fit=crop&w=1400&q=80');
-      -webkit-mask-image: linear-gradient(to right, black 50%, transparent 100%);
-      mask-image: linear-gradient(to right, black 50%, transparent 100%);
+    .hero-overlay-final{
+      position:absolute;
+      inset:0;
+      background:linear-gradient(to bottom, rgba(8,8,8,0) 0%, rgba(8,8,8,0.9) 100%);
+      z-index:2;
     }
 
-    .side-usa {
-      right: 0;
-      background-image: url('https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=1400&q=80');
-      -webkit-mask-image: linear-gradient(to left, black 50%, transparent 100%);
-      mask-image: linear-gradient(to left, black 50%, transparent 100%);
-    }
-
-    .hero-overlay-final {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to bottom, rgba(8,8,8,0) 0%, rgba(8,8,8,0.9) 100%);
-      z-index: 2;
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 0 10%;
-      pointer-events: none;
-      width: 100%;
-      height: 100%;
+    .hero-content{
+      position:relative;
+      z-index:10;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      padding:0 10%;
+      pointer-events:none;
+      width:100%;
+      height:100%;
     }
 
     /* SCROLL INDICATOR */
-    @keyframes scrollLine {
-      0% { transform: translateY(-18px); opacity: 0; }
-      30% { opacity: 1; }
-      100% { transform: translateY(52px); opacity: 0; }
+    @keyframes scrollLine{
+      0%{transform:translateY(-18px);opacity:0}
+      30%{opacity:1}
+      100%{transform:translateY(52px);opacity:0}
     }
 
-    .explore-indicator {
-      position: absolute;
-      bottom: 46px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 20;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-      text-decoration: none;
-      opacity: 0.82;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      pointer-events: auto;
+    .explore-indicator{
+      position:absolute;
+      bottom:46px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:20;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:14px;
+      text-decoration:none;
+      opacity:0.82;
+      transition:opacity 0.2s ease, transform 0.2s ease;
+      pointer-events:auto;
     }
 
-    .explore-indicator:hover {
-      opacity: 1;
-      transform: translateX(-50%) translateY(3px);
+    .explore-indicator:hover{
+      opacity:1;
+      transform:translateX(-50%) translateY(3px);
     }
 
-    .explore-indicator span {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.55em;
-      color: rgba(255,255,255,0.78);
-      padding-left: 0.55em;
-      white-space: nowrap;
-      text-shadow: 0 8px 18px rgba(0,0,0,0.7);
+    .explore-indicator span{
+      font-size:0.65rem;
+      text-transform:uppercase;
+      letter-spacing:0.55em;
+      color:rgba(255,255,255,0.78);
+      padding-left:0.55em;
+      white-space:nowrap;
+      text-shadow:0 8px 18px rgba(0,0,0,0.7);
     }
 
-    .scroll-track {
-      width: 1px;
-      height: 54px;
-      background: rgba(255,255,255,0.25);
-      position: relative;
-      overflow: hidden;
+    .scroll-track{
+      width:1px;
+      height:54px;
+      background:rgba(255,255,255,0.25);
+      position:relative;
+      overflow:hidden;
     }
 
-    .scroll-dot {
-      width: 100%;
-      height: 16px;
-      background: var(--brand-gold);
-      position: absolute;
-      top: 0;
-      left: 0;
-      animation: scrollLine 1.6s infinite ease-in-out;
+    .scroll-dot{
+      width:100%;
+      height:16px;
+      background:var(--brand-gold);
+      position:absolute;
+      top:0;
+      left:0;
+      animation:scrollLine 1.6s infinite ease-in-out;
     }
 
-    /* Cards */
-    .glass-card {
-      background: rgba(255, 255, 255, 0.02);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(197, 160, 89, 0.15);
-      padding: 2.2rem;
-      transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
-      height: 100%;
+    /* GLASS CARDS */
+    .glass-card{
+      background:rgba(255,255,255,0.02);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      border:1px solid rgba(197,160,89,0.15);
+      padding:2.2rem;
+      transition:all 0.5s cubic-bezier(0.165,0.84,0.44,1);
+      height:100%;
     }
 
-    .glass-card:hover {
-      border-color: var(--brand-gold);
-      background: rgba(197, 160, 89, 0.05);
-      transform: translateY(-5px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    .glass-card:hover{
+      border-color:var(--brand-gold);
+      background:rgba(197,160,89,0.05);
+      transform:translateY(-5px);
+      box-shadow:0 20px 40px rgba(0,0,0,0.5);
     }
 
-    /* Footer */
-    .site-footer {
-      background-color: #000;
-      padding: 6rem 2rem;
-      border-top: 1px solid rgba(255,255,255,0.05);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
+    /* TIMELINE */
+    .step-node{
+      width:45px;height:45px;
+      border:1px solid var(--brand-gold);
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:var(--brand-dark);
+      z-index:10;
+      font-weight:700;
+      color:var(--brand-gold);
+      font-size:0.85rem;
+      flex-shrink:0;
+    }
+
+    .timeline-line{
+      position:absolute;
+      left:22px;
+      top:0;
+      bottom:0;
+      width:1px;
+      background:linear-gradient(to bottom, transparent, rgba(255,255,255,0.1) 15%, rgba(255,255,255,0.1) 85%, transparent);
+    }
+
+    /* FOOTER */
+    .site-footer{
+      background-color:#000;
+      padding:6rem 2rem;
+      border-top:1px solid rgba(255,255,255,0.05);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      text-align:center;
     }
 
     /* RESPONSIVE */
-    @media (max-width: 1024px) {
-      .glass-header {
-        flex-direction: column !important;
-        justify-content: flex-start !important;
-        align-items: center !important;
-        height: 220px !important;
-        padding: 2.8rem 0 1.4rem 0 !important;
-        gap: 14px;
+    @media (max-width:1024px){
+      .glass-header{
+        flex-direction:column !important;
+        justify-content:center !important;
+        height:160px !important;
+        padding:1.5rem 0 !important;
       }
+      .glass-header.scrolled{height:135px !important;}
+      .nav-container{display:none !important;}
+      #central-menu-btn{display:flex !important;margin-top:12px;}
+      .logo-wrap{transform:scale(0.8)}
 
-      .glass-header.scrolled {
-        height: 185px !important;
-        padding-top: 2.4rem !important;
+      .hero-side{
+        width:100%;
+        opacity:1;
+        mask-image:none !important;
+        -webkit-mask-image:none !important;
       }
+      .side-usa{display:none;}
 
-      .nav-container { display: none !important; }
-      #central-menu-btn { display: flex !important; margin-top: 12px; }
-
-      .logo-wrap {
-        transform: scale(0.80);
-        margin-top: 16px;
-        margin-bottom: 6px;
+      .hero-content{
+        padding-top:220px !important;
       }
-
-      .hero-side {
-        width: 100%;
-        opacity: 1;
-        mask-image: none !important;
-        -webkit-mask-image: none !important;
+      .hero-content h3{
+        font-size:1.2rem !important;
+        margin-bottom:0.8rem !important;
       }
-
-      .side-usa { display: none; }
-
-      /* FIX HERO TEXT OVERLAP */
-      .hero-content {
-        padding-top: 220px !important;
+      .hero-content h1{
+        font-size:clamp(2rem,7vw,3.2rem) !important;
+        line-height:1.05 !important;
+        margin-bottom:1.5rem !important;
       }
-
-      .hero-content h3 {
-        font-size: 1.2rem !important;
-        margin-bottom: 0.8rem !important;
-      }
-
-      .hero-content h1 {
-        font-size: clamp(2rem, 7vw, 3.2rem) !important;
-        line-height: 1.05 !important;
-        margin-bottom: 1.5rem !important;
-      }
-
-      .hero-content p {
-        font-size: 0.95rem !important;
-        max-width: 90% !important;
+      .hero-content p{
+        font-size:0.95rem !important;
+        max-width:90% !important;
       }
     }
 
-    @media (max-width: 768px) {
-      .hero-content {
-        padding-top: 240px !important;
-      }
-
-      .hero-content h3 {
-        font-size: 1.05rem !important;
-      }
-
-      .hero-content h1 {
-        font-size: clamp(1.7rem, 8vw, 2.8rem) !important;
-        line-height: 1.05 !important;
-      }
-
-      .hero-content p {
-        font-size: 0.9rem !important;
-      }
-
-      .glass-card { padding: 1.8rem; }
-      .explore-indicator { bottom: 40px; }
+    @media (max-width:768px){
+      .hero-content{padding-top:240px !important;}
+      .hero-content h3{font-size:1.05rem !important;}
+      .hero-content h1{font-size:clamp(1.7rem,8vw,2.8rem) !important;}
+      .hero-content p{font-size:0.9rem !important;}
+      .glass-card{padding:1.8rem;}
+      .explore-indicator{bottom:40px;}
+      .timeline-line{display:none;}
     }
 
-    @media (max-width: 350px) {
-      .logo-wrap { transform: scale(0.72); margin-top: 18px; }
-      .glass-header { height: 235px !important; padding-top: 3rem !important; }
-      .glass-header.scrolled { height: 200px !important; }
-      #central-menu-btn { scale: 0.92; margin-top: 10px; }
-
-      .hero-content {
-        padding-top: 250px !important;
-      }
-
-      .hero-content h1 {
-        font-size: 1.8rem !important;
-      }
+    @media (max-width:350px){
+      .logo-wrap{transform:scale(0.72); margin-top:18px;}
+      .glass-header{height:145px !important;}
+      #central-menu-btn{scale:0.92; margin-top:10px;}
+      .hero-content{padding-top:250px !important;}
+      .hero-content h1{font-size:1.8rem !important;}
     }
   </style>
 </head>
 
 <body>
 
-  <!-- MOBILE MENU OVERLAY -->
-  <div id="mobile-menu-overlay">
-    <button id="close-menu" class="absolute top-8 right-8 text-white focus:outline-none">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-        stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    </button>
-
-    <div class="mobile-nav-list">
-      <a href="https://www.italianexp.com/" class="mobile-main-link">Home</a>
-
-      <!-- TRAVEL -->
-      <button class="mobile-dropdown-btn" data-target="submenu-travel">
-        Travel
-        <svg class="mobile-dropdown-arrow submenu-arrow" fill="none" stroke="currentColor" stroke-width="2"
-          viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
+  <!-- MOBILE MENU OVERLAY (MASTER) -->
+  <div id="mobile-menu-overlay" aria-hidden="true">
+    <div class="mobile-close">
+      <button id="close-menu" aria-label="Close menu" class="text-white/80 hover:text-white">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
       </button>
-
-      <div id="submenu-travel" class="mobile-submenu">
-        <a href="https://www.italianexp.com/travel/bespoke/" class="mobile-sub-link">Bespoke</a>
-        <a href="https://www.italianexp.com/travel/gapyear/" class="mobile-sub-link">Gap Year</a>
-        <a href="https://www.italianexp.com/travel/culinary/" class="mobile-sub-link">Culinary Academy</a>
-      </div>
-
-      <!-- RECRUITMENT -->
-      <button class="mobile-dropdown-btn active" data-target="submenu-recruitment">
-        Recruitment
-        <svg class="mobile-dropdown-arrow submenu-arrow" fill="none" stroke="currentColor" stroke-width="2"
-          viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
-        </svg>
-      </button>
-
-      <div id="submenu-recruitment" class="mobile-submenu open">
-        <a href="https://www.italianexp.com/recruitment/employer/" class="mobile-sub-link">Employer</a>
-        <a href="https://www.italianexp.com/recruitment/candidate/" class="mobile-sub-link active">Candidate</a>
-      </div>
-
-      <!-- FLAVORS -->
-      <button class="mobile-dropdown-btn" data-target="submenu-flavors">
-        Flavors
-        <svg class="mobile-dropdown-arrow submenu-arrow" fill="none" stroke="currentColor" stroke-width="2"
-          viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
-        </svg>
-      </button>
-
-      <div id="submenu-flavors" class="mobile-submenu">
-        <a href="https://www.italianexp.com/flavors/for-your-home/" class="mobile-sub-link">For Your Home</a>
-        <a href="https://www.italianexp.com/flavors/for-your-business/" class="mobile-sub-link">For Your Business</a>
-        <a href="https://www.italianexp.com/flavors/aziende-italiane/" class="mobile-sub-link">Aziende Italiane</a>
-      </div>
-
-      <a href="https://www.italianexp.com/estates/" class="mobile-main-link">Estates</a>
-      <a href="https://www.italianexp.com/contact/" class="mobile-main-link">Contact</a>
     </div>
+
+    <nav class="mobile-menu" aria-label="Mobile menu">
+      <a href="https://www.italianexp.com/" class="mobile-link" data-close>Home</a>
+
+      <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-travel">
+        <span>Travel</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="m6 9 6 6 6-6"></path>
+        </svg>
+      </button>
+      <div id="m-travel" class="mobile-sub">
+        <div class="mobile-sub-inner">
+          <a href="https://www.italianexp.com/travel/bespoke/" class="mobile-sublink" data-close>Bespoke</a>
+          <a href="https://www.italianexp.com/travel/gapyear/" class="mobile-sublink" data-close>Gap Years</a>
+          <a href="https://www.italianexp.com/travel/culinary/" class="mobile-sublink" data-close>Culinary Academy</a>
+        </div>
+      </div>
+
+      <button class="mobile-acc-btn active" type="button" aria-expanded="true" aria-controls="m-recruitment">
+        <span>Recruitment</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="m6 9 6 6 6-6"></path>
+        </svg>
+      </button>
+      <div id="m-recruitment" class="mobile-sub">
+        <div class="mobile-sub-inner">
+          <a href="https://www.italianexp.com/recruitment/employer/" class="mobile-sublink" data-close>Employer</a>
+          <a href="https://www.italianexp.com/recruitment/candidate/" class="mobile-sublink active" data-close>Candidate</a>
+        </div>
+      </div>
+
+      <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-flavors">
+        <span>Flavors</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="m6 9 6 6 6-6"></path>
+        </svg>
+      </button>
+      <div id="m-flavors" class="mobile-sub">
+        <div class="mobile-sub-inner">
+          <a href="https://www.italianexp.com/flavors/for-your-home/" class="mobile-sublink" data-close>For your home</a>
+          <a href="https://www.italianexp.com/flavors/for-your-business/" class="mobile-sublink" data-close>For your business</a>
+          <a href="https://www.italianexp.com/flavors/aziende-italiane/" class="mobile-sublink" data-close>Italian Companies</a>
+        </div>
+      </div>
+
+      <a href="https://www.italianexp.com/estates/" class="mobile-link" data-close>Estates</a>
+      <a href="https://www.italianexp.com/contact/" class="mobile-link" data-close>Contact</a>
+    </nav>
   </div>
 
   <!-- HEADER -->
@@ -686,39 +652,37 @@
       </div>
     </a>
 
-    <button id="central-menu-btn" aria-label="Menu">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(197, 160, 89, 0.8)" stroke-width="2"
-        stroke-linecap="round">
-        <circle cx="12" cy="12" r="10" stroke="rgba(197, 160, 89, 0.3)" stroke-width="1" />
-        <line x1="8" y1="10" x2="16" y2="10" stroke="#c5a059" stroke-width="2.5" />
-        <line x1="10" y1="14" x2="14" y2="14" stroke="#c5a059" stroke-width="2.5" />
+    <button id="central-menu-btn" aria-label="Open menu">
+      <svg class="menu-icon-svg" viewBox="0 0 24 24" fill="none" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10" stroke="rgba(197,160,89,0.4)" stroke-width="1"/>
+        <line x1="8" y1="10" x2="16" y2="10" stroke="#c5a059" stroke-width="2.5"/>
+        <line x1="10" y1="14" x2="14" y2="14" stroke="#c5a059" stroke-width="2.5"/>
       </svg>
       <span>Menu</span>
     </button>
 
-    <!-- DESKTOP MENU -->
     <div class="nav-container">
       <a href="https://www.italianexp.com/" class="nav-link">Home</a>
 
       <div class="dropdown">
-        <a href="https://www.italianexp.com/travel/" class="nav-link">Travel
-          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="3">
-            <path d="m6 9 6 6 6-6" />
+        <a href="https://www.italianexp.com/travel/" class="nav-link">
+          Travel
+          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="m6 9 6 6 6-6"/>
           </svg>
         </a>
         <div class="dropdown-menu">
           <a href="https://www.italianexp.com/travel/bespoke/" class="dropdown-item">Bespoke</a>
-          <a href="https://www.italianexp.com/travel/gapyear/" class="dropdown-item">Gap Year</a>
+          <a href="https://www.italianexp.com/travel/gapyear/" class="dropdown-item">Gap Years</a>
           <a href="https://www.italianexp.com/travel/culinary/" class="dropdown-item">Culinary Academy</a>
         </div>
       </div>
 
       <div class="dropdown">
-        <a href="https://www.italianexp.com/recruitment/" class="nav-link active">Recruitment
-          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="3">
-            <path d="m6 9 6 6 6-6" />
+        <a href="https://www.italianexp.com/recruitment/" class="nav-link active">
+          Recruitment
+          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="m6 9 6 6 6-6"/>
           </svg>
         </a>
         <div class="dropdown-menu">
@@ -728,16 +692,16 @@
       </div>
 
       <div class="dropdown">
-        <a href="https://www.italianexp.com/flavors/" class="nav-link">Flavors
-          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="3">
-            <path d="m6 9 6 6 6-6" />
+        <a href="https://www.italianexp.com/flavors/" class="nav-link">
+          Flavors
+          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="m6 9 6 6 6-6"/>
           </svg>
         </a>
         <div class="dropdown-menu">
-          <a href="https://www.italianexp.com/flavors/for-your-home/" class="dropdown-item">For Your Home</a>
-          <a href="https://www.italianexp.com/flavors/for-your-business/" class="dropdown-item">For Your Business</a>
-          <a href="https://www.italianexp.com/flavors/aziende-italiane/" class="dropdown-item">Aziende Italiane</a>
+          <a href="https://www.italianexp.com/flavors/for-your-home/" class="dropdown-item">For your home</a>
+          <a href="https://www.italianexp.com/flavors/for-your-business/" class="dropdown-item">For your business</a>
+          <a href="https://www.italianexp.com/flavors/aziende-italiane/" class="dropdown-item">Italian Companies</a>
         </div>
       </div>
 
@@ -771,7 +735,6 @@
       </p>
     </div>
 
-    <!-- SCROLL DOWN -->
     <a href="#ambassador" class="explore-indicator" aria-label="Explore section">
       <span>Explore</span>
       <div class="scroll-track" aria-hidden="true">
@@ -795,9 +758,9 @@
       <div class="grid md:grid-cols-3 gap-8">
         <div class="glass-card border-l-2 border-[#c5a059]">
           <div class="text-[#c5a059] text-3xl mb-6"><i class="fas fa-passport"></i></div>
-          <h3 class="text-white font-bold text-sm uppercase tracking-widest mb-4">Visa & Logistics</h3>
+          <h3 class="text-white font-bold text-sm uppercase tracking-widest mb-4">Visa and Logistics</h3>
           <p class="text-slate-400 text-xs font-light leading-relaxed">
-            Full coordination of your visa process and travel logistics. We handle the complexity so you can focus on performance.
+            End-to-end coordination of the visa journey and travel logistics. We handle the complexity so you can focus on performance.
           </p>
         </div>
 
@@ -805,7 +768,7 @@
           <div class="text-[#c5a059] text-3xl mb-6"><i class="fas fa-gem"></i></div>
           <h3 class="text-white font-bold text-sm uppercase tracking-widest mb-4">Luxury Environment</h3>
           <p class="text-slate-400 text-xs font-light leading-relaxed">
-            Access premium venues and high-end hospitality environments while expanding your international lifestyle.
+            Access premium venues and high-end hospitality environments while upgrading your international profile.
           </p>
         </div>
 
@@ -817,6 +780,206 @@
           </p>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- SECTION: SKILL SURGE -->
+  <section class="py-32 px-6 bg-[#0c0c0c]">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
+      <div>
+        <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.65rem] font-bold mb-4 block">Quantifiable Impact</span>
+        <h2 class="text-4xl md:text-6xl brand-font italic mb-10 text-white">Accelerate Your Future.</h2>
+
+        <div class="space-y-6">
+          <p class="text-slate-400 font-light leading-relaxed text-lg mb-8">
+            International immersion is a powerful differentiator for leadership roles in luxury hospitality.
+          </p>
+
+          <div class="glass-card flex items-start gap-5 p-6 border-l-4 border-[#c5a059]">
+            <div class="text-2xl text-[#c5a059] mt-1"><i class="fas fa-rocket"></i></div>
+            <div>
+              <h4 class="font-bold text-white uppercase text-xs tracking-widest mb-2">Global Market Value</h4>
+              <p class="text-slate-500 text-sm">
+                Exposure to the competitive US market strengthens your profile for international luxury groups.
+              </p>
+            </div>
+          </div>
+
+          <div class="glass-card flex items-start gap-5 p-6 border-l-4 border-slate-500">
+            <div class="text-2xl text-slate-400 mt-1"><i class="fas fa-comments"></i></div>
+            <div>
+              <h4 class="font-bold text-white uppercase text-xs tracking-widest mb-2">Business English</h4>
+              <p class="text-slate-500 text-sm">
+                Daily professional interaction improves your language confidence and executive communication.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-10 rounded-sm bg-[#080808] border border-white/5 shadow-2xl relative">
+        <h4 class="text-center brand-font italic text-xl mb-10 text-white uppercase tracking-widest">Professional Skill Surge</h4>
+        <div class="relative w-full h-[320px]">
+          <canvas id="growthChart"></canvas>
+        </div>
+        <p class="text-[0.55rem] text-center mt-8 text-slate-600 italic uppercase tracking-[0.3em]">
+          Comparative index: before vs after immersion.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: REQUIREMENTS -->
+  <section class="py-32 px-6">
+    <div class="max-w-6xl mx-auto text-center">
+      <span class="text-[#c5a059] uppercase tracking-[0.6em] text-[0.65rem] font-bold block mb-4">Admission Criteria</span>
+      <h2 class="text-4xl md:text-5xl brand-font text-white mb-6 leading-tight italic">Program Requirements.</h2>
+      <p class="text-slate-400 font-light text-sm md:text-base max-w-2xl mx-auto uppercase tracking-widest leading-relaxed mb-16">
+        To access cultural exchange opportunities in the United States, candidates must meet the following benchmarks.
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-8 text-left">
+        <div class="glass-card flex items-start gap-6 border-l-4 border-[#c5a059]/30">
+          <div class="text-[#c5a059] text-xl flex-shrink-0 w-12 h-12 flex items-center justify-center border border-[#c5a059]/20">
+            <i class="fas fa-passport"></i>
+          </div>
+          <div>
+            <h3 class="text-white font-bold text-sm uppercase tracking-widest mb-2">Age and Passport</h3>
+            <p class="text-slate-500 text-xs leading-relaxed">
+              You must be at least 18 years old and hold a valid passport from the country you represent.
+            </p>
+          </div>
+        </div>
+
+        <div class="glass-card flex items-start gap-6 border-l-4 border-[#c5a059]/30">
+          <div class="text-[#c5a059] text-xl flex-shrink-0 w-12 h-12 flex items-center justify-center border border-[#c5a059]/20">
+            <i class="fas fa-language"></i>
+          </div>
+          <div>
+            <h3 class="text-white font-bold text-sm uppercase tracking-widest mb-2">English Proficiency</h3>
+            <p class="text-slate-500 text-xs leading-relaxed">
+              A strong English level is required to integrate and perform in premium US hospitality environments.
+            </p>
+          </div>
+        </div>
+
+        <div class="glass-card flex items-start gap-6 border-l-4 border-[#c5a059]/30">
+          <div class="text-[#c5a059] text-xl flex-shrink-0 w-12 h-12 flex items-center justify-center border border-[#c5a059]/20">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <div>
+            <h3 class="text-white font-bold text-sm uppercase tracking-widest mb-2">Availability Period</h3>
+            <p class="text-slate-500 text-xs leading-relaxed">
+              Candidates must be available for a continuous 12 to 15 month commitment for the full program duration.
+            </p>
+          </div>
+        </div>
+
+        <div class="glass-card flex items-start gap-6 border-l-4 border-[#c5a059]/30">
+          <div class="text-[#c5a059] text-xl flex-shrink-0 w-12 h-12 flex items-center justify-center border border-[#c5a059]/20">
+            <i class="fas fa-flag"></i>
+          </div>
+          <div>
+            <h3 class="text-white font-bold text-sm uppercase tracking-widest mb-2">Ambassador Mindset</h3>
+            <p class="text-slate-500 text-xs leading-relaxed">
+              Pride in Italian culture and the willingness to represent it with professionalism and consistency.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-12 text-center">
+        <p class="text-slate-600 text-[0.6rem] uppercase tracking-[0.3em]">
+          Final eligibility is confirmed during screening and selection.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: ROADMAP -->
+  <section class="py-32 px-6 bg-[#080808]">
+    <div class="max-w-4xl mx-auto w-full">
+      <div class="text-center mb-20">
+        <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.6rem] font-bold block mb-4">The Process</span>
+        <h2 class="text-4xl md:text-5xl brand-font italic">Your 15 Month Roadmap.</h2>
+      </div>
+
+      <div class="space-y-16 relative">
+        <div class="timeline-line hidden md:block"></div>
+
+        <div class="flex gap-8 items-start relative">
+          <div class="step-node">01</div>
+          <div class="glass-card w-full">
+            <h4 class="text-lg font-bold uppercase tracking-widest text-white mb-2 italic">Technical Vetting</h4>
+            <p class="text-slate-500 text-sm font-light leading-relaxed">
+              A collaborative assessment of your skills with our partner academies, aligned to US service standards.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex gap-8 items-start relative">
+          <div class="step-node">02</div>
+          <div class="glass-card w-full border-l-4 border-[#c5a059]">
+            <h4 class="text-lg font-bold uppercase tracking-widest text-white mb-2 italic">Legal and Logistics</h4>
+            <p class="text-slate-500 text-sm font-light leading-relaxed">
+              Full structure for authorization, housing setup, and administrative onboarding before departure.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex gap-8 items-start relative">
+          <div class="step-node">03</div>
+          <div class="glass-card w-full">
+            <h4 class="text-lg font-bold uppercase tracking-widest text-white mb-2 italic">Ambassador Term</h4>
+            <p class="text-slate-500 text-sm font-light leading-relaxed">
+              Months 1 to 15: work in elite US venues while delivering cultural storytelling and Italian excellence.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: CONTACT FORM -->
+  <section id="contact-candidate" class="py-32 bg-[#0c0c0c]">
+    <div class="max-w-xl mx-auto text-center px-8 w-full">
+      <h2 class="text-4xl md:text-6xl font-bold brand-font mb-6 leading-tight text-white italic uppercase tracking-tighter">
+        Start Your <span class="text-[#c5a059]">Journey.</span>
+      </h2>
+      <p class="text-slate-500 mb-12 text-sm font-light tracking-widest uppercase">
+        Join the cohort representing the best of Italy.
+      </p>
+
+      <form class="space-y-6 text-left">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="text-[0.6rem] uppercase tracking-widest text-[#c5a059] ml-1 block mb-2 font-bold">Full Name</label>
+            <input type="text" placeholder="Mario Rossi" class="w-full bg-white/5 border border-[#c5a059]/20 p-3 text-white outline-none focus:border-[#c5a059]" />
+          </div>
+          <div>
+            <label class="text-[0.6rem] uppercase tracking-widest text-[#c5a059] ml-1 block mb-2 font-bold">Role</label>
+            <select class="w-full bg-white/5 border border-[#c5a059]/20 p-3 text-white outline-none focus:border-[#c5a059]">
+              <option style="color:black">Service and Floor</option>
+              <option style="color:black">Culinary</option>
+              <option style="color:black">Sommelier</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[0.6rem] uppercase tracking-widest text-[#c5a059] ml-1 block mb-2 font-bold">Email</label>
+          <input type="email" placeholder="mario.rossi@email.com" class="w-full bg-white/5 border border-[#c5a059]/20 p-3 text-white outline-none focus:border-[#c5a059]" />
+        </div>
+
+        <div>
+          <label class="text-[0.6rem] uppercase tracking-widest text-[#c5a059] ml-1 block mb-2 font-bold">Experience</label>
+          <textarea placeholder="Summarize your experience..." class="w-full bg-white/5 border border-[#c5a059]/20 p-3 text-white outline-none focus:border-[#c5a059] h-32"></textarea>
+        </div>
+
+        <button type="submit" class="w-full border border-[#c5a059] text-[#c5a059] py-4 text-[0.7rem] uppercase tracking-[0.4em] font-bold hover:bg-[#c5a059] hover:text-black transition-all">
+          Submit Application Request
+        </button>
+      </form>
     </div>
   </section>
 
@@ -841,110 +1004,188 @@
   </footer>
 
   <script>
-    // SMART HEADER
-    let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
-    const header = document.getElementById('main-header');
+    document.addEventListener('DOMContentLoaded', () => {
 
-    window.addEventListener('scroll', () => {
-      const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
-
-      if (currentScrollY > lastScrollY && currentScrollY > 100) header.classList.add('nav-up');
-      else header.classList.remove('nav-up');
-
-      if (currentScrollY > 50) header.classList.add('scrolled');
-      else header.classList.remove('scrolled');
-
-      lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
-    }, { passive: true });
-
-    // MOBILE MENU
-    const menuBtn = document.getElementById('central-menu-btn');
-    const overlay = document.getElementById('mobile-menu-overlay');
-    const closeBtn = document.getElementById('close-menu');
-
-    menuBtn.onclick = () => overlay.classList.add('active');
-    closeBtn.onclick = () => overlay.classList.remove('active');
-
-    overlay.onclick = (e) => {
-      if (e.target.closest("a")) overlay.classList.remove("active");
-    };
-
-    // MOBILE SUBMENU TOGGLE
-    document.querySelectorAll(".mobile-dropdown-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const targetId = btn.dataset.target;
-        const submenu = document.getElementById(targetId);
-        const arrow = btn.querySelector(".submenu-arrow");
-
-        const isOpen = submenu.classList.contains("open");
-
-        document.querySelectorAll(".mobile-submenu").forEach(sm => sm.classList.remove("open"));
-        document.querySelectorAll(".submenu-arrow").forEach(ar => ar.style.transform = "rotate(0deg)");
-
-        if (!isOpen) {
-          submenu.classList.add("open");
-          arrow.style.transform = "rotate(180deg)";
-        }
+      /* INIT LOGO LETTERS */
+      document.querySelectorAll('.font-ex').forEach(ex => {
+        const text = ex.getAttribute('data-text') || '';
+        ex.innerHTML = text.split('').map(c => `<span class="letter">${c}</span>`).join('');
       });
-    });
 
-    // LOGO EFFECT
-    function initLogo(id) {
-      const el = document.getElementById(id);
-      if (!el) return;
+      /* SMART HEADER */
+      let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
+      const header = document.getElementById('main-header');
 
-      const ex = el.querySelector('.font-ex');
-      const it = el.querySelector('.font-it');
+      window.addEventListener('scroll', () => {
+        const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
 
-      ex.innerHTML = ex.dataset.text.split('').map(c => `<span class="letter">${c}</span>`).join('');
-      const letters = el.querySelectorAll('.letter');
+        if (currentScrollY > lastScrollY && currentScrollY > 100) header.classList.add('nav-up');
+        else header.classList.remove('nav-up');
 
-      el.addEventListener('mousemove', (e) => {
-        const rect = el.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
+        if (currentScrollY > 50) header.classList.add('scrolled');
+        else header.classList.remove('scrolled');
 
-        const itX = it.offsetLeft + it.offsetWidth / 2;
-        const dIt = Math.abs(mouseX - itX);
-        const pIt = Math.max(0, (150 - dIt) / 150);
+        lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+      }, { passive: true });
 
-        it.style.textShadow = `0 0 ${20 * pIt}px rgba(197, 160, 89, 0.45)`;
-        it.style.transform = `scale(${1 + pIt * 0.05})`;
+      /* MOBILE MENU OPEN / CLOSE */
+      const menuBtn = document.getElementById('central-menu-btn');
+      const closeBtn = document.getElementById('close-menu');
+      const overlay = document.getElementById('mobile-menu-overlay');
 
-        letters.forEach(l => {
-          const lx = l.offsetLeft + l.offsetWidth / 2;
-          const dx = Math.abs(mouseX - lx);
+      menuBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        overlay.classList.add('active');
+        overlay.setAttribute('aria-hidden', 'false');
+      });
 
-          if (dx < 100) {
-            const p = (100 - dx) / 100;
+      closeBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        overlay.classList.remove('active');
+        overlay.setAttribute('aria-hidden', 'true');
+      });
 
-            if (mouseX > lx + 15) l.style.color = '#008C45';
-            else if (mouseX < lx - 15) l.style.color = '#CD212A';
-            else l.style.color = '#FFF';
+      overlay.addEventListener('click', (e) => {
+        const t = e.target;
+        if (t && t.closest && t.closest('[data-close]')) {
+          overlay.classList.remove('active');
+          overlay.setAttribute('aria-hidden', 'true');
+        }
+      }, { passive: true });
 
-            l.style.transform = `scale(${1 + p * 0.45}) translateY(${-p * 12}px)`;
-            l.style.textShadow = `0 0 ${15 * p}px currentColor`;
-          } else {
+      /* MOBILE ACCORDION */
+      const accBtns = Array.from(document.querySelectorAll('.mobile-acc-btn'));
+
+      function setAcc(btn, open) {
+        const id = btn.getAttribute('aria-controls');
+        const panel = id ? document.getElementById(id) : null;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (!panel) return;
+
+        if (open) {
+          const inner = panel.querySelector('.mobile-sub-inner');
+          const h = inner ? inner.scrollHeight : 0;
+          panel.style.maxHeight = Math.max(80, h + 14) + 'px';
+        } else {
+          panel.style.maxHeight = '0px';
+        }
+      }
+
+      accBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const isOpen = btn.getAttribute('aria-expanded') === 'true';
+          setAcc(btn, !isOpen);
+        });
+      });
+
+      /* APPLY INITIAL OPEN STATES */
+      accBtns.forEach(btn => {
+        const open = btn.getAttribute('aria-expanded') === 'true';
+        setAcc(btn, open);
+      });
+
+      /* LOGO MOUSE EFFECT */
+      function initLogoMouse(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (!window.matchMedia('(pointer: fine)').matches) return;
+
+        const it = el.querySelector('.font-it');
+        const letters = el.querySelectorAll('.letter');
+        if (!it || !letters.length) return;
+
+        el.addEventListener('mousemove', (e) => {
+          const r = el.getBoundingClientRect();
+          const x = e.clientX - r.left;
+
+          const itRect = it.getBoundingClientRect();
+          const itX = itRect.left + itRect.width / 2 - r.left;
+          const dIt = Math.abs(x - itX);
+          const pIt = Math.max(0, (200 - dIt) / 200);
+
+          it.style.textShadow = `0 0 ${15 * pIt}px rgba(197,160,89,0.5)`;
+          it.style.transform = `scale(${1 + pIt * 0.05})`;
+
+          letters.forEach(l => {
+            const lr = l.getBoundingClientRect();
+            const lx = lr.left + lr.width / 2 - r.left;
+            const dx = Math.abs(x - lx);
+
+            if (dx < 110) {
+              const p = (110 - dx) / 110;
+              l.style.color = (x > lx + 14) ? '#008C45' : (x < lx - 14 ? '#CD212A' : '#FFF');
+              l.style.transform = `scale(${1 + p * 0.42}) translateY(${-p * 10}px)`;
+              l.style.zIndex = '20';
+            } else {
+              l.style.color = '';
+              l.style.transform = '';
+              l.style.zIndex = '10';
+            }
+          });
+        }, { passive: true });
+
+        el.addEventListener('mouseleave', () => {
+          it.style.textShadow = '';
+          it.style.transform = '';
+          letters.forEach(l => {
             l.style.color = '';
             l.style.transform = '';
-            l.style.textShadow = '';
+            l.style.zIndex = '';
+          });
+        }, { passive: true });
+      }
+
+      initLogoMouse('logo-header');
+      initLogoMouse('logo-footer');
+
+      /* CHART */
+      const canvas = document.getElementById('growthChart');
+      if (canvas && window.Chart) {
+        const ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+          type: 'radar',
+          data: {
+            labels: ['Technical', 'Leadership', 'English', 'Market', 'Culture', 'Potential'],
+            datasets: [
+              {
+                label: 'Before',
+                data: [50, 35, 40, 30, 60, 45],
+                backgroundColor: 'rgba(255,255,255,0.05)',
+                borderColor: 'rgba(255,255,255,0.2)',
+                borderWidth: 1
+              },
+              {
+                label: 'After',
+                data: [95, 90, 95, 90, 100, 95],
+                backgroundColor: 'rgba(197,160,89,0.1)',
+                borderColor: '#c5a059',
+                pointBackgroundColor: '#c5a059',
+                borderWidth: 2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              r: {
+                angleLines: { color: 'rgba(255,255,255,0.05)' },
+                grid: { color: 'rgba(255,255,255,0.05)' },
+                pointLabels: { color: '#94a3b8', font: { size: 10 } },
+                ticks: { display: false },
+                suggestedMin: 0,
+                suggestedMax: 100
+              }
+            },
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { color: '#94a3b8', font: { size: 10 }, padding: 20 }
+              }
+            }
           }
         });
-      });
-
-      el.addEventListener('mouseleave', () => {
-        it.style.textShadow = '';
-        it.style.transform = '';
-        letters.forEach(l => {
-          l.style.color = '';
-          l.style.transform = '';
-          l.style.textShadow = '';
-        });
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      initLogo('logo-header');
-      initLogo('logo-footer');
+      }
     });
   </script>
 
