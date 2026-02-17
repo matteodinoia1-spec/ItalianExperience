@@ -6,15 +6,15 @@
   <title>Aziende Italiane | Italian Experience</title>
 
   <!-- META SEO -->
-  <meta name="description" content="Connettiamo aziende italiane di eccellenza con il mercato USA. Compliance FDA, export strategy e posizionamento premium per il settore food & beverage." />
-  <meta name="keywords" content="Italian Experience, Flavors, aziende italiane, export USA, FDA, importazione, olive oil, food beverage" />
+  <meta name="description" content="Supportiamo aziende italiane food & beverage nell'espansione negli USA con un percorso premium: compliance FDA, strategia export e posizionamento di mercato." />
+  <meta name="keywords" content="Italian Experience, Flavors, aziende italiane, export USA, FDA compliance, importazione, prodotti italiani" />
   <meta name="author" content="Italian Experience" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://www.italianexp.com/flavors/aziende-italiane/" />
 
   <!-- OPEN GRAPH -->
   <meta property="og:title" content="Aziende Italiane | Italian Experience" />
-  <meta property="og:description" content="Portiamo le aziende italiane nel mercato americano con un percorso premium, compliance e strategia export." />
+  <meta property="og:description" content="Portiamo aziende italiane nel mercato USA con un percorso premium: compliance FDA, posizionamento e strategia export." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.italianexp.com/flavors/aziende-italiane/" />
   <meta property="og:image" content="https://www.italianexp.com/assets/preview.jpg" />
@@ -22,12 +22,11 @@
   <!-- TWITTER -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Aziende Italiane | Italian Experience" />
-  <meta name="twitter:description" content="Export premium per aziende italiane verso gli USA: compliance FDA e posizionamento." />
+  <meta name="twitter:description" content="Export premium per aziende italiane verso gli USA: compliance e strategia." />
   <meta name="twitter:image" content="https://www.italianexp.com/assets/preview.jpg" />
 
   <!-- LIBRARIES -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@200;300;400;600&family=Great+Vibes&family=Montserrat:wght@700;900&display=swap');
@@ -319,47 +318,44 @@
       color:var(--brand-gold);
     }
 
-    /* HERO */
-    .hero-master{
+    /* HERO SPLIT */
+    .hero-split{
       width:100%;
-      height:100vh;
-      height:100dvh;
+      min-height:100vh;
+      min-height:100dvh;
       position:relative;
       overflow:hidden;
       background:#000;
-      padding-top:110px;
       display:flex;
-      justify-content:center;
       align-items:center;
-      text-align:center;
     }
 
-    .hero-bg{
+    .hero-image{
       position:absolute;
-      inset:0;
-      background-image:url("https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=1600&q=80");
-      background-size:cover;
-      background-position:center;
+      right:0;
+      top:0;
+      width:55%;
+      height:100%;
+      background:url("https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1500&q=80") center/cover no-repeat;
+      z-index:1;
       filter:brightness(0.35) contrast(1.12);
-      z-index:0;
     }
 
-    .hero-overlay{
+    .hero-image::after{
+      content:'';
       position:absolute;
       inset:0;
-      background:linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.9) 100%);
-      z-index:2;
+      background:linear-gradient(to right, rgba(8,8,8,1) 0%, rgba(8,8,8,0.7) 20%, rgba(8,8,8,0) 60%);
     }
 
     .hero-content{
       position:relative;
-      z-index:10;
-      max-width:980px;
-      padding:0 10%;
-      pointer-events:none;
+      z-index:5;
+      width:55%;
+      padding:180px 0 90px 8%;
     }
 
-    /* SCROLL INDICATOR */
+    /* SCROLL INDICATOR MASTER */
     @keyframes scrollLine {
       0% { transform: translateY(-18px); opacity: 0; }
       30% { opacity: 1; }
@@ -367,24 +363,20 @@
     }
 
     .explore-indicator{
-      position:absolute;
-      bottom:46px;
-      left:50%;
-      transform:translateX(-50%);
-      z-index:20;
-      display:flex;
+      display:inline-flex;
       flex-direction:column;
-      align-items:center;
+      align-items:flex-start;
       gap:14px;
       text-decoration:none;
       opacity:0.82;
+      margin-top:3.5rem;
       transition:opacity 0.2s ease, transform 0.2s ease;
       pointer-events:auto;
     }
 
     .explore-indicator:hover{
       opacity:1;
-      transform:translateX(-50%) translateY(3px);
+      transform:translateY(3px);
     }
 
     .explore-indicator span{
@@ -465,7 +457,7 @@
       font-weight:700;
     }
 
-    /* STEPS */
+    /* ROADMAP */
     .roadmap-step{
       position:relative;
       padding-left:4rem;
@@ -506,7 +498,7 @@
       text-align:center;
     }
 
-    /* RESPONSIVE HEADER MOBILE */
+    /* RESPONSIVE CHECK */
     @media (max-width:1024px){
       .glass-header{
         flex-direction:column !important;
@@ -519,7 +511,25 @@
       .logo-wrap{transform:scale(0.82);margin:0 auto;}
       #central-menu-btn{display:flex !important;margin-top:6px;}
       .nav-container{display:none !important;}
-      .hero-master{padding-top:160px;}
+
+      .hero-content{
+        width:100%;
+        padding:220px 2rem 80px;
+        text-align:center;
+      }
+
+      .hero-image{
+        width:100%;
+        opacity:0.25;
+      }
+
+      .hero-image::after{
+        background:linear-gradient(to bottom, rgba(8,8,8,1) 0%, rgba(8,8,8,0.7) 45%, rgba(8,8,8,0) 100%);
+      }
+
+      .explore-indicator{
+        align-items:center;
+      }
     }
 
     @media (max-width:768px){
@@ -536,7 +546,7 @@
       .logo-wrap{transform:scale(0.68)}
       .glass-header{height:145px !important}
       #central-menu-btn{scale:0.9}
-      .hero-master{padding-top:145px}
+      .hero-content{padding-top:200px !important;}
     }
   </style>
 </head>
@@ -557,7 +567,6 @@
     <nav class="mobile-menu" aria-label="Menu mobile">
       <a href="https://www.italianexp.com/" class="mobile-link" data-close>Home</a>
 
-      <!-- TRAVEL -->
       <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-travel">
         <span>Travel</span>
         <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -572,7 +581,6 @@
         </div>
       </div>
 
-      <!-- RECRUITMENT -->
       <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-recruitment">
         <span>Recruitment</span>
         <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -586,7 +594,6 @@
         </div>
       </div>
 
-      <!-- FLAVORS -->
       <button class="mobile-acc-btn active" type="button" aria-expanded="true" aria-controls="m-flavors">
         <span>Flavors</span>
         <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -629,7 +636,6 @@
       <span>Menu</span>
     </button>
 
-    <!-- DESKTOP MENU -->
     <div class="nav-container" aria-label="Desktop navigation">
       <a href="https://www.italianexp.com/" class="nav-link">Home</a>
 
@@ -679,11 +685,8 @@
     </div>
   </nav>
 
-  <!-- HERO -->
-  <section class="hero-master">
-    <div class="hero-bg"></div>
-    <div class="hero-overlay"></div>
-
+  <!-- HERO SPLIT -->
+  <section class="hero-split">
     <div class="hero-content">
       <h3 class="text-[#c5a059] italic brand-font text-2xl mb-4 drop-shadow-xl">
         Flavors
@@ -691,26 +694,22 @@
 
       <h1 class="text-5xl md:text-8xl font-bold brand-font leading-tight mb-8 text-white drop-shadow-2xl uppercase tracking-tighter">
         Aziende <br>
-        <span class="italic font-light text-[#c5a059]">Italiane.</span>
+        <span class="italic font-light text-white/80">Italiane.</span>
       </h1>
 
-      <p class="text-slate-200 font-light text-base md:text-xl max-w-3xl mx-auto leading-relaxed mb-4 text-center">
-        Selezioniamo produttori d’eccellenza e li guidiamo verso l’espansione negli Stati Uniti,
-        con un percorso premium basato su compliance, posizionamento e strategia.
+      <p class="text-slate-300 font-light text-base md:text-lg max-w-md leading-relaxed mb-6">
+        Selezioniamo produttori d’eccellenza e costruiamo per loro un ingresso reale nel mercato americano, con compliance, posizionamento e strategia.
       </p>
 
-      <p class="text-white/60 font-light text-sm md:text-base max-w-2xl mx-auto leading-relaxed text-center">
-        Non vendiamo solo prodotti. Costruiamo una presenza credibile e sostenibile nel mercato americano.
-      </p>
+      <a href="#aziende" class="explore-indicator" aria-label="Scopri la sezione">
+        <span>Scopri</span>
+        <div class="scroll-track" aria-hidden="true">
+          <div class="scroll-dot"></div>
+        </div>
+      </a>
     </div>
 
-    <!-- SCROLL DOWN INDICATOR -->
-    <a href="#aziende" class="explore-indicator" aria-label="Scopri la sezione">
-      <span>Scopri</span>
-      <div class="scroll-track" aria-hidden="true">
-        <div class="scroll-dot"></div>
-      </div>
-    </a>
+    <div class="hero-image"></div>
   </section>
 
   <!-- SECTION 1 -->
@@ -738,9 +737,9 @@
       <div class="grid lg:grid-cols-3 gap-8">
         <div class="glass-panel">
           <div class="flex items-center gap-4 mb-6">
-            <div class="w-10 h-10 flex items-center justify-center border border-white/10 bg-white/5">
-              <i class="fa-solid fa-award text-[#c5a059]"></i>
-            </div>
+            <svg class="w-10 h-10 text-[#c5a059]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path d="M12 2l3 7h7l-5.5 4 2.2 7L12 16l-6.7 4 2.2-7L2 9h7l3-7z" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
             <h3 class="brand-font italic text-2xl text-white">Selezione Premium</h3>
           </div>
 
@@ -752,9 +751,10 @@
 
         <div class="glass-panel border-t-2 border-[#c5a059]">
           <div class="flex items-center gap-4 mb-6">
-            <div class="w-10 h-10 flex items-center justify-center border border-white/10 bg-white/5">
-              <i class="fa-solid fa-shield-halved text-[#c5a059]"></i>
-            </div>
+            <svg class="w-10 h-10 text-[#c5a059]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4z" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
             <h3 class="brand-font italic text-2xl text-white">Compliance Totale</h3>
           </div>
 
@@ -766,9 +766,11 @@
 
         <div class="glass-panel">
           <div class="flex items-center gap-4 mb-6">
-            <div class="w-10 h-10 flex items-center justify-center border border-white/10 bg-white/5">
-              <i class="fa-solid fa-chart-line text-[#c5a059]"></i>
-            </div>
+            <svg class="w-10 h-10 text-[#c5a059]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path d="M4 19h16" stroke-linecap="round"></path>
+              <path d="M6 16l4-5 4 3 4-6" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path d="M18 10h2v2" stroke-linecap="round"></path>
+            </svg>
             <h3 class="brand-font italic text-2xl text-white">Strategia Export</h3>
           </div>
 
@@ -816,9 +818,9 @@
 
             <div class="space-y-6">
               <div class="flex gap-4 items-start">
-                <div class="w-10 h-10 flex items-center justify-center border border-white/10 bg-white/5 shrink-0">
-                  <i class="fa-solid fa-file-signature text-[#c5a059]"></i>
-                </div>
+                <svg class="w-10 h-10 text-[#c5a059] shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
                 <div>
                   <p class="text-white text-sm uppercase tracking-widest font-semibold mb-1">Documentazione FDA</p>
                   <p class="text-slate-400 text-sm leading-relaxed font-light">
@@ -828,9 +830,10 @@
               </div>
 
               <div class="flex gap-4 items-start">
-                <div class="w-10 h-10 flex items-center justify-center border border-white/10 bg-white/5 shrink-0">
-                  <i class="fa-solid fa-building-columns text-[#c5a059]"></i>
-                </div>
+                <svg class="w-10 h-10 text-[#c5a059] shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path d="M12 3l8 5v6c0 5-3.5 9.5-8 11-4.5-1.5-8-6-8-11V8l8-5z" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
                 <div>
                   <p class="text-white text-sm uppercase tracking-widest font-semibold mb-1">Posizionamento e pricing</p>
                   <p class="text-slate-400 text-sm leading-relaxed font-light">
@@ -840,9 +843,12 @@
               </div>
 
               <div class="flex gap-4 items-start">
-                <div class="w-10 h-10 flex items-center justify-center border border-white/10 bg-white/5 shrink-0">
-                  <i class="fa-solid fa-truck-fast text-[#c5a059]"></i>
-                </div>
+                <svg class="w-10 h-10 text-[#c5a059] shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path d="M3 7h13v10H3V7z" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path d="M16 10h4l1 2v5h-5v-7z" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path d="M7 17a2 2 0 104 0" stroke-linecap="round"></path>
+                  <path d="M17 17a2 2 0 104 0" stroke-linecap="round"></path>
+                </svg>
                 <div>
                   <p class="text-white text-sm uppercase tracking-widest font-semibold mb-1">Canali e distribuzione</p>
                   <p class="text-slate-400 text-sm leading-relaxed font-light">
@@ -852,9 +858,11 @@
               </div>
 
               <div class="flex gap-4 items-start">
-                <div class="w-10 h-10 flex items-center justify-center border border-white/10 bg-white/5 shrink-0">
-                  <i class="fa-solid fa-user-shield text-[#c5a059]"></i>
-                </div>
+                <svg class="w-10 h-10 text-[#c5a059] shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4z" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path d="M12 11v5" stroke-linecap="round"></path>
+                  <path d="M12 8h.01" stroke-linecap="round"></path>
+                </svg>
                 <div>
                   <p class="text-white text-sm uppercase tracking-widest font-semibold mb-1">U.S. Agent</p>
                   <p class="text-slate-400 text-sm leading-relaxed font-light">
@@ -1042,7 +1050,6 @@
         });
       });
 
-      /* OPEN DEFAULT ACCORDIONS */
       setTimeout(() => {
         accBtns.forEach(btn => {
           const isOpen = btn.getAttribute('aria-expanded') === 'true';
