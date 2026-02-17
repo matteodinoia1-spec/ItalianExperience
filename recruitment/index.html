@@ -482,7 +482,6 @@
       .hero-recruitment{padding-top:160px;}
     }
 
-    /* MOBILE HERO FIX: keep images visible */
     @media (max-width:768px){
       .hero-recruitment{
         flex-direction:column;
@@ -537,7 +536,6 @@
 
 <body>
 
-  <!-- MOBILE MENU OVERLAY -->
   <div id="mobile-menu-overlay" aria-hidden="true">
     <div class="mobile-close">
       <button id="close-menu" aria-label="Chiudi menu" class="text-white/80 hover:text-white">
@@ -549,7 +547,7 @@
     </div>
 
     <nav class="mobile-menu" aria-label="Menu mobile">
-      <a href="../" class="mobile-link" data-close>Home</a>
+      <a href="/ItalianExperience/" class="mobile-link" data-close>Home</a>
 
       <button class="mobile-acc-btn mobile-acc-travel" type="button" aria-expanded="false" aria-controls="m-travel">
         <span>Travel</span>
@@ -559,16 +557,14 @@
       </button>
       <div id="m-travel" class="mobile-sub">
         <div class="mobile-sub-inner">
-          <a href="../travel/bespoke/" class="mobile-sublink" data-close>Bespoke</a>
-          <a href="../travel/gapyear/" class="mobile-sublink" data-close>Gap Year</a>
-          <a href="../travel/culinary/" class="mobile-sublink" data-close>Culinary Academy</a>
+          <a href="/ItalianExperience/travel/bespoke/" class="mobile-sublink" data-close>Bespoke</a>
+          <a href="/ItalianExperience/travel/gapyear/" class="mobile-sublink" data-close>Gap Year</a>
+          <a href="/ItalianExperience/travel/culinary-academy/" class="mobile-sublink" data-close>Culinary Academy</a>
         </div>
       </div>
 
       <button class="mobile-acc-btn mobile-acc-recruitment active" type="button" aria-expanded="true" aria-controls="m-recruitment">
-        <a href="./" class="mobile-link active" style="padding:0;margin:0;width:auto;letter-spacing:0.35em;">
-          Recruitment
-        </a>
+        <span>Recruitment</span>
         <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="m6 9 6 6 6-6"></path>
         </svg>
@@ -576,8 +572,8 @@
 
       <div id="m-recruitment" class="mobile-sub" style="max-height:260px">
         <div class="mobile-sub-inner">
-          <a href="./employer/" class="mobile-sublink" data-close>Employer</a>
-          <a href="./candidate/" class="mobile-sublink" data-close>Candidate</a>
+          <a href="/ItalianExperience/recruitment/employer/" class="mobile-sublink" data-close>Employer</a>
+          <a href="/ItalianExperience/recruitment/candidate/" class="mobile-sublink" data-close>Candidate</a>
         </div>
       </div>
 
@@ -589,21 +585,20 @@
       </button>
       <div id="m-flavors" class="mobile-sub">
         <div class="mobile-sub-inner">
-          <a href="../flavors/for-your-home/" class="mobile-sublink" data-close>For your home</a>
-          <a href="../flavors/for-your-business/" class="mobile-sublink" data-close>For your business</a>
-          <a href="../flavors/aziende-italiane/" class="mobile-sublink" data-close>Aziende Italiane</a>
+          <a href="/ItalianExperience/flavors/for-your-home/" class="mobile-sublink" data-close>For your home</a>
+          <a href="/ItalianExperience/flavors/for-your-business/" class="mobile-sublink" data-close>For your business</a>
+          <a href="/ItalianExperience/flavors/aziende-italiane/" class="mobile-sublink" data-close>Aziende Italiane</a>
         </div>
       </div>
 
-      <a href="../estates/" class="mobile-link" data-close>Estates</a>
-      <a href="../contact/" class="mobile-link" data-close>Contact</a>
+      <a href="/ItalianExperience/estates/" class="mobile-link" data-close>Estates</a>
+      <a href="/ItalianExperience/contact/" class="mobile-link" data-close>Contact</a>
     </nav>
   </div>
 
-  <!-- HEADER -->
   <nav class="glass-header" id="main-header" aria-label="Header">
 
-    <a href="../" class="no-underline">
+    <a href="/ItalianExperience/" class="no-underline">
       <div class="logo-wrap" id="logo-header">
         <span class="font-it">Italian</span>
         <div class="font-ex" data-text="EXPERIENCE"></div>
@@ -625,62 +620,60 @@
     </button>
 
     <div class="nav-container" aria-label="Navigazione desktop">
-      <a href="../" class="nav-link">Home</a>
+      <a href="/ItalianExperience/" class="nav-link">Home</a>
 
       <div class="dropdown">
-        <a href="../travel/" class="nav-link nav-link-travel">
+        <a href="/ItalianExperience/travel/" class="nav-link nav-link-travel">
           Travel
           <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
             <path d="m6 9 6 6 6-6"></path>
           </svg>
         </a>
         <div class="dropdown-menu">
-          <a href="../travel/bespoke/" class="dropdown-item">Bespoke</a>
-          <a href="../travel/gapyear/" class="dropdown-item">Gap Year</a>
-          <a href="../travel/culinary/" class="dropdown-item">Culinary Academy</a>
+          <a href="/ItalianExperience/travel/bespoke/" class="dropdown-item">Bespoke</a>
+          <a href="/ItalianExperience/travel/gapyear/" class="dropdown-item">Gap Year</a>
+          <a href="/ItalianExperience/travel/culinary-academy/" class="dropdown-item">Culinary Academy</a>
         </div>
       </div>
 
       <div class="dropdown">
-        <a href="./" class="nav-link nav-link-recruitment active">
+        <a href="/ItalianExperience/recruitment/" class="nav-link nav-link-recruitment active">
           Recruitment
           <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
             <path d="m6 9 6 6 6-6"></path>
           </svg>
         </a>
         <div class="dropdown-menu">
-          <a href="./employer/" class="dropdown-item">Employer</a>
-          <a href="./candidate/" class="dropdown-item">Candidate</a>
+          <a href="/ItalianExperience/recruitment/employer/" class="dropdown-item">Employer</a>
+          <a href="/ItalianExperience/recruitment/candidate/" class="dropdown-item">Candidate</a>
         </div>
       </div>
 
       <div class="dropdown">
-        <a href="../flavors/" class="nav-link nav-link-flavors">
+        <a href="/ItalianExperience/flavors/" class="nav-link nav-link-flavors">
           Flavors
           <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
             <path d="m6 9 6 6 6-6"></path>
           </svg>
         </a>
         <div class="dropdown-menu">
-          <a href="../flavors/for-your-home/" class="dropdown-item">For your home</a>
-          <a href="../flavors/for-your-business/" class="dropdown-item">For your business</a>
-          <a href="../flavors/aziende-italiane/" class="dropdown-item">Aziende Italiane</a>
+          <a href="/ItalianExperience/flavors/for-your-home/" class="dropdown-item">For your home</a>
+          <a href="/ItalianExperience/flavors/for-your-business/" class="dropdown-item">For your business</a>
+          <a href="/ItalianExperience/flavors/aziende-italiane/" class="dropdown-item">Aziende Italiane</a>
         </div>
       </div>
 
-      <a href="../estates/" class="nav-link">Estates</a>
-      <a href="../contact/" class="nav-link">Contact</a>
+      <a href="/ItalianExperience/estates/" class="nav-link">Estates</a>
+      <a href="/ItalianExperience/contact/" class="nav-link">Contact</a>
     </div>
   </nav>
 
-  <!-- HERO -->
   <section class="hero-recruitment">
     <div class="hero-bg-left" id="bg-left"></div>
     <div class="hero-bg-right" id="bg-right"></div>
 
     <div class="relative z-10 w-full h-full max-w-7xl mx-auto grid md:grid-cols-2">
 
-      <!-- EMPLOYER -->
       <div class="panel-col panel-employer" id="panel-employer">
         <span class="floating-text">EMPLOYER</span>
 
@@ -697,7 +690,7 @@
             Acquire authentic Italian personnel and elite talent through our meticulously tailored recruitment framework.
           </p>
 
-          <a href="./employer/" class="btn-luxury">Explore</a>
+          <a href="/ItalianExperience/recruitment/employer/" class="btn-luxury">Explore</a>
           <div class="secondary-link" onclick="showDetails('employer')">
             Why Choose Us <i class="fas fa-chart-pie ml-1"></i>
           </div>
@@ -722,7 +715,7 @@
               <i class="fas fa-video text-[#c5a059] text-sm mt-1"></i>
               <div>
                 <h4 class="text-[0.65rem] font-bold uppercase tracking-wider text-white">Vetted Screening</h4>
-                <p class="text-[0.55rem] text-slate-500 italic">Rigorous phone & video evaluations.</p>
+                <p class="text-[0.55rem] text-slate-500 italic">Rigorous phone and video evaluations.</p>
               </div>
             </div>
 
@@ -751,7 +744,6 @@
         </div>
       </div>
 
-      <!-- CANDIDATE -->
       <div class="panel-col panel-candidate" id="panel-candidate">
         <span class="floating-text">CANDIDATE</span>
 
@@ -768,7 +760,7 @@
             Dedicated to assisting elite candidates in launching prestigious careers through curated opportunities.
           </p>
 
-          <a href="./candidate/" class="btn-luxury">Live the Dream</a>
+          <a href="/ItalianExperience/recruitment/candidate/" class="btn-luxury">Live the Dream</a>
           <div class="secondary-link" onclick="showDetails('candidate')">
             View Roadmap <i class="fas fa-map-signs ml-1"></i>
           </div>
@@ -788,7 +780,7 @@
                 <div class="w-px h-full bg-white/10 mt-2"></div>
               </div>
               <div class="pb-6">
-                <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-1">Interview & Selection</h4>
+                <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-1">Interview and Selection</h4>
                 <p class="text-[0.6rem] text-slate-400 italic">
                   Individual screening sessions to evaluate your profile and expectations.
                 </p>
@@ -851,9 +843,8 @@
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer class="site-footer">
-    <a href="../" class="no-underline mb-8">
+    <a href="/ItalianExperience/" class="no-underline mb-8">
       <div class="logo-wrap scale-[0.7] md:scale-[0.8]" id="logo-footer">
         <span class="font-it">Italian</span>
         <div class="font-ex" data-text="EXPERIENCE"></div>
@@ -866,8 +857,7 @@
     </a>
 
     <p class="text-white/20 uppercase tracking-[0.4em] text-[0.6rem]">
-      © ITALIAN RECRUITMENT DBA ITALIAN EXPERIENCE<br>
-      STRATEGIC HOSPITALITY ADVISORY
+      © 2026 ITALIAN EXPERIENCE · STRATEGIC ADVISORY
     </p>
   </footer>
 
@@ -1014,8 +1004,8 @@
       bg.style.transform = 'scale(1.05)';
 
       setTimeout(() => {
-        detailsPanel.classList.add("active");
-        if(type === 'employer' && !employerChart) initChart();
+        detailsPanel.classList.add('active');
+        if (type === 'employer' && !employerChart) initChart();
       }, 250);
     }
 
@@ -1024,7 +1014,7 @@
       const detailsPanel = document.getElementById(`details-${type}`);
       const bg = document.getElementById(type === 'employer' ? 'bg-left' : 'bg-right');
 
-      detailsPanel.classList.remove("active");
+      detailsPanel.classList.remove('active');
 
       bg.style.opacity = '0.28';
       bg.style.transform = 'scale(1)';
@@ -1036,7 +1026,10 @@
     }
 
     function initChart() {
-      const ctx = document.getElementById('employerChart').getContext('2d');
+      const canvas = document.getElementById('employerChart');
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
 
       employerChart = new Chart(ctx, {
         type: 'doughnut',
