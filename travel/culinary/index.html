@@ -3,39 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-
   <title>Culinary Academy | Italian Experience</title>
-  <meta name="description" content="Structured culinary journeys in Italy. Professional gastronomy programs, regional apprenticeships, elite sourcing, and full support by Italian Experience." />
-  <meta name="keywords" content="Italian Experience, culinary academy, Italy gastronomy, culinary training, apprenticeships, luxury travel, Italian cuisine" />
+
+  <meta name="description" content="Master Italian gastronomy through structured culinary programs, elite kitchens, and regional apprenticeships. A premium cultural academy by Italian Experience." />
+  <meta name="keywords" content="Italian Experience, culinary academy, Italian gastronomy, cooking program Italy, culinary apprenticeship, luxury culinary travel" />
   <meta name="author" content="Italian Experience" />
   <meta name="robots" content="index, follow" />
 
   <link rel="canonical" href="https://www.italianexp.com/travel/culinary/" />
 
   <meta property="og:title" content="Culinary Academy | Italian Experience" />
-  <meta property="og:description" content="Structured culinary journeys in Italy. Professional gastronomy programs, regional apprenticeships, elite sourcing, and full support by Italian Experience." />
+  <meta property="og:description" content="Master Italian gastronomy through structured culinary programs, elite kitchens, and regional apprenticeships. A premium cultural academy by Italian Experience." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.italianexp.com/travel/culinary/" />
 
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
+
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-  <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
-  <script src="/ItalianExperience/assets/js/site.js" defer></script>
-
   <style>
+    .brand-font{font-family:'Playfair Display',serif}
+
     .hero-culinary{
       width:100%;
-      min-height:100svh;
-      min-height:100dvh;
+      height:100vh;
+      height:100dvh;
       position:relative;
       overflow:hidden;
       background:#000;
     }
 
-    .hero-swiper{width:100%;height:100%}
+    .hero-swiper,
+    .hero-swiper .swiper-wrapper,
+    .hero-swiper .swiper-slide{
+      width:100%;
+      height:100%;
+    }
 
     .hero-slide img{
       width:100%;
@@ -46,7 +52,9 @@
       transition:transform 8s ease-in-out;
     }
 
-    .swiper-slide-active img{transform:scale(1)}
+    .swiper-slide-active img{
+      transform:scale(1);
+    }
 
     .hero-overlay-content{
       position:absolute;
@@ -108,7 +116,7 @@
     .scroll-dot{
       width:100%;
       height:16px;
-      background:var(--brand-gold, #c5a059);
+      background:var(--brand-gold);
       position:absolute;
       top:0;
       left:0;
@@ -122,9 +130,13 @@
     }
 
     .support-card:hover{
-      border-color:rgba(197,160,89,0.9);
+      border-color:var(--brand-gold);
       transform:translateY(-6px);
       box-shadow:0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    @media (max-width:768px){
+      .explore-indicator{bottom:54px}
     }
   </style>
 </head>
@@ -133,50 +145,55 @@
 
   <div id="site-header"></div>
 
-  <main>
+  <header class="hero-culinary" aria-label="Culinary Academy Hero">
+    <div class="swiper hero-swiper">
+      <div class="swiper-wrapper">
 
-    <header class="hero-culinary">
-      <div class="swiper hero-swiper">
-        <div class="swiper-wrapper">
-          <div class="swiper-slide hero-slide">
-            <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=1920" alt="Chef plating" loading="lazy">
-          </div>
-          <div class="swiper-slide hero-slide">
-            <img src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?q=80&w=1920" alt="Pasta making" loading="lazy">
-          </div>
-          <div class="swiper-slide hero-slide">
-            <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1920" alt="Kitchen atmosphere" loading="lazy">
-          </div>
+        <div class="swiper-slide hero-slide">
+          <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=1920" alt="Chef plating" loading="lazy">
         </div>
 
-        <div class="hero-overlay-content">
-          <h3 class="text-[#c5a059] italic brand-font text-xl md:text-2xl mb-4">
-            Mastering the Craft
-          </h3>
-
-          <h1 class="text-white font-bold uppercase tracking-tighter text-4xl md:text-9xl brand-font leading-[0.9] mb-8">
-            Culinary <br><span class="italic font-light opacity-80">Academy.</span>
-          </h1>
-
-          <div class="w-16 md:w-24 h-px bg-[#c5a059] opacity-40 mb-10 mx-auto"></div>
-
-          <p class="text-slate-300 text-[0.65rem] md:text-base uppercase tracking-[0.5em] max-w-[380px] md:max-w-none">
-            Professional Gastronomy & Regional Apprenticeships
-          </p>
+        <div class="swiper-slide hero-slide">
+          <img src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?q=80&w=1920" alt="Pasta making" loading="lazy">
         </div>
 
-        <a href="#intro" class="explore-indicator" aria-label="Explore section">
-          <span>Explore</span>
-          <div class="scroll-track" aria-hidden="true">
-            <div class="scroll-dot"></div>
-          </div>
-        </a>
+        <div class="swiper-slide hero-slide">
+          <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1920" alt="Kitchen atmosphere" loading="lazy">
+        </div>
 
       </div>
-    </header>
+
+      <div class="hero-overlay-content">
+        <h3 class="text-[#c5a059] italic brand-font text-xl md:text-2xl mb-4">
+          Mastering the Craft
+        </h3>
+
+        <h1 class="text-white font-bold uppercase tracking-tighter text-4xl md:text-9xl brand-font leading-[0.9] mb-8">
+          Culinary <br><span class="italic font-light opacity-80">Academy.</span>
+        </h1>
+
+        <div class="w-16 md:w-24 h-px bg-[#c5a059] opacity-40 mb-10 mx-auto"></div>
+
+        <p class="text-slate-300 text-[0.65rem] md:text-base uppercase tracking-[0.5em] max-w-[420px] md:max-w-none">
+          Professional Gastronomy & Regional Apprenticeships
+        </p>
+      </div>
+
+      <a href="#intro" class="explore-indicator" aria-label="Explore section">
+        <span>Explore</span>
+        <div class="scroll-track" aria-hidden="true">
+          <div class="scroll-dot"></div>
+        </div>
+      </a>
+
+    </div>
+  </header>
+
+  <main>
 
     <section id="intro" class="py-20 md:py-28 flex items-center justify-center bg-[#080808]">
       <div class="max-w-4xl px-8 md:px-10 text-center">
+
         <span class="text-[#c5a059] uppercase tracking-[0.7em] text-[0.55rem] md:text-[0.65rem] font-bold block mb-10">
           Gastronomic Specialization
         </span>
@@ -200,6 +217,7 @@
             Are you ready to master Italian gastronomy?
           </p>
         </div>
+
       </div>
     </section>
 
@@ -239,7 +257,7 @@
               Expert Mentorship
             </h3>
             <p class="text-slate-500 text-sm leading-relaxed font-light">
-              Local professionals guide you through the real evolution of Italian cuisine and its philosophy.
+              Local professionals guide you through the evolution of Italian cuisine and its philosophy.
             </p>
           </div>
 
@@ -298,7 +316,7 @@
             </div>
             <h3 class="brand-font text-2xl text-white mb-4 italic">Useful Services</h3>
             <p class="text-slate-500 text-sm font-light leading-relaxed">
-              Visa guidance, residence permits, local orientation, and continuous support during your culinary stay.
+              Visa guidance, local orientation, and continuous support during your culinary stay.
             </p>
           </div>
 
@@ -319,14 +337,46 @@
   <div id="site-footer"></div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      new Swiper('.hero-swiper', {
+    document.addEventListener("DOMContentLoaded", () => {
+      new Swiper(".hero-swiper", {
         loop: true,
-        effect: 'fade',
+        effect: "fade",
         speed: 2000,
         autoplay: { delay: 5200, disableOnInteraction: false }
       });
     });
+  </script>
+
+  <script>
+    (function () {
+      const base = "/ItalianExperience";
+      const headerMount = document.getElementById("site-header");
+      const footerMount = document.getElementById("site-footer");
+
+      function inject(el, html) { if (el) el.innerHTML = html; }
+
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const s = document.createElement("script");
+          s.src = src;
+          s.defer = true;
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+
+      Promise.all([
+        fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
+        fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
+      ]).then(async ([h, f]) => {
+        inject(headerMount, h);
+        inject(footerMount, f);
+
+        await loadScript(base + "/assets/js/site.js");
+        if (window.IEInit) window.IEInit(document);
+      }).catch(err => console.error(err));
+    })();
   </script>
 
 </body>
