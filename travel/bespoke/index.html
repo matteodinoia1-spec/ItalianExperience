@@ -5,28 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Bespoke | Italian Experience</title>
 
-  <meta name="description" content="Bespoke travel by Italian Experience. Private advisory, curated journeys, and premium itineraries across Italy." />
+  <meta name="description" content="Private advisory journeys across Italy. Bespoke itineraries curated with cultural depth, strategic planning, and luxury heritage by Italian Experience." />
+  <meta name="keywords" content="Italian Experience, bespoke travel, luxury travel Italy, private advisory, curated journeys, Amalfi, Tuscany, Venice, Rome" />
+  <meta name="author" content="Italian Experience" />
   <meta name="robots" content="index, follow" />
+
   <link rel="canonical" href="https://www.italianexp.com/travel/bespoke/" />
 
   <meta property="og:title" content="Bespoke | Italian Experience" />
-  <meta property="og:description" content="Private advisory and curated journeys across Italy." />
+  <meta property="og:description" content="Private advisory journeys across Italy. Bespoke itineraries curated with cultural depth, strategic planning, and luxury heritage by Italian Experience." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.italianexp.com/travel/bespoke/" />
-  <meta property="og:image" content="https://www.italianexp.com/assets/preview.jpg" />
-
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Bespoke | Italian Experience" />
-  <meta name="twitter:description" content="Private advisory and curated journeys across Italy." />
-  <meta name="twitter:image" content="https://www.italianexp.com/assets/preview.jpg" />
 
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
   <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
   <script src="/ItalianExperience/assets/js/site.js" defer></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
   <style>
     .brand-font{font-family:'Playfair Display',serif}
@@ -39,7 +36,9 @@
       overflow:hidden;
       background:#000;
     }
+
     .hero-swiper{width:100%;height:100%}
+
     .hero-slide img{
       width:100%;
       height:100%;
@@ -48,7 +47,9 @@
       transform:scale(1.1);
       transition:transform 8s ease-in-out;
     }
+
     .swiper-slide-active img{transform:scale(1)}
+
     .hero-overlay-content{
       position:absolute;
       inset:0;
@@ -67,6 +68,7 @@
       30%{opacity:1}
       100%{transform:translateY(52px);opacity:0}
     }
+
     .explore-indicator{
       position:absolute;
       bottom:46px;
@@ -81,10 +83,12 @@
       opacity:0.82;
       transition:opacity 0.2s ease,transform 0.2s ease;
     }
+
     .explore-indicator:hover{
       opacity:1;
       transform:translateX(-50%) translateY(3px);
     }
+
     .explore-indicator span{
       font-size:0.65rem;
       text-transform:uppercase;
@@ -94,6 +98,7 @@
       white-space:nowrap;
       text-shadow:0 8px 18px rgba(0,0,0,0.7);
     }
+
     .scroll-track{
       width:1px;
       height:54px;
@@ -101,6 +106,7 @@
       position:relative;
       overflow:hidden;
     }
+
     .scroll-dot{
       width:100%;
       height:16px;
@@ -115,19 +121,21 @@
       height:850px;
       position:relative;
       border-bottom:1px solid rgba(255,255,255,0.05);
-      background:#000;
     }
+
     .location-swiper{
       width:100%;
       height:100%;
       padding-bottom:60px;
     }
+
     .location-card{
       position:relative;
       height:100%;
       overflow:hidden;
       cursor:grab;
     }
+
     .location-card img{
       width:100%;
       height:100%;
@@ -135,10 +143,12 @@
       filter:brightness(0.45);
       transition:1.2s ease;
     }
+
     .location-card:hover img{
       filter:brightness(0.75);
       transform:scale(1.05);
     }
+
     .location-info{
       position:absolute;
       bottom:0;
@@ -158,6 +168,7 @@
       margin:0 8px !important;
       transition:0.4s ease !important;
     }
+
     .swiper-pagination-bullet-active{
       background:var(--brand-gold) !important;
       width:45px !important;
@@ -165,221 +176,227 @@
 
     @media (max-width:768px){
       .explore-indicator{bottom:54px}
-      .location-info{padding:3.25rem 2.25rem}
     }
   </style>
 </head>
 
-<body>
+<body class="bg-[#080808] text-white overflow-x-hidden">
 
   <div id="site-header"></div>
 
-  <section class="hero-odyssey" aria-label="Bespoke hero">
-    <div class="swiper hero-swiper">
-      <div class="swiper-wrapper">
-        <div class="swiper-slide hero-slide">
-          <img src="https://images.unsplash.com/photo-1529260830199-42c24126f198?q=80&w=1920" alt="Italy" loading="lazy">
-        </div>
-        <div class="swiper-slide hero-slide">
-          <img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?q=80&w=1920" alt="Venice" loading="lazy">
-        </div>
-        <div class="swiper-slide hero-slide">
-          <img src="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=1920" alt="Florence" loading="lazy">
-        </div>
-      </div>
+  <main>
 
-      <div class="hero-overlay-content">
-        <h3 class="text-[#c5a059] italic brand-font text-xl md:text-2xl mb-4">Private Advisory</h3>
-        <h1 class="text-white font-bold uppercase tracking-tighter text-4xl md:text-9xl brand-font leading-[0.9] mb-8">
-          Bespoke <br><span class="italic font-light opacity-80">Journeys.</span>
-        </h1>
-        <div class="w-16 md:w-24 h-px bg-[#c5a059] opacity-40 mb-10 mx-auto"></div>
-        <p class="text-slate-300 text-[0.65rem] md:text-base uppercase tracking-[0.5em] max-w-[340px] md:max-w-none">
-          Curated Experiences Across Italy
-        </p>
-      </div>
+    <header class="hero-odyssey" aria-label="Bespoke Hero">
+      <div class="swiper hero-swiper">
+        <div class="swiper-wrapper">
 
-      <a href="#advisory" class="explore-indicator" aria-label="Explore section">
-        <span>Explore</span>
-        <div class="scroll-track" aria-hidden="true"><div class="scroll-dot"></div></div>
-      </a>
-    </div>
-  </section>
-
-  <section id="advisory" class="py-32 md:py-48 flex items-center justify-center bg-[#080808]">
-    <div class="max-w-4xl px-8 md:px-10 text-center">
-      <span class="text-[#c5a059] uppercase tracking-[0.7em] text-[0.55rem] md:text-[0.65rem] font-bold block mb-12">
-        Private Advisory
-      </span>
-
-      <h2 class="text-4xl md:text-7xl mb-12 italic text-white brand-font leading-tight mx-auto mt-10">
-        Extraordinary Life Experiences.
-      </h2>
-
-      <div class="space-y-10 font-light text-lg md:text-xl text-slate-400 leading-relaxed mx-auto mt-10">
-        <p>
-          We do not just create luxury vacations in Italy, but rather
-          <span class="text-white font-normal">extraordinary and unique life experiences.</span>
-          Each project is a dialogue between your vision and our heritage.
-        </p>
-        <p>
-          Our objective is a <span class="text-[#c5a059] italic">unique and warm personal approach</span>
-          to planning every strategic detail of your journey.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section class="location-section" aria-label="Regional atmospheres">
-    <div class="absolute top-10 left-10 md:top-12 md:left-12 z-20 pointer-events-none">
-      <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.55rem] font-bold block mb-2">
-        A Strategic Survey
-      </span>
-      <h2 class="text-3xl md:text-4xl brand-font italic text-white drop-shadow-xl">
-        Regional Atmospheres
-      </h2>
-    </div>
-
-    <div class="swiper location-swiper">
-      <div class="swiper-wrapper">
-        <div class="swiper-slide location-card">
-          <img src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=800" alt="Amalfi Coast" loading="lazy">
-          <div class="location-info">
-            <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">Coastal Sanctuary</span>
-            <h4 class="brand-font italic text-3xl md:text-4xl text-white">Amalfi Coast</h4>
-            <div class="w-12 h-[2px] bg-[#c5a059] mt-6"></div>
+          <div class="swiper-slide hero-slide">
+            <img src="https://images.unsplash.com/photo-1529260830199-42c24126f198?q=80&w=1920" alt="Italian coastline" loading="lazy">
           </div>
-        </div>
 
-        <div class="swiper-slide location-card">
-          <img src="https://images.unsplash.com/photo-1528114039593-4366cc08227d?q=80&w=800" alt="Tuscany" loading="lazy">
-          <div class="location-info">
-            <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">Rural Continuity</span>
-            <h4 class="brand-font italic text-3xl md:text-4xl text-white">Tuscany</h4>
-            <div class="w-12 h-[2px] bg-[#c5a059] mt-6"></div>
+          <div class="swiper-slide hero-slide">
+            <img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?q=80&w=1920" alt="Venice canals" loading="lazy">
           </div>
-        </div>
 
-        <div class="swiper-slide location-card">
-          <img src="https://images.unsplash.com/photo-1688635629079-d9aca2419551?q=80&w=800" alt="Venice" loading="lazy">
-          <div class="location-info">
-            <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">Floating Legacy</span>
-            <h4 class="brand-font italic text-3xl md:text-4xl text-white">Venice</h4>
-            <div class="w-12 h-[2px] bg-[#c5a059] mt-6"></div>
+          <div class="swiper-slide hero-slide">
+            <img src="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=1920" alt="Florence landscape" loading="lazy">
           </div>
+
         </div>
 
-        <div class="swiper-slide location-card">
-          <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=800" alt="Rome" loading="lazy">
-          <div class="location-info">
-            <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">Urban Antiquity</span>
-            <h4 class="brand-font italic text-3xl md:text-4xl text-white">Rome</h4>
-            <div class="w-12 h-[2px] bg-[#c5a059] mt-6"></div>
-          </div>
-        </div>
-      </div>
+        <div class="hero-overlay-content">
+          <h3 class="text-[#c5a059] italic brand-font text-xl md:text-2xl mb-4">
+            Private Advisory
+          </h3>
 
-      <div class="swiper-pagination" aria-hidden="true"></div>
-    </div>
-  </section>
+          <h1 class="text-white font-bold uppercase tracking-tighter text-4xl md:text-9xl brand-font leading-[0.9] mb-8">
+            Bespoke <br><span class="italic font-light opacity-80">Journeys.</span>
+          </h1>
 
-  <section class="py-32 md:py-48 bg-[#080808]">
-    <div class="max-w-6xl mx-auto px-10">
-      <div class="grid md:grid-cols-3 gap-20">
-        <div class="border-l border-[#c5a059]/30 pl-10 group">
-          <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic transition-all group-hover:opacity-60">01</span>
-          <h4 class="uppercase tracking-[0.4em] text-[0.65rem] font-bold mb-6 text-[#c5a059]">Discovery Session</h4>
-          <p class="text-slate-400 text-sm leading-relaxed font-light">
-            Deep exploration of your cultural goals and logistical requirements to frame the journey.
+          <div class="w-16 md:w-24 h-px bg-[#c5a059] opacity-40 mb-10 mx-auto"></div>
+
+          <p class="text-slate-300 text-[0.65rem] md:text-base uppercase tracking-[0.5em] max-w-[340px] md:max-w-none">
+            Curated Experiences Across Italy
           </p>
         </div>
 
-        <div class="border-l border-[#c5a059]/30 pl-10 group">
-          <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic transition-all group-hover:opacity-60">02</span>
-          <h4 class="uppercase tracking-[0.4em] text-[0.65rem] font-bold mb-6 text-[#c5a059]">Expert Synthesis</h4>
-          <p class="text-slate-400 text-sm leading-relaxed font-light">
-            Identifying luxury nodes and heritage keys aligned with your unique vision.
+        <a href="#advisory" class="explore-indicator" aria-label="Explore section">
+          <span>Explore</span>
+          <div class="scroll-track" aria-hidden="true">
+            <div class="scroll-dot"></div>
+          </div>
+        </a>
+
+      </div>
+    </header>
+
+    <section id="advisory" class="py-32 md:py-48 flex items-center justify-center bg-[#080808]">
+      <div class="max-w-4xl px-8 md:px-10 text-center">
+
+        <span class="text-[#c5a059] uppercase tracking-[0.7em] text-[0.55rem] md:text-[0.65rem] font-bold block mb-12">
+          Private Advisory
+        </span>
+
+        <h2 class="text-4xl md:text-7xl mb-12 italic text-white brand-font leading-tight mx-auto mt-10">
+          Extraordinary Life Experiences.
+        </h2>
+
+        <div class="space-y-10 font-light text-lg md:text-xl text-slate-400 leading-relaxed mx-auto mt-10">
+          <p>
+            We do not just create luxury vacations in Italy, but rather
+            <span class="text-white font-normal">extraordinary and unique life experiences.</span>
+            Each project is a dialogue between your vision and our heritage.
+          </p>
+
+          <p>
+            Our objective is a <span class="text-[#c5a059] italic">unique and warm personal approach</span>
+            to planning every strategic detail of your journey.
           </p>
         </div>
 
-        <div class="border-l border-[#c5a059]/30 pl-10 group">
-          <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic transition-all group-hover:opacity-60">03</span>
-          <h4 class="uppercase tracking-[0.4em] text-[0.65rem] font-bold mb-6 text-[#c5a059]">Orientation</h4>
-          <p class="text-slate-400 text-sm leading-relaxed font-light">
-            Clear overview, structure, and guidance to make execution smooth and premium.
-          </p>
+      </div>
+    </section>
+
+    <section class="location-section" aria-label="Regional atmospheres">
+      <div class="absolute top-10 left-10 md:top-12 md:left-12 z-20 pointer-events-none">
+        <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.55rem] font-bold block mb-2">
+          A Strategic Survey
+        </span>
+        <h2 class="text-3xl md:text-4xl brand-font italic text-white drop-shadow-xl">
+          Regional Atmospheres
+        </h2>
+      </div>
+
+      <div class="swiper location-swiper">
+        <div class="swiper-wrapper">
+
+          <div class="swiper-slide location-card">
+            <img src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=800" alt="Amalfi Coast" loading="lazy">
+            <div class="location-info">
+              <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">
+                Coastal Sanctuary
+              </span>
+              <h3 class="brand-font italic text-3xl md:text-4xl text-white">
+                Amalfi Coast
+              </h3>
+              <div class="w-12 h-[2px] bg-[#c5a059] mt-6"></div>
+            </div>
+          </div>
+
+          <div class="swiper-slide location-card">
+            <img src="https://images.unsplash.com/photo-1528114039593-4366cc08227d?q=80&w=800" alt="Tuscany hills" loading="lazy">
+            <div class="location-info">
+              <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">
+                Rural Continuity
+              </span>
+              <h3 class="brand-font italic text-3xl md:text-4xl text-white">
+                Tuscany
+              </h3>
+              <div class="w-12 h-[2px] bg-[#c5a059] mt-6"></div>
+            </div>
+          </div>
+
+          <div class="swiper-slide location-card">
+            <img src="https://images.unsplash.com/photo-1688635629079-d9aca2419551?q=80&w=800" alt="Venice canals" loading="lazy">
+            <div class="location-info">
+              <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">
+                Floating Legacy
+              </span>
+              <h3 class="brand-font italic text-3xl md:text-4xl text-white">
+                Venice
+              </h3>
+              <div class="w-12 h-[2px] bg-[#c5a059] mt-6"></div>
+            </div>
+          </div>
+
+          <div class="swiper-slide location-card">
+            <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=800" alt="Rome Colosseum" loading="lazy">
+            <div class="location-info">
+              <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">
+                Urban Antiquity
+              </span>
+              <h3 class="brand-font italic text-3xl md:text-4xl text-white">
+                Rome
+              </h3>
+              <div class="w-12 h-[2px] bg-[#c5a059] mt-6"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="swiper-pagination"></div>
+      </div>
+    </section>
+
+    <section class="py-32 md:py-48 bg-[#080808]">
+      <div class="max-w-6xl mx-auto px-10">
+        <div class="grid md:grid-cols-3 gap-20">
+
+          <div class="border-l border-[#c5a059]/30 pl-10 group">
+            <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic transition-all group-hover:opacity-60">
+              01
+            </span>
+            <h3 class="uppercase tracking-[0.4em] text-[0.65rem] font-bold mb-6 text-[#c5a059]">
+              Discovery Session
+            </h3>
+            <p class="text-slate-400 text-sm leading-relaxed font-light">
+              Deep exploration of your cultural goals and logistical requirements to frame the odyssey.
+            </p>
+          </div>
+
+          <div class="border-l border-[#c5a059]/30 pl-10 group">
+            <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic transition-all group-hover:opacity-60">
+              02
+            </span>
+            <h3 class="uppercase tracking-[0.4em] text-[0.65rem] font-bold mb-6 text-[#c5a059]">
+              Expert Synthesis
+            </h3>
+            <p class="text-slate-400 text-sm leading-relaxed font-light">
+              Identifying hidden luxury nodes and heritage keys that align with your unique vision.
+            </p>
+          </div>
+
+          <div class="border-l border-[#c5a059]/30 pl-10 group">
+            <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic transition-all group-hover:opacity-60">
+              03
+            </span>
+            <h3 class="uppercase tracking-[0.4em] text-[0.65rem] font-bold mb-6 text-[#c5a059]">
+              Orientation
+            </h3>
+            <p class="text-slate-400 text-sm leading-relaxed font-light">
+              Comprehensive strategic overview and professional guidance through the Italian soul.
+            </p>
+          </div>
+
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+
+  </main>
 
   <div id="site-footer"></div>
 
   <script>
-    (function () {
-      const base = "/ItalianExperience";
-      const headerMount = document.getElementById("site-header");
-      const footerMount = document.getElementById("site-footer");
+    document.addEventListener('DOMContentLoaded', () => {
+      new Swiper('.hero-swiper', {
+        loop: true,
+        effect: 'fade',
+        speed: 2000,
+        autoplay: { delay: 5000, disableOnInteraction: false }
+      });
 
-      function inject(el, html) { if (el) el.innerHTML = html; }
-
-      function setActiveCurrentPage() {
-        const currentPath = (window.location.pathname || "").replace(/\/$/, "");
-
-        document.querySelectorAll(".dropdown-item, .nav-link, .mobile-link, .mobile-sublink").forEach(link => {
-          const href = link.getAttribute("href");
-          if (!href) return;
-          const a = document.createElement("a");
-          a.href = href;
-          const linkPath = (a.pathname || "").replace(/\/$/, "");
-          if (linkPath === currentPath) link.classList.add("active");
-        });
-
-        if (currentPath.includes("/travel")) {
-          document.querySelectorAll(".nav-link-travel, .mobile-acc-travel").forEach(el => el.classList.add("active"));
-          const travelAcc = document.querySelector(".mobile-acc-travel");
-          if (travelAcc) travelAcc.setAttribute("aria-expanded", "true");
-          const mTravel = document.getElementById("m-travel");
-          if (mTravel) mTravel.style.maxHeight = "260px";
+      new Swiper('.location-swiper', {
+        slidesPerView: 1,
+        loop: true,
+        speed: 1000,
+        autoplay: { delay: 4500 },
+        pagination: { el: '.swiper-pagination', clickable: true },
+        breakpoints: {
+          768: { slidesPerView: 2 },
+          1024: { slidesPerView: 3 }
         }
-      }
-
-      function initSwipers() {
-        if (typeof Swiper === "undefined") return;
-
-        new Swiper(".hero-swiper", {
-          loop: true,
-          effect: "fade",
-          speed: 2000,
-          autoplay: { delay: 5000, disableOnInteraction: false }
-        });
-
-        new Swiper(".location-swiper", {
-          slidesPerView: 1,
-          loop: true,
-          speed: 1000,
-          autoplay: { delay: 4500, disableOnInteraction: false },
-          pagination: { el: ".swiper-pagination", clickable: true },
-          breakpoints: {
-            768: { slidesPerView: 2 },
-            1024: { slidesPerView: 3 }
-          }
-        });
-      }
-
-      Promise.all([
-        fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
-        fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
-      ]).then(([h, f]) => {
-        inject(headerMount, h);
-        inject(footerMount, f);
-
-        if (window.IEInit) window.IEInit(document);
-
-        setActiveCurrentPage();
-        initSwipers();
-      }).catch(err => console.error(err));
-    })();
+      });
+    });
   </script>
 
 </body>
