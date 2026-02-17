@@ -29,14 +29,19 @@
 
     .hero-odyssey{
       width:100%;
-      min-height:100vh;
-      min-height:100dvh;
+      height:100vh;
+      height:100dvh;
       position:relative;
       overflow:hidden;
       background:#000;
     }
 
-    .hero-swiper{width:100%;height:100%}
+    .hero-swiper,
+    .hero-swiper .swiper-wrapper,
+    .hero-swiper .swiper-slide{
+      width:100%;
+      height:100%;
+    }
 
     .hero-slide img{
       width:100%;
@@ -47,7 +52,9 @@
       transition:transform 8s ease-in-out;
     }
 
-    .swiper-slide-active img{transform:scale(1)}
+    .swiper-slide-active img{
+      transform:scale(1);
+    }
 
     .hero-overlay-content{
       position:absolute;
@@ -183,20 +190,20 @@
 
   <div id="site-header"></div>
 
-  <header class="hero-odyssey">
-    <div class="swiper hero-swiper h-full">
+  <header class="hero-odyssey" aria-label="Bespoke Hero">
+    <div class="swiper hero-swiper">
       <div class="swiper-wrapper">
 
         <div class="swiper-slide hero-slide">
-          <img src="https://images.unsplash.com/photo-1529260830199-42c24126f198?q=80&w=1920" alt="Italy" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1529260830199-42c24126f198?q=80&w=1920" alt="Italy coastline" loading="lazy">
         </div>
 
         <div class="swiper-slide hero-slide">
-          <img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?q=80&w=1920" alt="Venice" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?q=80&w=1920" alt="Venice canals" loading="lazy">
         </div>
 
         <div class="swiper-slide hero-slide">
-          <img src="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=1920" alt="Florence" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=1920" alt="Florence landscape" loading="lazy">
         </div>
 
       </div>
@@ -223,6 +230,7 @@
           <div class="scroll-dot"></div>
         </div>
       </a>
+
     </div>
   </header>
 
@@ -255,7 +263,7 @@
       </div>
     </section>
 
-    <section class="location-section">
+    <section class="location-section" aria-label="Regional atmospheres">
       <div class="absolute top-10 left-10 md:top-12 md:left-12 z-20 pointer-events-none">
         <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.55rem] font-bold block mb-2">
           A Strategic Survey
@@ -265,7 +273,7 @@
         </h2>
       </div>
 
-      <div class="swiper location-swiper h-full">
+      <div class="swiper location-swiper">
         <div class="swiper-wrapper">
 
           <div class="swiper-slide location-card">
@@ -282,7 +290,7 @@
           </div>
 
           <div class="swiper-slide location-card">
-            <img src="https://images.unsplash.com/photo-1528114039593-4366cc08227d?q=80&w=800" alt="Tuscany" loading="lazy">
+            <img src="https://images.unsplash.com/photo-1528114039593-4366cc08227d?q=80&w=800" alt="Tuscany hills" loading="lazy">
             <div class="location-info">
               <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">
                 Rural Continuity
@@ -295,7 +303,7 @@
           </div>
 
           <div class="swiper-slide location-card">
-            <img src="https://images.unsplash.com/photo-1688635629079-d9aca2419551?q=80&w=800" alt="Venice" loading="lazy">
+            <img src="https://images.unsplash.com/photo-1688635629079-d9aca2419551?q=80&w=800" alt="Venice canals" loading="lazy">
             <div class="location-info">
               <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">
                 Floating Legacy
@@ -308,7 +316,7 @@
           </div>
 
           <div class="swiper-slide location-card">
-            <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=800" alt="Rome" loading="lazy">
+            <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=800" alt="Rome Colosseum" loading="lazy">
             <div class="location-info">
               <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">
                 Urban Antiquity
