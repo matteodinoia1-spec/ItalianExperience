@@ -1,608 +1,902 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Italian Heritage Estates - Italian Experience</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@100;300;400;500;600&family=Great+Vibes&family=Montserrat:wght@700;900&display=swap');
-        
-        :root { 
-            --brand-gold: #c5a059; 
-            --brand-dark: #080808; 
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Italian Heritage Estates - Italian Experience</title>
 
-        /* RESET & GLOBAL */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; background-color: #000; }
-        body { 
-            background-color: var(--brand-dark); 
-            color: #fff; 
-            font-family: 'Inter', sans-serif; 
-            overflow-x: hidden;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-        }
-        .serif-font, .brand-font { font-family: 'Playfair Display', serif; }
+  <script src="https://cdn.tailwindcss.com"></script>
 
-        /* HEADER SMART ULTRA GLASS */
-        .glass-header {
-            position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;
-            background: transparent; backdrop-filter: blur(0px);
-            padding: 0 4rem; display: flex; flex-direction: row; 
-            justify-content: space-between; align-items: center;
-            height: 110px;
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.5s, backdrop-filter 0.5s, height 0.4s;
-        }
-        .glass-header.nav-up { transform: translateY(-110%); }
-        .glass-header.scrolled {
-            height: 90px;
-            background: rgba(15, 15, 15, 0.45);
-            backdrop-filter: blur(40px) saturate(180%);
-            -webkit-backdrop-filter: blur(40px) saturate(180%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            padding: 0 2rem;
-        }
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@100;300;400;500;600&family=Great+Vibes&family=Montserrat:wght@700;900&display=swap');
 
-        /* LOGO */
-        .logo-wrap { 
-            display: flex; align-items: baseline; gap: 8px; position: relative; 
-            cursor: pointer; user-select: none; transition: all 0.4s ease;
-            z-index: 10001;
-        }
-        .font-it { font-family: 'Great Vibes', cursive; color: var(--brand-gold); font-size: 70px; line-height: 1; white-space: nowrap; transition: 0.3s; }
-        .font-ex { font-family: 'Montserrat', sans-serif; color: var(--brand-gold); font-weight: 900; font-size: 35px; line-height: 1; letter-spacing: -0.02em; display: flex; }
-        .letter { display: inline-block; position: relative; will-change: transform, color; transition: all 0.25s ease-out; }
-        .tricolore-line { position: absolute; height: 2px; width: 60px; bottom: -6px; right: 0; display: flex; pointer-events: none; }
+    :root {
+      --brand-gold: #c5a059;
+      --brand-dark: #080808;
+    }
 
-        /* CENTRAL MOBILE MENU BTN */
-        #central-menu-btn {
-            display: none;
-            flex-direction: column; align-items: center; justify-content: center;
-            background: none; border: none; cursor: pointer; outline: none; z-index: 10002;
-            transition: all 0.3s ease;
-        }
-        #central-menu-btn span { color: var(--brand-gold); font-size: 0.52rem; text-transform: uppercase; letter-spacing: 0.4em; margin-top: 5px; font-weight: 600; opacity: 0.9; }
-        .menu-icon-svg { width: 22px; height: 22px; stroke: var(--brand-gold); stroke-width: 1.5; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; background-color: #000; }
+    body {
+      background-color: var(--brand-dark);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
 
-        /* NAVIGATION DESKTOP */
-        .nav-container { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; height: 100%; }
-        .nav-link {
-            color: #fff; text-transform: uppercase; font-size: 0.62rem; letter-spacing: 0.25em;
-            text-decoration: none; padding: 1rem 0.8rem; transition: all 0.3s; opacity: 0.7; white-space: nowrap; cursor: pointer;
-        }
-        .nav-link:hover { color: var(--brand-gold); opacity: 1; }
+    .serif-font, .brand-font { font-family: 'Playfair Display', serif; }
 
-        .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
-        .dropdown-menu {
-            position: absolute; top: 100%; right: 0; background: rgba(10, 10, 10, 0.96);
-            backdrop-filter: blur(35px); border: 1px solid rgba(255,255,255,0.1);
-            min-width: 230px; opacity: 0; visibility: hidden; transform: translateY(10px);
-            transition: all 0.4s ease; padding: 1.2rem 0; border-radius: 2px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
-        .dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
-        .dropdown-item { display: block; padding: 0.8rem 2rem; color: #fff; text-decoration: none; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.6; transition: 0.3s; }
-        .dropdown-item:hover { color: var(--brand-gold); opacity: 1; background: rgba(255,255,255,0.03); padding-left: 2.5rem; }
+    /* HEADER ULTRA GLASS */
+    .glass-header {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      z-index: 9999;
+      background: transparent;
+      backdrop-filter: blur(0px);
+      padding: 0 4rem;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      height: 110px;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.5s, backdrop-filter 0.5s, height 0.4s;
+    }
 
-        /* MOBILE OVERLAY */
-        #mobile-menu-overlay {
-            position: fixed; inset: 0; background: rgba(8, 8, 8, 0.98);
-            backdrop-filter: blur(50px) saturate(160%); z-index: 10000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            opacity: 0; visibility: hidden; transition: all 0.5s ease; overflow-y: auto;
-        }
-        #mobile-menu-overlay.active { opacity: 1; visibility: visible; }
-        .mobile-nav-list { display: flex; flex-direction: column; align-items: center; width: 100%; text-align: center; padding: 4rem 0; }
-        .mobile-link { font-size: 1.1rem; color: #fff; text-transform: uppercase; letter-spacing: 0.4em; margin: 1.2rem 0; text-decoration: none; font-weight: 200; transition: color 0.3s; }
-        .mobile-sub-list { display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem; border-top: 1px solid rgba(197, 160, 89, 0.15); padding-top: 0.5rem; width: 75%; }
-        .mobile-sub-link { font-size: 0.7rem; color: var(--brand-gold); text-transform: uppercase; letter-spacing: 0.25em; margin: 0.5rem 0; text-decoration: none; opacity: 0.6; }
+    .glass-header.nav-up { transform: translateY(-110%); }
 
-        /* HERO */
-        .estates-hero { 
-            position: relative; width: 100%; height: 100vh; height: 100dvh; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            text-align: center; overflow: hidden; background: #000;
-        }
-        .hero-bg-estates {
-            position: absolute; inset: 0;
-            background-image: url('https://static.wixstatic.com/media/d5773c_36e1f1c872c7470d9415f71a261afc0b~mv2.jpg');
-            background-size: cover;
-            background-position: center;
-            opacity: 1;
-            z-index: 0;
-            filter: brightness(0.55) contrast(1.1);
-            transform: scale(1.02);
-        }
-        .hero-gradient { 
-            position: absolute; inset: 0; 
-            background: linear-gradient(to bottom, rgba(8,8,8,0.85) 0%, rgba(8,8,8,0.35) 45%, rgba(8,8,8,0.25) 60%, rgba(8,8,8,0.85) 100%);
-            z-index: 1;
-        }
-        .hero-content-estates { 
-            position: relative; z-index: 10; 
-            padding: 180px 2rem 140px 2rem; 
-            max-width: 1200px;
-            pointer-events: none; 
-        }
+    .glass-header.scrolled {
+      height: 90px;
+      background: rgba(15, 15, 15, 0.45);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      padding: 0 2rem;
+    }
 
-        /* SCROLL INDICATOR CENTER */
-        .explore-indicator {
-            position: absolute;
-            bottom: 54px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 20;
+    /* LOGO */
+    .logo-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.4s ease;
+      z-index: 10001;
+    }
 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
+    .font-it {
+      font-family: 'Great Vibes', cursive;
+      color: var(--brand-gold);
+      font-size: 70px;
+      line-height: 1;
+      white-space: nowrap;
+      transition: 0.3s;
+    }
 
-            opacity: 0.75;
-            transition: all 0.35s ease;
-            cursor: pointer;
-            pointer-events: auto;
-        }
-        .explore-indicator:hover {
-            opacity: 1;
-            transform: translateX(-50%) translateY(6px);
-        }
+    .font-ex {
+      font-family: 'Montserrat', sans-serif;
+      color: var(--brand-gold);
+      font-weight: 900;
+      font-size: 35px;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      display: flex;
+    }
 
-        .explore-text { 
-            color: #fff; 
-            font-size: 0.6rem; 
-            text-transform: uppercase; 
-            letter-spacing: 0.5em; 
-            margin-bottom: 1.2rem; 
-            font-weight: 300; 
-            white-space: nowrap;
-        }
+    .letter {
+      display: inline-block;
+      position: relative;
+      will-change: transform, color;
+      transition: all 0.25s ease-out;
+    }
 
-        .scroll-track {
-            width: 1px;
-            height: 54px;
-            background: rgba(255,255,255,0.25);
-            position: relative;
-            overflow: hidden;
-        }
+    .tricolore-line {
+      position: absolute;
+      height: 2px;
+      width: 60px;
+      bottom: -6px;
+      right: 0;
+      display: flex;
+      pointer-events: none;
+    }
 
-        .scroll-dot {
-            width: 100%;
-            height: 16px;
-            background: var(--brand-gold);
-            position: absolute;
-            top: 0;
-            left: 0;
-            animation: scrollLine 1.6s infinite ease-in-out;
-        }
+    /* MOBILE CENTRAL BTN */
+    #central-menu-btn {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      z-index: 10002;
+      transition: all 0.3s ease;
+    }
 
-        @keyframes scrollLine {
-            0% { transform: translateY(-18px); opacity: 0; }
-            30% { opacity: 1; }
-            100% { transform: translateY(52px); opacity: 0; }
-        }
+    #central-menu-btn span {
+      color: var(--brand-gold);
+      font-size: 0.52rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      margin-top: 5px;
+      font-weight: 600;
+      opacity: 0.9;
+    }
 
-        /* SECTION 2 */
-        .glass-card { 
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(15px); 
-            border: 1px solid rgba(197, 160, 89, 0.15); 
-            transition: all 0.5s ease; 
-            padding: 2.5rem;
-            height: 100%;
-        }
-        .glass-card:hover { 
-            border-color: var(--brand-gold); 
-            background: rgba(197, 160, 89, 0.05); 
-            transform: translateY(-5px); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-        .gold-divider { width: 48px; height: 1px; background: var(--brand-gold); }
+    .menu-icon-svg { width: 22px; height: 22px; stroke: var(--brand-gold); stroke-width: 1.5; }
 
-        /* DISCLOSURE */
-        .disclosure-card { padding: 3rem; border: 1px solid rgba(197, 160, 89, 0.1); background: rgba(255, 255, 255, 0.01); max-width: 900px; margin: 0 auto; text-align: center; }
-        .legal-notice-text { font-size: 0.65rem; line-height: 2.2; color: #666; text-align: justify; text-transform: uppercase; letter-spacing: 0.12em; }
+    /* NAV DESKTOP */
+    .nav-container { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; height: 100%; }
 
-        /* FOOTER */
-        .site-footer { 
-            background-color: #000; padding: 8rem 2rem; border-top: 1px solid rgba(255,255,255,0.05); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%;
-        }
-        .footer-copyright { margin-top: 3.5rem; color: rgba(255,255,255,0.2); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.4em; line-height: 2.2; font-weight: 300; }
+    .nav-link {
+      color: #fff;
+      text-transform: uppercase;
+      font-size: 0.62rem;
+      letter-spacing: 0.25em;
+      text-decoration: none;
+      padding: 1rem 0.8rem;
+      transition: all 0.3s;
+      opacity: 0.7;
+      white-space: nowrap;
+      cursor: pointer;
+    }
 
-        /* RESPONSIVE */
-        @media (max-width: 1024px) {
-            .glass-header { flex-direction: column !important; justify-content: center !important; height: 160px !important; padding: 1.5rem 0 !important; }
-            .glass-header.scrolled { height: 130px !important; }
-            .nav-container { display: none !important; }
-            #central-menu-btn { display: flex !important; margin-top: 12px; }
-            .logo-wrap { transform: scale(0.8); }
+    .nav-link:hover { color: var(--brand-gold); opacity: 1; }
 
-            .hero-content-estates { padding-top: 220px; }
-            .hero-bg-estates { filter: brightness(0.6) contrast(1.1); }
-            .hero-gradient { 
-                background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.10) 100%);
-            }
-        }
+    .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
 
-        @media (max-width: 350px) {
-            .logo-wrap { transform: scale(0.65); }
-            .glass-header { height: 140px !important; }
-            #central-menu-btn { scale: 0.9; margin-top: 8px; }
-        }
-    </style>
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: rgba(10, 10, 10, 0.96);
+      backdrop-filter: blur(35px);
+      border: 1px solid rgba(255,255,255,0.1);
+      min-width: 230px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: all 0.4s ease;
+      padding: 1.2rem 0;
+      border-radius: 2px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+
+    .dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+
+    .dropdown-item {
+      display: block;
+      padding: 0.8rem 2rem;
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      opacity: 0.6;
+      transition: 0.3s;
+    }
+
+    .dropdown-item:hover {
+      color: var(--brand-gold);
+      opacity: 1;
+      background: rgba(255,255,255,0.03);
+      padding-left: 2.5rem;
+    }
+
+    /* NEW MOBILE OVERLAY MASTER */
+    #mobile-menu-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 8, 8, 0.98);
+      backdrop-filter: blur(55px) saturate(170%);
+      -webkit-backdrop-filter: blur(55px) saturate(170%);
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.5s ease;
+      overflow-y: auto;
+      padding: 5rem 1.5rem;
+    }
+
+    #mobile-menu-overlay.active { opacity: 1; visibility: visible; }
+
+    .mobile-nav-list {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 520px;
+      text-align: center;
+      gap: 1.2rem;
+    }
+
+    .mobile-link {
+      font-size: 1.05rem;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.35em;
+      text-decoration: none;
+      font-weight: 200;
+      transition: all 0.35s ease;
+      opacity: 0.9;
+      padding: 0.5rem 0;
+    }
+
+    .mobile-link:hover { color: var(--brand-gold); opacity: 1; }
+
+    .mobile-dropdown {
+      width: 100%;
+      border-top: 1px solid rgba(197, 160, 89, 0.12);
+      padding-top: 1.2rem;
+      margin-top: 0.8rem;
+    }
+
+    .mobile-dropdown-btn {
+      width: 100%;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.05rem;
+      text-transform: uppercase;
+      letter-spacing: 0.35em;
+      font-weight: 200;
+      padding: 0.6rem 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      opacity: 0.9;
+    }
+
+    .mobile-dropdown-btn:hover { color: var(--brand-gold); opacity: 1; }
+
+    .mobile-dropdown-icon {
+      width: 16px;
+      height: 16px;
+      opacity: 0.5;
+      transition: transform 0.35s ease;
+    }
+
+    .mobile-sub-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.7rem;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: all 0.45s ease;
+      padding-top: 0;
+    }
+
+    .mobile-sub-list.open {
+      max-height: 400px;
+      opacity: 1;
+      padding-top: 1.2rem;
+    }
+
+    .mobile-sub-link {
+      font-size: 0.72rem;
+      color: var(--brand-gold);
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      text-decoration: none;
+      opacity: 0.65;
+      transition: all 0.3s ease;
+      padding: 0.3rem 0;
+    }
+
+    .mobile-sub-link:hover { opacity: 1; }
+
+    .rotate-icon { transform: rotate(180deg); }
+
+    /* HERO */
+    .estates-hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .hero-bg-estates {
+      position: absolute;
+      inset: 0;
+      background-image: url('https://static.wixstatic.com/media/d5773c_36e1f1c872c7470d9415f71a261afc0b~mv2.jpg');
+      background-size: cover;
+      background-position: center;
+      opacity: 1;
+      z-index: 0;
+      filter: brightness(0.55) contrast(1.1);
+      transform: scale(1.02);
+    }
+
+    .hero-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(8,8,8,0.85) 0%, rgba(8,8,8,0.35) 45%, rgba(8,8,8,0.25) 60%, rgba(8,8,8,0.85) 100%);
+      z-index: 1;
+    }
+
+    .hero-content-estates {
+      position: relative;
+      z-index: 10;
+      padding: 180px 2rem 140px 2rem;
+      max-width: 1200px;
+      pointer-events: none;
+    }
+
+    /* SCROLL INDICATOR */
+    .explore-indicator {
+      position: absolute;
+      bottom: 54px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      opacity: 0.75;
+      transition: all 0.35s ease;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    .explore-indicator:hover {
+      opacity: 1;
+      transform: translateX(-50%) translateY(6px);
+    }
+
+    .explore-text {
+      color: #fff;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5em;
+      margin-bottom: 1.2rem;
+      font-weight: 300;
+      white-space: nowrap;
+    }
+
+    .scroll-track {
+      width: 1px;
+      height: 54px;
+      background: rgba(255,255,255,0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scroll-dot {
+      width: 100%;
+      height: 16px;
+      background: var(--brand-gold);
+      position: absolute;
+      top: 0;
+      left: 0;
+      animation: scrollLine 1.6s infinite ease-in-out;
+    }
+
+    @keyframes scrollLine {
+      0% { transform: translateY(-18px); opacity: 0; }
+      30% { opacity: 1; }
+      100% { transform: translateY(52px); opacity: 0; }
+    }
+
+    /* SECTION 2 */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(197, 160, 89, 0.15);
+      transition: all 0.5s ease;
+      padding: 2.5rem;
+      height: 100%;
+    }
+
+    .glass-card:hover {
+      border-color: var(--brand-gold);
+      background: rgba(197, 160, 89, 0.05);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .gold-divider { width: 48px; height: 1px; background: var(--brand-gold); }
+
+    /* DISCLOSURE */
+    .disclosure-card {
+      padding: 3rem;
+      border: 1px solid rgba(197, 160, 89, 0.1);
+      background: rgba(255, 255, 255, 0.01);
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .legal-notice-text {
+      font-size: 0.65rem;
+      line-height: 2.2;
+      color: #666;
+      text-align: justify;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    /* FOOTER */
+    .site-footer {
+      background-color: #000;
+      padding: 8rem 2rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      width: 100%;
+    }
+
+    .footer-copyright {
+      margin-top: 3.5rem;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      line-height: 2.2;
+      font-weight: 300;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .glass-header {
+        flex-direction: column !important;
+        justify-content: center !important;
+        height: 160px !important;
+        padding: 1.5rem 0 !important;
+      }
+
+      .glass-header.scrolled { height: 130px !important; }
+      .nav-container { display: none !important; }
+      #central-menu-btn { display: flex !important; margin-top: 12px; }
+      .logo-wrap { transform: scale(0.8); }
+
+      .hero-content-estates { padding-top: 220px; }
+
+      .hero-bg-estates { filter: brightness(0.6) contrast(1.1); }
+
+      .hero-gradient {
+        background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.10) 100%);
+      }
+    }
+
+    @media (max-width: 350px) {
+      .logo-wrap { transform: scale(0.65); }
+      .glass-header { height: 140px !important; }
+      #central-menu-btn { scale: 0.9; margin-top: 8px; }
+    }
+  </style>
 </head>
+
 <body class="custom-scrollbar">
 
-    <!-- MOBILE MENU OVERLAY -->
-    <div id="mobile-menu-overlay">
-        <button id="close-menu" class="absolute top-8 right-8 text-white focus:outline-none">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
+  <!-- MOBILE MENU OVERLAY MASTER -->
+  <div id="mobile-menu-overlay">
+    <button id="close-menu" class="absolute top-8 right-8 text-white focus:outline-none" aria-label="Close menu">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <div class="mobile-nav-list">
+      <a href="https://www.italianexp.com/" class="mobile-link">Home</a>
+
+      <div class="mobile-dropdown">
+        <button class="mobile-dropdown-btn" type="button" data-dropdown="travel">
+          Travel
+          <svg class="mobile-dropdown-icon" id="icon-travel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m6 9 6 6 6-6"></path>
+          </svg>
         </button>
-        <div class="mobile-nav-list">
-            <a href="https://www.italianexp.com/" class="mobile-link">Home</a>
-            
-            <span class="mobile-link">Travel</span>
-            <div class="mobile-sub-list">
-                <a href="https://www.italianexp.com/travel/bespoke" class="mobile-sub-link">Bespoke</a>
-                <a href="https://www.italianexp.com/travel/gapyear" class="mobile-sub-link">Gap Year</a>
-                <a href="https://www.italianexp.com/travel/culinary" class="mobile-sub-link">Culinary Academy</a>
-            </div>
-
-            <span class="mobile-link">Recruitment</span>
-            <div class="mobile-sub-list">
-                <a href="https://www.italianexp.com/recruitment/employer" class="mobile-sub-link">Employer</a>
-                <a href="https://www.italianexp.com/recruitment/candidate" class="mobile-sub-link">Candidate</a>
-            </div>
-
-            <span class="mobile-link">Flavors</span>
-            <div class="mobile-sub-list">
-                <a href="https://www.italianexp.com/flavors/foryourhome" class="mobile-sub-link">For your Home</a>
-                <a href="https://www.italianexp.com/flavors/foryourbusiness" class="mobile-sub-link">For your Business</a>
-                <a href="https://www.italianexp.com/flavors/aziendeitaliane" class="mobile-sub-link">Aziende Italiane</a>
-            </div>
-
-            <a href="https://www.italianexp.com/estetes" class="mobile-link">Estates</a>
-            <a href="https://www.italianexp.com/contact" class="mobile-link">Contact</a>
+        <div class="mobile-sub-list" id="dropdown-travel">
+          <a href="https://www.italianexp.com/travel/bespoke" class="mobile-sub-link">Bespoke</a>
+          <a href="https://www.italianexp.com/travel/gapyear" class="mobile-sub-link">Gap Year</a>
+          <a href="https://www.italianexp.com/travel/culinary" class="mobile-sub-link">Culinary Academy</a>
         </div>
+      </div>
+
+      <div class="mobile-dropdown">
+        <button class="mobile-dropdown-btn" type="button" data-dropdown="recruitment">
+          Recruitment
+          <svg class="mobile-dropdown-icon" id="icon-recruitment" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m6 9 6 6 6-6"></path>
+          </svg>
+        </button>
+        <div class="mobile-sub-list" id="dropdown-recruitment">
+          <a href="https://www.italianexp.com/recruitment/employer" class="mobile-sub-link">Employer</a>
+          <a href="https://www.italianexp.com/recruitment/candidate" class="mobile-sub-link">Candidate</a>
+        </div>
+      </div>
+
+      <div class="mobile-dropdown">
+        <button class="mobile-dropdown-btn" type="button" data-dropdown="flavors">
+          Flavors
+          <svg class="mobile-dropdown-icon" id="icon-flavors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m6 9 6 6 6-6"></path>
+          </svg>
+        </button>
+        <div class="mobile-sub-list" id="dropdown-flavors">
+          <a href="https://www.italianexp.com/flavors/foryourhome" class="mobile-sub-link">For your Home</a>
+          <a href="https://www.italianexp.com/flavors/foryourbusiness" class="mobile-sub-link">For your Business</a>
+          <a href="https://www.italianexp.com/flavors/aziendeitaliane" class="mobile-sub-link">Aziende Italiane</a>
+        </div>
+      </div>
+
+      <a href="https://www.italianexp.com/estetes" class="mobile-link">Estates</a>
+      <a href="https://www.italianexp.com/contact" class="mobile-link">Contact</a>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <nav class="glass-header" id="main-header">
+    <a href="https://www.italianexp.com/" target="_top" class="no-underline block">
+      <div class="logo-wrap" id="logo-header">
+        <span class="font-it">Italian</span>
+        <div class="font-ex" data-text="EXPERIENCE"></div>
+        <div class="tricolore-line">
+          <div class="bg-[#008C45] flex-1"></div>
+          <div class="bg-white flex-1"></div>
+          <div class="bg-[#CD212A] flex-1"></div>
+        </div>
+      </div>
+    </a>
+
+    <button id="central-menu-btn" aria-label="Menu">
+      <svg class="menu-icon-svg" viewBox="0 0 24 24" fill="none" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10" stroke="rgba(197, 160, 89, 0.4)" stroke-width="1"/>
+        <line x1="8" y1="10" x2="16" y2="10" stroke="#c5a059" stroke-width="2.5"/>
+        <line x1="10" y1="14" x2="14" y2="14" stroke="#c5a059" stroke-width="2.5"/>
+      </svg>
+      <span>Menu</span>
+    </button>
+
+    <div class="nav-container">
+      <a href="https://www.italianexp.com/" class="nav-link">Home</a>
+
+      <div class="dropdown h-full flex items-center">
+        <a href="https://www.italianexp.com/travel" class="nav-link">
+          Travel
+          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </a>
+        <div class="dropdown-menu">
+          <a href="https://www.italianexp.com/travel/bespoke" class="dropdown-item">Bespoke</a>
+          <a href="https://www.italianexp.com/travel/gapyear" class="dropdown-item">Gap Year</a>
+          <a href="https://www.italianexp.com/travel/culinary" class="dropdown-item">Culinary Academy</a>
+        </div>
+      </div>
+
+      <div class="dropdown h-full flex items-center">
+        <a href="https://www.italianexp.com/recruitment" class="nav-link">
+          Recruitment
+          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </a>
+        <div class="dropdown-menu">
+          <a href="https://www.italianexp.com/recruitment/employer" class="dropdown-item">Employer</a>
+          <a href="https://www.italianexp.com/recruitment/candidate" class="dropdown-item">Candidate</a>
+        </div>
+      </div>
+
+      <div class="dropdown h-full flex items-center">
+        <a href="https://www.italianexp.com/flavors" class="nav-link">
+          Flavors
+          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </a>
+        <div class="dropdown-menu">
+          <a href="https://www.italianexp.com/flavors/foryourhome" class="dropdown-item">For your Home</a>
+          <a href="https://www.italianexp.com/flavors/foryourbusiness" class="dropdown-item">For your Business</a>
+          <a href="https://www.italianexp.com/flavors/aziendeitaliane" class="dropdown-item">Aziende Italiane</a>
+        </div>
+      </div>
+
+      <a href="https://www.italianexp.com/estetes" class="nav-link font-bold text-[#c5a059]">Estates</a>
+      <a href="https://www.italianexp.com/contact" class="nav-link">Contact</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="estates-hero">
+    <div class="hero-bg-estates"></div>
+    <div class="hero-gradient"></div>
+
+    <div class="hero-content-estates">
+      <h3 class="text-[#c5a059] italic brand-font text-2xl mb-4 tracking-wide uppercase">
+        A Legacy of Ownership
+      </h3>
+
+      <h1 class="text-6xl md:text-9xl font-bold brand-font leading-tight text-white uppercase tracking-tighter">
+        Italian Heritage <br>
+        <span class="italic font-light text-white/80">Estates.</span>
+      </h1>
+
+      <p class="text-slate-300 font-light text-xl max-w-2xl mx-auto leading-relaxed mb-10">
+        Strategic advisory for the acquisition of prestigious Italian real estate. We navigate legal frameworks, fiscal structures, and cultural value to protect your long-term investment.
+      </p>
     </div>
 
-    <!-- HEADER SMART -->
-    <nav class="glass-header" id="main-header">
-        <a href="https://www.italianexp.com/" target="_top" class="no-underline block">
-            <div class="logo-wrap" id="logo-header">
-                <span class="font-it">Italian</span>
-                <div class="font-ex" data-text="EXPERIENCE"></div>
-                <div class="tricolore-line">
-                    <div class="bg-[#008C45] flex-1"></div>
-                    <div class="bg-white flex-1"></div>
-                    <div class="bg-[#CD212A] flex-1"></div>
-                </div>
-            </div>
-        </a>
+    <a href="#framework" class="explore-indicator">
+      <span class="explore-text">Explore the Strategy</span>
+      <div class="scroll-track">
+        <div class="scroll-dot"></div>
+      </div>
+    </a>
+  </header>
 
-        <button id="central-menu-btn" aria-label="Menu">
-            <svg class="menu-icon-svg" viewBox="0 0 24 24" fill="none" stroke-linecap="round">
-                <circle cx="12" cy="12" r="10" stroke="rgba(197, 160, 89, 0.4)" stroke-width="1"/>
-                <line x1="8" y1="10" x2="16" y2="10" stroke="#c5a059" stroke-width="2.5"/>
-                <line x1="10" y1="14" x2="14" y2="14" stroke="#c5a059" stroke-width="2.5"/>
-            </svg>
-            <span>Menu</span>
-        </button>
+  <!-- SECTION 2 -->
+  <section id="framework" class="py-32 md:py-48 px-6 bg-[#080808]">
+    <div class="max-w-7xl mx-auto w-full">
+      <div class="grid lg:grid-cols-2 gap-20 items-center">
 
-        <div class="nav-container">
-            <a href="https://www.italianexp.com/" class="nav-link">Home</a>
+        <div>
+          <div class="flex items-center mb-8">
+            <div class="gold-divider mr-4"></div>
+            <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.7rem] font-bold">
+              Acquisition Framework
+            </span>
+          </div>
 
-            <div class="dropdown h-full flex items-center">
-                <a href="https://www.italianexp.com/travel" class="nav-link">
-                    Travel 
-                    <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                        <path d="m6 9 6 6 6-6"/>
-                    </svg>
-                </a>
-                <div class="dropdown-menu">
-                    <a href="https://www.italianexp.com/travel/bespoke" class="dropdown-item">Bespoke</a>
-                    <a href="https://www.italianexp.com/travel/gapyear" class="dropdown-item">Gap Year</a>
-                    <a href="https://www.italianexp.com/travel/culinary" class="dropdown-item">Culinary Academy</a>
-                </div>
-            </div>
+          <h2 class="text-4xl md:text-7xl brand-font text-white mb-12 italic leading-tight">
+            Protecting Your <br>Global Legacy.
+          </h2>
 
-            <div class="dropdown h-full flex items-center">
-                <a href="https://www.italianexp.com/recruitment" class="nav-link">
-                    Recruitment 
-                    <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                        <path d="m6 9 6 6 6-6"/>
-                    </svg>
-                </a>
-                <div class="dropdown-menu">
-                    <a href="https://www.italianexp.com/recruitment/employer" class="dropdown-item">Employer</a>
-                    <a href="https://www.italianexp.com/recruitment/candidate" class="dropdown-item">Candidate</a>
-                </div>
+          <div class="space-y-10">
+
+            <div class="flex items-start gap-6">
+              <div class="text-[#c5a059] mt-1">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div>
+                <h4 class="text-white font-bold uppercase text-[0.65rem] tracking-widest mb-2">Fiscal Optimization</h4>
+                <p class="text-slate-500 text-sm leading-relaxed font-light">
+                  Strategic structuring of ownership to optimize property taxation and preserve long-term yield.
+                </p>
+              </div>
             </div>
 
-            <div class="dropdown h-full flex items-center">
-                <a href="https://www.italianexp.com/flavors" class="nav-link">
-                    Flavors 
-                    <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                        <path d="m6 9 6 6 6-6"/>
-                    </svg>
-                </a>
-                <div class="dropdown-menu">
-                    <a href="https://www.italianexp.com/flavors/foryourhome" class="dropdown-item">For your Home</a>
-                    <a href="https://www.italianexp.com/flavors/foryourbusiness" class="dropdown-item">For your Business</a>
-                    <a href="https://www.italianexp.com/flavors/aziendeitaliane" class="dropdown-item">Aziende Italiane</a>
-                </div>
+            <div class="flex items-start gap-6">
+              <div class="text-[#c5a059] mt-1">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div>
+                <h4 class="text-white font-bold uppercase text-[0.65rem] tracking-widest mb-2">Due Diligence</h4>
+                <p class="text-slate-500 text-sm leading-relaxed font-light">
+                  Full verification of cadastral compliance, legal ownership, and risk exposure before any transaction.
+                </p>
+              </div>
             </div>
 
-            <a href="https://www.italianexp.com/estetes" class="nav-link font-bold text-[#c5a059]">Estates</a>
-            <a href="https://www.italianexp.com/contact" class="nav-link">Contact</a>
+            <div class="flex items-start gap-6">
+              <div class="text-[#c5a059] mt-1">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path d="M12 6v6l4 2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div>
+                <h4 class="text-white font-bold uppercase text-[0.65rem] tracking-widest mb-2">Heritage & Restoration</h4>
+                <p class="text-slate-500 text-sm leading-relaxed font-light">
+                  Advisory on protected assets, restoration incentives, and architectural heritage preservation.
+                </p>
+              </div>
+            </div>
+
+          </div>
         </div>
-    </nav>
 
-    <!-- HERO -->
-    <header class="estates-hero">
-        <div class="hero-bg-estates"></div>
-        <div class="hero-gradient"></div>
-
-        <div class="hero-content-estates">
-            <h3 class="text-[#c5a059] italic brand-font text-2xl mb-4 tracking-wide uppercase">
-                A Legacy of Ownership
-            </h3>
-
-            <h1 class="text-6xl md:text-9xl font-bold brand-font leading-tight text-white uppercase tracking-tighter">
-                Italian Heritage <br>
-                <span class="italic font-light text-white/80">Estates.</span>
-            </h1>
-
-            <p class="text-slate-300 font-light text-xl max-w-2xl mx-auto leading-relaxed mb-10">
-                Strategic advisory for the acquisition of prestigious Italian real estate. We navigate legal frameworks, fiscal structures, and cultural value to protect your long-term investment.
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="glass-card border-t-2 border-[#c5a059]">
+            <h3 class="text-2xl font-bold text-white mb-4 italic brand-font">Off-Market</h3>
+            <p class="text-slate-500 text-sm leading-relaxed font-light">
+              Access to discreet opportunities in Italy’s most protected and exclusive regions.
             </p>
+          </div>
+
+          <div class="glass-card">
+            <h3 class="text-2xl font-bold text-white mb-4 italic brand-font">Legal Structure</h3>
+            <p class="text-slate-500 text-sm leading-relaxed font-light">
+              Cross-border legal architecture designed for seamless ownership and asset protection.
+            </p>
+          </div>
+
+          <div class="glass-card">
+            <h3 class="text-2xl font-bold text-white mb-4 italic brand-font">Heritage Value</h3>
+            <p class="text-slate-500 text-sm leading-relaxed font-light">
+              Consultation on cultural significance, protected areas, and long-term prestige.
+            </p>
+          </div>
+
+          <div class="glass-card border-b-2 border-[#c5a059]">
+            <h3 class="text-2xl font-bold text-white mb-4 italic brand-font">Yield Strategy</h3>
+            <p class="text-slate-500 text-sm leading-relaxed font-light">
+              Asset strategy for high-end hospitality conversion, private rentals, or long-term appreciation.
+            </p>
+          </div>
         </div>
 
-        <a href="#framework" class="explore-indicator">
-            <span class="explore-text">Explore the Strategy</span>
-            <div class="scroll-track">
-                <div class="scroll-dot"></div>
-            </div>
-        </a>
-    </header>
+      </div>
+    </div>
+  </section>
 
-    <!-- SECTION 2: ACQUISITION FRAMEWORK -->
-    <section id="framework" class="py-32 md:py-48 px-6 bg-[#080808]">
-        <div class="max-w-7xl mx-auto w-full">
-            <div class="grid lg:grid-cols-2 gap-20 items-center">
-                
-                <div>
-                    <div class="flex items-center mb-8">
-                        <div class="gold-divider mr-4"></div>
-                        <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.7rem] font-bold">
-                            Acquisition Framework
-                        </span>
-                    </div>
-
-                    <h2 class="text-4xl md:text-7xl brand-font text-white mb-12 italic leading-tight">
-                        Protecting Your <br>Global Legacy.
-                    </h2>
-
-                    <div class="space-y-10">
-                        <div class="flex items-start gap-6 group transition-all">
-                            <div class="text-[#c5a059] mt-1">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h4 class="text-white font-bold uppercase text-[0.65rem] tracking-widest mb-2">
-                                    Fiscal Optimization
-                                </h4>
-                                <p class="text-slate-500 text-sm leading-relaxed font-light">
-                                    Strategic structuring of ownership to optimize property taxation and preserve long-term yield.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-6 group transition-all">
-                            <div class="text-[#c5a059] mt-1">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h4 class="text-white font-bold uppercase text-[0.65rem] tracking-widest mb-2">
-                                    Due Diligence
-                                </h4>
-                                <p class="text-slate-500 text-sm leading-relaxed font-light">
-                                    Full verification of cadastral compliance, legal ownership, and risk exposure before any transaction.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-6 group transition-all">
-                            <div class="text-[#c5a059] mt-1">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path d="M12 6v6l4 2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h4 class="text-white font-bold uppercase text-[0.65rem] tracking-widest mb-2">
-                                    Heritage & Restoration
-                                </h4>
-                                <p class="text-slate-500 text-sm leading-relaxed font-light">
-                                    Advisory on protected assets, restoration incentives, and architectural heritage preservation.
-                                </p>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-card border-t-2 border-[#c5a059]">
-                        <h3 class="text-2xl font-bold text-white mb-4 italic brand-font">Off-Market</h3>
-                        <p class="text-slate-500 text-sm leading-relaxed font-light">
-                            Access to discreet opportunities in Italy’s most protected and exclusive regions.
-                        </p>
-                    </div>
-
-                    <div class="glass-card">
-                        <h3 class="text-2xl font-bold text-white mb-4 italic brand-font">Legal Structure</h3>
-                        <p class="text-slate-500 text-sm leading-relaxed font-light">
-                            Cross-border legal architecture designed for seamless ownership and asset protection.
-                        </p>
-                    </div>
-
-                    <div class="glass-card">
-                        <h3 class="text-2xl font-bold text-white mb-4 italic brand-font">Heritage Value</h3>
-                        <p class="text-slate-500 text-sm leading-relaxed font-light">
-                            Consultation on cultural significance, protected areas, and long-term prestige.
-                        </p>
-                    </div>
-
-                    <div class="glass-card border-b-2 border-[#c5a059]">
-                        <h3 class="text-2xl font-bold text-white mb-4 italic brand-font">Yield Strategy</h3>
-                        <p class="text-slate-500 text-sm leading-relaxed font-light">
-                            Asset strategy for high-end hospitality conversion, private rentals, or long-term appreciation.
-                        </p>
-                    </div>
-                </div>
-
-            </div>
+  <!-- DISCLOSURE -->
+  <section class="py-24 px-8 bg-[#000]">
+    <div class="max-w-4xl mx-auto">
+      <div class="disclosure-card">
+        <h5 class="font-bold uppercase text-[0.6rem] tracking-[0.4em] mb-8 text-slate-400 italic underline decoration-[#c5a059]/40">
+          Real Estate Disclosure
+        </h5>
+        <div class="legal-notice-text">
+          Italian Heritage Estates is a strategic consultancy service. All real estate transactions are conducted through licensed professionals in accordance with Italian Civil Code and applicable fiscal regulations. We operate as advisory partners to ensure transparency, legal compliance, and long-term asset protection for cross-border acquisitions.
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <!-- DISCLOSURE -->
-    <section class="py-24 px-8 bg-[#000]">
-        <div class="max-w-4xl mx-auto">
-            <div class="disclosure-card">
-                <h5 class="font-bold uppercase text-[0.6rem] tracking-[0.4em] mb-8 text-slate-400 italic underline decoration-[#c5a059]/40">
-                    Real Estate Disclosure
-                </h5>
-                <div class="legal-notice-text">
-                    Italian Heritage Estates is a strategic consultancy service. All real estate transactions are conducted through licensed professionals in accordance with Italian Civil Code and applicable fiscal regulations. We operate as advisory partners to ensure transparency, legal compliance, and long-term asset protection for cross-border acquisitions.
-                </div>
-            </div>
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <a href="https://www.italianexp.com/" target="_top" class="no-underline block mb-8">
+      <div class="logo-wrap scale-[0.7] md:scale-[0.8] origin-center" id="logo-footer">
+        <span class="font-it text-[70px]">Italian</span>
+        <div class="font-ex text-[35px]" data-text="EXPERIENCE"></div>
+        <div class="tricolore-line">
+          <div class="bg-[#008C45] flex-1"></div>
+          <div class="bg-white flex-1"></div>
+          <div class="bg-[#CD212A] flex-1"></div>
         </div>
-    </section>
+      </div>
+    </a>
 
-    <!-- FOOTER -->
-    <footer class="site-footer">
-        <a href="https://www.italianexp.com/" target="_top" class="no-underline block mb-8">
-            <div class="logo-wrap scale-[0.7] md:scale-[0.8] origin-center" id="logo-footer">
-                <span class="font-it text-[70px]">Italian</span>
-                <div class="font-ex text-[35px]" data-text="EXPERIENCE"></div>
-                <div class="tricolore-line">
-                    <div class="bg-[#008C45] flex-1"></div>
-                    <div class="bg-white flex-1"></div>
-                    <div class="bg-[#CD212A] flex-1"></div>
-                </div>
-            </div>
-        </a>
-        <p class="footer-copyright">
-            &copy; ITALIAN RECRUITMENT DBA ITALIAN EXPERIENCE<br>
-            STRATEGIC HOSPITALITY ADVISORY
-        </p>
-    </footer>
+    <p class="footer-copyright">
+      &copy; ITALIAN RECRUITMENT DBA ITALIAN EXPERIENCE<br>
+      STRATEGIC HOSPITALITY ADVISORY
+    </p>
+  </footer>
 
-    <script>
-        // SMART SCROLL LOGIC
-        let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
-        const header = document.getElementById('main-header');
+  <script>
+    // SMART SCROLL HEADER
+    let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
+    const header = document.getElementById('main-header');
 
-        window.addEventListener('scroll', () => {
-            const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+    window.addEventListener('scroll', () => {
+      const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
 
-            if (currentScrollY > lastScrollY && currentScrollY > 100) { 
-                header.classList.add('nav-up'); 
-            } else { 
-                header.classList.remove('nav-up'); 
-            }
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        header.classList.add('nav-up');
+      } else {
+        header.classList.remove('nav-up');
+      }
 
-            if (currentScrollY > 50) { 
-                header.classList.add('scrolled'); 
-            } else { 
-                header.classList.remove('scrolled'); 
-            }
+      if (currentScrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
 
-            lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
-        }, { passive: true });
+      lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+    }, { passive: true });
 
-        // MOBILE MENU
-        const menuBtn = document.getElementById('central-menu-btn');
-        const overlay = document.getElementById('mobile-menu-overlay');
-        const closeBtn = document.getElementById('close-menu');
+    // MOBILE MENU OPEN CLOSE
+    const menuBtn = document.getElementById('central-menu-btn');
+    const overlay = document.getElementById('mobile-menu-overlay');
+    const closeBtn = document.getElementById('close-menu');
 
-        menuBtn.onclick = () => overlay.classList.add('active');
-        closeBtn.onclick = () => overlay.classList.remove('active');
+    menuBtn.addEventListener('click', () => overlay.classList.add('active'));
+    closeBtn.addEventListener('click', () => overlay.classList.remove('active'));
 
-        overlay.onclick = (e) => { 
-            if(e.target.closest('.mobile-link') || e.target.closest('.mobile-sub-link')) overlay.classList.remove('active'); 
-        };
+    // CLOSE MENU ON LINK CLICK
+    overlay.addEventListener('click', (e) => {
+      if (e.target.closest('a')) overlay.classList.remove('active');
+    });
 
-        // LOGO PRISM LOGIC
-        function initLogo(id) {
-            const el = document.getElementById(id);
-            if (!el) return;
+    // MOBILE DROPDOWNS
+    const dropdownButtons = document.querySelectorAll('.mobile-dropdown-btn');
 
-            const ex = el.querySelector('.font-ex');
-            const it = el.querySelector('.font-it');
+    dropdownButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.getAttribute('data-dropdown');
+        const list = document.getElementById('dropdown-' + key);
+        const icon = document.getElementById('icon-' + key);
 
-            ex.innerHTML = ex.dataset.text.split('').map(c => `<span class="letter">${c}</span>`).join('');
-            const letters = el.querySelectorAll('.letter');
+        const isOpen = list.classList.contains('open');
 
-            el.addEventListener('mousemove', (e) => {
-                const rect = el.getBoundingClientRect();
-                const mouseX = e.clientX - rect.left;
+        document.querySelectorAll('.mobile-sub-list').forEach(el => el.classList.remove('open'));
+        document.querySelectorAll('.mobile-dropdown-icon').forEach(ic => ic.classList.remove('rotate-icon'));
 
-                const itRect = it.getBoundingClientRect();
-                const itX = itRect.left + itRect.width/2 - rect.left;
-                const dIt = Math.abs(mouseX - itX);
-                const pIt = Math.max(0, (150 - dIt) / 150);
-
-                it.style.textShadow = `0 0 ${20 * pIt}px rgba(197, 160, 89, 0.45)`;
-                it.style.transform = `scale(${1 + pIt * 0.05})`;
-
-                letters.forEach(l => {
-                    const lRect = l.getBoundingClientRect();
-                    const lx = lRect.left + lRect.width/2 - rect.left;
-                    const dx = Math.abs(mouseX - lx);
-
-                    if (dx < 100) {
-                        const p = (100 - dx) / 100;
-                        l.style.color = mouseX > lx + 15 ? '#008C45' : (mouseX < lx - 15 ? '#CD212A' : '#FFF');
-                        l.style.transform = `scale(${1 + p * 0.45}) translateY(${-p * 12}px)`;
-                        l.style.textShadow = `0 0 ${15 * p}px currentColor`;
-                    } else {
-                        l.style.color = '';
-                        l.style.transform = '';
-                        l.style.textShadow = '';
-                    }
-                });
-            });
-
-            el.addEventListener('mouseleave', () => {
-                it.style.textShadow = '';
-                it.style.transform = '';
-                letters.forEach(l => { 
-                    l.style.color = '';
-                    l.style.transform = '';
-                    l.style.textShadow = '';
-                });
-            });
+        if (!isOpen) {
+          list.classList.add('open');
+          icon.classList.add('rotate-icon');
         }
+      });
+    });
 
-        window.onload = () => { 
-            initLogo('logo-header'); 
-            initLogo('logo-footer'); 
-        };
-    </script>
+    // LOGO PRISM EFFECT
+    function initLogo(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      const ex = el.querySelector('.font-ex');
+      const it = el.querySelector('.font-it');
+
+      ex.innerHTML = ex.dataset.text.split('').map(c => `<span class="letter">${c}</span>`).join('');
+      const letters = el.querySelectorAll('.letter');
+
+      el.addEventListener('mousemove', (e) => {
+        const rect = el.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+
+        const itRect = it.getBoundingClientRect();
+        const itX = itRect.left + itRect.width / 2 - rect.left;
+        const dIt = Math.abs(mouseX - itX);
+        const pIt = Math.max(0, (150 - dIt) / 150);
+
+        it.style.textShadow = `0 0 ${20 * pIt}px rgba(197, 160, 89, 0.45)`;
+        it.style.transform = `scale(${1 + pIt * 0.05})`;
+
+        letters.forEach(l => {
+          const lRect = l.getBoundingClientRect();
+          const lx = lRect.left + lRect.width / 2 - rect.left;
+          const dx = Math.abs(mouseX - lx);
+
+          if (dx < 100) {
+            const p = (100 - dx) / 100;
+            l.style.color = mouseX > lx + 15 ? '#008C45' : (mouseX < lx - 15 ? '#CD212A' : '#FFF');
+            l.style.transform = `scale(${1 + p * 0.45}) translateY(${-p * 12}px)`;
+            l.style.textShadow = `0 0 ${15 * p}px currentColor`;
+          } else {
+            l.style.color = '';
+            l.style.transform = '';
+            l.style.textShadow = '';
+          }
+        });
+      });
+
+      el.addEventListener('mouseleave', () => {
+        it.style.textShadow = '';
+        it.style.transform = '';
+        letters.forEach(l => {
+          l.style.color = '';
+          l.style.transform = '';
+          l.style.textShadow = '';
+        });
+      });
+    }
+
+    window.onload = () => {
+      initLogo('logo-header');
+      initLogo('logo-footer');
+    };
+  </script>
 </body>
 </html>
