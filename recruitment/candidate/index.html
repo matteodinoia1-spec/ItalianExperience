@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Candidate Journey - Italian Experience</title>
+  <title>Candidate Journey | Italian Experience</title>
 
-  <!-- Scripts -->
+  <!-- Tailwind + Chart -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -22,6 +22,7 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; background-color: #000; }
+
     body {
       background-color: var(--brand-dark);
       color: #fff;
@@ -30,6 +31,7 @@
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
     }
+
     .brand-font { font-family: 'Playfair Display', serif; }
 
     /* HEADER */
@@ -43,13 +45,14 @@
       backdrop-filter: blur(0px);
       padding: 0 4rem;
       display: flex;
-      flex-direction: row;
       justify-content: space-between;
       align-items: center;
       height: 110px;
       transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.5s, backdrop-filter 0.5s, height 0.4s;
     }
+
     .glass-header.nav-up { transform: translateY(-110%); }
+
     .glass-header.scrolled {
       height: 90px;
       background: rgba(15, 15, 15, 0.45);
@@ -71,6 +74,7 @@
       transition: all 0.4s ease;
       z-index: 9010;
     }
+
     .font-it {
       font-family: 'Great Vibes', cursive;
       color: var(--brand-gold);
@@ -78,6 +82,7 @@
       line-height: 1;
       white-space: nowrap;
     }
+
     .font-ex {
       font-family: 'Montserrat', sans-serif;
       color: var(--brand-gold);
@@ -87,12 +92,14 @@
       letter-spacing: -0.02em;
       display: flex;
     }
+
     .letter {
       display: inline-block;
       position: relative;
       will-change: transform, color;
       transition: all 0.25s ease-out;
     }
+
     .tricolore-line {
       position: absolute;
       height: 2px;
@@ -111,6 +118,7 @@
       margin-left: auto;
       height: 100%;
     }
+
     .nav-link {
       color: #fff;
       text-transform: uppercase;
@@ -123,6 +131,7 @@
       white-space: nowrap;
       cursor: pointer;
     }
+
     .nav-link:hover {
       color: var(--brand-gold);
       opacity: 1;
@@ -136,6 +145,7 @@
     }
 
     .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
+
     .dropdown-menu {
       position: absolute;
       top: 100%;
@@ -151,11 +161,13 @@
       padding: 1.2rem 0;
       border-radius: 2px;
     }
+
     .dropdown:hover .dropdown-menu {
       opacity: 1;
       visibility: visible;
       transform: translateY(0);
     }
+
     .dropdown-item {
       display: block;
       padding: 0.8rem 2rem;
@@ -167,12 +179,14 @@
       opacity: 0.6;
       transition: 0.3s;
     }
+
     .dropdown-item:hover {
       color: var(--brand-gold);
       opacity: 1;
       background: rgba(255,255,255,0.03);
       padding-left: 2.5rem;
     }
+
     .dropdown-item.active {
       color: var(--brand-gold);
       opacity: 1;
@@ -190,6 +204,7 @@
       outline: none;
       z-index: 9020;
     }
+
     #central-menu-btn span {
       color: var(--brand-gold);
       font-size: 0.52rem;
@@ -200,7 +215,7 @@
       opacity: 0.9;
     }
 
-    /* MOBILE OVERLAY */
+    /* MOBILE OVERLAY MENU (NEW STYLE) */
     #mobile-menu-overlay {
       position: fixed;
       inset: 0;
@@ -215,55 +230,115 @@
       visibility: hidden;
       transition: all 0.5s ease;
       overflow-y: auto;
-      padding: 3rem 0;
+      padding: 4rem 0;
     }
+
     #mobile-menu-overlay.active {
       opacity: 1;
       visibility: visible;
     }
+
     .mobile-nav-list {
       display: flex;
       flex-direction: column;
       align-items: center;
       width: 100%;
       text-align: center;
-      padding: 3rem 0;
+      padding: 2rem 0;
+      gap: 1.2rem;
     }
 
-    .mobile-link {
+    .mobile-main-link {
       font-size: 1.05rem;
       color: #fff;
       text-transform: uppercase;
       letter-spacing: 0.4em;
-      margin: 1.1rem 0;
       text-decoration: none;
       font-weight: 200;
       transition: color 0.3s;
+      opacity: 0.85;
     }
-    .mobile-link:hover { color: var(--brand-gold); }
 
-    .mobile-link.active { color: var(--brand-gold); }
+    .mobile-main-link:hover {
+      color: var(--brand-gold);
+      opacity: 1;
+    }
 
-    .mobile-sub-list {
+    .mobile-main-link.active {
+      color: var(--brand-gold);
+      opacity: 1;
+    }
+
+    .mobile-dropdown-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
       display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      font-size: 1.05rem;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      font-weight: 200;
+      opacity: 0.85;
+      transition: color 0.3s, opacity 0.3s;
+    }
+
+    .mobile-dropdown-btn:hover {
+      color: var(--brand-gold);
+      opacity: 1;
+    }
+
+    .mobile-dropdown-btn.active {
+      color: var(--brand-gold);
+      opacity: 1;
+    }
+
+    .mobile-dropdown-arrow {
+      width: 18px;
+      height: 18px;
+      color: var(--brand-gold);
+      opacity: 0.7;
+      transition: transform 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .mobile-submenu {
+      width: 80%;
+      max-width: 360px;
+      margin: 0 auto;
+      padding-top: 0.8rem;
+      border-top: 1px solid rgba(197, 160, 89, 0.15);
+      display: none;
       flex-direction: column;
       align-items: center;
-      margin-bottom: 1.5rem;
-      border-top: 1px solid rgba(197, 160, 89, 0.15);
-      padding-top: 0.5rem;
-      width: 78%;
+      gap: 0.65rem;
     }
+
+    .mobile-submenu.open {
+      display: flex;
+    }
+
     .mobile-sub-link {
       font-size: 0.72rem;
       color: var(--brand-gold);
       text-transform: uppercase;
       letter-spacing: 0.25em;
-      margin: 0.5rem 0;
       text-decoration: none;
       opacity: 0.55;
       transition: 0.3s;
+      padding: 0.25rem 0;
     }
+
     .mobile-sub-link:hover { opacity: 1; }
+
+    .mobile-sub-link.active {
+      opacity: 1;
+      color: var(--brand-gold);
+    }
 
     /* HERO */
     .hero-split-container {
@@ -329,7 +404,7 @@
       height: 100%;
     }
 
-    /* TEMPLATE SCROLL INDICATOR */
+    /* SCROLL INDICATOR */
     @keyframes scrollLine {
       0% { transform: translateY(-18px); opacity: 0; }
       30% { opacity: 1; }
@@ -394,6 +469,7 @@
       transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
       height: 100%;
     }
+
     .glass-card:hover {
       border-color: var(--brand-gold);
       background: rgba(197, 160, 89, 0.05);
@@ -417,6 +493,7 @@
       font-size: 0.85rem;
       flex-shrink: 0;
     }
+
     .timeline-line {
       position: absolute;
       left: 22px;
@@ -426,7 +503,7 @@
       background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.1) 15%, rgba(255,255,255,0.1) 85%, transparent);
     }
 
-    /* Chart container */
+    /* Chart */
     .chart-container { width: 100%; height: 320px; }
 
     /* Footer */
@@ -440,18 +517,28 @@
       text-align: center;
     }
 
-    /* Responsive */
+    /* RESPONSIVE HEADER FIX */
     @media (max-width: 1024px) {
       .glass-header {
         flex-direction: column !important;
         justify-content: center !important;
-        height: 160px !important;
-        padding: 1.5rem 0 !important;
+        align-items: center !important;
+        height: 180px !important;
+        padding: 1.4rem 0 !important;
+        gap: 12px;
       }
-      .glass-header.scrolled { height: 130px !important; }
+
+      .glass-header.scrolled {
+        height: 150px !important;
+      }
+
       .nav-container { display: none !important; }
-      #central-menu-btn { display: flex !important; margin-top: 12px; }
-      .logo-wrap { transform: scale(0.85); }
+      #central-menu-btn { display: flex !important; margin-top: 6px; }
+
+      .logo-wrap {
+        transform: scale(0.82);
+        margin: 0 auto;
+      }
 
       .hero-side {
         width: 100%;
@@ -459,6 +546,7 @@
         mask-image: none !important;
         -webkit-mask-image: none !important;
       }
+
       .side-usa { display: none; }
     }
 
@@ -467,6 +555,7 @@
         font-size: clamp(2.4rem, 11vw, 4rem) !important;
         line-height: 1.1 !important;
       }
+
       .timeline-line { display: none; }
       .glass-card { padding: 1.8rem; }
       .chart-container { height: 260px; }
@@ -474,16 +563,17 @@
     }
 
     @media (max-width: 350px) {
-      .logo-wrap { transform: scale(0.7); }
-      .glass-header { height: 145px !important; }
-      #central-menu-btn { scale: 0.9; margin-top: 8px; }
+      .logo-wrap { transform: scale(0.72); }
+      .glass-header { height: 165px !important; }
+      .glass-header.scrolled { height: 140px !important; }
+      #central-menu-btn { scale: 0.92; margin-top: 4px; }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- MOBILE MENU OVERLAY -->
+  <!-- MOBILE MENU OVERLAY (NEW STYLE) -->
   <div id="mobile-menu-overlay">
     <button id="close-menu" class="absolute top-8 right-8 text-white focus:outline-none">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
@@ -494,54 +584,56 @@
     </button>
 
     <div class="mobile-nav-list">
-      <a href="https://www.italianexp.com/" class="mobile-link">Home</a>
+
+      <a href="https://www.italianexp.com/" class="mobile-main-link">Home</a>
 
       <!-- TRAVEL -->
-      <button class="mobile-link toggle-submenu flex items-center justify-center gap-3 w-full" data-target="submenu-travel">
+      <button class="mobile-dropdown-btn" data-target="submenu-travel">
         Travel
-        <svg class="w-4 h-4 text-[#c5a059] opacity-70 transition-transform duration-300 submenu-arrow" fill="none"
-          stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <svg class="mobile-dropdown-arrow submenu-arrow" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
         </svg>
       </button>
 
-      <div id="submenu-travel" class="mobile-sub-list hidden">
+      <div id="submenu-travel" class="mobile-submenu">
         <a href="https://www.italianexp.com/travel/bespoke" class="mobile-sub-link">Bespoke</a>
         <a href="https://www.italianexp.com/travel/gapyear" class="mobile-sub-link">Gap Years</a>
         <a href="https://www.italianexp.com/travel/culinary" class="mobile-sub-link">Culinary Academy</a>
       </div>
 
       <!-- RECRUITMENT -->
-      <button class="mobile-link toggle-submenu flex items-center justify-center gap-3 w-full active" data-target="submenu-recruitment">
+      <button class="mobile-dropdown-btn active" data-target="submenu-recruitment">
         Recruitment
-        <svg class="w-4 h-4 text-[#c5a059] opacity-70 transition-transform duration-300 submenu-arrow" fill="none"
-          stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <svg class="mobile-dropdown-arrow submenu-arrow" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
         </svg>
       </button>
 
-      <div id="submenu-recruitment" class="mobile-sub-list">
+      <div id="submenu-recruitment" class="mobile-submenu open">
         <a href="https://www.italianexp.com/recruitment/employer" class="mobile-sub-link">Employer</a>
-        <a href="https://www.italianexp.com/recruitment/candidate" class="mobile-sub-link" style="opacity:1;">Candidate</a>
+        <a href="https://www.italianexp.com/recruitment/candidate" class="mobile-sub-link active">Candidate</a>
       </div>
 
       <!-- FLAVORS -->
-      <button class="mobile-link toggle-submenu flex items-center justify-center gap-3 w-full" data-target="submenu-flavors">
+      <button class="mobile-dropdown-btn" data-target="submenu-flavors">
         Flavors
-        <svg class="w-4 h-4 text-[#c5a059] opacity-70 transition-transform duration-300 submenu-arrow" fill="none"
-          stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <svg class="mobile-dropdown-arrow submenu-arrow" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
         </svg>
       </button>
 
-      <div id="submenu-flavors" class="mobile-sub-list hidden">
-        <a href="https://www.italianexp.com/flavors/foryourhome" class="mobile-sub-link">For Your Home</a>
-        <a href="https://www.italianexp.com/flavors/foryourbusiness" class="mobile-sub-link">For Your Business</a>
-        <a href="https://www.italianexp.com/flavors/aziendeitaliane" class="mobile-sub-link">Italian Companies</a>
+      <div id="submenu-flavors" class="mobile-submenu">
+        <a href="https://www.italianexp.com/flavors/for-your-home" class="mobile-sub-link">For Your Home</a>
+        <a href="https://www.italianexp.com/flavors/for-your-business" class="mobile-sub-link">For Your Business</a>
+        <a href="https://www.italianexp.com/flavors/aziende-italiane" class="mobile-sub-link">Italian Companies</a>
       </div>
 
-      <a href="https://www.italianexp.com/estetes" class="mobile-link">Estates</a>
-      <a href="https://www.italianexp.com/contact" class="mobile-link">Contact</a>
+      <a href="https://www.italianexp.com/estates" class="mobile-main-link">Estates</a>
+      <a href="https://www.italianexp.com/contact" class="mobile-main-link">Contact</a>
+
     </div>
   </div>
 
@@ -569,6 +661,7 @@
       <span>Menu</span>
     </button>
 
+    <!-- DESKTOP MENU -->
     <div class="nav-container">
       <a href="https://www.italianexp.com/" class="nav-link">Home</a>
 
@@ -607,13 +700,13 @@
           </svg>
         </a>
         <div class="dropdown-menu">
-          <a href="https://www.italianexp.com/flavors/foryourhome" class="dropdown-item">For Your Home</a>
-          <a href="https://www.italianexp.com/flavors/foryourbusiness" class="dropdown-item">For Your Business</a>
-          <a href="https://www.italianexp.com/flavors/aziendeitaliane" class="dropdown-item">Italian Companies</a>
+          <a href="https://www.italianexp.com/flavors/for-your-home" class="dropdown-item">For Your Home</a>
+          <a href="https://www.italianexp.com/flavors/for-your-business" class="dropdown-item">For Your Business</a>
+          <a href="https://www.italianexp.com/flavors/aziende-italiane" class="dropdown-item">Italian Companies</a>
         </div>
       </div>
 
-      <a href="https://www.italianexp.com/estetes" class="nav-link">Estates</a>
+      <a href="https://www.italianexp.com/estates" class="nav-link">Estates</a>
       <a href="https://www.italianexp.com/contact" class="nav-link">Contact</a>
     </div>
   </nav>
@@ -638,12 +731,12 @@
       </h1>
 
       <p class="text-slate-200 font-light text-base md:text-xl max-w-3xl mx-auto leading-relaxed mb-4 text-center">
-        Whether you are aiming for a life-changing cultural program in the United States or a strategic career move,
+        Whether you are pursuing a life-changing cultural program in the United States or a strategic career move,
         we provide full support to help you represent authentic Italian excellence.
       </p>
     </div>
 
-    <!-- SCROLL DOWN TEMPLATE -->
+    <!-- SCROLL DOWN -->
     <a href="#ambassador" class="explore-indicator" aria-label="Explore section">
       <span>Explore</span>
       <div class="scroll-track" aria-hidden="true">
@@ -669,15 +762,15 @@
           <div class="text-[#c5a059] text-3xl mb-6"><i class="fas fa-passport"></i></div>
           <h3 class="text-white font-bold text-sm uppercase tracking-widest mb-4">Visa & Logistics</h3>
           <p class="text-slate-400 text-xs font-light leading-relaxed">
-            Full coordination of your visa process and travel logistics. We handle complexity so you can focus on performance.
+            Full coordination of your visa process and travel logistics. We handle the complexity so you can focus on performance.
           </p>
         </div>
 
         <div class="glass-card border-t-2 border-[#c5a059]/40">
           <div class="text-[#c5a059] text-3xl mb-6"><i class="fas fa-gem"></i></div>
-          <h3 class="text-white font-bold text-sm uppercase tracking-widest mb-4">Luxury Lifestyle</h3>
+          <h3 class="text-white font-bold text-sm uppercase tracking-widest mb-4">Luxury Environment</h3>
           <p class="text-slate-400 text-xs font-light leading-relaxed">
-            Experience the American lifestyle with premium housing solutions and high-end environments.
+            Access premium venues and high-end hospitality environments while expanding your international lifestyle.
           </p>
         </div>
 
@@ -685,7 +778,7 @@
           <div class="text-[#c5a059] text-3xl mb-6"><i class="fas fa-hands-helping"></i></div>
           <h3 class="text-white font-bold text-sm uppercase tracking-widest mb-4">Full Assistance</h3>
           <p class="text-slate-400 text-xs font-light leading-relaxed">
-            Continuous on-site support in the United States, including cultural integration and administrative guidance.
+            Continuous support in the United States, including cultural integration and administrative guidance.
           </p>
         </div>
       </div>
@@ -746,196 +839,6 @@
     </div>
   </section>
 
-  <!-- SECTION: REQUIREMENTS -->
-  <section class="py-28 px-6">
-    <div class="max-w-6xl mx-auto text-center">
-      <span class="text-[#c5a059] uppercase tracking-[0.6em] text-[0.65rem] font-bold block mb-4">
-        Admission Criteria
-      </span>
-
-      <h2 class="text-4xl md:text-5xl brand-font text-white mb-6 leading-tight italic">
-        Program Requirements.
-      </h2>
-
-      <p class="text-slate-400 font-light text-sm md:text-base max-w-2xl mx-auto uppercase tracking-widest leading-relaxed mb-16">
-        To access cultural exchange opportunities in the United States, candidates must meet the following benchmarks.
-      </p>
-
-      <div class="grid md:grid-cols-2 gap-8 text-left">
-        <div class="glass-card flex items-start gap-6 border-l-4 border-[#c5a059]/30">
-          <div class="text-[#c5a059] text-xl flex-shrink-0 w-12 h-12 flex items-center justify-center border border-[#c5a059]/20">
-            <i class="fas fa-passport"></i>
-          </div>
-          <div>
-            <h3 class="text-white font-bold text-sm uppercase tracking-widest mb-2">Age & Passport</h3>
-            <p class="text-slate-500 text-xs leading-relaxed">
-              You must be at least 18 years old and hold a valid passport from the country you represent.
-            </p>
-          </div>
-        </div>
-
-        <div class="glass-card flex items-start gap-6 border-l-4 border-[#c5a059]/30">
-          <div class="text-[#c5a059] text-xl flex-shrink-0 w-12 h-12 flex items-center justify-center border border-[#c5a059]/20">
-            <i class="fas fa-language"></i>
-          </div>
-          <div>
-            <h3 class="text-white font-bold text-sm uppercase tracking-widest mb-2">English Proficiency</h3>
-            <p class="text-slate-500 text-xs leading-relaxed">
-              Strong English skills are required (B2-C1) to integrate successfully in U.S. luxury environments.
-            </p>
-          </div>
-        </div>
-
-        <div class="glass-card flex items-start gap-6 border-l-4 border-[#c5a059]/30">
-          <div class="text-[#c5a059] text-xl flex-shrink-0 w-12 h-12 flex items-center justify-center border border-[#c5a059]/20">
-            <i class="fas fa-calendar-check"></i>
-          </div>
-          <div>
-            <h3 class="text-white font-bold text-sm uppercase tracking-widest mb-2">Availability</h3>
-            <p class="text-slate-500 text-xs leading-relaxed">
-              Candidates must be available for a full commitment of 12 to 15 months.
-            </p>
-          </div>
-        </div>
-
-        <div class="glass-card flex items-start gap-6 border-l-4 border-[#c5a059]/30">
-          <div class="text-[#c5a059] text-xl flex-shrink-0 w-12 h-12 flex items-center justify-center border border-[#c5a059]/20">
-            <i class="fas fa-flag"></i>
-          </div>
-          <div>
-            <h3 class="text-white font-bold text-sm uppercase tracking-widest mb-2">Ambassador Mindset</h3>
-            <p class="text-slate-500 text-xs leading-relaxed">
-              Passion for Italian culture and the motivation to represent authentic Italian hospitality with pride.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-12 text-center">
-        <p class="text-slate-600 text-[0.6rem] uppercase tracking-[0.3em]">
-          Final eligibility is confirmed during the initial screening process.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION: ROADMAP -->
-  <section class="py-28 px-6 bg-[#080808]">
-    <div class="max-w-4xl mx-auto w-full">
-      <div class="text-center mb-20">
-        <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.6rem] font-bold block mb-4">
-          The Process
-        </span>
-        <h2 class="text-4xl md:text-5xl brand-font italic">
-          Your 15-Month Roadmap.
-        </h2>
-      </div>
-
-      <div class="space-y-14 relative">
-        <div class="timeline-line hidden md:block"></div>
-
-        <div class="flex gap-8 items-start relative">
-          <div class="step-node">01</div>
-          <div class="glass-card w-full">
-            <h4 class="text-lg font-bold uppercase tracking-widest text-white mb-2 italic">Technical Vetting</h4>
-            <p class="text-slate-500 text-sm font-light leading-relaxed">
-              Skill assessment and structured interviews with our partner academies in Italy, aligned with U.S. service standards.
-            </p>
-          </div>
-        </div>
-
-        <div class="flex gap-8 items-start relative">
-          <div class="step-node">02</div>
-          <div class="glass-card w-full border-l-4 border-[#c5a059]">
-            <h4 class="text-lg font-bold uppercase tracking-widest text-white mb-2 italic">Legal & Logistics</h4>
-            <p class="text-slate-500 text-sm font-light leading-relaxed">
-              Complete legal architecture, housing placement, and administrative onboarding.
-            </p>
-          </div>
-        </div>
-
-        <div class="flex gap-8 items-start relative">
-          <div class="step-node">03</div>
-          <div class="glass-card w-full">
-            <h4 class="text-lg font-bold uppercase tracking-widest text-white mb-2 italic">Ambassador Term</h4>
-            <p class="text-slate-500 text-sm font-light leading-relaxed">
-              Months 1 to 15: work in elite hospitality venues in the United States, delivering authentic cultural storytelling and premium service.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION: JOB LOCATIONS -->
-  <section class="py-28 px-6 bg-[#0c0c0c]">
-    <div class="max-w-6xl mx-auto text-center">
-      <span class="text-[#c5a059] uppercase tracking-[0.6em] text-[0.65rem] font-bold block mb-4">
-        Career Destinations
-      </span>
-
-      <h2 class="text-4xl md:text-5xl brand-font italic text-white mb-16">
-        Our Job Locations.
-      </h2>
-
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-10">
-        <div class="group">
-          <div class="overflow-hidden border border-white/10 bg-white/5">
-            <img src="https://images.unsplash.com/photo-1520975916090-3105956dac38?auto=format&fit=crop&w=900&q=80"
-              class="w-full h-[180px] md:h-[240px] object-cover group-hover:scale-105 transition-transform duration-700"
-              alt="United States">
-          </div>
-          <p class="mt-4 text-white/70 uppercase tracking-[0.25em] text-[0.65rem]">United States</p>
-        </div>
-
-        <div class="group">
-          <div class="overflow-hidden border border-white/10 bg-white/5">
-            <img src="https://images.unsplash.com/photo-1503614472-8c93d56e92ce?auto=format&fit=crop&w=900&q=80"
-              class="w-full h-[180px] md:h-[240px] object-cover group-hover:scale-105 transition-transform duration-700"
-              alt="Canada">
-          </div>
-          <p class="mt-4 text-white/70 uppercase tracking-[0.25em] text-[0.65rem]">Canada</p>
-        </div>
-
-        <div class="group">
-          <div class="overflow-hidden border border-white/10 bg-white/5">
-            <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=900&q=80"
-              class="w-full h-[180px] md:h-[240px] object-cover group-hover:scale-105 transition-transform duration-700"
-              alt="Europe">
-          </div>
-          <p class="mt-4 text-white/70 uppercase tracking-[0.25em] text-[0.65rem]">Europe</p>
-        </div>
-
-        <div class="group">
-          <div class="overflow-hidden border border-white/10 bg-white/5">
-            <img src="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d6?auto=format&fit=crop&w=900&q=80"
-              class="w-full h-[180px] md:h-[240px] object-cover group-hover:scale-105 transition-transform duration-700"
-              alt="Australia">
-          </div>
-          <p class="mt-4 text-white/70 uppercase tracking-[0.25em] text-[0.65rem]">Australia</p>
-        </div>
-
-        <div class="group">
-          <div class="overflow-hidden border border-white/10 bg-white/5">
-            <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=900&q=80"
-              class="w-full h-[180px] md:h-[240px] object-cover group-hover:scale-105 transition-transform duration-700"
-              alt="Middle East">
-          </div>
-          <p class="mt-4 text-white/70 uppercase tracking-[0.25em] text-[0.65rem]">Middle East</p>
-        </div>
-
-        <div class="group">
-          <div class="overflow-hidden border border-white/10 bg-white/5">
-            <img src="https://images.unsplash.com/photo-1494587416117-f102a2ac0a8d?auto=format&fit=crop&w=900&q=80"
-              class="w-full h-[180px] md:h-[240px] object-cover group-hover:scale-105 transition-transform duration-700"
-              alt="Asia">
-          </div>
-          <p class="mt-4 text-white/70 uppercase tracking-[0.25em] text-[0.65rem]">Asia</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- FOOTER -->
   <footer class="site-footer">
     <a href="https://www.italianexp.com/" target="_top" class="no-underline block mb-8">
@@ -957,7 +860,7 @@
   </footer>
 
   <script>
-    // SMART SCROLL HEADER
+    /* SMART HEADER */
     let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
     const header = document.getElementById('main-header');
 
@@ -973,7 +876,7 @@
       lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
     }, { passive: true });
 
-    // MOBILE MENU
+    /* MOBILE MENU */
     const menuBtn = document.getElementById('central-menu-btn');
     const overlay = document.getElementById('mobile-menu-overlay');
     const closeBtn = document.getElementById('close-menu');
@@ -982,31 +885,31 @@
     closeBtn.onclick = () => overlay.classList.remove('active');
 
     overlay.onclick = (e) => {
-      if (e.target.closest("a.mobile-link") || e.target.closest("a.mobile-sub-link")) {
+      if (e.target.closest("a")) {
         overlay.classList.remove("active");
       }
     };
 
-    // MOBILE SUBMENUS TOGGLE
-    document.querySelectorAll(".toggle-submenu").forEach(btn => {
-      btn.addEventListener("click", (e) => {
-        e.preventDefault();
-
+    /* MOBILE SUBMENU TOGGLE */
+    document.querySelectorAll(".mobile-dropdown-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
         const targetId = btn.dataset.target;
         const submenu = document.getElementById(targetId);
         const arrow = btn.querySelector(".submenu-arrow");
 
-        submenu.classList.toggle("hidden");
+        const isOpen = submenu.classList.contains("open");
 
-        if (!submenu.classList.contains("hidden")) {
+        document.querySelectorAll(".mobile-submenu").forEach(sm => sm.classList.remove("open"));
+        document.querySelectorAll(".submenu-arrow").forEach(ar => ar.style.transform = "rotate(0deg)");
+
+        if (!isOpen) {
+          submenu.classList.add("open");
           arrow.style.transform = "rotate(180deg)";
-        } else {
-          arrow.style.transform = "rotate(0deg)";
         }
       });
     });
 
-    // LOGO PRISM EFFECT
+    /* LOGO EFFECT */
     function initLogo(id) {
       const el = document.getElementById(id);
       if (!el) return;
@@ -1060,7 +963,7 @@
       });
     }
 
-    // CHART
+    /* CHART */
     function initChart() {
       const canvas = document.getElementById('growthChart');
       if (!canvas) return;
@@ -1118,5 +1021,6 @@
       initChart();
     });
   </script>
+
 </body>
 </html>
