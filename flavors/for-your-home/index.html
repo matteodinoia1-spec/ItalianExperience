@@ -886,4 +886,100 @@
         overlay.setAttribute('aria-hidden', 'true');
       });
 
-      overlay.addEventListener('click',
+      overlay.addEventListener('click', (e) => {
+  const t = e.target;
+  if (t && t.closest && t.closest('[data-close]')) {
+    overlay.classList.remove('active');
+    overlay.setAttribute('aria-hidden', 'true');
+  }
+}, { passive: true });
+
+      /* MOBILE ACCORDION */
+      const accBtns = Array.from(document.querySelectorAll('.mobile-acc-btn'));
+
+      function setAcc(btn, open) {
+        const id = btn.getAttribute('aria-controls');
+        const panel = id ? document.getElementById(id) : null;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (!panel) return;
+
+        if (open) {
+          const inner = panel.querySelector('.mobile-sub-inner');
+          const h = inner ? inner.scrollHeight : 0;
+          panel.style.maxHeight = Math.max(80, h + 14) + 'px';
+        } else {
+          panel.style.maxHeight = '0px';
+        }
+      }
+
+      accBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const isOpen = btn.getAttribute('aria-expanded') === 'true';
+          setAcc(btn, !isOpen);
+        });
+      });
+
+      setTimeout(() => {
+        accBtns.forEach(btn => {
+          const isOpen = btn.getAttribute('aria-expanded') === 'true';
+          if (isOpen) setAcc(btn, true);
+        });
+      }, 150);
+
+      /* LOGO MOUSE EFFECT */
+      function initLogoMouse(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (!window.matchMedia('(pointer: fine)').matches) return;
+
+        const it = el.querySelector('.font-it');
+        const letters = el.querySelectorAll('.letter');
+        if (!it || !letters.length) return;
+
+        el.addEventListener('mousemove', (e) => {
+          const r = el.getBoundingClientRect();
+          const x = e.clientX - r.left;
+
+          const itRect = it.getBoundingClientRect();
+          const itX = itRect.left + itRect.width / 2 - r.left;
+          const dIt = Math.abs(x - itX);
+          const pIt = Math.max(0, (200 - dIt) / 200);
+
+          it.style.textShadow = `0 0 ${15 * pIt}px rgba(197,160,89,0.5)`;
+          it.style.transform = `scale(${1 + pIt * 0.05})`;
+
+          letters.forEach(l => {
+            const lr = l.getBoundingClientRect();
+            const lx = lr.left + lr.width / 2 - r.left;
+            const dx = Math.abs(x - lx);
+
+            if (dx < 110) {
+              const p = (110 - dx) / 110;
+              l.style.color = (x > lx + 14) ? '#008C45' : (x < lx - 14 ? '#CD212A' : '#FFF');
+              l.style.transform = `scale(${1 + p * 0.42}) translateY(${-p * 10}px)`;
+              l.style.zIndex = '20';
+            } else {
+              l.style.color = '';
+              l.style.transform = '';
+              l.style.zIndex = '10';
+            }
+          });
+        }, { passive: true });
+
+        el.addEventListener('mouseleave', () => {
+          it.style.textShadow = '';
+          it.style.transform = '';
+          letters.forEach(l => { l.style.color = ''; l.style.transform = ''; l.style.zIndex = ''; });
+        }, { passive: true });
+      }
+
+            initLogoMouse('logo-header');
+      initLogoMouse('logo-footer');
+
+    });
+  </script>
+
+</body>
+</html>
+
+
