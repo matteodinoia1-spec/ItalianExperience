@@ -127,7 +127,9 @@
     }
 
     .nav-link.active,
+    .dropdown-item.active,
     .mobile-link.active,
+    .mobile-sublink.active,
     .mobile-acc-btn.active{
       color:var(--brand-gold) !important;
       opacity:1 !important;
@@ -327,58 +329,59 @@
       padding:0 1.5rem;
     }
 
-@keyframes scrollLine{
-  0%{transform:translateY(-18px);opacity:0}
-  30%{opacity:1}
-  100%{transform:translateY(52px);opacity:0}
-}
+    /* EXPLORE INDICATOR */
+    @keyframes scrollLine{
+      0%{transform:translateY(-18px);opacity:0}
+      30%{opacity:1}
+      100%{transform:translateY(52px);opacity:0}
+    }
 
-.explore-indicator{
-  position:absolute;
-  bottom:46px;
-  left:50%;
-  transform:translateX(-50%);
-  z-index:20;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:14px;
-  text-decoration:none;
-  opacity:0.82;
-  transition:opacity 0.2s ease,transform 0.2s ease;
-}
-.explore-indicator:hover{
-  opacity:1;
-  transform:translateX(-50%) translateY(3px);
-}
+    .explore-indicator{
+      position:absolute;
+      bottom:46px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:20;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:14px;
+      text-decoration:none;
+      opacity:0.82;
+      transition:opacity 0.2s ease,transform 0.2s ease;
+    }
+    .explore-indicator:hover{
+      opacity:1;
+      transform:translateX(-50%) translateY(3px);
+    }
 
-.explore-indicator span{
-  font-size:0.65rem;
-  text-transform:uppercase;
-  letter-spacing:0.55em;
-  color:rgba(255,255,255,0.78);
-  padding-left:0.55em;
-  white-space:nowrap;
-  text-shadow:0 8px 18px rgba(0,0,0,0.7);
-}
+    .explore-indicator span{
+      font-size:0.65rem;
+      text-transform:uppercase;
+      letter-spacing:0.55em;
+      color:rgba(255,255,255,0.78);
+      padding-left:0.55em;
+      white-space:nowrap;
+      text-shadow:0 8px 18px rgba(0,0,0,0.7);
+    }
 
-.scroll-track{
-  width:1px;
-  height:54px;
-  background:rgba(255,255,255,0.25);
-  position:relative;
-  overflow:hidden;
-}
+    .scroll-track{
+      width:1px;
+      height:54px;
+      background:rgba(255,255,255,0.25);
+      position:relative;
+      overflow:hidden;
+    }
 
-.scroll-dot{
-  width:100%;
-  height:16px;
-  background:var(--brand-gold);
-  position:absolute;
-  top:0;
-  left:0;
-  animation:scrollLine 1.6s infinite ease-in-out;
-}
+    .scroll-dot{
+      width:100%;
+      height:16px;
+      background:var(--brand-gold);
+      position:absolute;
+      top:0;
+      left:0;
+      animation:scrollLine 1.6s infinite ease-in-out;
+    }
 
     /* LOCATION SWIPER */
     .location-section{
@@ -494,7 +497,7 @@
 
       <a href="../../" class="mobile-link" data-close>Home</a>
 
-      <button class="mobile-acc-btn mobile-acc-travel active" type="button" aria-expanded="true" aria-controls="m-travel">
+      <button class="mobile-acc-btn mobile-acc-travel" type="button" aria-expanded="true" aria-controls="m-travel">
         <span>Travel</span>
         <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="m6 9 6 6 6-6"></path>
@@ -504,7 +507,7 @@
       <div id="m-travel" class="mobile-sub" style="max-height:260px">
         <div class="mobile-sub-inner">
           <a href="../" class="mobile-sublink" data-close>Travel Home</a>
-          <a href="./" class="mobile-sublink active" data-close>Bespoke</a>
+          <a href="./" class="mobile-sublink" data-close>Bespoke</a>
           <a href="../gapyear/" class="mobile-sublink" data-close>Gap Years</a>
           <a href="../culinary/" class="mobile-sublink" data-close>Culinary Academy</a>
         </div>
@@ -572,17 +575,17 @@
     </button>
 
     <div class="nav-container" aria-label="Navigazione desktop">
-      <a href="../../" class="nav-link">Home</a>
+      <a href="../../" class="nav-link nav-link-home">Home</a>
 
       <div class="dropdown">
-        <a href="../" class="nav-link nav-link-travel active">
+        <a href="../" class="nav-link nav-link-travel">
           Travel
           <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
             <path d="m6 9 6 6 6-6"></path>
           </svg>
         </a>
         <div class="dropdown-menu">
-          <a href="./" class="dropdown-item active">Bespoke</a>
+          <a href="./" class="dropdown-item">Bespoke</a>
           <a href="../gapyear/" class="dropdown-item">Gap Years</a>
           <a href="../culinary/" class="dropdown-item">Culinary Academy</a>
         </div>
@@ -647,11 +650,11 @@
       </div>
 
       <a href="#advisory" class="explore-indicator" aria-label="Explore section">
-  <span>Explore</span>
-  <div class="scroll-track" aria-hidden="true">
-    <div class="scroll-dot"></div>
-  </div>
-</a>
+        <span>Explore</span>
+        <div class="scroll-track" aria-hidden="true">
+          <div class="scroll-dot"></div>
+        </div>
+      </a>
 
     </div>
   </section>
@@ -940,6 +943,35 @@
           1024: { slidesPerView: 3 }
         }
       });
+
+      /* AUTO ACTIVE LINKS */
+      (function setActiveNavLinks(){
+        const currentPath = window.location.pathname.replace(/\/$/, "");
+
+        document.querySelectorAll(".dropdown-item, .nav-link, .mobile-link, .mobile-sublink").forEach(link => {
+          const href = link.getAttribute("href");
+          if (!href) return;
+
+          const temp = document.createElement("a");
+          temp.href = href;
+
+          const linkPath = temp.pathname.replace(/\/$/, "");
+
+          if (linkPath === currentPath) {
+            link.classList.add("active");
+          }
+        });
+
+        if (currentPath.includes("/travel")) {
+          document.querySelectorAll(".nav-link-travel, .mobile-acc-travel").forEach(el => el.classList.add("active"));
+        }
+        if (currentPath.includes("/recruitment")) {
+          document.querySelectorAll(".nav-link-recruitment, .mobile-acc-recruitment").forEach(el => el.classList.add("active"));
+        }
+        if (currentPath.includes("/flavors")) {
+          document.querySelectorAll(".nav-link-flavors, .mobile-acc-flavors").forEach(el => el.classList.add("active"));
+        }
+      })();
 
     });
   </script>
