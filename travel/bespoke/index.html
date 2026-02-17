@@ -20,7 +20,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
-  <script src="/ItalianExperience/assets/js/site.js" defer></script>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -184,51 +183,50 @@
 
   <div id="site-header"></div>
 
-  <main>
+  <header class="hero-odyssey">
+    <div class="swiper hero-swiper h-full">
+      <div class="swiper-wrapper">
 
-    <header class="hero-odyssey" aria-label="Bespoke Hero">
-      <div class="swiper hero-swiper">
-        <div class="swiper-wrapper">
-
-          <div class="swiper-slide hero-slide">
-            <img src="https://images.unsplash.com/photo-1529260830199-42c24126f198?q=80&w=1920" alt="Italian coastline" loading="lazy">
-          </div>
-
-          <div class="swiper-slide hero-slide">
-            <img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?q=80&w=1920" alt="Venice canals" loading="lazy">
-          </div>
-
-          <div class="swiper-slide hero-slide">
-            <img src="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=1920" alt="Florence landscape" loading="lazy">
-          </div>
-
+        <div class="swiper-slide hero-slide">
+          <img src="https://images.unsplash.com/photo-1529260830199-42c24126f198?q=80&w=1920" alt="Italy" loading="lazy">
         </div>
 
-        <div class="hero-overlay-content">
-          <h3 class="text-[#c5a059] italic brand-font text-xl md:text-2xl mb-4">
-            Private Advisory
-          </h3>
-
-          <h1 class="text-white font-bold uppercase tracking-tighter text-4xl md:text-9xl brand-font leading-[0.9] mb-8">
-            Bespoke <br><span class="italic font-light opacity-80">Journeys.</span>
-          </h1>
-
-          <div class="w-16 md:w-24 h-px bg-[#c5a059] opacity-40 mb-10 mx-auto"></div>
-
-          <p class="text-slate-300 text-[0.65rem] md:text-base uppercase tracking-[0.5em] max-w-[340px] md:max-w-none">
-            Curated Experiences Across Italy
-          </p>
+        <div class="swiper-slide hero-slide">
+          <img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?q=80&w=1920" alt="Venice" loading="lazy">
         </div>
 
-        <a href="#advisory" class="explore-indicator" aria-label="Explore section">
-          <span>Explore</span>
-          <div class="scroll-track" aria-hidden="true">
-            <div class="scroll-dot"></div>
-          </div>
-        </a>
+        <div class="swiper-slide hero-slide">
+          <img src="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=1920" alt="Florence" loading="lazy">
+        </div>
 
       </div>
-    </header>
+
+      <div class="hero-overlay-content">
+        <h3 class="text-[#c5a059] italic brand-font text-xl md:text-2xl mb-4">
+          Private Advisory
+        </h3>
+
+        <h1 class="text-white font-bold uppercase tracking-tighter text-4xl md:text-9xl brand-font leading-[0.9] mb-8">
+          Bespoke <br><span class="italic font-light opacity-80">Journeys.</span>
+        </h1>
+
+        <div class="w-16 md:w-24 h-px bg-[#c5a059] opacity-40 mb-10 mx-auto"></div>
+
+        <p class="text-slate-300 text-[0.65rem] md:text-base uppercase tracking-[0.5em] max-w-[340px] md:max-w-none">
+          Curated Experiences Across Italy
+        </p>
+      </div>
+
+      <a href="#advisory" class="explore-indicator" aria-label="Explore section">
+        <span>Explore</span>
+        <div class="scroll-track" aria-hidden="true">
+          <div class="scroll-dot"></div>
+        </div>
+      </a>
+    </div>
+  </header>
+
+  <main>
 
     <section id="advisory" class="py-32 md:py-48 flex items-center justify-center bg-[#080808]">
       <div class="max-w-4xl px-8 md:px-10 text-center">
@@ -257,7 +255,7 @@
       </div>
     </section>
 
-    <section class="location-section" aria-label="Regional atmospheres">
+    <section class="location-section">
       <div class="absolute top-10 left-10 md:top-12 md:left-12 z-20 pointer-events-none">
         <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.55rem] font-bold block mb-2">
           A Strategic Survey
@@ -267,7 +265,7 @@
         </h2>
       </div>
 
-      <div class="swiper location-swiper">
+      <div class="swiper location-swiper h-full">
         <div class="swiper-wrapper">
 
           <div class="swiper-slide location-card">
@@ -284,7 +282,7 @@
           </div>
 
           <div class="swiper-slide location-card">
-            <img src="https://images.unsplash.com/photo-1528114039593-4366cc08227d?q=80&w=800" alt="Tuscany hills" loading="lazy">
+            <img src="https://images.unsplash.com/photo-1528114039593-4366cc08227d?q=80&w=800" alt="Tuscany" loading="lazy">
             <div class="location-info">
               <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">
                 Rural Continuity
@@ -297,7 +295,7 @@
           </div>
 
           <div class="swiper-slide location-card">
-            <img src="https://images.unsplash.com/photo-1688635629079-d9aca2419551?q=80&w=800" alt="Venice canals" loading="lazy">
+            <img src="https://images.unsplash.com/photo-1688635629079-d9aca2419551?q=80&w=800" alt="Venice" loading="lazy">
             <div class="location-info">
               <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">
                 Floating Legacy
@@ -310,7 +308,7 @@
           </div>
 
           <div class="swiper-slide location-card">
-            <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=800" alt="Rome Colosseum" loading="lazy">
+            <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=800" alt="Rome" loading="lazy">
             <div class="location-info">
               <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">
                 Urban Antiquity
@@ -377,26 +375,58 @@
   <div id="site-footer"></div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      new Swiper('.hero-swiper', {
+    document.addEventListener("DOMContentLoaded", () => {
+      new Swiper(".hero-swiper", {
         loop: true,
-        effect: 'fade',
+        effect: "fade",
         speed: 2000,
         autoplay: { delay: 5000, disableOnInteraction: false }
       });
 
-      new Swiper('.location-swiper', {
+      new Swiper(".location-swiper", {
         slidesPerView: 1,
         loop: true,
         speed: 1000,
         autoplay: { delay: 4500 },
-        pagination: { el: '.swiper-pagination', clickable: true },
+        pagination: { el: ".swiper-pagination", clickable: true },
         breakpoints: {
           768: { slidesPerView: 2 },
           1024: { slidesPerView: 3 }
         }
       });
     });
+  </script>
+
+  <script>
+    (function () {
+      const base = "/ItalianExperience";
+      const headerMount = document.getElementById("site-header");
+      const footerMount = document.getElementById("site-footer");
+
+      function inject(el, html) { if (el) el.innerHTML = html; }
+
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const s = document.createElement("script");
+          s.src = src;
+          s.defer = true;
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+
+      Promise.all([
+        fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
+        fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
+      ]).then(async ([h, f]) => {
+        inject(headerMount, h);
+        inject(footerMount, f);
+
+        await loadScript(base + "/assets/js/site.js");
+        if (window.IEInit) window.IEInit(document);
+      }).catch(err => console.error(err));
+    })();
   </script>
 
 </body>
