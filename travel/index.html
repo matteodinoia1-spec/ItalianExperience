@@ -7,15 +7,11 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- GLOBAL (template) -->
   <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
 
   <style>
-    /* Page-only styles (hero + services) */
-
     .brand-font{font-family:'Playfair Display',serif}
 
-    /* HERO */
     .hero-narrative{
       width:100%;
       min-height:100vh;
@@ -83,7 +79,6 @@
     .scroll-track{width:1px;height:54px;background:rgba(255,255,255,0.25);position:relative;overflow:hidden}
     .scroll-dot{width:100%;height:16px;background:var(--brand-gold);position:absolute;top:0;left:0;animation:scrollLine 1.6s infinite ease-in-out}
 
-    /* SERVICES */
     .services-horizontal{
       width:100%;
       height:850px;
@@ -157,10 +152,8 @@
 
 <body>
 
-  <!-- TEMPLATE HEADER -->
   <div id="site-header"></div>
 
-  <!-- HERO -->
   <header class="hero-narrative" aria-label="Hero Travel">
     <div class="hero-bg" aria-hidden="true"></div>
     <div class="hero-overlay" aria-hidden="true"></div>
@@ -182,7 +175,6 @@
     </a>
   </header>
 
-  <!-- SERVICES -->
   <section class="services-horizontal" id="services" aria-label="Travel services">
     <a href="/ItalianExperience/travel/bespoke/" class="service-panel">
       <div class="panel-bg" aria-hidden="true">
@@ -224,10 +216,8 @@
     </a>
   </section>
 
-  <!-- TEMPLATE FOOTER -->
   <div id="site-footer"></div>
 
-  <!-- Load partials + init global JS -->
   <script>
     (function () {
       const base = "/ItalianExperience";
@@ -255,7 +245,6 @@
         inject(footerMount, f);
 
         await loadScript(base + "/assets/js/site.js");
-
         if (window.IEInit) window.IEInit(document);
       }).catch(err => console.error(err));
     })();
