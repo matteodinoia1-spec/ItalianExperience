@@ -5,30 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Flavors Hub | Italian Experience</title>
 
-  <!-- META SEO -->
   <meta name="description" content="Italian Flavors Hub. Curated gourmet experiences, wholesale supply, and export advisory for Italian food excellence." />
   <meta name="keywords" content="Italian Experience, Flavors, Italian food, export USA, wholesale, gourmet, Italian companies" />
   <meta name="author" content="Italian Experience" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://www.italianexp.com/flavors/" />
 
-  <!-- OPEN GRAPH -->
   <meta property="og:title" content="Flavors Hub | Italian Experience" />
   <meta property="og:description" content="Curated gourmet experiences, wholesale supply, and export advisory for Italian excellence." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.italianexp.com/flavors/" />
   <meta property="og:image" content="https://www.italianexp.com/assets/preview.jpg" />
 
-  <!-- TWITTER -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Flavors Hub | Italian Experience" />
   <meta name="twitter:description" content="Curated gourmet experiences, wholesale supply, and export advisory for Italian excellence." />
   <meta name="twitter:image" content="https://www.italianexp.com/assets/preview.jpg" />
 
-  <!-- LIBRARIES -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- GLOBAL (template) -->
   <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
 
   <style>
@@ -197,10 +192,8 @@
 
 <body>
 
-  <!-- TEMPLATE HEADER -->
   <div id="site-header"></div>
 
-  <!-- HERO -->
   <main class="hub-grid" aria-label="Flavors Hub">
     <a href="/ItalianExperience/flavors/for-your-home/" class="hub-panel">
       <div class="hub-bg" style="background-image:url('https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&q=80&w=1800');" aria-hidden="true"></div>
@@ -239,110 +232,7 @@
     </a>
   </main>
 
-  <!-- SECTION 2 -->
   <section class="py-32 px-8 flex items-center justify-center bg-[#080808]">
     <div class="max-w-6xl w-full text-center">
       <div class="mb-20">
-        <span class="text-[#c5a059] uppercase tracking-[0.6em] text-[0.65rem] font-bold block mb-8">
-          Strategic Food Curation
-        </span>
-
-        <h2 class="text-5xl md:text-7xl mb-10 italic text-white brand-font leading-tight">
-          The Gastronomic Legacy.
-        </h2>
-
-        <div class="w-16 h-px bg-[#c5a059] opacity-40 mx-auto"></div>
-      </div>
-
-      <div class="split-content">
-        <div class="mb-20 lg:mb-0">
-          <span class="text-[#c5a059] text-[0.55rem] uppercase tracking-[0.4em] mb-6 block opacity-70 font-bold">
-            Italiano
-          </span>
-
-          <p class="text-slate-200 text-xl md:text-2xl leading-relaxed font-light">
-            Non curiamo semplicemente spedizioni, ma <span class="text-[#c5a059] font-normal italic">storie di eccellenza.</span>
-            Dall'artigianato locale alle tavole internazionali, ogni fase della catena del valore è studiata per portare
-            l'autentico gusto italiano nel mondo.
-          </p>
-        </div>
-
-        <div>
-          <span class="text-slate-500 text-[0.55rem] uppercase tracking-[0.4em] mb-6 block font-bold">
-            English
-          </span>
-
-          <p class="text-slate-500 text-xl md:text-2xl leading-relaxed font-light italic">
-            We don’t just manage shipments; we curate <span class="text-slate-300 font-normal italic">stories of excellence.</span>
-            From local craftsmanship to international tables, every stage of the value chain is designed to bring authentic Italian flavor to the world.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 3 -->
-  <section class="py-24 px-8 lg:px-20 bg-[#000]">
-    <div class="max-w-4xl mx-auto">
-      <div class="disclosure-container">
-        <h5 class="font-bold uppercase text-[0.6rem] tracking-[0.4em] mb-8 text-slate-400 italic">
-          Strategic Disclosure | Informativa Strategica
-        </h5>
-
-        <div class="legal-notice-text">
-          <div class="mb-4">
-            Italian Recruitment LLC DBA Italian Experience opera come consulente strategico per l'eccellenza alimentare.
-            Non siamo un semplice distributore, ma un partner per la curatela del prodotto e l'internazionalizzazione.
-            Tutti i processi logistici e di vendita sono gestiti in conformità con le normative internazionali e partner certificati FDA.
-          </div>
-
-          <div class="lang-divider"></div>
-
-          <div class="text-slate-600">
-            Italian Recruitment LLC DBA Italian Experience operates as a strategic consultant for food excellence.
-            We are not a mere distributor, but a partner for product curation and internationalization.
-            All logistical and sales processes are managed in compliance with international regulations and FDA-certified partners.
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TEMPLATE FOOTER -->
-  <div id="site-footer"></div>
-
-  <!-- Load partials first, then init effects -->
-  <script>
-    (function () {
-      const base = "/ItalianExperience";
-      const headerMount = document.getElementById("site-header");
-      const footerMount = document.getElementById("site-footer");
-
-      function inject(el, html) {
-        if (!el) return;
-        el.innerHTML = html;
-      }
-
-      Promise.all([
-        fetch(base + "/partials/header.html").then(r => r.text()),
-        fetch(base + "/partials/footer.html").then(r => r.text())
-      ]).then(([h, f]) => {
-        inject(headerMount, h);
-        inject(footerMount, f);
-
-        const s = document.createElement("script");
-        s.src = base + "/assets/js/site.js";
-        s.defer = true;
-        s.onload = function () {
-          if (window.IEInit) window.IEInit(document);
-        };
-        document.head.appendChild(s);
-      }).catch(() => {
-        if (headerMount) headerMount.innerHTML = "";
-        if (footerMount) footerMount.innerHTML = "";
-      });
-    })();
-  </script>
-
-</body>
-</html>
+        <span
