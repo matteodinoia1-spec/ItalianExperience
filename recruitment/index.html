@@ -5,705 +5,87 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Recruitment Hub | Italian Experience</title>
 
+  <meta name="description" content="Italian Experience Recruitment connects elite Italian hospitality talent with premium employers worldwide. Strategic staffing, cultural exchange programs, and full end-to-end support." />
+  <meta name="keywords" content="Italian Experience, recruitment, hospitality recruitment, Italian staff USA, Q1 visa, cultural exchange program, luxury hospitality staffing" />
+  <meta name="author" content="Italian Experience" />
+  <meta name="robots" content="index, follow" />
+
+  <link rel="canonical" href="https://www.italianexp.com/recruitment/" />
+
+  <meta property="og:title" content="Recruitment Hub | Italian Experience" />
+  <meta property="og:description" content="Italian Experience Recruitment connects elite Italian hospitality talent with premium employers worldwide. Strategic staffing, cultural exchange programs, and full end-to-end support." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.italianexp.com/recruitment/" />
+
   <script src="https://cdn.tailwindcss.com"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@200;300;400;600&family=Great+Vibes&family=Montserrat:wght@700;900&display=swap');
-
-    :root{
-      --brand-gold:#c5a059;
-      --brand-dark:#080808;
-      --it-green:#008C45;
-      --it-red:#CD212A;
-    }
-
-    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    html{scroll-behavior:smooth;background:#000}
-
-    body{
-      font-family:'Inter',sans-serif;
-      background:var(--brand-dark);
-      color:#fff;
-      overflow-x:hidden;
-      min-height:100vh;
-      -webkit-font-smoothing:antialiased;
-    }
-
-    a{color:inherit;text-decoration:none}
-    .brand-font{font-family:'Playfair Display',serif}
-
-    /* HEADER */
-    .glass-header{
-      position:fixed;
-      top:0;left:0;width:100%;
-      z-index:9999;
-      height:110px;
-      padding:0 4rem;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      background:transparent;
-      backdrop-filter:blur(0px);
-      transition:transform 0.6s cubic-bezier(0.16,1,0.3,1),background 0.5s,backdrop-filter 0.5s,height 0.4s,padding 0.4s;
-    }
-    .glass-header.nav-up{transform:translateY(-110%)}
-    .glass-header.scrolled{
-      height:90px;
-      padding:0 2rem;
-      background:rgba(15,15,15,0.45);
-      backdrop-filter:blur(40px) saturate(180%);
-      -webkit-backdrop-filter:blur(40px) saturate(180%);
-      border-bottom:1px solid rgba(255,255,255,0.08);
-      box-shadow:0 10px 30px rgba(0,0,0,0.5);
-    }
-
-    /* LOGO */
-    .logo-wrap{
-      display:flex;
-      align-items:baseline;
-      gap:8px;
-      position:relative;
-      user-select:none;
-      white-space:nowrap;
-      z-index:10001;
-    }
-    .font-it{
-      font-family:'Great Vibes',cursive;
-      color:var(--brand-gold);
-      font-size:70px;
-      line-height:1;
-      white-space:nowrap;
-      transition:0.3s;
-    }
-    .font-ex{
-      font-family:'Montserrat',sans-serif;
-      color:var(--brand-gold);
-      font-weight:900;
-      font-size:35px;
-      line-height:1;
-      letter-spacing:-0.02em;
-      display:flex;
-    }
-    .letter{
-      display:inline-block;
-      position:relative;
-      will-change:transform,color;
-      transition:all 0.25s ease-out;
-    }
-    .tricolore-line{
-      position:absolute;
-      height:2px;
-      width:60px;
-      bottom:-6px;
-      right:0;
-      display:flex;
-      pointer-events:none;
-    }
-
-    /* DESKTOP NAV */
-    .nav-container{
-      display:flex;
-      align-items:center;
-      gap:0.25rem;
-      margin-left:auto;
-      height:100%;
-    }
-    .nav-link{
-      color:#fff;
-      text-transform:uppercase;
-      font-size:0.62rem;
-      letter-spacing:0.25em;
-      padding:1.2rem 0.8rem;
-      transition:all 0.25s;
-      opacity:0.72;
-      white-space:nowrap;
-      cursor:pointer;
-    }
-    .nav-link:hover{
-      color:var(--brand-gold);
-      opacity:1;
-      text-shadow:0 0 10px rgba(197,160,89,0.4);
-    }
-
-    .nav-link.active,
-    .dropdown-item.active,
-    .mobile-link.active,
-    .mobile-sublink.active,
-    .mobile-acc-btn.active{
-      color:var(--brand-gold) !important;
-      opacity:1 !important;
-      text-shadow:0 0 12px rgba(197,160,89,0.35);
-    }
-
-    .dropdown{position:relative;height:100%;display:flex;align-items:center}
-    .dropdown-menu{
-      position:absolute;
-      top:100%;
-      right:0;
-      min-width:260px;
-      background:rgba(10,10,10,0.96);
-      backdrop-filter:blur(35px);
-      border:1px solid rgba(255,255,255,0.1);
-      opacity:0;
-      visibility:hidden;
-      transform:translateY(10px);
-      transition:all 0.3s ease;
-      padding:1rem 0;
-      box-shadow:0 20px 40px rgba(0,0,0,0.6);
-    }
-    .dropdown:hover .dropdown-menu{
-      opacity:1;
-      visibility:visible;
-      transform:translateY(0);
-    }
-    .dropdown-item{
-      display:block;
-      padding:0.8rem 1.8rem;
-      color:#fff;
-      font-size:0.6rem;
-      text-transform:uppercase;
-      letter-spacing:0.15em;
-      opacity:0.65;
-      transition:0.25s;
-    }
-    .dropdown-item:hover{
-      color:var(--brand-gold);
-      opacity:1;
-      background:rgba(255,255,255,0.03);
-      padding-left:2.2rem;
-    }
-
-    /* MOBILE MENU BUTTON */
-    #central-menu-btn{
-      display:none;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      background:none;
-      border:none;
-      cursor:pointer;
-      outline:none;
-      z-index:10002;
-      transition:all 0.25s ease;
-    }
-    #central-menu-btn span{
-      color:var(--brand-gold);
-      font-size:0.52rem;
-      text-transform:uppercase;
-      letter-spacing:0.4em;
-      margin-top:6px;
-      font-weight:600;
-      opacity:0.95;
-    }
-
-    /* MOBILE OVERLAY */
-    #mobile-menu-overlay{
-      position:fixed;
-      inset:0;
-      background:rgba(8,8,8,0.98);
-      backdrop-filter:blur(50px) saturate(160%);
-      z-index:10000;
-      opacity:0;
-      visibility:hidden;
-      transition:opacity 0.35s ease,visibility 0.35s ease;
-      padding:clamp(1.2rem,4vw,2.2rem);
-      overflow-y:auto;
-    }
-    #mobile-menu-overlay.active{
-      opacity:1;
-      visibility:visible;
-    }
-
-    .mobile-close{
-      position:sticky;
-      top:0;
-      display:flex;
-      justify-content:flex-end;
-      z-index:2;
-      padding:0.5rem 0;
-    }
-
-    .mobile-menu{
-      max-width:520px;
-      margin:0 auto;
-      padding:2.2rem 0 3rem 0;
-      display:flex;
-      flex-direction:column;
-      gap:0.4rem;
-      align-items:center;
-      text-align:center;
-    }
-
-    .mobile-link,
-    .mobile-acc-btn{
-      width:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:12px;
-      padding:14px 10px;
-      color:#fff;
-      text-transform:uppercase;
-      letter-spacing:0.35em;
-      font-size:0.72rem;
-      opacity:0.75;
-      transition:opacity 0.2s ease,color 0.2s ease;
-      background:transparent;
-      border:none;
-      cursor:pointer;
-    }
-    .mobile-link:hover,
-    .mobile-acc-btn:hover{
-      opacity:1;
-      color:var(--brand-gold);
-    }
-
-    .chev{
-      width:14px;
-      height:14px;
-      opacity:0.65;
-      transition:transform 0.25s ease,opacity 0.25s ease;
-    }
-    .mobile-acc-btn[aria-expanded="true"] .chev{
-      transform:rotate(180deg);
-      opacity:1;
-    }
-
-    .mobile-sub{
-      width:100%;
-      max-height:0;
-      overflow:hidden;
-      transition:max-height 0.35s ease;
-    }
-    .mobile-sub-inner{
-      padding:4px 0 10px 0;
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-    }
-    .mobile-sublink{
-      display:block;
-      padding:10px 10px;
-      color:#fff;
-      text-transform:uppercase;
-      letter-spacing:0.28em;
-      font-size:0.62rem;
-      opacity:0.55;
-      transition:opacity 0.2s ease,color 0.2s ease;
-    }
-    .mobile-sublink:hover{
-      opacity:1;
-      color:var(--brand-gold);
-    }
-
-    /* HERO */
-    .hero-recruitment{
-      width:100%;
-      min-height:100vh;
-      min-height:100dvh;
-      display:flex;
-      position:relative;
-      overflow:hidden;
-      padding-top:110px;
-      background:#000;
-    }
-
-    .hero-bg-left,.hero-bg-right{
-      position:absolute;
-      top:0;
-      width:50%;
-      height:100%;
-      background-size:cover;
-      background-position:center;
-      opacity:0.28;
-      transition:opacity 0.8s ease,transform 1.2s ease;
-      z-index:0;
-    }
-
-    .hero-bg-left{
-      left:0;
-      background-image:url('https://images.unsplash.com/photo-1556745753-b2904692b3cd?auto=format&fit=crop&w=1400&q=80');
-      border-right:1px solid rgba(255,255,255,0.08);
-    }
-    .hero-bg-right{
-      right:0;
-      background-image:url('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1400&q=80');
-    }
-
-    .floating-text{
-      font-size:clamp(5rem,15vw,12rem);
-      color:rgba(255,255,255,0.03);
-      position:absolute;
-      font-weight:800;
-      z-index:0;
-      pointer-events:none;
-      top:50%;
-      transform:translateY(-50%);
-      white-space:nowrap;
-      letter-spacing:-0.02em;
-    }
-    .panel-employer .floating-text{left:-5%;text-align:left}
-    .panel-candidate .floating-text{right:-5%;text-align:right}
-
-    .panel-col{
-      position:relative;
-      height:100%;
-      min-height:calc(100vh - 110px);
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      overflow:hidden;
-      border-left:1px solid rgba(255,255,255,0.06);
-    }
-    .panel-col:first-child{border-left:none}
-
-    .content-main{
-      position:relative;
-      z-index:10;
-      transition:opacity 0.45s ease,transform 0.45s ease;
-      text-align:center;
-      max-width:520px;
-      padding:0 2rem;
-    }
-
-    .details-overlay{
-      position:absolute;
-      inset:0;
-      background:rgba(8,8,8,0.97);
-      z-index:50;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      padding:3rem 2rem;
-      opacity:0;
-      visibility:hidden;
-      transform:scale(1.02);
-      transition:opacity 0.35s ease,transform 0.35s ease,visibility 0.35s ease;
-      overflow-y:auto;
-    }
-
-    .details-overlay.active{
-      opacity:1;
-      visibility:visible;
-      transform:scale(1);
-    }
-
-    .btn-luxury{
-      border:1px solid var(--brand-gold);
-      color:var(--brand-gold);
-      padding:1rem 2.5rem;
-      letter-spacing:3px;
-      font-size:0.65rem;
-      text-transform:uppercase;
-      transition:all 0.35s ease;
-      cursor:pointer;
-      background:transparent;
-      font-weight:600;
-      margin-top:2rem;
-      display:inline-block;
-      pointer-events:auto;
-    }
-    .btn-luxury:hover{
-      color:var(--brand-dark);
-      background:var(--brand-gold);
-      box-shadow:0 0 20px rgba(197,160,89,0.4);
-    }
-
-    .secondary-link{
-      font-size:0.55rem;
-      text-transform:uppercase;
-      letter-spacing:0.15em;
-      color:#666;
-      margin-top:1.5rem;
-      cursor:pointer;
-      border-bottom:1px solid transparent;
-      transition:all 0.3s;
-      pointer-events:auto;
-    }
-    .secondary-link:hover{
-      color:#fff;
-      border-bottom-color:#fff;
-    }
-
-    .btn-close-overlay{
-      margin-top:2.5rem;
-      color:var(--brand-gold);
-      font-size:0.6rem;
-      text-transform:uppercase;
-      letter-spacing:0.25em;
-      border-bottom:1px solid var(--brand-gold);
-      padding-bottom:0.25rem;
-      transition:all 0.3s ease;
-      pointer-events:auto;
-      background:transparent;
-      border:none;
-      cursor:pointer;
-    }
-    .btn-close-overlay:hover{
-      color:white;
-      border-bottom-color:white;
-      letter-spacing:0.35em;
-    }
-
-    .chart-container{
-      width:100%;
-      max-width:160px;
-      height:160px;
-      margin:1rem auto;
-    }
-
-    /* FOOTER */
-    .site-footer{
-      background:#000;
-      padding:6rem 2rem;
-      border-top:1px solid rgba(255,255,255,0.05);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      text-align:center;
-    }
-
-    /* RESPONSIVE HEADER MOBILE */
-    @media (max-width:1024px){
-      .glass-header{
-        flex-direction:column !important;
-        justify-content:center !important;
-        height:160px !important;
-        padding:1rem 0 !important;
-        gap:10px;
-      }
-      .glass-header.scrolled{height:135px !important;}
-      .logo-wrap{transform:scale(0.82);margin:0 auto;}
-      #central-menu-btn{display:flex !important;margin-top:6px;}
-      .nav-container{display:none !important;}
-      .hero-recruitment{padding-top:160px;}
-    }
-
-    @media (max-width:768px){
-      .hero-recruitment{
-        flex-direction:column;
-        min-height:auto;
-        overflow:visible;
-      }
-
-      .hero-bg-left,.hero-bg-right{
-        width:100%;
-        height:50%;
-        opacity:0.22;
-      }
-
-      .hero-bg-left{
-        top:0;
-        left:0;
-        border-right:none;
-        border-bottom:1px solid rgba(255,255,255,0.08);
-      }
-
-      .hero-bg-right{
-        bottom:0;
-        top:auto;
-        right:0;
-      }
-
-      .panel-col{
-        width:100%;
-        min-height:88vh;
-        border-left:none;
-        border-top:1px solid rgba(255,255,255,0.06);
-      }
-      .panel-col:first-child{border-top:none;}
-
-      .panel-employer .floating-text,
-      .panel-candidate .floating-text{
-        left:50%;
-        right:auto;
-        transform:translate(-50%,-50%);
-        opacity:0.02;
-      }
-    }
-
-    @media (max-width:350px){
-      .logo-wrap{transform:scale(0.68)}
-      .glass-header{height:145px !important}
-      #central-menu-btn{scale:0.9}
-      .hero-recruitment{padding-top:145px}
-    }
-  </style>
+  <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
 </head>
 
-<body>
+<body class="bg-[#080808] text-white overflow-x-hidden">
 
-  <div id="mobile-menu-overlay" aria-hidden="true">
-    <div class="mobile-close">
-      <button id="close-menu" aria-label="Chiudi menu" class="text-white/80 hover:text-white">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
+  <div id="site-header"></div>
+
+  <section class="relative w-full h-[100vh] h-[100dvh] bg-black overflow-hidden hero-recruitment">
+
+    <div class="absolute inset-0 z-0 flex">
+      <div id="bg-left" class="w-1/2 h-full opacity-[0.28] border-r border-white/10 bg-cover bg-center transition-all duration-1000"
+        style="background-image:url('https://images.unsplash.com/photo-1556745753-b2904692b3cd?auto=format&fit=crop&w=1400&q=80');">
+      </div>
+
+      <div id="bg-right" class="w-1/2 h-full opacity-[0.28] bg-cover bg-center transition-all duration-1000"
+        style="background-image:url('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1400&q=80');">
+      </div>
     </div>
-
-    <nav class="mobile-menu" aria-label="Menu mobile">
-      <a href="/ItalianExperience/" class="mobile-link" data-close>Home</a>
-
-      <button class="mobile-acc-btn mobile-acc-travel" type="button" aria-expanded="false" aria-controls="m-travel">
-        <span>Travel</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
-      </button>
-      <div id="m-travel" class="mobile-sub">
-        <div class="mobile-sub-inner">
-          <a href="/ItalianExperience/travel/bespoke/" class="mobile-sublink" data-close>Bespoke</a>
-          <a href="/ItalianExperience/travel/gapyear/" class="mobile-sublink" data-close>Gap Year</a>
-          <a href="/ItalianExperience/travel/culinary-academy/" class="mobile-sublink" data-close>Culinary Academy</a>
-        </div>
-      </div>
-
-      <button class="mobile-acc-btn mobile-acc-recruitment active" type="button" aria-expanded="true" aria-controls="m-recruitment">
-        <span>Recruitment</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
-      </button>
-
-      <div id="m-recruitment" class="mobile-sub" style="max-height:260px">
-        <div class="mobile-sub-inner">
-          <a href="/ItalianExperience/recruitment/employer/" class="mobile-sublink" data-close>Employer</a>
-          <a href="/ItalianExperience/recruitment/candidate/" class="mobile-sublink" data-close>Candidate</a>
-        </div>
-      </div>
-
-      <button class="mobile-acc-btn mobile-acc-flavors" type="button" aria-expanded="false" aria-controls="m-flavors">
-        <span>Flavors</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
-      </button>
-      <div id="m-flavors" class="mobile-sub">
-        <div class="mobile-sub-inner">
-          <a href="/ItalianExperience/flavors/for-your-home/" class="mobile-sublink" data-close>For your home</a>
-          <a href="/ItalianExperience/flavors/for-your-business/" class="mobile-sublink" data-close>For your business</a>
-          <a href="/ItalianExperience/flavors/aziende-italiane/" class="mobile-sublink" data-close>Aziende Italiane</a>
-        </div>
-      </div>
-
-      <a href="/ItalianExperience/estates/" class="mobile-link" data-close>Estates</a>
-      <a href="/ItalianExperience/contact/" class="mobile-link" data-close>Contact</a>
-    </nav>
-  </div>
-
-  <nav class="glass-header" id="main-header" aria-label="Header">
-
-    <a href="/ItalianExperience/" class="no-underline">
-      <div class="logo-wrap" id="logo-header">
-        <span class="font-it">Italian</span>
-        <div class="font-ex" data-text="EXPERIENCE"></div>
-        <div class="tricolore-line">
-          <div style="background:var(--it-green);flex:1"></div>
-          <div style="background:#fff;flex:1"></div>
-          <div style="background:var(--it-red);flex:1"></div>
-        </div>
-      </div>
-    </a>
-
-    <button id="central-menu-btn" aria-label="Apri menu">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-linecap="round">
-        <circle cx="12" cy="12" r="10" stroke="rgba(197,160,89,0.4)" stroke-width="1"></circle>
-        <line x1="8" y1="10" x2="16" y2="10" stroke="#c5a059" stroke-width="2.5"></line>
-        <line x1="10" y1="14" x2="14" y2="14" stroke="#c5a059" stroke-width="2.5"></line>
-      </svg>
-      <span>Menu</span>
-    </button>
-
-    <div class="nav-container" aria-label="Navigazione desktop">
-      <a href="/ItalianExperience/" class="nav-link">Home</a>
-
-      <div class="dropdown">
-        <a href="/ItalianExperience/travel/" class="nav-link nav-link-travel">
-          Travel
-          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <path d="m6 9 6 6 6-6"></path>
-          </svg>
-        </a>
-        <div class="dropdown-menu">
-          <a href="/ItalianExperience/travel/bespoke/" class="dropdown-item">Bespoke</a>
-          <a href="/ItalianExperience/travel/gapyear/" class="dropdown-item">Gap Year</a>
-          <a href="/ItalianExperience/travel/culinary-academy/" class="dropdown-item">Culinary Academy</a>
-        </div>
-      </div>
-
-      <div class="dropdown">
-        <a href="/ItalianExperience/recruitment/" class="nav-link nav-link-recruitment active">
-          Recruitment
-          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <path d="m6 9 6 6 6-6"></path>
-          </svg>
-        </a>
-        <div class="dropdown-menu">
-          <a href="/ItalianExperience/recruitment/employer/" class="dropdown-item">Employer</a>
-          <a href="/ItalianExperience/recruitment/candidate/" class="dropdown-item">Candidate</a>
-        </div>
-      </div>
-
-      <div class="dropdown">
-        <a href="/ItalianExperience/flavors/" class="nav-link nav-link-flavors">
-          Flavors
-          <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <path d="m6 9 6 6 6-6"></path>
-          </svg>
-        </a>
-        <div class="dropdown-menu">
-          <a href="/ItalianExperience/flavors/for-your-home/" class="dropdown-item">For your home</a>
-          <a href="/ItalianExperience/flavors/for-your-business/" class="dropdown-item">For your business</a>
-          <a href="/ItalianExperience/flavors/aziende-italiane/" class="dropdown-item">Aziende Italiane</a>
-        </div>
-      </div>
-
-      <a href="/ItalianExperience/estates/" class="nav-link">Estates</a>
-      <a href="/ItalianExperience/contact/" class="nav-link">Contact</a>
-    </div>
-  </nav>
-
-  <section class="hero-recruitment">
-    <div class="hero-bg-left" id="bg-left"></div>
-    <div class="hero-bg-right" id="bg-right"></div>
 
     <div class="relative z-10 w-full h-full max-w-7xl mx-auto grid md:grid-cols-2">
 
-      <div class="panel-col panel-employer" id="panel-employer">
-        <span class="floating-text">EMPLOYER</span>
+      <div class="relative flex items-center justify-center border-r border-white/10 overflow-hidden min-h-full panel-employer">
+        <span class="absolute top-1/2 -translate-y-1/2 left-[-5%] text-[rgba(255,255,255,0.03)] font-extrabold tracking-tight pointer-events-none whitespace-nowrap text-[clamp(5rem,15vw,12rem)]">
+          EMPLOYER
+        </span>
 
-        <div class="content-main" id="content-employer-main">
+        <div class="relative z-10 text-center max-w-[520px] px-8 transition-all duration-500" id="content-employer-main">
           <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.6rem] mb-4 block font-bold">
             Strategic Partnership
           </span>
 
           <h2 class="text-5xl md:text-7xl brand-font mb-6 italic text-white">
-            I am an <br>Employer
+            I am an <br />Employer
           </h2>
 
           <p class="text-slate-400 font-light text-sm max-w-xs mx-auto mb-8 leading-relaxed">
             Acquire authentic Italian personnel and elite talent through our meticulously tailored recruitment framework.
           </p>
 
-          <a href="/ItalianExperience/recruitment/employer/" class="btn-luxury">Explore</a>
-          <div class="secondary-link" onclick="showDetails('employer')">
+          <a href="/ItalianExperience/recruitment/employer/"
+            class="inline-block border border-[#c5a059] text-[#c5a059] px-10 py-4 text-[0.65rem] uppercase tracking-[0.25em] font-semibold hover:bg-[#c5a059] hover:text-[#080808] transition-all duration-500">
+            Explore
+          </a>
+
+          <button type="button"
+            class="block mx-auto mt-8 text-[0.55rem] uppercase tracking-[0.15em] text-slate-500 hover:text-white transition-all duration-300 border-b border-transparent hover:border-white"
+            onclick="showDetails('employer')">
             Why Choose Us <i class="fas fa-chart-pie ml-1"></i>
-          </div>
+          </button>
         </div>
 
-        <div class="details-overlay" id="details-employer">
-          <h3 class="text-[#c5a059] brand-font italic text-3xl mb-4">Why Choose Us</h3>
-          <p class="text-[0.65rem] text-slate-400 mb-8 max-w-md mx-auto leading-relaxed text-center">
+        <div class="absolute inset-0 bg-[rgba(8,8,8,0.97)] flex flex-col justify-center items-center px-8 py-14 opacity-0 invisible scale-[1.02] transition-all duration-500 overflow-y-auto"
+          id="details-employer">
+
+          <h3 class="text-[#c5a059] brand-font italic text-3xl mb-4 text-center">
+            Why Choose Us
+          </h3>
+
+          <p class="text-[0.65rem] text-slate-400 mb-10 max-w-md mx-auto leading-relaxed text-center">
             We handle the entire recruitment cycle, allowing you to focus on your core operations while we increase your company's global competitiveness.
           </p>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl w-full mb-8">
-            <div class="flex items-start gap-3 text-left p-3 border border-white/5 bg-white/5">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl w-full mb-10">
+            <div class="flex items-start gap-3 text-left p-4 border border-white/5 bg-white/5">
               <i class="fas fa-search-plus text-[#c5a059] text-sm mt-1"></i>
               <div>
                 <h4 class="text-[0.65rem] font-bold uppercase tracking-wider text-white">Needs Analysis</h4>
@@ -711,7 +93,7 @@
               </div>
             </div>
 
-            <div class="flex items-start gap-3 text-left p-3 border border-white/5 bg-white/5">
+            <div class="flex items-start gap-3 text-left p-4 border border-white/5 bg-white/5">
               <i class="fas fa-video text-[#c5a059] text-sm mt-1"></i>
               <div>
                 <h4 class="text-[0.65rem] font-bold uppercase tracking-wider text-white">Vetted Screening</h4>
@@ -719,7 +101,7 @@
               </div>
             </div>
 
-            <div class="flex items-start gap-3 text-left p-3 border border-white/5 bg-white/5">
+            <div class="flex items-start gap-3 text-left p-4 border border-white/5 bg-white/5">
               <i class="fas fa-check-double text-[#c5a059] text-sm mt-1"></i>
               <div>
                 <h4 class="text-[0.65rem] font-bold uppercase tracking-wider text-white">Reference Checks</h4>
@@ -727,7 +109,7 @@
               </div>
             </div>
 
-            <div class="flex items-start gap-3 text-left p-3 border border-white/5 bg-white/5">
+            <div class="flex items-start gap-3 text-left p-4 border border-white/5 bg-white/5">
               <i class="fas fa-piggy-bank text-[#c5a059] text-sm mt-1"></i>
               <div>
                 <h4 class="text-[0.65rem] font-bold uppercase tracking-wider text-white">FICA Tax Savings</h4>
@@ -736,50 +118,67 @@
             </div>
           </div>
 
-          <div class="chart-container">
+          <div class="w-full max-w-[170px] h-[170px] mb-10">
             <canvas id="employerChart"></canvas>
           </div>
 
-          <button class="btn-close-overlay" onclick="hideDetails('employer')">Return</button>
+          <button type="button"
+            class="text-[#c5a059] text-[0.6rem] uppercase tracking-[0.25em] border-b border-[#c5a059] pb-1 hover:text-white hover:border-white transition-all duration-300"
+            onclick="hideDetails('employer')">
+            Return
+          </button>
         </div>
       </div>
 
-      <div class="panel-col panel-candidate" id="panel-candidate">
-        <span class="floating-text">CANDIDATE</span>
+      <div class="relative flex items-center justify-center overflow-hidden min-h-full panel-candidate">
+        <span class="absolute top-1/2 -translate-y-1/2 right-[-5%] text-[rgba(255,255,255,0.03)] font-extrabold tracking-tight pointer-events-none whitespace-nowrap text-[clamp(5rem,15vw,12rem)]">
+          CANDIDATE
+        </span>
 
-        <div class="content-main" id="content-candidate-main">
+        <div class="relative z-10 text-center max-w-[520px] px-8 transition-all duration-500" id="content-candidate-main">
           <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.6rem] mb-4 block font-bold">
             Career Mastery
           </span>
 
           <h2 class="text-5xl md:text-7xl brand-font mb-6 italic text-white">
-            I am a <br>Candidate
+            I am a <br />Candidate
           </h2>
 
           <p class="text-slate-400 font-light text-sm max-w-xs mx-auto mb-8 leading-relaxed">
             Dedicated to assisting elite candidates in launching prestigious careers through curated opportunities.
           </p>
 
-          <a href="/ItalianExperience/recruitment/candidate/" class="btn-luxury">Live the Dream</a>
-          <div class="secondary-link" onclick="showDetails('candidate')">
+          <a href="/ItalianExperience/recruitment/candidate/"
+            class="inline-block border border-[#c5a059] text-[#c5a059] px-10 py-4 text-[0.65rem] uppercase tracking-[0.25em] font-semibold hover:bg-[#c5a059] hover:text-[#080808] transition-all duration-500">
+            Live the Dream
+          </a>
+
+          <button type="button"
+            class="block mx-auto mt-8 text-[0.55rem] uppercase tracking-[0.15em] text-slate-500 hover:text-white transition-all duration-300 border-b border-transparent hover:border-white"
+            onclick="showDetails('candidate')">
             View Roadmap <i class="fas fa-map-signs ml-1"></i>
-          </div>
+          </button>
         </div>
 
-        <div class="details-overlay" id="details-candidate">
-          <h3 class="text-[#c5a059] brand-font italic text-3xl mb-4">Candidate Solutions</h3>
-          <p class="text-[0.65rem] text-slate-400 mb-8 max-w-md mx-auto leading-relaxed text-center">
+        <div class="absolute inset-0 bg-[rgba(8,8,8,0.97)] flex flex-col justify-center items-center px-8 py-14 opacity-0 invisible scale-[1.02] transition-all duration-500 overflow-y-auto"
+          id="details-candidate">
+
+          <h3 class="text-[#c5a059] brand-font italic text-3xl mb-4 text-center">
+            Candidate Solutions
+          </h3>
+
+          <p class="text-[0.65rem] text-slate-400 mb-10 max-w-md mx-auto leading-relaxed text-center">
             Whether you are aiming for an international cultural program or a strategic local career move, we provide end-to-end support.
           </p>
 
-          <div class="w-full max-w-md space-y-6 text-left mb-8">
+          <div class="w-full max-w-md space-y-8 text-left mb-10">
 
             <div class="flex gap-4">
               <div class="flex flex-col items-center">
                 <div class="w-8 h-8 rounded-full border border-[#c5a059] text-[#c5a059] flex items-center justify-center text-xs font-bold">1</div>
                 <div class="w-px h-full bg-white/10 mt-2"></div>
               </div>
-              <div class="pb-6">
+              <div class="pb-4">
                 <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-1">Interview and Selection</h4>
                 <p class="text-[0.6rem] text-slate-400 italic">
                   Individual screening sessions to evaluate your profile and expectations.
@@ -792,16 +191,18 @@
                 <div class="w-8 h-8 rounded-full border border-[#c5a059] text-[#c5a059] flex items-center justify-center text-xs font-bold">2</div>
                 <div class="w-px h-full bg-white/10 mt-2"></div>
               </div>
-              <div class="pb-6">
-                <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-1">Strategic Placement</h4>
 
-                <div class="mt-2 space-y-2">
-                  <div class="bg-white/5 p-2 border-l-2 border-[#c5a059]">
-                    <p class="text-[0.55rem] font-bold text-white uppercase tracking-tighter">International Pathway</p>
+              <div class="pb-4">
+                <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-2">Strategic Placement</h4>
+
+                <div class="space-y-3">
+                  <div class="bg-white/5 p-3 border-l-2 border-[#c5a059]">
+                    <p class="text-[0.55rem] font-bold text-white uppercase tracking-tight">International Pathway</p>
                     <p class="text-[0.5rem] text-slate-500">Visa programs, housing, and travel logistics.</p>
                   </div>
-                  <div class="bg-white/5 p-2 border-l-2 border-slate-500">
-                    <p class="text-[0.55rem] font-bold text-white uppercase tracking-tighter">Local Opportunities</p>
+
+                  <div class="bg-white/5 p-3 border-l-2 border-slate-500">
+                    <p class="text-[0.55rem] font-bold text-white uppercase tracking-tight">Local Opportunities</p>
                     <p class="text-[0.5rem] text-slate-500">Direct recruitment within Italy and Europe.</p>
                   </div>
                 </div>
@@ -814,7 +215,7 @@
                 <div class="w-8 h-8 rounded-full bg-[#c5a059] text-black flex items-center justify-center text-xs font-bold shadow-[0_0_15px_rgba(197,160,89,0.5)]">3</div>
                 <div class="w-px h-full bg-white/10 mt-2"></div>
               </div>
-              <div class="pb-6">
+              <div class="pb-4">
                 <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-1">Total Support</h4>
                 <p class="text-[0.6rem] text-slate-400 italic">
                   Insurance, group departures, and full relocation guidance.
@@ -836,223 +237,91 @@
 
           </div>
 
-          <button class="btn-close-overlay" onclick="hideDetails('candidate')">Return</button>
+          <button type="button"
+            class="text-[#c5a059] text-[0.6rem] uppercase tracking-[0.25em] border-b border-[#c5a059] pb-1 hover:text-white hover:border-white transition-all duration-300"
+            onclick="hideDetails('candidate')">
+            Return
+          </button>
         </div>
       </div>
 
     </div>
+
   </section>
 
-  <footer class="site-footer">
-    <a href="/ItalianExperience/" class="no-underline mb-8">
-      <div class="logo-wrap scale-[0.7] md:scale-[0.8]" id="logo-footer">
-        <span class="font-it">Italian</span>
-        <div class="font-ex" data-text="EXPERIENCE"></div>
-        <div class="tricolore-line">
-          <div style="background:var(--it-green);flex:1"></div>
-          <div style="background:#fff;flex:1"></div>
-          <div style="background:var(--it-red);flex:1"></div>
-        </div>
-      </div>
-    </a>
-
-    <p class="text-white/20 uppercase tracking-[0.4em] text-[0.6rem]">
-      © 2026 ITALIAN EXPERIENCE · STRATEGIC ADVISORY
-    </p>
-  </footer>
+  <div id="site-footer"></div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-
-      document.querySelectorAll('.font-ex').forEach(ex => {
-        const text = ex.getAttribute('data-text') || '';
-        ex.innerHTML = text.split('').map(c => `<span class="letter">${c}</span>`).join('');
-      });
-
-      let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
-      const header = document.getElementById('main-header');
-
-      window.addEventListener('scroll', () => {
-        const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
-
-        if (currentScrollY > lastScrollY && currentScrollY > 100) header.classList.add('nav-up');
-        else header.classList.remove('nav-up');
-
-        if (currentScrollY > 50) header.classList.add('scrolled');
-        else header.classList.remove('scrolled');
-
-        lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
-      }, { passive: true });
-
-      const menuBtn = document.getElementById('central-menu-btn');
-      const closeBtn = document.getElementById('close-menu');
-      const overlay = document.getElementById('mobile-menu-overlay');
-
-      menuBtn?.addEventListener('click', (e) => {
-        e.preventDefault();
-        overlay.classList.add('active');
-        overlay.setAttribute('aria-hidden', 'false');
-      });
-
-      closeBtn?.addEventListener('click', (e) => {
-        e.preventDefault();
-        overlay.classList.remove('active');
-        overlay.setAttribute('aria-hidden', 'true');
-      });
-
-      overlay.addEventListener('click', (e) => {
-        const t = e.target;
-        if (t && t.closest && t.closest('[data-close]')) {
-          overlay.classList.remove('active');
-          overlay.setAttribute('aria-hidden', 'true');
-        }
-      }, { passive: true });
-
-      const accBtns = Array.from(document.querySelectorAll('.mobile-acc-btn'));
-
-      function setAcc(btn, open) {
-        const id = btn.getAttribute('aria-controls');
-        const panel = id ? document.getElementById(id) : null;
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        if (!panel) return;
-
-        if (open) {
-          const inner = panel.querySelector('.mobile-sub-inner');
-          const h = inner ? inner.scrollHeight : 0;
-          panel.style.maxHeight = Math.max(80, h + 14) + 'px';
-        } else {
-          panel.style.maxHeight = '0px';
-        }
-      }
-
-      accBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const isOpen = btn.getAttribute('aria-expanded') === 'true';
-          setAcc(btn, !isOpen);
-        });
-      });
-
-      setTimeout(() => {
-        accBtns.forEach(btn => {
-          const isOpen = btn.getAttribute('aria-expanded') === 'true';
-          if (isOpen) setAcc(btn, true);
-        });
-      }, 150);
-
-      function initLogoMouse(id) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        if (!window.matchMedia('(pointer: fine)').matches) return;
-
-        const it = el.querySelector('.font-it');
-        const letters = el.querySelectorAll('.letter');
-        if (!it || !letters.length) return;
-
-        el.addEventListener('mousemove', (e) => {
-          const r = el.getBoundingClientRect();
-          const x = e.clientX - r.left;
-
-          const itRect = it.getBoundingClientRect();
-          const itX = itRect.left + itRect.width / 2 - r.left;
-          const dIt = Math.abs(x - itX);
-          const pIt = Math.max(0, (200 - dIt) / 200);
-
-          it.style.textShadow = `0 0 ${15 * pIt}px rgba(197,160,89,0.5)`;
-          it.style.transform = `scale(${1 + pIt * 0.05})`;
-
-          letters.forEach(l => {
-            const lr = l.getBoundingClientRect();
-            const lx = lr.left + lr.width / 2 - r.left;
-            const dx = Math.abs(x - lx);
-
-            if (dx < 110) {
-              const p = (110 - dx) / 110;
-              l.style.color = (x > lx + 14) ? '#008C45' : (x < lx - 14 ? '#CD212A' : '#FFF');
-              l.style.transform = `scale(${1 + p * 0.42}) translateY(${-p * 10}px)`;
-              l.style.zIndex = '20';
-            } else {
-              l.style.color = '';
-              l.style.transform = '';
-              l.style.zIndex = '10';
-            }
-          });
-        }, { passive: true });
-
-        el.addEventListener('mouseleave', () => {
-          it.style.textShadow = '';
-          it.style.transform = '';
-          letters.forEach(l => { l.style.color = ''; l.style.transform = ''; l.style.zIndex = ''; });
-        }, { passive: true });
-      }
-
-      initLogoMouse('logo-header');
-      initLogoMouse('logo-footer');
-
-    });
-
     let employerChart = null;
 
     function showDetails(type) {
       const mainContent = document.getElementById(`content-${type}-main`);
       const detailsPanel = document.getElementById(`details-${type}`);
-      const bg = document.getElementById(type === 'employer' ? 'bg-left' : 'bg-right');
+      const bg = document.getElementById(type === "employer" ? "bg-left" : "bg-right");
 
-      mainContent.style.opacity = '0';
-      mainContent.style.transform = 'translateY(-18px)';
+      if (!mainContent || !detailsPanel || !bg) return;
 
-      bg.style.opacity = '0.55';
-      bg.style.transform = 'scale(1.05)';
+      mainContent.style.opacity = "0";
+      mainContent.style.transform = "translateY(-18px)";
+
+      bg.style.opacity = "0.55";
+      bg.style.transform = "scale(1.05)";
 
       setTimeout(() => {
-        detailsPanel.classList.add('active');
-        if (type === 'employer' && !employerChart) initChart();
-      }, 250);
+        detailsPanel.classList.remove("opacity-0", "invisible", "scale-[1.02]");
+        detailsPanel.classList.add("opacity-100", "visible", "scale-100");
+
+        if (type === "employer" && !employerChart) initChart();
+      }, 220);
     }
 
     function hideDetails(type) {
       const mainContent = document.getElementById(`content-${type}-main`);
       const detailsPanel = document.getElementById(`details-${type}`);
-      const bg = document.getElementById(type === 'employer' ? 'bg-left' : 'bg-right');
+      const bg = document.getElementById(type === "employer" ? "bg-left" : "bg-right");
 
-      detailsPanel.classList.remove('active');
+      if (!mainContent || !detailsPanel || !bg) return;
 
-      bg.style.opacity = '0.28';
-      bg.style.transform = 'scale(1)';
+      detailsPanel.classList.add("opacity-0", "invisible", "scale-[1.02]");
+      detailsPanel.classList.remove("opacity-100", "visible", "scale-100");
+
+      bg.style.opacity = "0.28";
+      bg.style.transform = "scale(1)";
 
       setTimeout(() => {
-        mainContent.style.opacity = '1';
-        mainContent.style.transform = 'translateY(0)';
-      }, 280);
+        mainContent.style.opacity = "1";
+        mainContent.style.transform = "translateY(0)";
+      }, 250);
     }
 
     function initChart() {
-      const canvas = document.getElementById('employerChart');
+      const canvas = document.getElementById("employerChart");
       if (!canvas) return;
 
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
 
       employerChart = new Chart(ctx, {
-        type: 'doughnut',
+        type: "doughnut",
         data: {
-          labels: ['Tax Savings', 'Operating Cost'],
+          labels: ["Tax Savings", "Operating Cost"],
           datasets: [{
             data: [15, 85],
-            backgroundColor: ['#c5a059', '#1a1a1a'],
-            borderColor: 'rgba(255,255,255,0.1)',
+            backgroundColor: ["#c5a059", "#1a1a1a"],
+            borderColor: "rgba(255,255,255,0.08)",
             borderWidth: 1
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          cutout: '80%',
+          cutout: "80%",
           plugins: {
             legend: {
               display: true,
-              position: 'bottom',
+              position: "bottom",
               labels: {
-                color: '#94a3b8',
-                font: { size: 9, family: 'Inter' }
+                color: "#94a3b8",
+                font: { size: 9, family: "Inter" }
               }
             },
             tooltip: {
@@ -1064,6 +333,38 @@
         }
       });
     }
+  </script>
+
+  <script>
+    (function () {
+      const base = "/ItalianExperience";
+      const headerMount = document.getElementById("site-header");
+      const footerMount = document.getElementById("site-footer");
+
+      function inject(el, html) { if (el) el.innerHTML = html; }
+
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const s = document.createElement("script");
+          s.src = src;
+          s.defer = true;
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+
+      Promise.all([
+        fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
+        fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
+      ]).then(async ([h, f]) => {
+        inject(headerMount, h);
+        inject(footerMount, f);
+
+        await loadScript(base + "/assets/js/site.js");
+        if (window.IEInit) window.IEInit(document);
+      }).catch(err => console.error(err));
+    })();
   </script>
 
 </body>
