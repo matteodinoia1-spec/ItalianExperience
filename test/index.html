@@ -324,11 +324,11 @@
       }
 
       Promise.all([
-        fetch(base + "/partial/header.html").then(r => {
+        fetch(base + "/partials/header.html").then(r => {
           if (!r.ok) throw new Error("Header fetch failed: " + r.status);
           return r.text();
         }),
-        fetch(base + "/partial/footer.html").then(r => {
+        fetch(base + "/partials/footer.html").then(r => {
           if (!r.ok) throw new Error("Footer fetch failed: " + r.status);
           return r.text();
         })
