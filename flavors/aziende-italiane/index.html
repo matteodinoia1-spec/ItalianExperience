@@ -6,15 +6,15 @@
   <title>Aziende Italiane | Italian Experience</title>
 
   <!-- META SEO -->
-  <meta name="description" content="Supportiamo aziende italiane food & beverage nell'espansione negli USA con un percorso premium: compliance FDA, strategia export e posizionamento di mercato." />
-  <meta name="keywords" content="Italian Experience, Flavors, aziende italiane, export USA, FDA compliance, importazione, prodotti italiani" />
+  <meta name="description" content="Scopri le aziende italiane selezionate da Italian Experience. Supportiamo produttori d’eccellenza con accesso al mercato USA, compliance e strategia." />
+  <meta name="keywords" content="Italian Experience, aziende italiane, export USA, prodotti italiani, FDA compliance, importazione USA" />
   <meta name="author" content="Italian Experience" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://www.italianexp.com/flavors/aziende-italiane/" />
 
   <!-- OPEN GRAPH -->
   <meta property="og:title" content="Aziende Italiane | Italian Experience" />
-  <meta property="og:description" content="Portiamo aziende italiane nel mercato USA con un percorso premium: compliance FDA, posizionamento e strategia export." />
+  <meta property="og:description" content="Selezioniamo aziende italiane d’eccellenza e le accompagniamo nella crescita nel mercato USA con un approccio premium e conforme." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.italianexp.com/flavors/aziende-italiane/" />
   <meta property="og:image" content="https://www.italianexp.com/assets/preview.jpg" />
@@ -22,11 +22,12 @@
   <!-- TWITTER -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Aziende Italiane | Italian Experience" />
-  <meta name="twitter:description" content="Export premium per aziende italiane verso gli USA: compliance e strategia." />
+  <meta name="twitter:description" content="Export, posizionamento e compliance per aziende italiane nel mercato USA." />
   <meta name="twitter:image" content="https://www.italianexp.com/assets/preview.jpg" />
 
   <!-- LIBRARIES -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@200;300;400;600&family=Great+Vibes&family=Montserrat:wght@700;900&display=swap');
@@ -336,26 +337,27 @@
       top:0;
       width:55%;
       height:100%;
-      background:url("https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1500&q=80") center/cover no-repeat;
-      z-index:1;
-      filter:brightness(0.35) contrast(1.12);
+      background:url("https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=1600&q=80") center/cover no-repeat;
+      filter:brightness(0.38) contrast(1.12);
+      z-index:0;
     }
 
     .hero-image::after{
-      content:'';
+      content:"";
       position:absolute;
       inset:0;
-      background:linear-gradient(to right, rgba(8,8,8,1) 0%, rgba(8,8,8,0.7) 20%, rgba(8,8,8,0) 60%);
+      background:linear-gradient(to right, rgba(8,8,8,1) 0%, rgba(8,8,8,0.7) 40%, rgba(8,8,8,0.0) 100%);
+      z-index:1;
     }
 
     .hero-content{
       position:relative;
       z-index:5;
       width:55%;
-      padding:180px 0 90px 8%;
+      padding:180px 0 80px 8%;
     }
 
-    /* SCROLL INDICATOR MASTER */
+    /* UPDATED SCROLL INDICATOR */
     @keyframes scrollLine {
       0% { transform: translateY(-18px); opacity: 0; }
       30% { opacity: 1; }
@@ -363,20 +365,24 @@
     }
 
     .explore-indicator{
-      display:inline-flex;
+      position:absolute;
+      bottom:46px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:20;
+      display:flex;
       flex-direction:column;
-      align-items:flex-start;
+      align-items:center;
       gap:14px;
       text-decoration:none;
       opacity:0.82;
-      margin-top:3.5rem;
       transition:opacity 0.2s ease, transform 0.2s ease;
       pointer-events:auto;
     }
 
     .explore-indicator:hover{
       opacity:1;
-      transform:translateY(3px);
+      transform:translateX(-50%) translateY(3px);
     }
 
     .explore-indicator span{
@@ -407,68 +413,56 @@
       animation:scrollLine 1.6s infinite ease-in-out;
     }
 
-    /* PREMIUM SECTIONS */
-    .section-soft{
-      position:relative;
-      background:linear-gradient(to bottom, #0b0b0b 0%, #070707 100%);
-    }
-
-    .glow-bg{
-      position:absolute;
-      top:50%;
-      left:50%;
-      transform:translate(-50%, -50%);
-      width:90%;
-      height:90%;
-      background:radial-gradient(circle, rgba(197,160,89,0.08) 0%, transparent 70%);
-      z-index:0;
-      pointer-events:none;
-    }
-
-    .glass-panel{
+    /* PREMIUM SECTION STYLES */
+    .glass-card{
       background:rgba(255,255,255,0.02);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
       border:1px solid rgba(197,160,89,0.15);
-      backdrop-filter:blur(18px);
-      -webkit-backdrop-filter:blur(18px);
-      padding:2.6rem;
+      transition:all 0.5s ease;
+      padding:2.5rem;
       border-radius:2px;
-      transition:all 0.35s ease;
+      height:100%;
     }
 
-    .glass-panel:hover{
-      border-color:rgba(197,160,89,0.45);
-      background:rgba(197,160,89,0.03);
-      transform:translateY(-4px);
+    .glass-card:hover{
+      border-color:var(--brand-gold);
+      transform:translateY(-5px);
+      background:rgba(197,160,89,0.04);
+    }
+
+    .info-badge{
+      background:rgba(197,160,89,0.05);
+      border:1px solid rgba(197,160,89,0.2);
+      padding:1.5rem;
+      transition:all 0.4s ease;
+      border-radius:2px;
+    }
+
+    .info-badge:hover{
+      border-color:var(--brand-gold);
+      background:rgba(197,160,89,0.1);
     }
 
     .gold-line-long{
-      width:62px;
+      width:60px;
       height:1px;
       background:var(--brand-gold);
       display:inline-block;
       vertical-align:middle;
     }
 
-    .micro-label{
-      text-transform:uppercase;
-      letter-spacing:0.5em;
-      font-size:0.65rem;
-      color:rgba(197,160,89,0.95);
-      font-weight:700;
-    }
-
     /* ROADMAP */
     .roadmap-step{
       position:relative;
       padding-left:4rem;
-      border-left:1px solid rgba(197,160,89,0.18);
-      padding-bottom:4.5rem;
+      border-left:1px solid rgba(197,160,89,0.2);
+      padding-bottom:5rem;
     }
     .roadmap-step:last-child{
       border-left-color:transparent;
       padding-bottom:0;
     }
-
     .roadmap-number{
       position:absolute;
       left:-18px;
@@ -482,9 +476,9 @@
       align-items:center;
       justify-content:center;
       font-size:0.8rem;
-      font-weight:800;
+      font-weight:700;
       border-radius:50%;
-      box-shadow:0 0 18px rgba(197,160,89,0.22);
+      box-shadow:0 0 15px rgba(197,160,89,0.2);
     }
 
     /* FOOTER */
@@ -498,7 +492,7 @@
       text-align:center;
     }
 
-    /* RESPONSIVE CHECK */
+    /* RESPONSIVE HEADER + HERO */
     @media (max-width:1024px){
       .glass-header{
         flex-direction:column !important;
@@ -514,31 +508,30 @@
 
       .hero-content{
         width:100%;
-        padding:220px 2rem 80px;
+        padding:220px 2rem 90px;
         text-align:center;
       }
 
       .hero-image{
         width:100%;
-        opacity:0.25;
+        opacity:1;
+        filter:brightness(0.55) contrast(1.1);
       }
 
       .hero-image::after{
-        background:linear-gradient(to bottom, rgba(8,8,8,1) 0%, rgba(8,8,8,0.7) 45%, rgba(8,8,8,0) 100%);
-      }
-
-      .explore-indicator{
-        align-items:center;
+        background:linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.10) 100%);
       }
     }
 
     @media (max-width:768px){
       .hero-content h1{
-        font-size:clamp(1.7rem, 8vw, 2.8rem) !important;
+        font-size:clamp(2.0rem, 10vw, 3.2rem) !important;
         line-height:1.05 !important;
       }
       .hero-content p{
-        font-size:0.92rem !important;
+        font-size:0.95rem !important;
+        max-width:520px !important;
+        margin:0 auto;
       }
     }
 
@@ -546,7 +539,7 @@
       .logo-wrap{transform:scale(0.68)}
       .glass-header{height:145px !important}
       #central-menu-btn{scale:0.9}
-      .hero-content{padding-top:200px !important;}
+      .hero-content{padding:200px 1.2rem 80px;}
     }
   </style>
 </head>
@@ -556,7 +549,7 @@
   <!-- MOBILE MENU OVERLAY -->
   <div id="mobile-menu-overlay" aria-hidden="true">
     <div class="mobile-close">
-      <button id="close-menu" aria-label="Chiudi menu" class="text-white/80 hover:text-white">
+      <button id="close-menu" aria-label="Close menu" class="text-white/80 hover:text-white">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -564,9 +557,10 @@
       </button>
     </div>
 
-    <nav class="mobile-menu" aria-label="Menu mobile">
+    <nav class="mobile-menu" aria-label="Mobile menu">
       <a href="https://www.italianexp.com/" class="mobile-link" data-close>Home</a>
 
+      <!-- TRAVEL -->
       <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-travel">
         <span>Travel</span>
         <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -581,6 +575,7 @@
         </div>
       </div>
 
+      <!-- RECRUITMENT -->
       <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-recruitment">
         <span>Recruitment</span>
         <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -594,7 +589,8 @@
         </div>
       </div>
 
-      <button class="mobile-acc-btn active" type="button" aria-expanded="true" aria-controls="m-flavors">
+      <!-- FLAVORS -->
+      <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-flavors">
         <span>Flavors</span>
         <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="m6 9 6 6 6-6"></path>
@@ -627,7 +623,7 @@
       </div>
     </a>
 
-    <button id="central-menu-btn" aria-label="Apri menu">
+    <button id="central-menu-btn" aria-label="Open menu">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-linecap="round">
         <circle cx="12" cy="12" r="10" stroke="rgba(197,160,89,0.4)" stroke-width="1"></circle>
         <line x1="8" y1="10" x2="16" y2="10" stroke="#c5a059" stroke-width="2.5"></line>
@@ -636,6 +632,7 @@
       <span>Menu</span>
     </button>
 
+    <!-- DESKTOP MENU -->
     <div class="nav-container" aria-label="Desktop navigation">
       <a href="https://www.italianexp.com/" class="nav-link">Home</a>
 
@@ -698,180 +695,128 @@
       </h1>
 
       <p class="text-slate-300 font-light text-base md:text-lg max-w-md leading-relaxed mb-6">
-        Selezioniamo produttori d’eccellenza e costruiamo per loro un ingresso reale nel mercato americano, con compliance, posizionamento e strategia.
+        Selezioniamo produttori d’eccellenza e costruiamo per loro un ingresso reale nel mercato americano, con posizionamento premium, strategia e conformità normativa.
       </p>
-
-      <a href="#aziende" class="explore-indicator" aria-label="Scopri la sezione">
-        <span>Scopri</span>
-        <div class="scroll-track" aria-hidden="true">
-          <div class="scroll-dot"></div>
-        </div>
-      </a>
     </div>
 
     <div class="hero-image"></div>
+
+    <!-- SCROLL INDICATOR -->
+    <a href="#aziende" class="explore-indicator" aria-label="Scopri la sezione">
+      <span>Scopri</span>
+      <div class="scroll-track" aria-hidden="true">
+        <div class="scroll-dot"></div>
+      </div>
+    </a>
   </section>
 
-  <!-- SECTION 1 -->
-  <section id="aziende" class="py-28 px-6 section-soft">
-    <div class="glow-bg"></div>
-
-    <div class="max-w-7xl mx-auto relative z-10">
-      <div class="text-center mb-20">
-        <div class="flex items-center justify-center gap-4 mb-8">
-          <span class="gold-line-long"></span>
-          <span class="micro-label">Italian Excellence Network</span>
-          <span class="gold-line-long"></span>
-        </div>
-
-        <h2 class="text-4xl md:text-6xl brand-font italic mb-8 text-white uppercase tracking-tighter">
-          Un network selezionato.
+  <!-- SECTION: VALUE PROPOSITION -->
+  <section id="aziende" class="py-32 px-6 bg-[#080808]">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-24">
+        <span class="text-[#c5a059] uppercase tracking-[0.6em] text-[0.65rem] font-bold block mb-4">Un Hub Selettivo</span>
+        <h2 class="text-4xl md:text-6xl brand-font italic text-white uppercase tracking-tighter">
+          Il meglio dell’Italia, <span class="text-[#c5a059]">pronto per il mondo.</span>
         </h2>
-
-        <p class="text-slate-400 text-sm md:text-base max-w-3xl mx-auto leading-relaxed">
-          Lavoriamo con aziende italiane che rispettano standard elevati di qualità, autenticità e visione.
-          Il nostro obiettivo è trasformare il prodotto in una presenza strutturata nel mercato USA.
+        <p class="text-slate-400 text-sm md:text-base font-light leading-relaxed max-w-3xl mx-auto mt-8">
+          Italian Experience collabora con aziende italiane selezionate, valorizzandone identità, artigianalità e qualità. Creiamo una strategia concreta per la crescita internazionale e l’accesso al mercato statunitense.
         </p>
       </div>
 
-      <div class="grid lg:grid-cols-3 gap-8">
-        <div class="glass-panel">
-          <div class="flex items-center gap-4 mb-6">
-            <svg class="w-10 h-10 text-[#c5a059]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path d="M12 2l3 7h7l-5.5 4 2.2 7L12 16l-6.7 4 2.2-7L2 9h7l3-7z" stroke-linecap="round" stroke-linejoin="round"></path>
-            </svg>
-            <h3 class="brand-font italic text-2xl text-white">Selezione Premium</h3>
-          </div>
-
-          <p class="text-slate-400 text-sm leading-relaxed font-light">
-            Analizziamo prodotto, identità del brand e potenziale commerciale.
-            Solo le realtà con valore reale entrano nel nostro percorso.
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="glass-card">
+          <h3 class="text-2xl brand-font text-[#c5a059] mb-6 italic">Selezione Premium</h3>
+          <p class="text-slate-400 text-sm font-light leading-relaxed">
+            Lavoriamo con produttori autentici e marchi con un’identità forte. Ogni azienda viene valutata per qualità, storia e potenziale commerciale.
           </p>
         </div>
 
-        <div class="glass-panel border-t-2 border-[#c5a059]">
-          <div class="flex items-center gap-4 mb-6">
-            <svg class="w-10 h-10 text-[#c5a059]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4z" stroke-linecap="round" stroke-linejoin="round"></path>
-              <path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"></path>
-            </svg>
-            <h3 class="brand-font italic text-2xl text-white">Compliance Totale</h3>
-          </div>
-
-          <p class="text-slate-400 text-sm leading-relaxed font-light">
-            Gestiamo il processo di conformità normativa (FDA, labeling, registrazioni)
-            e riduciamo al minimo il rischio operativo.
+        <div class="glass-card border-t-2 border-[#c5a059]">
+          <h3 class="text-2xl brand-font text-[#c5a059] mb-6 italic">Accesso al Mercato USA</h3>
+          <p class="text-slate-400 text-sm font-light leading-relaxed">
+            Creiamo un percorso strategico per l’ingresso negli Stati Uniti: pricing, posizionamento, canali e distribuzione coerenti con l’eccellenza del brand.
           </p>
         </div>
 
-        <div class="glass-panel">
-          <div class="flex items-center gap-4 mb-6">
-            <svg class="w-10 h-10 text-[#c5a059]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path d="M4 19h16" stroke-linecap="round"></path>
-              <path d="M6 16l4-5 4 3 4-6" stroke-linecap="round" stroke-linejoin="round"></path>
-              <path d="M18 10h2v2" stroke-linecap="round"></path>
-            </svg>
-            <h3 class="brand-font italic text-2xl text-white">Strategia Export</h3>
-          </div>
-
-          <p class="text-slate-400 text-sm leading-relaxed font-light">
-            Dalla distribuzione al posizionamento, costruiamo una roadmap chiara e sostenibile.
-            Un percorso che protegge l’immagine e valorizza il prezzo.
+        <div class="glass-card">
+          <h3 class="text-2xl brand-font text-[#c5a059] mb-6 italic">Compliance Totale</h3>
+          <p class="text-slate-400 text-sm font-light leading-relaxed">
+            Gestiamo gli aspetti normativi e tecnici, inclusi FDA, labeling e requisiti di importazione. Un approccio sicuro e professionale.
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- SECTION 2 -->
-  <section class="py-28 px-6 bg-[#070707]">
+  <!-- SECTION: COMPLIANCE BADGES -->
+  <section class="py-32 px-6 bg-[#0c0c0c]">
     <div class="max-w-7xl mx-auto">
-      <div class="grid lg:grid-cols-12 gap-14 items-center">
-
-        <div class="lg:col-span-6">
-          <div class="flex items-center mb-8">
-            <span class="gold-line-long"></span>
-            <span class="uppercase tracking-[0.5em] text-[0.65rem] text-[#c5a059] mx-4 font-bold">
-              Il nostro approccio
-            </span>
-          </div>
-
-          <h2 class="text-4xl md:text-6xl brand-font italic text-white uppercase tracking-tighter mb-8">
-            Dal prodotto al mercato.
-          </h2>
-
-          <p class="text-slate-300 font-light text-sm md:text-base leading-relaxed mb-6">
-            Entrare negli USA non significa semplicemente spedire.
-            Significa rispettare regole federali, costruire credibilità e creare una strategia coerente con il posizionamento.
-          </p>
-
-          <p class="text-slate-400 font-light text-sm md:text-base leading-relaxed">
-            Per questo lavoriamo come un partner operativo e strategico, non come un semplice intermediario.
-          </p>
-        </div>
-
-        <div class="lg:col-span-6">
-          <div class="glass-panel">
-            <h3 class="brand-font italic text-2xl text-[#c5a059] mb-8">
-              Cosa offriamo alle aziende
-            </h3>
-
-            <div class="space-y-6">
-              <div class="flex gap-4 items-start">
-                <svg class="w-10 h-10 text-[#c5a059] shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path>
-                </svg>
-                <div>
-                  <p class="text-white text-sm uppercase tracking-widest font-semibold mb-1">Documentazione FDA</p>
-                  <p class="text-slate-400 text-sm leading-relaxed font-light">
-                    Registrazioni, verifiche, etichette e procedure richieste per operare legalmente.
-                  </p>
-                </div>
-              </div>
-
-              <div class="flex gap-4 items-start">
-                <svg class="w-10 h-10 text-[#c5a059] shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path d="M12 3l8 5v6c0 5-3.5 9.5-8 11-4.5-1.5-8-6-8-11V8l8-5z" stroke-linecap="round" stroke-linejoin="round"></path>
-                  <path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"></path>
-                </svg>
-                <div>
-                  <p class="text-white text-sm uppercase tracking-widest font-semibold mb-1">Posizionamento e pricing</p>
-                  <p class="text-slate-400 text-sm leading-relaxed font-light">
-                    Definizione della strategia premium, protezione del valore e coerenza di mercato.
-                  </p>
-                </div>
-              </div>
-
-              <div class="flex gap-4 items-start">
-                <svg class="w-10 h-10 text-[#c5a059] shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path d="M3 7h13v10H3V7z" stroke-linecap="round" stroke-linejoin="round"></path>
-                  <path d="M16 10h4l1 2v5h-5v-7z" stroke-linecap="round" stroke-linejoin="round"></path>
-                  <path d="M7 17a2 2 0 104 0" stroke-linecap="round"></path>
-                  <path d="M17 17a2 2 0 104 0" stroke-linecap="round"></path>
-                </svg>
-                <div>
-                  <p class="text-white text-sm uppercase tracking-widest font-semibold mb-1">Canali e distribuzione</p>
-                  <p class="text-slate-400 text-sm leading-relaxed font-light">
-                    Scelta del modello di vendita, importatore, distributore o B2B diretto.
-                  </p>
-                </div>
-              </div>
-
-              <div class="flex gap-4 items-start">
-                <svg class="w-10 h-10 text-[#c5a059] shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4z" stroke-linecap="round" stroke-linejoin="round"></path>
-                  <path d="M12 11v5" stroke-linecap="round"></path>
-                  <path d="M12 8h.01" stroke-linecap="round"></path>
-                </svg>
-                <div>
-                  <p class="text-white text-sm uppercase tracking-widest font-semibold mb-1">U.S. Agent</p>
-                  <p class="text-slate-400 text-sm leading-relaxed font-light">
-                    Supporto continuo e gestione delle comunicazioni ufficiali con gli enti competenti.
-                  </p>
-                </div>
-              </div>
+      <div class="grid lg:grid-cols-12 gap-16 items-center">
+        <div class="lg:col-span-6 space-y-10">
+          <div>
+            <div class="flex items-center mb-8">
+              <span class="gold-line-long"></span>
+              <span class="uppercase tracking-[0.5em] text-[0.65rem] text-[#c5a059] mx-4 font-bold">Approccio Operativo</span>
             </div>
 
+            <h2 class="text-5xl md:text-7xl brand-font mb-8 leading-tight text-white">
+              Struttura, <br>
+              <span class="italic text-[#c5a059]">Compliance</span> e Visione.
+            </h2>
+
+            <p class="text-slate-300 font-light text-lg leading-relaxed">
+              Il mercato americano richiede metodo, precisione e presenza locale. Italian Experience opera come partner strategico e come ponte operativo tra Italia e Stati Uniti.
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="info-badge">
+              <svg class="w-8 h-8 text-[#c5a059] mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+
+              <h4 class="text-white font-bold text-xs uppercase tracking-widest mb-2">Full FDA Package</h4>
+              <p class="text-slate-500 text-[0.65rem] leading-relaxed">
+                Gestiamo registrazioni, documentazione e requisiti completi per un ingresso conforme nel mercato USA.
+              </p>
+            </div>
+
+            <div class="info-badge">
+              <svg class="w-8 h-8 text-[#c5a059] mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+
+              <h4 class="text-white font-bold text-xs uppercase tracking-widest mb-2">Compliance Totale</h4>
+              <p class="text-slate-500 text-[0.65rem] leading-relaxed">
+                Dalla verifica ingredienti al labeling, eliminiamo ogni rischio tecnico e normativo.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-6">
+          <div class="glass-card">
+            <h3 class="text-3xl brand-font text-white italic mb-6">
+              Una rete in crescita.
+            </h3>
+            <p class="text-slate-400 text-sm font-light leading-relaxed mb-10">
+              La nostra rete di aziende italiane è costruita con cura e visione. Ogni partnership nasce per creare valore reale e duraturo, non solo vendita.
+            </p>
+
+            <div class="grid grid-cols-2 gap-8 text-center md:text-left border-t border-white/5 pt-10">
+              <div>
+                <span class="block text-[#c5a059] font-bold text-3xl brand-font">Italia</span>
+                <span class="text-[0.65rem] uppercase tracking-widest text-slate-500 leading-relaxed">
+                  Produzione selezionata
+                </span>
+              </div>
+              <div>
+                <span class="block text-[#c5a059] font-bold text-3xl brand-font">USA</span>
+                <span class="text-[0.65rem] uppercase tracking-widest text-slate-500 leading-relaxed">
+                  Mercato target premium
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -879,78 +824,41 @@
     </div>
   </section>
 
-  <!-- SECTION 3 ROADMAP -->
-  <section class="py-28 px-6 bg-[#080808]">
-    <div class="max-w-5xl mx-auto">
-      <div class="text-center md:text-left mb-20">
-        <div class="flex items-center justify-center md:justify-start mb-8">
-          <span class="gold-line-long"></span>
-          <span class="uppercase tracking-[0.5em] text-[0.65rem] text-[#c5a059] mx-4 font-bold">
-            Il percorso
-          </span>
-        </div>
-
-        <h2 class="text-4xl md:text-6xl brand-font italic text-white uppercase tracking-tighter">
-          Roadmap di espansione.
+  <!-- SECTION: ROADMAP -->
+  <section class="py-32 px-6 bg-[#080808]">
+    <div class="max-w-4xl mx-auto">
+      <div class="mb-24 text-center md:text-left">
+        <span class="gold-line-long"></span>
+        <span class="uppercase tracking-[0.5em] text-[0.65rem] text-[#c5a059] mx-4 font-bold">Percorso Strategico</span>
+        <h2 class="text-4xl md:text-6xl brand-font italic mt-8 text-white uppercase tracking-tighter">
+          Fasi del Successo.
         </h2>
       </div>
 
       <div class="space-y-0 relative">
         <div class="roadmap-step">
           <div class="roadmap-number">01</div>
-          <h3 class="text-xl brand-font text-white mb-4 italic">Analisi e Valutazione</h3>
-          <p class="text-slate-400 text-sm font-light leading-relaxed max-w-3xl">
-            Valutiamo il prodotto, la readiness dell’azienda e la compatibilità con il mercato USA.
-            Identifichiamo opportunità e criticità prima di qualsiasi investimento.
+          <h4 class="text-xl brand-font text-white mb-4 italic">Analisi e Valutazione</h4>
+          <p class="text-slate-400 text-sm font-light leading-relaxed max-w-2xl">
+            Studio del prodotto, della storia del brand e del potenziale commerciale. Valutazione dei requisiti per export e compliance USA.
           </p>
         </div>
 
         <div class="roadmap-step">
           <div class="roadmap-number">02</div>
-          <h3 class="text-xl brand-font text-white mb-4 italic">Compliance e Preparazione</h3>
-          <p class="text-slate-400 text-sm font-light leading-relaxed max-w-3xl">
-            Gestiamo registrazioni, labeling e processi richiesti. Prepariamo l’azienda per operare con
-            una struttura solida e conforme.
+          <h4 class="text-xl brand-font text-white mb-4 italic">Strategia e Posizionamento</h4>
+          <p class="text-slate-400 text-sm font-light leading-relaxed max-w-2xl">
+            Definizione del target americano, pricing, storytelling e canali. Costruiamo un posizionamento premium coerente con il valore reale dell’azienda.
           </p>
         </div>
 
         <div class="roadmap-step">
           <div class="roadmap-number">03</div>
-          <h3 class="text-xl brand-font text-white mb-4 italic">Go-to-Market USA</h3>
-          <p class="text-slate-400 text-sm font-light leading-relaxed max-w-3xl">
-            Costruiamo la strategia commerciale e i canali di ingresso, con un approccio premium.
-            Il focus è mantenere identità italiana e margini sostenibili.
+          <h4 class="text-xl brand-font text-white mb-4 italic">Ingresso e Crescita</h4>
+          <p class="text-slate-400 text-sm font-light leading-relaxed max-w-2xl">
+            Supporto operativo continuo, logistica, compliance e partnership locali. L’obiettivo è una presenza stabile e duratura nel mercato USA.
           </p>
         </div>
-
-        <div class="roadmap-step">
-          <div class="roadmap-number">04</div>
-          <h3 class="text-xl brand-font text-white mb-4 italic">Gestione Continuativa</h3>
-          <p class="text-slate-400 text-sm font-light leading-relaxed max-w-3xl">
-            Supporto continuo come U.S. Agent e advisory. Il progetto non finisce al primo container.
-            Lo trasformiamo in presenza stabile.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA SECTION -->
-  <section class="py-28 px-6 bg-[#070707]">
-    <div class="max-w-5xl mx-auto text-center">
-      <div class="glass-panel">
-        <h2 class="text-3xl md:text-5xl brand-font italic text-white uppercase tracking-tighter mb-6">
-          Vuoi portare la tua azienda negli USA?
-        </h2>
-
-        <p class="text-slate-300 font-light text-sm md:text-base max-w-2xl mx-auto leading-relaxed mb-10">
-          Se sei un produttore italiano e vuoi esportare con serietà e posizionamento premium,
-          possiamo costruire insieme un percorso completo, dalla compliance alla strategia commerciale.
-        </p>
-
-        <a href="https://www.italianexp.com/contact/" class="inline-flex items-center justify-center px-10 py-4 border border-[#c5a059] text-[#c5a059] uppercase tracking-[0.35em] text-[0.7rem] font-semibold hover:bg-[#c5a059] hover:text-black transition-all duration-300">
-          Richiedi una call
-        </a>
       </div>
     </div>
   </section>
@@ -1089,12 +997,10 @@
               l.style.color = (x > lx + 14) ? '#008C45' : (x < lx - 14 ? '#CD212A' : '#FFF');
               l.style.transform = `scale(${1 + p * 0.42}) translateY(${-p * 10}px)`;
               l.style.zIndex = '20';
-              l.style.textShadow = `0 0 ${12 * p}px currentColor`;
             } else {
               l.style.color = '';
               l.style.transform = '';
               l.style.zIndex = '10';
-              l.style.textShadow = '';
             }
           });
         }, { passive: true });
@@ -1102,12 +1008,7 @@
         el.addEventListener('mouseleave', () => {
           it.style.textShadow = '';
           it.style.transform = '';
-          letters.forEach(l => {
-            l.style.color = '';
-            l.style.transform = '';
-            l.style.zIndex = '';
-            l.style.textShadow = '';
-          });
+          letters.forEach(l => { l.style.color = ''; l.style.transform = ''; l.style.zIndex = ''; });
         }, { passive: true });
       }
 
