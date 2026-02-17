@@ -1,0 +1,137 @@
+<!-- MOBILE MENU OVERLAY -->
+<div id="mobile-menu-overlay" aria-hidden="true">
+  <div class="mobile-close">
+    <button id="close-menu" type="button" aria-label="Close menu" class="text-white/80 hover:text-white">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+
+  <nav class="mobile-menu" aria-label="Mobile navigation">
+    <a href="/ItalianExperience/" class="mobile-link" data-close data-nav="home">Home</a>
+
+    <div class="mobile-acc-row">
+      <a href="/ItalianExperience/travel/" class="mobile-linkish" data-close data-nav="travel">Travel</a>
+      <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-travel" aria-label="Toggle Travel">
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m6 9 6 6 6-6"></path>
+        </svg>
+      </button>
+    </div>
+    <div id="m-travel" class="mobile-sub" hidden>
+      <div class="mobile-sub-inner">
+        <a href="/ItalianExperience/travel/bespoke/" class="mobile-sublink" data-close>Bespoke</a>
+        <a href="/ItalianExperience/travel/gapyear/" class="mobile-sublink" data-close>Gap Year</a>
+        <a href="/ItalianExperience/travel/culinary/" class="mobile-sublink" data-close>Culinary Academy</a>
+      </div>
+    </div>
+
+    <div class="mobile-acc-row">
+      <a href="/ItalianExperience/recruitment/" class="mobile-linkish" data-close data-nav="recruitment">Recruitment</a>
+      <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-recruitment" aria-label="Toggle Recruitment">
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m6 9 6 6 6-6"></path>
+        </svg>
+      </button>
+    </div>
+    <div id="m-recruitment" class="mobile-sub" hidden>
+      <div class="mobile-sub-inner">
+        <a href="/ItalianExperience/recruitment/employer/" class="mobile-sublink" data-close>Employer</a>
+        <a href="/ItalianExperience/recruitment/candidate/" class="mobile-sublink" data-close>Candidate</a>
+      </div>
+    </div>
+
+    <div class="mobile-acc-row">
+      <a href="/ItalianExperience/flavors/" class="mobile-linkish" data-close data-nav="flavors">Flavors</a>
+      <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-flavors" aria-label="Toggle Flavors">
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m6 9 6 6 6-6"></path>
+        </svg>
+      </button>
+    </div>
+    <div id="m-flavors" class="mobile-sub" hidden>
+      <div class="mobile-sub-inner">
+        <a href="/ItalianExperience/flavors/for-your-home/" class="mobile-sublink" data-close>For your home</a>
+        <a href="/ItalianExperience/flavors/for-your-business/" class="mobile-sublink" data-close>For your business</a>
+        <a href="/ItalianExperience/flavors/aziende-italiane/" class="mobile-sublink" data-close>Aziende Italiane</a>
+      </div>
+    </div>
+
+    <a href="/ItalianExperience/estates/" class="mobile-link" data-close data-nav="estates">Estates</a>
+    <a href="/ItalianExperience/contact/" class="mobile-link" data-close data-nav="contact">Contact</a>
+  </nav>
+</div>
+
+<!-- HEADER -->
+<nav class="glass-header" id="main-header" aria-label="Header">
+  <a href="/ItalianExperience/" class="block no-underline" aria-label="Go to Home">
+    <div class="logo-wrap" id="logo-header">
+      <span class="font-it text-[70px]">Italian</span>
+      <div class="font-ex text-[35px]" data-text="EXPERIENCE"></div>
+      <div class="tricolore" aria-hidden="true">
+        <div style="background:var(--it-green)"></div>
+        <div style="background:#fff"></div>
+        <div style="background:var(--it-red)"></div>
+      </div>
+    </div>
+  </a>
+
+  <button id="central-menu-btn" type="button" aria-label="Open menu">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-linecap="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" stroke="rgba(197,160,89,0.4)" stroke-width="1" />
+      <line x1="8" y1="10" x2="16" y2="10" stroke="#c5a059" stroke-width="2.5" />
+      <line x1="10" y1="14" x2="14" y2="14" stroke="#c5a059" stroke-width="2.5" />
+    </svg>
+    <span>Menu</span>
+  </button>
+
+  <div class="nav-container" aria-label="Desktop navigation">
+    <a href="/ItalianExperience/" class="nav-link" data-nav="home">Home</a>
+
+    <div class="dropdown">
+      <a href="/ItalianExperience/travel/" class="nav-link" data-nav="travel">
+        Travel
+        <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+          <path d="m6 9 6 6 6-6"></path>
+        </svg>
+      </a>
+      <div class="dropdown-menu">
+        <a href="/ItalianExperience/travel/bespoke/" class="dropdown-item">Bespoke</a>
+        <a href="/ItalianExperience/travel/gapyear/" class="dropdown-item">Gap Year</a>
+        <a href="/ItalianExperience/travel/culinary/" class="dropdown-item">Culinary Academy</a>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <a href="/ItalianExperience/recruitment/" class="nav-link" data-nav="recruitment">
+        Recruitment
+        <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+          <path d="m6 9 6 6 6-6"></path>
+        </svg>
+      </a>
+      <div class="dropdown-menu">
+        <a href="/ItalianExperience/recruitment/employer/" class="dropdown-item">Employer</a>
+        <a href="/ItalianExperience/recruitment/candidate/" class="dropdown-item">Candidate</a>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <a href="/ItalianExperience/flavors/" class="nav-link" data-nav="flavors">
+        Flavors
+        <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+          <path d="m6 9 6 6 6-6"></path>
+        </svg>
+      </a>
+      <div class="dropdown-menu">
+        <a href="/ItalianExperience/flavors/for-your-home/" class="dropdown-item">For your home</a>
+        <a href="/ItalianExperience/flavors/for-your-business/" class="dropdown-item">For your business</a>
+        <a href="/ItalianExperience/flavors/aziende-italiane/" class="dropdown-item">Aziende Italiane</a>
+      </div>
+    </div>
+
+    <a href="/ItalianExperience/estates/" class="nav-link" data-nav="estates">Estates</a>
+    <a href="/ItalianExperience/contact/" class="nav-link" data-nav="contact">Contact</a>
+  </div>
+</nav>
