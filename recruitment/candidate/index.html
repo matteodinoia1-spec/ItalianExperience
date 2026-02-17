@@ -3,11 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
   <title>Candidate Journey | Italian Experience</title>
 
+  <meta name="description" content="Discover the Candidate Journey with Italian Experience. Cultural exchange programs, luxury hospitality careers, and full support for your international path." />
+  <meta name="keywords" content="Italian Experience, recruitment, hospitality, Q1 visa, cultural exchange, luxury hotels, Italian staff, USA hospitality" />
+  <meta name="author" content="Italian Experience" />
+  <meta name="robots" content="index, follow" />
+
+  <link rel="canonical" href="https://www.italianexp.com/recruitment/candidate/" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Candidate Journey | Italian Experience" />
+  <meta property="og:description" content="A premium cultural exchange journey designed for Italian hospitality professionals. Visa support, placement, and full guidance." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.italianexp.com/recruitment/candidate/" />
+  <meta property="og:image" content="https://www.italianexp.com/assets/preview.jpg" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Candidate Journey | Italian Experience" />
+  <meta name="twitter:description" content="A premium cultural exchange journey designed for Italian hospitality professionals." />
+  <meta name="twitter:image" content="https://www.italianexp.com/assets/preview.jpg" />
+
+  <!-- Scripts -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
@@ -20,7 +43,6 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; background-color: #000; }
-
     body {
       background-color: var(--brand-dark);
       color: #fff;
@@ -142,7 +164,12 @@
       text-shadow: 0 0 12px rgba(197, 160, 89, 0.35);
     }
 
-    .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
+    .dropdown {
+      position: relative;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
 
     .dropdown-menu {
       position: absolute;
@@ -402,7 +429,7 @@
       height: 100%;
     }
 
-    /* SCROLL INDICATOR */
+    /* TEMPLATE SCROLL INDICATOR */
     @keyframes scrollLine {
       0% { transform: translateY(-18px); opacity: 0; }
       30% { opacity: 1; }
@@ -475,9 +502,6 @@
       box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     }
 
-    /* Chart */
-    .chart-container { width: 100%; height: 320px; }
-
     /* Footer */
     .site-footer {
       background-color: #000;
@@ -489,41 +513,40 @@
       text-align: center;
     }
 
-    /* RESPONSIVE HEADER FIX (UPDATED MORE TOP SPACE) */
-   @media (max-width: 1024px) {
-  .glass-header {
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-    align-items: center !important;
-    height: 210px !important;
-    padding: 2.2rem 0 1.4rem 0 !important;
-    gap: 14px;
-  }
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .glass-header {
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        align-items: center !important;
+        height: 220px !important;
+        padding: 2.8rem 0 1.4rem 0 !important;
+        gap: 14px;
+      }
 
-  .glass-header.scrolled {
-    height: 175px !important;
-    padding-top: 2rem !important;
-  }
+      .glass-header.scrolled {
+        height: 185px !important;
+        padding-top: 2.4rem !important;
+      }
 
-  .nav-container { display: none !important; }
-  #central-menu-btn { display: flex !important; margin-top: 10px; }
+      .nav-container { display: none !important; }
+      #central-menu-btn { display: flex !important; margin-top: 12px; }
 
-  .logo-wrap {
-    transform: scale(0.82);
-    margin-top: 12px;
-    margin-bottom: 6px;
-  }
+      .logo-wrap {
+        transform: scale(0.80);
+        margin-top: 16px;
+        margin-bottom: 6px;
+      }
 
-  .hero-side {
-    width: 100%;
-    opacity: 1;
-    mask-image: none !important;
-    -webkit-mask-image: none !important;
-  }
+      .hero-side {
+        width: 100%;
+        opacity: 1;
+        mask-image: none !important;
+        -webkit-mask-image: none !important;
+      }
 
-  .side-usa { display: none; }
-}
-
+      .side-usa { display: none; }
+    }
 
     @media (max-width: 768px) {
       h1 {
@@ -532,15 +555,14 @@
       }
 
       .glass-card { padding: 1.8rem; }
-      .chart-container { height: 260px; }
       .explore-indicator { bottom: 40px; }
     }
 
     @media (max-width: 350px) {
-      .logo-wrap { transform: scale(0.72); margin-top: 14px; }
-      .glass-header { height: 220px !important; padding-top: 2.4rem !important; }
-      .glass-header.scrolled { height: 190px !important; }
-      #central-menu-btn { scale: 0.92; margin-top: 8px; }
+      .logo-wrap { transform: scale(0.72); margin-top: 18px; }
+      .glass-header { height: 235px !important; padding-top: 3rem !important; }
+      .glass-header.scrolled { height: 200px !important; }
+      #central-menu-btn { scale: 0.92; margin-top: 10px; }
     }
   </style>
 </head>
@@ -560,6 +582,7 @@
     <div class="mobile-nav-list">
       <a href="https://www.italianexp.com/" class="mobile-main-link">Home</a>
 
+      <!-- TRAVEL -->
       <button class="mobile-dropdown-btn" data-target="submenu-travel">
         Travel
         <svg class="mobile-dropdown-arrow submenu-arrow" fill="none" stroke="currentColor" stroke-width="2"
@@ -569,11 +592,12 @@
       </button>
 
       <div id="submenu-travel" class="mobile-submenu">
-        <a href="https://www.italianexp.com/travel/bespoke" class="mobile-sub-link">Bespoke</a>
-        <a href="https://www.italianexp.com/travel/gapyear" class="mobile-sub-link">Gap Years</a>
-        <a href="https://www.italianexp.com/travel/culinary" class="mobile-sub-link">Culinary Academy</a>
+        <a href="https://www.italianexp.com/travel/bespoke/" class="mobile-sub-link">Bespoke</a>
+        <a href="https://www.italianexp.com/travel/gapyear/" class="mobile-sub-link">Gap Years</a>
+        <a href="https://www.italianexp.com/travel/culinary/" class="mobile-sub-link">Culinary Academy</a>
       </div>
 
+      <!-- RECRUITMENT -->
       <button class="mobile-dropdown-btn active" data-target="submenu-recruitment">
         Recruitment
         <svg class="mobile-dropdown-arrow submenu-arrow" fill="none" stroke="currentColor" stroke-width="2"
@@ -583,10 +607,11 @@
       </button>
 
       <div id="submenu-recruitment" class="mobile-submenu open">
-        <a href="https://www.italianexp.com/recruitment/employer" class="mobile-sub-link">Employer</a>
-        <a href="https://www.italianexp.com/recruitment/candidate" class="mobile-sub-link active">Candidate</a>
+        <a href="https://www.italianexp.com/recruitment/employer/" class="mobile-sub-link">Employer</a>
+        <a href="https://www.italianexp.com/recruitment/candidate/" class="mobile-sub-link active">Candidate</a>
       </div>
 
+      <!-- FLAVORS -->
       <button class="mobile-dropdown-btn" data-target="submenu-flavors">
         Flavors
         <svg class="mobile-dropdown-arrow submenu-arrow" fill="none" stroke="currentColor" stroke-width="2"
@@ -596,13 +621,13 @@
       </button>
 
       <div id="submenu-flavors" class="mobile-submenu">
-        <a href="https://www.italianexp.com/flavors/for-your-home" class="mobile-sub-link">For Your Home</a>
-        <a href="https://www.italianexp.com/flavors/for-your-business" class="mobile-sub-link">For Your Business</a>
-        <a href="https://www.italianexp.com/flavors/aziende-italiane" class="mobile-sub-link">Italian Companies</a>
+        <a href="https://www.italianexp.com/flavors/for-your-home/" class="mobile-sub-link">For Your Home</a>
+        <a href="https://www.italianexp.com/flavors/for-your-business/" class="mobile-sub-link">For Your Business</a>
+        <a href="https://www.italianexp.com/flavors/aziende-italiane/" class="mobile-sub-link">Italian Companies</a>
       </div>
 
-      <a href="https://www.italianexp.com/estates" class="mobile-main-link">Estates</a>
-      <a href="https://www.italianexp.com/contact" class="mobile-main-link">Contact</a>
+      <a href="https://www.italianexp.com/estates/" class="mobile-main-link">Estates</a>
+      <a href="https://www.italianexp.com/contact/" class="mobile-main-link">Contact</a>
     </div>
   </div>
 
@@ -630,52 +655,53 @@
       <span>Menu</span>
     </button>
 
+    <!-- DESKTOP MENU -->
     <div class="nav-container">
       <a href="https://www.italianexp.com/" class="nav-link">Home</a>
 
       <div class="dropdown">
-        <a href="https://www.italianexp.com/travel" class="nav-link">Travel
+        <a href="https://www.italianexp.com/travel/" class="nav-link">Travel
           <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="3">
             <path d="m6 9 6 6 6-6" />
           </svg>
         </a>
         <div class="dropdown-menu">
-          <a href="https://www.italianexp.com/travel/bespoke" class="dropdown-item">Bespoke</a>
-          <a href="https://www.italianexp.com/travel/gapyear" class="dropdown-item">Gap Years</a>
-          <a href="https://www.italianexp.com/travel/culinary" class="dropdown-item">Culinary Academy</a>
+          <a href="https://www.italianexp.com/travel/bespoke/" class="dropdown-item">Bespoke</a>
+          <a href="https://www.italianexp.com/travel/gapyear/" class="dropdown-item">Gap Years</a>
+          <a href="https://www.italianexp.com/travel/culinary/" class="dropdown-item">Culinary Academy</a>
         </div>
       </div>
 
       <div class="dropdown">
-        <a href="https://www.italianexp.com/recruitment" class="nav-link active">Recruitment
+        <a href="https://www.italianexp.com/recruitment/" class="nav-link active">Recruitment
           <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="3">
             <path d="m6 9 6 6 6-6" />
           </svg>
         </a>
         <div class="dropdown-menu">
-          <a href="https://www.italianexp.com/recruitment/employer" class="dropdown-item">Employer</a>
-          <a href="https://www.italianexp.com/recruitment/candidate" class="dropdown-item active">Candidate</a>
+          <a href="https://www.italianexp.com/recruitment/employer/" class="dropdown-item">Employer</a>
+          <a href="https://www.italianexp.com/recruitment/candidate/" class="dropdown-item active">Candidate</a>
         </div>
       </div>
 
       <div class="dropdown">
-        <a href="https://www.italianexp.com/flavors" class="nav-link">Flavors
+        <a href="https://www.italianexp.com/flavors/" class="nav-link">Flavors
           <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="3">
             <path d="m6 9 6 6 6-6" />
           </svg>
         </a>
         <div class="dropdown-menu">
-          <a href="https://www.italianexp.com/flavors/for-your-home" class="dropdown-item">For Your Home</a>
-          <a href="https://www.italianexp.com/flavors/for-your-business" class="dropdown-item">For Your Business</a>
-          <a href="https://www.italianexp.com/flavors/aziende-italiane" class="dropdown-item">Italian Companies</a>
+          <a href="https://www.italianexp.com/flavors/for-your-home/" class="dropdown-item">For Your Home</a>
+          <a href="https://www.italianexp.com/flavors/for-your-business/" class="dropdown-item">For Your Business</a>
+          <a href="https://www.italianexp.com/flavors/aziende-italiane/" class="dropdown-item">Italian Companies</a>
         </div>
       </div>
 
-      <a href="https://www.italianexp.com/estates" class="nav-link">Estates</a>
-      <a href="https://www.italianexp.com/contact" class="nav-link">Contact</a>
+      <a href="https://www.italianexp.com/estates/" class="nav-link">Estates</a>
+      <a href="https://www.italianexp.com/contact/" class="nav-link">Contact</a>
     </div>
   </nav>
 
@@ -704,6 +730,7 @@
       </p>
     </div>
 
+    <!-- SCROLL DOWN -->
     <a href="#ambassador" class="explore-indicator" aria-label="Explore section">
       <span>Explore</span>
       <div class="scroll-track" aria-hidden="true">
@@ -773,7 +800,7 @@
   </footer>
 
   <script>
-    /* SMART HEADER */
+    // SMART HEADER
     let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
     const header = document.getElementById('main-header');
 
@@ -789,7 +816,7 @@
       lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
     }, { passive: true });
 
-    /* MOBILE MENU */
+    // MOBILE MENU
     const menuBtn = document.getElementById('central-menu-btn');
     const overlay = document.getElementById('mobile-menu-overlay');
     const closeBtn = document.getElementById('close-menu');
@@ -798,12 +825,10 @@
     closeBtn.onclick = () => overlay.classList.remove('active');
 
     overlay.onclick = (e) => {
-      if (e.target.closest("a")) {
-        overlay.classList.remove("active");
-      }
+      if (e.target.closest("a")) overlay.classList.remove("active");
     };
 
-    /* MOBILE SUBMENU TOGGLE */
+    // MOBILE SUBMENU TOGGLE
     document.querySelectorAll(".mobile-dropdown-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         const targetId = btn.dataset.target;
@@ -822,7 +847,7 @@
       });
     });
 
-    /* LOGO EFFECT */
+    // LOGO EFFECT
     function initLogo(id) {
       const el = document.getElementById(id);
       if (!el) return;
