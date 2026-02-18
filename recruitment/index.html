@@ -24,14 +24,12 @@
   <style>
     :root{ --ie-header-h: 120px; }
 
-    /* Header safe offset: avoids overlap with the fixed header + iPhone safe area */
     .hero-recruitment{
       padding-top: calc(var(--ie-header-h) + env(safe-area-inset-top) + 14px);
       min-height: 100dvh;
       background:#000;
     }
 
-    /* Backgrounds: stacked on mobile, split on desktop */
     .recruitment-bg{ display:flex; flex-direction:column; }
     .bg-half{ width:100%; height:50%; }
     @media (min-width:768px){
@@ -39,16 +37,33 @@
       .bg-half{ width:50%; height:100%; }
     }
 
-    /* Make mobile panels breathe so texts/buttons never collide */
+    /* EXTRA SPACE + BLEND BAND ON MOBILE */
+    .mobile-top-space{
+      display:none;
+    }
     @media (max-width:767px){
+      .mobile-top-space{
+        display:block;
+        position:absolute;
+        top:0;
+        left:0;
+        right:0;
+        height:110px;
+        z-index:6;
+        pointer-events:none;
+        background:linear-gradient(to bottom, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 45%, rgba(0,0,0,0.0) 100%);
+      }
+
       .panel-inner{
-        padding-top: 18px;
+        padding-top: 46px;
         padding-bottom: 26px;
       }
+
       .panel-title{
-        font-size: clamp(2.6rem, 11vw, 3.4rem);
+        font-size: clamp(2.55rem, 11vw, 3.35rem);
         line-height: 1.02;
       }
+
       .panel-label{
         letter-spacing: 0.4em;
       }
@@ -84,7 +99,7 @@
       justify-content:flex-end;
       padding: 6px 0 10px 0;
       z-index: 5;
-      background: linear-gradient(to bottom, rgba(8,8,8,0.98) 0%, rgba(8,8,8,0) 100%);
+      background:linear-gradient(to bottom, rgba(8,8,8,0.98) 0%, rgba(8,8,8,0) 100%);
     }
     .ie-xbtn{
       width: 44px;
@@ -98,8 +113,6 @@
       line-height: 1;
       background: rgba(0,0,0,0.35);
     }
-
-    /* Desktop keeps the original overlay panels */
     @media (min-width:768px){
       .ie-modal{ display:none !important; }
     }
@@ -119,6 +132,9 @@
       <div id="bg-right" class="bg-half opacity-[0.28] bg-cover bg-center transition-all duration-1000"
         style="background-image:url('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1400&q=80');"></div>
     </div>
+
+    <!-- BLACK BLEND BAND ON TOP (mobile only) -->
+    <div class="mobile-top-space" aria-hidden="true"></div>
 
     <div class="relative z-10 w-full max-w-7xl mx-auto grid grid-rows-2 md:grid-rows-1 md:grid-cols-2 min-h-[calc(100dvh-var(--ie-header-h))]">
 
@@ -148,13 +164,11 @@
 
           <button type="button"
             class="block mx-auto mt-7 text-[0.55rem] uppercase tracking-[0.15em] text-slate-400 hover:text-white transition-all duration-300 border-b border-transparent hover:border-white"
-            data-open-modal="employer"
             onclick="showDetails('employer')">
             Why Choose Us <i class="fas fa-chart-pie ml-1"></i>
           </button>
         </div>
 
-        <!-- DESKTOP OVERLAY (unchanged behavior on desktop) -->
         <div class="hidden md:flex absolute inset-0 bg-[rgba(8,8,8,0.97)] flex-col justify-center items-center px-8 py-14 opacity-0 invisible scale-[1.02] transition-all duration-500 overflow-y-auto"
           id="details-employer">
 
@@ -236,13 +250,11 @@
 
           <button type="button"
             class="block mx-auto mt-7 text-[0.55rem] uppercase tracking-[0.15em] text-slate-400 hover:text-white transition-all duration-300 border-b border-transparent hover:border-white"
-            data-open-modal="candidate"
             onclick="showDetails('candidate')">
             View Roadmap <i class="fas fa-map-signs ml-1"></i>
           </button>
         </div>
 
-        <!-- DESKTOP OVERLAY -->
         <div class="hidden md:flex absolute inset-0 bg-[rgba(8,8,8,0.97)] flex-col justify-center items-center px-8 py-14 opacity-0 invisible scale-[1.02] transition-all duration-500 overflow-y-auto"
           id="details-candidate">
 
@@ -446,7 +458,6 @@
       el.classList.add("is-open");
       el.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
-
       if (type === "employer" && !employerChartMobile) initChartMobile();
     }
 
@@ -459,10 +470,7 @@
     }
 
     function showDetails(type) {
-      if (isMobile()) {
-        openModal(type);
-        return;
-      }
+      if (isMobile()) { openModal(type); return; }
 
       const mainContent = document.getElementById(`content-${type}-main`);
       const detailsPanel = document.getElementById(`details-${type}`);
@@ -580,7 +588,6 @@
           document.querySelector("header");
 
         if (!headerEl) return;
-
         const h = headerEl.getBoundingClientRect().height || 120;
         document.documentElement.style.setProperty("--ie-header-h", Math.ceil(h) + "px");
       }
