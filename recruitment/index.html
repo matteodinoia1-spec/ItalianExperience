@@ -42,10 +42,25 @@
     /* FIX: align mobile split exactly with the 2 rows that contain the content */
     @media (max-width:767px){
       .recruitment-bg{
-        height: calc(100dvh - (var(--ie-header-h) + env(safe-area-inset-top) + 14px));
+        /* Make bg cover the full container, not just the content area */
+        height: 100% !important; 
       }
-      .bg-half{
-        height: 50%;
+      
+      /* CALCOLO CORRETTO PER L'ALLINEAMENTO:
+         Il contenuto (grid) inizia dopo il padding superiore.
+         L'immagine superiore deve coprire il Padding + Metà dell'altezza rimanente.
+         Formula: 50% dell'altezza totale + Metà del Padding Superiore.
+      */
+      #bg-left {
+        height: calc(50% + (var(--ie-header-h) + env(safe-area-inset-top) + 14px) / 2);
+        background-position: center;
+      }
+
+      /* L'immagine inferiore deve coprire il resto.
+         Formula: 50% dell'altezza totale - Metà del Padding Superiore.
+      */
+      #bg-right {
+        height: calc(50% - (var(--ie-header-h) + env(safe-area-inset-top) + 14px) / 2);
         background-position: center;
       }
     }
