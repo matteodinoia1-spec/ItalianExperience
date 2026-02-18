@@ -5,100 +5,387 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>404 | Italian Experience</title>
 
+  <meta name="description" content="The page you are trying to reach does not exist. Return to the Italian Experience homepage." />
+  <meta name="keywords" content="Italian Experience, 404, page not found" />
+  <meta name="author" content="Italian Experience" />
   <meta name="robots" content="noindex, nofollow" />
+  <link rel="canonical" href="https://www.italianexp.com/404" />
+
+  <meta property="og:title" content="404 | Italian Experience" />
+  <meta property="og:description" content="The page you are trying to reach does not exist. Return to the Italian Experience homepage." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.italianexp.com/404" />
+  <meta property="og:image" content="https://www.italianexp.com/assets/preview.jpg" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="404 | Italian Experience" />
+  <meta name="twitter:description" content="The page you are trying to reach does not exist." />
+  <meta name="twitter:image" content="https://www.italianexp.com/assets/preview.jpg" />
+
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@200;300;400;600&display=swap');
+  <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
 
-    :root{
-      --brand-gold:#c5a059;
-      --brand-dark:#080808;
+  <style>
+    .brand-font{font-family:'Playfair Display',serif}
+
+    .hero-coming{
+      width:100%;
+      height:100vh;
+      height:100dvh;
+      position:relative;
+      overflow:hidden;
+      background:#000;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
     }
 
-    body{
-      background:var(--brand-dark);
-      color:#fff;
-      font-family:'Inter',sans-serif;
+    .hero-bg{
+      position:absolute;
+      inset:0;
+      background-image:url("https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1800&q=80");
+      background-size:cover;
+      background-position:center;
+      filter:brightness(0.30) contrast(1.15);
+      transform:scale(1.05);
+      z-index:0;
+    }
+
+    .hero-overlay{
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at top, rgba(197,160,89,0.15), transparent 60%),
+        linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.92) 100%);
+      z-index:2;
+    }
+
+    .hero-content{
+      position:relative;
+      z-index:10;
+      max-width:980px;
+      padding:0 10%;
+      pointer-events:none;
+    }
+
+    .soon-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:10px 18px;
+      border-radius:999px;
+      border:1px solid rgba(197,160,89,0.35);
+      background:rgba(0,0,0,0.35);
+      backdrop-filter:blur(25px);
+      -webkit-backdrop-filter:blur(25px);
+      text-transform:uppercase;
+      letter-spacing:0.35em;
+      font-size:0.62rem;
+      color:rgba(255,255,255,0.75);
+      margin:0 auto 18px auto;
+      width:fit-content;
+      box-shadow:0 15px 35px rgba(0,0,0,0.45);
+    }
+
+    .pulse-dot{
+      width:7px;
+      height:7px;
+      border-radius:999px;
+      background:var(--brand-gold);
+      box-shadow:0 0 16px rgba(197,160,89,0.7);
+      animation:pulse 1.6s infinite ease-in-out;
+    }
+
+    @keyframes pulse{
+      0%{transform:scale(0.9);opacity:0.6}
+      50%{transform:scale(1.35);opacity:1}
+      100%{transform:scale(0.9);opacity:0.6}
+    }
+
+    .coming-title{
+      font-size:clamp(2.2rem, 7vw, 5.8rem);
+      line-height:0.95;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:-0.03em;
+      text-shadow:0 30px 70px rgba(0,0,0,0.85);
+    }
+
+    .coming-title span{
+      color:var(--brand-gold);
+      font-style:italic;
+      font-weight:300;
+      text-transform:none;
+    }
+
+    .coming-sub{
+      margin-top:22px;
+      font-size:clamp(0.95rem, 1.2vw, 1.2rem);
+      color:rgba(226,232,240,0.75);
+      font-weight:300;
+      line-height:1.75;
+      max-width:720px;
+      margin-left:auto;
+      margin-right:auto;
+      text-shadow:0 20px 50px rgba(0,0,0,0.8);
+    }
+
+    .coming-divider{
+      width:78px;
+      height:1px;
+      background:rgba(197,160,89,0.55);
+      margin:26px auto 0 auto;
+      opacity:0.6;
+    }
+
+    .coming-actions{
+      margin-top:42px;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:14px;
+      pointer-events:auto;
+    }
+
+    .btn-gold{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      padding:15px 22px;
+      border-radius:999px;
+      border:1px solid rgba(197,160,89,0.55);
+      background:rgba(197,160,89,0.12);
+      color:var(--brand-gold);
+      text-transform:uppercase;
+      letter-spacing:0.3em;
+      font-size:0.68rem;
+      font-weight:700;
+      transition:all 0.35s ease;
+      backdrop-filter:blur(25px);
+      -webkit-backdrop-filter:blur(25px);
+      box-shadow:0 20px 50px rgba(0,0,0,0.55);
+    }
+
+    .btn-gold:hover{
+      background:var(--brand-gold);
+      color:#080808;
+      transform:translateY(-3px);
+      box-shadow:0 25px 70px rgba(0,0,0,0.75);
+    }
+
+    .btn-outline{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      padding:15px 22px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.18);
+      background:rgba(255,255,255,0.04);
+      color:rgba(255,255,255,0.8);
+      text-transform:uppercase;
+      letter-spacing:0.3em;
+      font-size:0.68rem;
+      font-weight:700;
+      transition:all 0.35s ease;
+      backdrop-filter:blur(25px);
+      -webkit-backdrop-filter:blur(25px);
+      box-shadow:0 20px 50px rgba(0,0,0,0.55);
+    }
+
+    .btn-outline:hover{
+      border-color:rgba(197,160,89,0.6);
+      color:var(--brand-gold);
+      transform:translateY(-3px);
+    }
+
+    @keyframes scrollLine{
+      0%{transform:translateY(-18px);opacity:0}
+      30%{opacity:1}
+      100%{transform:translateY(52px);opacity:0}
+    }
+
+    .explore-indicator{
+      position:absolute;
+      bottom:46px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:20;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:14px;
+      text-decoration:none;
+      opacity:0.82;
+      transition:opacity 0.2s ease,transform 0.2s ease;
+      pointer-events:auto;
+    }
+
+    .explore-indicator:hover{
+      opacity:1;
+      transform:translateX(-50%) translateY(3px);
+    }
+
+    .explore-indicator span{
+      font-size:0.65rem;
+      text-transform:uppercase;
+      letter-spacing:0.55em;
+      color:rgba(255,255,255,0.78);
+      padding-left:0.55em;
+      white-space:nowrap;
+      text-shadow:0 8px 18px rgba(0,0,0,0.7);
+    }
+
+    .scroll-track{
+      width:1px;
+      height:54px;
+      background:rgba(255,255,255,0.25);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .scroll-dot{
+      width:100%;
+      height:16px;
+      background:var(--brand-gold);
+      position:absolute;
+      top:0;
+      left:0;
+      animation:scrollLine 1.6s infinite ease-in-out;
+    }
+
+    @media (max-width:768px){
+      .coming-actions{gap:10px}
+      .btn-gold,
+      .btn-outline{
+        width:100%;
+        max-width:340px;
+        justify-content:center;
+      }
     }
   </style>
 </head>
 
-<body>
+<body class="bg-[#080808] text-white overflow-x-hidden">
 
-  <!-- HEADER -->
-  <div id="header"></div>
+  <div id="site-header"></div>
 
-  <!-- MAIN -->
-  <main class="min-h-screen flex items-center justify-center text-center px-6 py-24">
-    <div class="max-w-2xl">
+  <main>
 
-      <h1 class="text-6xl md:text-7xl font-bold text-[var(--brand-gold)] mb-6"
-          style="font-family:'Playfair Display',serif;">
-        404
-      </h1>
+    <section class="hero-coming" aria-label="404 hero">
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="hero-overlay" aria-hidden="true"></div>
 
-      <h2 class="text-2xl md:text-3xl font-semibold mb-4"
-          style="font-family:'Playfair Display',serif;">
-        Page Not Found
-      </h2>
+      <div class="hero-content">
 
-      <p class="text-gray-300 text-lg mb-10 leading-relaxed">
-        The page you are looking for does not exist or may have been moved.
-        Please return to the homepage.
-      </p>
+        <div class="soon-badge">
+          <div class="pulse-dot"></div>
+          <span>Error 404</span>
+        </div>
 
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="/ItalianExperience/"
-           class="px-8 py-3 rounded-full bg-[var(--brand-gold)] text-black font-semibold hover:opacity-90 transition">
-          Back to Home
-        </a>
+        <h1 class="brand-font coming-title">
+          Page <br />
+          <span>Not Found.</span>
+        </h1>
 
-        <button onclick="history.back()"
-          class="px-8 py-3 rounded-full border border-gray-500 text-gray-200 font-semibold hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)] transition">
-          Go Back
-        </button>
+        <div class="coming-divider"></div>
+
+        <p class="coming-sub">
+          The page you are trying to reach does not exist or may have been moved.
+          Please return to the homepage or navigate through our main sections.
+        </p>
+
+        <div class="coming-actions">
+          <a href="/ItalianExperience/" class="btn-gold">
+            Back to Home
+          </a>
+
+          <button onclick="history.back()" class="btn-outline">
+            Go Back
+          </button>
+        </div>
+
       </div>
 
-    </div>
+      <a href="#info" class="explore-indicator" aria-label="Explore section">
+        <span>Explore</span>
+        <div class="scroll-track" aria-hidden="true">
+          <div class="scroll-dot"></div>
+        </div>
+      </a>
+    </section>
+
+    <section id="info" class="py-24 md:py-32 px-8 bg-[#080808] border-t border-white/5">
+      <div class="max-w-5xl mx-auto text-center">
+
+        <span class="text-[#c5a059] uppercase tracking-[0.7em] text-[0.55rem] md:text-[0.65rem] font-bold block mb-10">
+          Italian Experience
+        </span>
+
+        <h2 class="brand-font text-4xl md:text-6xl italic mb-10 text-white leading-tight">
+          This Page Does Not Exist.
+        </h2>
+
+        <p class="text-slate-400 font-light text-sm md:text-lg leading-relaxed max-w-3xl mx-auto">
+          If you arrived here through a broken link, please contact our team.
+          Italian Experience is constantly improving its digital ecosystem and premium experience.
+        </p>
+
+        <div class="mt-14 flex flex-col md:flex-row justify-center items-center gap-6">
+          <div class="flex items-center gap-4 text-slate-300/70 uppercase tracking-[0.35em] text-[0.6rem]">
+            <span class="text-[#c5a059]">◆</span> Luxury Design
+          </div>
+
+          <div class="flex items-center gap-4 text-slate-300/70 uppercase tracking-[0.35em] text-[0.6rem]">
+            <span class="text-[#c5a059]">◆</span> Premium Navigation
+          </div>
+
+          <div class="flex items-center gap-4 text-slate-300/70 uppercase tracking-[0.35em] text-[0.6rem]">
+            <span class="text-[#c5a059]">◆</span> Timeless Experience
+          </div>
+        </div>
+
+      </div>
+    </section>
+
   </main>
 
-  <!-- FOOTER -->
-  <div id="footer"></div>
+  <div id="site-footer"></div>
 
   <script>
-    async function loadPartial(id, url, fallbackHTML = "") {
-      try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error("Fetch failed");
-        const html = await res.text();
-        document.getElementById(id).innerHTML = html;
-      } catch (err) {
-        document.getElementById(id).innerHTML = fallbackHTML;
+    (function () {
+      const base = "/ItalianExperience";
+      const headerMount = document.getElementById("site-header");
+      const footerMount = document.getElementById("site-footer");
+
+      function inject(el, html) { if (el) el.innerHTML = html; }
+
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const s = document.createElement("script");
+          s.src = src;
+          s.defer = true;
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
       }
-    }
 
-    loadPartial(
-      "header",
-      "/ItalianExperience/partials/header.html",
-      `
-      <header class="w-full py-6 text-center border-b border-white/10">
-        <a href="/ItalianExperience/" class="text-lg font-semibold text-[var(--brand-gold)]">
-          Italian Experience
-        </a>
-      </header>
-      `
-    );
+      Promise.all([
+        fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
+        fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
+      ]).then(async ([h, f]) => {
+        inject(headerMount, h);
+        inject(footerMount, f);
 
-    loadPartial(
-      "footer",
-      "/ItalianExperience/partials/footer.html",
-      `
-      <footer class="w-full py-6 text-center border-t border-white/10 text-gray-400 text-sm">
-        © 2026 ITALIAN EXPERIENCE · STRATEGIC ADVISORY
-      </footer>
-      `
-    );
+        await loadScript(base + "/assets/js/site.js");
+        if (window.IEInit) window.IEInit(document);
+      }).catch(err => console.error(err));
+    })();
   </script>
 
 </body>
