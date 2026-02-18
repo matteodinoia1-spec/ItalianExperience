@@ -18,7 +18,6 @@
   <meta property="og:url" content="https://www.italianexp.com/recruitment/" />
 
   <script src="https://cdn.tailwindcss.com"></script>
-
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
@@ -43,13 +42,13 @@
 
     <div class="relative z-10 w-full h-full max-w-7xl mx-auto grid md:grid-cols-2">
 
-      <div class="relative flex items-center justify-center border-r border-white/10 overflow-hidden min-h-full panel-employer">
+      <!-- EMPLOYER PANEL -->
+      <div class="relative flex items-start md:items-center justify-center border-r border-white/10 overflow-hidden min-h-full pt-40 md:pt-0 panel-employer">
         <span class="absolute top-1/2 -translate-y-1/2 left-[-5%] text-[rgba(255,255,255,0.03)] font-extrabold tracking-tight pointer-events-none whitespace-nowrap text-[clamp(5rem,15vw,12rem)]">
           EMPLOYER
         </span>
 
-        <!-- FIX MOBILE HEADER OVERLAP: add top padding on mobile only -->
-        <div class="relative z-10 text-center max-w-[520px] px-8 pt-24 md:pt-0 transition-all duration-500" id="content-employer-main">
+        <div class="relative z-10 text-center max-w-[520px] px-8 transition-all duration-500" id="content-employer-main">
           <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.6rem] mb-4 block font-bold">
             Strategic Partnership
           </span>
@@ -131,13 +130,13 @@
         </div>
       </div>
 
-      <div class="relative flex items-center justify-center overflow-hidden min-h-full panel-candidate">
+      <!-- CANDIDATE PANEL -->
+      <div class="relative flex items-start md:items-center justify-center overflow-hidden min-h-full pt-40 md:pt-0 panel-candidate">
         <span class="absolute top-1/2 -translate-y-1/2 right-[-5%] text-[rgba(255,255,255,0.03)] font-extrabold tracking-tight pointer-events-none whitespace-nowrap text-[clamp(5rem,15vw,12rem)]">
           CANDIDATE
         </span>
 
-        <!-- FIX MOBILE HEADER OVERLAP: add top padding on mobile only -->
-        <div class="relative z-10 text-center max-w-[520px] px-8 pt-24 md:pt-0 transition-all duration-500" id="content-candidate-main">
+        <div class="relative z-10 text-center max-w-[520px] px-8 transition-all duration-500" id="content-candidate-main">
           <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.6rem] mb-4 block font-bold">
             Career Mastery
           </span>
