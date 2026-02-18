@@ -9,7 +9,6 @@
   <meta name="keywords" content="Italian Experience, recruitment, hospitality recruitment, Italian staff USA, Q1 visa, cultural exchange program, luxury hospitality staffing" />
   <meta name="author" content="Italian Experience" />
   <meta name="robots" content="index, follow" />
-
   <link rel="canonical" href="https://www.italianexp.com/recruitment/" />
 
   <meta property="og:title" content="Recruitment Hub | Italian Experience" />
@@ -23,32 +22,86 @@
   <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
 
   <style>
-    :root{ --ie-header-h: 96px; }
+    :root{ --ie-header-h: 120px; }
 
-    /* Fixed header safe offset */
+    /* Header safe offset: avoids overlap with the fixed header + iPhone safe area */
     .hero-recruitment{
-      padding-top: var(--ie-header-h);
+      padding-top: calc(var(--ie-header-h) + env(safe-area-inset-top) + 14px);
       min-height: 100dvh;
+      background:#000;
     }
 
-    /* Mobile should stack backgrounds vertically like your homepage cards */
-    .recruitment-bg{
-      display:flex;
-      flex-direction:column;
-    }
+    /* Backgrounds: stacked on mobile, split on desktop */
+    .recruitment-bg{ display:flex; flex-direction:column; }
+    .bg-half{ width:100%; height:50%; }
     @media (min-width:768px){
       .recruitment-bg{ flex-direction:row; }
+      .bg-half{ width:50%; height:100%; }
     }
 
-    .bg-half{
-      width:100%;
-      height:50%;
-    }
-    @media (min-width:768px){
-      .bg-half{
-        width:50%;
-        height:100%;
+    /* Make mobile panels breathe so texts/buttons never collide */
+    @media (max-width:767px){
+      .panel-inner{
+        padding-top: 18px;
+        padding-bottom: 26px;
       }
+      .panel-title{
+        font-size: clamp(2.6rem, 11vw, 3.4rem);
+        line-height: 1.02;
+      }
+      .panel-label{
+        letter-spacing: 0.4em;
+      }
+    }
+
+    /* Mobile modal */
+    .ie-modal{
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0,0,0,0.82);
+      backdrop-filter: blur(14px);
+      display: none;
+    }
+    .ie-modal.is-open{ display:block; }
+    .ie-modal-card{
+      position:absolute;
+      inset: 12px;
+      border: 1px solid rgba(197,160,89,0.18);
+      background: rgba(8,8,8,0.94);
+      overflow: hidden;
+    }
+    .ie-modal-scroll{
+      height: 100%;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 18px 16px 22px 16px;
+    }
+    .ie-modal-close{
+      position: sticky;
+      top: 0;
+      display:flex;
+      justify-content:flex-end;
+      padding: 6px 0 10px 0;
+      z-index: 5;
+      background: linear-gradient(to bottom, rgba(8,8,8,0.98) 0%, rgba(8,8,8,0) 100%);
+    }
+    .ie-xbtn{
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(197,160,89,0.35);
+      color: #c5a059;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 18px;
+      line-height: 1;
+      background: rgba(0,0,0,0.35);
+    }
+
+    /* Desktop keeps the original overlay panels */
+    @media (min-width:768px){
+      .ie-modal{ display:none !important; }
     }
   </style>
 </head>
@@ -57,38 +110,34 @@
 
   <div id="site-header"></div>
 
-  <section class="relative w-full bg-black overflow-hidden hero-recruitment">
+  <section class="relative w-full overflow-hidden hero-recruitment">
 
-    <!-- Backgrounds: stacked on mobile, split on desktop -->
     <div class="absolute inset-0 z-0 recruitment-bg">
       <div id="bg-left" class="bg-half opacity-[0.28] md:border-r border-white/10 bg-cover bg-center transition-all duration-1000"
-        style="background-image:url('https://images.unsplash.com/photo-1556745753-b2904692b3cd?auto=format&fit=crop&w=1400&q=80');">
-      </div>
+        style="background-image:url('https://images.unsplash.com/photo-1556745753-b2904692b3cd?auto=format&fit=crop&w=1400&q=80');"></div>
 
       <div id="bg-right" class="bg-half opacity-[0.28] bg-cover bg-center transition-all duration-1000"
-        style="background-image:url('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1400&q=80');">
-      </div>
+        style="background-image:url('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1400&q=80');"></div>
     </div>
 
-    <!-- Layout: 2 rows on mobile, 2 columns on desktop -->
     <div class="relative z-10 w-full max-w-7xl mx-auto grid grid-rows-2 md:grid-rows-1 md:grid-cols-2 min-h-[calc(100dvh-var(--ie-header-h))]">
 
-      <!-- EMPLOYER PANEL -->
+      <!-- EMPLOYER -->
       <div class="relative flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 overflow-hidden min-h-[50dvh] md:min-h-full panel-employer">
         <span class="absolute top-1/2 -translate-y-1/2 left-[-5%] text-[rgba(255,255,255,0.03)] font-extrabold tracking-tight pointer-events-none whitespace-nowrap text-[clamp(5rem,15vw,12rem)]">
           EMPLOYER
         </span>
 
-        <div class="relative z-10 text-center max-w-[520px] px-8 py-10 md:py-0 transition-all duration-500" id="content-employer-main">
-          <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.6rem] mb-4 block font-bold">
+        <div class="relative z-10 text-center max-w-[520px] px-8 panel-inner transition-all duration-500" id="content-employer-main">
+          <span class="text-[#c5a059] uppercase panel-label text-[0.6rem] mb-4 block font-bold">
             Strategic Partnership
           </span>
 
-          <h2 class="text-5xl md:text-7xl brand-font mb-6 italic text-white">
+          <h2 class="panel-title text-5xl md:text-7xl brand-font mb-6 italic text-white">
             I am an <br />Employer
           </h2>
 
-          <p class="text-slate-400 font-light text-sm max-w-xs mx-auto mb-8 leading-relaxed">
+          <p class="text-slate-300/80 font-light text-sm max-w-xs mx-auto mb-7 leading-relaxed">
             Acquire authentic Italian personnel and elite talent through our meticulously tailored recruitment framework.
           </p>
 
@@ -98,18 +147,18 @@
           </a>
 
           <button type="button"
-            class="block mx-auto mt-8 text-[0.55rem] uppercase tracking-[0.15em] text-slate-500 hover:text-white transition-all duration-300 border-b border-transparent hover:border-white"
+            class="block mx-auto mt-7 text-[0.55rem] uppercase tracking-[0.15em] text-slate-400 hover:text-white transition-all duration-300 border-b border-transparent hover:border-white"
+            data-open-modal="employer"
             onclick="showDetails('employer')">
             Why Choose Us <i class="fas fa-chart-pie ml-1"></i>
           </button>
         </div>
 
-        <div class="absolute inset-0 bg-[rgba(8,8,8,0.97)] flex flex-col justify-start md:justify-center items-center px-8 pt-10 md:pt-14 pb-14 opacity-0 invisible scale-[1.02] transition-all duration-500 overflow-y-auto"
+        <!-- DESKTOP OVERLAY (unchanged behavior on desktop) -->
+        <div class="hidden md:flex absolute inset-0 bg-[rgba(8,8,8,0.97)] flex-col justify-center items-center px-8 py-14 opacity-0 invisible scale-[1.02] transition-all duration-500 overflow-y-auto"
           id="details-employer">
 
-          <h3 class="text-[#c5a059] brand-font italic text-3xl mb-4 text-center">
-            Why Choose Us
-          </h3>
+          <h3 class="text-[#c5a059] brand-font italic text-3xl mb-4 text-center">Why Choose Us</h3>
 
           <p class="text-[0.65rem] text-slate-400 mb-10 max-w-md mx-auto leading-relaxed text-center">
             We handle the entire recruitment cycle, allowing you to focus on your core operations while we increase your company's global competitiveness.
@@ -161,22 +210,22 @@
         </div>
       </div>
 
-      <!-- CANDIDATE PANEL -->
+      <!-- CANDIDATE -->
       <div class="relative flex items-center justify-center overflow-hidden min-h-[50dvh] md:min-h-full panel-candidate">
         <span class="absolute top-1/2 -translate-y-1/2 right-[-5%] text-[rgba(255,255,255,0.03)] font-extrabold tracking-tight pointer-events-none whitespace-nowrap text-[clamp(5rem,15vw,12rem)]">
           CANDIDATE
         </span>
 
-        <div class="relative z-10 text-center max-w-[520px] px-8 py-10 md:py-0 transition-all duration-500" id="content-candidate-main">
-          <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.6rem] mb-4 block font-bold">
+        <div class="relative z-10 text-center max-w-[520px] px-8 panel-inner transition-all duration-500" id="content-candidate-main">
+          <span class="text-[#c5a059] uppercase panel-label text-[0.6rem] mb-4 block font-bold">
             Career Mastery
           </span>
 
-          <h2 class="text-5xl md:text-7xl brand-font mb-6 italic text-white">
+          <h2 class="panel-title text-5xl md:text-7xl brand-font mb-6 italic text-white">
             I am a <br />Candidate
           </h2>
 
-          <p class="text-slate-400 font-light text-sm max-w-xs mx-auto mb-8 leading-relaxed">
+          <p class="text-slate-300/80 font-light text-sm max-w-xs mx-auto mb-7 leading-relaxed">
             Dedicated to assisting elite candidates in launching prestigious careers through curated opportunities.
           </p>
 
@@ -186,25 +235,24 @@
           </a>
 
           <button type="button"
-            class="block mx-auto mt-8 text-[0.55rem] uppercase tracking-[0.15em] text-slate-500 hover:text-white transition-all duration-300 border-b border-transparent hover:border-white"
+            class="block mx-auto mt-7 text-[0.55rem] uppercase tracking-[0.15em] text-slate-400 hover:text-white transition-all duration-300 border-b border-transparent hover:border-white"
+            data-open-modal="candidate"
             onclick="showDetails('candidate')">
             View Roadmap <i class="fas fa-map-signs ml-1"></i>
           </button>
         </div>
 
-        <div class="absolute inset-0 bg-[rgba(8,8,8,0.97)] flex flex-col justify-start md:justify-center items-center px-8 pt-10 md:pt-14 pb-14 opacity-0 invisible scale-[1.02] transition-all duration-500 overflow-y-auto"
+        <!-- DESKTOP OVERLAY -->
+        <div class="hidden md:flex absolute inset-0 bg-[rgba(8,8,8,0.97)] flex-col justify-center items-center px-8 py-14 opacity-0 invisible scale-[1.02] transition-all duration-500 overflow-y-auto"
           id="details-candidate">
 
-          <h3 class="text-[#c5a059] brand-font italic text-3xl mb-4 text-center">
-            Candidate Solutions
-          </h3>
+          <h3 class="text-[#c5a059] brand-font italic text-3xl mb-4 text-center">Candidate Solutions</h3>
 
           <p class="text-[0.65rem] text-slate-400 mb-10 max-w-md mx-auto leading-relaxed text-center">
             Whether you are aiming for an international cultural program or a strategic local career move, we provide end-to-end support.
           </p>
 
           <div class="w-full max-w-md space-y-8 text-left mb-10">
-
             <div class="flex gap-4">
               <div class="flex flex-col items-center">
                 <div class="w-8 h-8 rounded-full border border-[#c5a059] text-[#c5a059] flex items-center justify-center text-xs font-bold">1</div>
@@ -212,9 +260,7 @@
               </div>
               <div class="pb-4">
                 <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-1">Interview and Selection</h4>
-                <p class="text-[0.6rem] text-slate-400 italic">
-                  Individual screening sessions to evaluate your profile and expectations.
-                </p>
+                <p class="text-[0.6rem] text-slate-400 italic">Individual screening sessions to evaluate your profile and expectations.</p>
               </div>
             </div>
 
@@ -238,7 +284,6 @@
                     <p class="text-[0.5rem] text-slate-500">Direct recruitment within Italy and Europe.</p>
                   </div>
                 </div>
-
               </div>
             </div>
 
@@ -249,9 +294,7 @@
               </div>
               <div class="pb-4">
                 <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-1">Total Support</h4>
-                <p class="text-[0.6rem] text-slate-400 italic">
-                  Insurance, group departures, and full relocation guidance.
-                </p>
+                <p class="text-[0.6rem] text-slate-400 italic">Insurance, group departures, and full relocation guidance.</p>
               </div>
             </div>
 
@@ -261,12 +304,9 @@
               </div>
               <div>
                 <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-1">Career Evolution</h4>
-                <p class="text-[0.6rem] text-slate-400 italic">
-                  Continuous follow-up and career development access.
-                </p>
+                <p class="text-[0.6rem] text-slate-400 italic">Continuous follow-up and career development access.</p>
               </div>
             </div>
-
           </div>
 
           <button type="button"
@@ -278,15 +318,152 @@
       </div>
 
     </div>
-
   </section>
+
+  <!-- MOBILE MODALS -->
+  <div id="modal-employer" class="ie-modal" aria-hidden="true">
+    <div class="ie-modal-card">
+      <div class="ie-modal-scroll">
+        <div class="ie-modal-close">
+          <button type="button" class="ie-xbtn" aria-label="Close" onclick="closeModal('employer')">✕</button>
+        </div>
+
+        <h3 class="text-[#c5a059] brand-font italic text-3xl mb-3 text-center">Why Choose Us</h3>
+        <p class="text-[0.78rem] text-slate-300/80 mb-6 leading-relaxed text-center">
+          We handle the entire recruitment cycle, allowing you to focus on your core operations while we increase your company's global competitiveness.
+        </p>
+
+        <div class="grid grid-cols-1 gap-3 mb-6">
+          <div class="flex items-start gap-3 text-left p-4 border border-white/10 bg-white/5">
+            <i class="fas fa-search-plus text-[#c5a059] text-sm mt-1"></i>
+            <div>
+              <h4 class="text-[0.72rem] font-bold uppercase tracking-wider text-white">Needs Analysis</h4>
+              <p class="text-[0.62rem] text-slate-400 italic">Customized approach to fit your specific culture.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 text-left p-4 border border-white/10 bg-white/5">
+            <i class="fas fa-video text-[#c5a059] text-sm mt-1"></i>
+            <div>
+              <h4 class="text-[0.72rem] font-bold uppercase tracking-wider text-white">Vetted Screening</h4>
+              <p class="text-[0.62rem] text-slate-400 italic">Rigorous phone and video evaluations.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 text-left p-4 border border-white/10 bg-white/5">
+            <i class="fas fa-check-double text-[#c5a059] text-sm mt-1"></i>
+            <div>
+              <h4 class="text-[0.72rem] font-bold uppercase tracking-wider text-white">Reference Checks</h4>
+              <p class="text-[0.62rem] text-slate-400 italic">Thorough verification for quality assurance.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 text-left p-4 border border-white/10 bg-white/5">
+            <i class="fas fa-piggy-bank text-[#c5a059] text-sm mt-1"></i>
+            <div>
+              <h4 class="text-[0.72rem] font-bold uppercase tracking-wider text-white">FICA Tax Savings</h4>
+              <p class="text-[0.62rem] text-slate-400 italic">Total exemption through cultural exchange.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full max-w-[170px] h-[170px] mx-auto mb-6">
+          <canvas id="employerChartMobile"></canvas>
+        </div>
+
+        <a href="/ItalianExperience/recruitment/employer/"
+          class="block text-center border border-[#c5a059] text-[#c5a059] px-8 py-4 text-[0.65rem] uppercase tracking-[0.25em] font-semibold hover:bg-[#c5a059] hover:text-[#080808] transition-all duration-500">
+          Explore Employer
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-candidate" class="ie-modal" aria-hidden="true">
+    <div class="ie-modal-card">
+      <div class="ie-modal-scroll">
+        <div class="ie-modal-close">
+          <button type="button" class="ie-xbtn" aria-label="Close" onclick="closeModal('candidate')">✕</button>
+        </div>
+
+        <h3 class="text-[#c5a059] brand-font italic text-3xl mb-3 text-center">Candidate Solutions</h3>
+        <p class="text-[0.78rem] text-slate-300/80 mb-6 leading-relaxed text-center">
+          Whether you are aiming for an international cultural program or a strategic local career move, we provide end-to-end support.
+        </p>
+
+        <div class="space-y-4 mb-6">
+          <div class="border border-white/10 bg-white/5 p-4">
+            <p class="text-[0.7rem] uppercase font-bold tracking-widest text-white mb-1">1. Interview and Selection</p>
+            <p class="text-[0.65rem] text-slate-300/80 italic">Individual screening sessions to evaluate your profile and expectations.</p>
+          </div>
+
+          <div class="border border-white/10 bg-white/5 p-4">
+            <p class="text-[0.7rem] uppercase font-bold tracking-widest text-white mb-2">2. Strategic Placement</p>
+            <div class="space-y-2">
+              <div class="bg-black/30 p-3 border-l-2 border-[#c5a059]">
+                <p class="text-[0.65rem] font-bold uppercase tracking-tight text-white">International Pathway</p>
+                <p class="text-[0.6rem] text-slate-300/70">Visa programs, housing, and travel logistics.</p>
+              </div>
+              <div class="bg-black/30 p-3 border-l-2 border-slate-500">
+                <p class="text-[0.65rem] font-bold uppercase tracking-tight text-white">Local Opportunities</p>
+                <p class="text-[0.6rem] text-slate-300/70">Direct recruitment within Italy and Europe.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="border border-white/10 bg-white/5 p-4">
+            <p class="text-[0.7rem] uppercase font-bold tracking-widest text-white mb-1">3. Total Support</p>
+            <p class="text-[0.65rem] text-slate-300/80 italic">Insurance, group departures, and full relocation guidance.</p>
+          </div>
+
+          <div class="border border-white/10 bg-white/5 p-4">
+            <p class="text-[0.7rem] uppercase font-bold tracking-widest text-white mb-1">4. Career Evolution</p>
+            <p class="text-[0.65rem] text-slate-300/80 italic">Continuous follow-up and career development access.</p>
+          </div>
+        </div>
+
+        <a href="/ItalianExperience/recruitment/candidate/"
+          class="block text-center border border-[#c5a059] text-[#c5a059] px-8 py-4 text-[0.65rem] uppercase tracking-[0.25em] font-semibold hover:bg-[#c5a059] hover:text-[#080808] transition-all duration-500">
+          Explore Candidate
+        </a>
+      </div>
+    </div>
+  </div>
 
   <div id="site-footer"></div>
 
   <script>
     let employerChart = null;
+    let employerChartMobile = null;
+
+    function isMobile() {
+      return window.matchMedia("(max-width: 767px)").matches;
+    }
+
+    function openModal(type) {
+      const el = document.getElementById(`modal-${type}`);
+      if (!el) return;
+      el.classList.add("is-open");
+      el.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+
+      if (type === "employer" && !employerChartMobile) initChartMobile();
+    }
+
+    function closeModal(type) {
+      const el = document.getElementById(`modal-${type}`);
+      if (!el) return;
+      el.classList.remove("is-open");
+      el.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
 
     function showDetails(type) {
+      if (isMobile()) {
+        openModal(type);
+        return;
+      }
+
       const mainContent = document.getElementById(`content-${type}-main`);
       const detailsPanel = document.getElementById(`details-${type}`);
       const bg = document.getElementById(type === "employer" ? "bg-left" : "bg-right");
@@ -301,7 +478,7 @@
       setTimeout(() => {
         detailsPanel.classList.remove("opacity-0", "invisible", "scale-[1.02]");
         detailsPanel.classList.add("opacity-100", "visible", "scale-100");
-        if (type === "employer" && !employerChart) initChart();
+        if (type === "employer" && !employerChart) initChartDesktop();
       }, 220);
     }
 
@@ -323,12 +500,8 @@
       }, 250);
     }
 
-    function initChart() {
-      const canvas = document.getElementById("employerChart");
-      if (!canvas) return;
-
-      const ctx = canvas.getContext("2d");
-      employerChart = new Chart(ctx, {
+    function buildChart(ctx) {
+      return new Chart(ctx, {
         type: "doughnut",
         data: {
           labels: ["Tax Savings", "Operating Cost"],
@@ -354,6 +527,32 @@
         }
       });
     }
+
+    function initChartDesktop() {
+      const canvas = document.getElementById("employerChart");
+      if (!canvas) return;
+      employerChart = buildChart(canvas.getContext("2d"));
+    }
+
+    function initChartMobile() {
+      const canvas = document.getElementById("employerChartMobile");
+      if (!canvas) return;
+      employerChartMobile = buildChart(canvas.getContext("2d"));
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeModal("employer");
+        closeModal("candidate");
+      }
+    });
+
+    document.getElementById("modal-employer")?.addEventListener("click", (e) => {
+      if (e.target && e.target.id === "modal-employer") closeModal("employer");
+    });
+    document.getElementById("modal-candidate")?.addEventListener("click", (e) => {
+      if (e.target && e.target.id === "modal-candidate") closeModal("candidate");
+    });
   </script>
 
   <script>
@@ -378,11 +577,11 @@
       function updateHeaderOffset() {
         const headerEl =
           document.querySelector("#site-header header") ||
-          document.querySelector("header") ||
-          document.getElementById("site-header");
+          document.querySelector("header");
 
         if (!headerEl) return;
-        const h = headerEl.getBoundingClientRect().height || 96;
+
+        const h = headerEl.getBoundingClientRect().height || 120;
         document.documentElement.style.setProperty("--ie-header-h", Math.ceil(h) + "px");
       }
 
