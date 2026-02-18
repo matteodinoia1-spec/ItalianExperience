@@ -23,18 +23,32 @@
   <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
 
   <style>
-    :root { --ie-header-h: 96px; }
+    :root{ --ie-header-h: 96px; }
 
-    /* Make the hero respect a fixed header on mobile without pushing content off-screen */
+    /* Fixed header safe offset */
     .hero-recruitment{
       padding-top: var(--ie-header-h);
       min-height: 100dvh;
-      height: auto;
     }
 
-    /* Ensure the split layout remains visible on mobile (2 rows) */
-    .hero-grid{
-      min-height: calc(100dvh - var(--ie-header-h));
+    /* Mobile should stack backgrounds vertically like your homepage cards */
+    .recruitment-bg{
+      display:flex;
+      flex-direction:column;
+    }
+    @media (min-width:768px){
+      .recruitment-bg{ flex-direction:row; }
+    }
+
+    .bg-half{
+      width:100%;
+      height:50%;
+    }
+    @media (min-width:768px){
+      .bg-half{
+        width:50%;
+        height:100%;
+      }
     }
   </style>
 </head>
@@ -45,18 +59,19 @@
 
   <section class="relative w-full bg-black overflow-hidden hero-recruitment">
 
-    <div class="absolute inset-0 z-0 flex">
-      <div id="bg-left" class="w-1/2 h-full opacity-[0.28] border-r border-white/10 bg-cover bg-center transition-all duration-1000"
+    <!-- Backgrounds: stacked on mobile, split on desktop -->
+    <div class="absolute inset-0 z-0 recruitment-bg">
+      <div id="bg-left" class="bg-half opacity-[0.28] md:border-r border-white/10 bg-cover bg-center transition-all duration-1000"
         style="background-image:url('https://images.unsplash.com/photo-1556745753-b2904692b3cd?auto=format&fit=crop&w=1400&q=80');">
       </div>
 
-      <div id="bg-right" class="w-1/2 h-full opacity-[0.28] bg-cover bg-center transition-all duration-1000"
+      <div id="bg-right" class="bg-half opacity-[0.28] bg-cover bg-center transition-all duration-1000"
         style="background-image:url('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1400&q=80');">
       </div>
     </div>
 
-    <!-- Mobile: 2 rows (Employer + Candidate). Desktop: 2 columns -->
-    <div class="relative z-10 w-full max-w-7xl mx-auto grid grid-rows-2 md:grid-rows-1 md:grid-cols-2 hero-grid">
+    <!-- Layout: 2 rows on mobile, 2 columns on desktop -->
+    <div class="relative z-10 w-full max-w-7xl mx-auto grid grid-rows-2 md:grid-rows-1 md:grid-cols-2 min-h-[calc(100dvh-var(--ie-header-h))]">
 
       <!-- EMPLOYER PANEL -->
       <div class="relative flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 overflow-hidden min-h-[50dvh] md:min-h-full panel-employer">
@@ -64,7 +79,7 @@
           EMPLOYER
         </span>
 
-        <div class="relative z-10 text-center max-w-[520px] px-8 transition-all duration-500" id="content-employer-main">
+        <div class="relative z-10 text-center max-w-[520px] px-8 py-10 md:py-0 transition-all duration-500" id="content-employer-main">
           <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.6rem] mb-4 block font-bold">
             Strategic Partnership
           </span>
@@ -89,7 +104,7 @@
           </button>
         </div>
 
-        <div class="absolute inset-0 bg-[rgba(8,8,8,0.97)] flex flex-col justify-center items-center px-8 py-14 opacity-0 invisible scale-[1.02] transition-all duration-500 overflow-y-auto"
+        <div class="absolute inset-0 bg-[rgba(8,8,8,0.97)] flex flex-col justify-start md:justify-center items-center px-8 pt-10 md:pt-14 pb-14 opacity-0 invisible scale-[1.02] transition-all duration-500 overflow-y-auto"
           id="details-employer">
 
           <h3 class="text-[#c5a059] brand-font italic text-3xl mb-4 text-center">
@@ -152,7 +167,7 @@
           CANDIDATE
         </span>
 
-        <div class="relative z-10 text-center max-w-[520px] px-8 transition-all duration-500" id="content-candidate-main">
+        <div class="relative z-10 text-center max-w-[520px] px-8 py-10 md:py-0 transition-all duration-500" id="content-candidate-main">
           <span class="text-[#c5a059] uppercase tracking-[0.5em] text-[0.6rem] mb-4 block font-bold">
             Career Mastery
           </span>
@@ -177,7 +192,7 @@
           </button>
         </div>
 
-        <div class="absolute inset-0 bg-[rgba(8,8,8,0.97)] flex flex-col justify-center items-center px-8 py-14 opacity-0 invisible scale-[1.02] transition-all duration-500 overflow-y-auto"
+        <div class="absolute inset-0 bg-[rgba(8,8,8,0.97)] flex flex-col justify-start md:justify-center items-center px-8 pt-10 md:pt-14 pb-14 opacity-0 invisible scale-[1.02] transition-all duration-500 overflow-y-auto"
           id="details-candidate">
 
           <h3 class="text-[#c5a059] brand-font italic text-3xl mb-4 text-center">
@@ -275,7 +290,6 @@
       const mainContent = document.getElementById(`content-${type}-main`);
       const detailsPanel = document.getElementById(`details-${type}`);
       const bg = document.getElementById(type === "employer" ? "bg-left" : "bg-right");
-
       if (!mainContent || !detailsPanel || !bg) return;
 
       mainContent.style.opacity = "0";
@@ -287,7 +301,6 @@
       setTimeout(() => {
         detailsPanel.classList.remove("opacity-0", "invisible", "scale-[1.02]");
         detailsPanel.classList.add("opacity-100", "visible", "scale-100");
-
         if (type === "employer" && !employerChart) initChart();
       }, 220);
     }
@@ -296,7 +309,6 @@
       const mainContent = document.getElementById(`content-${type}-main`);
       const detailsPanel = document.getElementById(`details-${type}`);
       const bg = document.getElementById(type === "employer" ? "bg-left" : "bg-right");
-
       if (!mainContent || !detailsPanel || !bg) return;
 
       detailsPanel.classList.add("opacity-0", "invisible", "scale-[1.02]");
@@ -316,7 +328,6 @@
       if (!canvas) return;
 
       const ctx = canvas.getContext("2d");
-
       employerChart = new Chart(ctx, {
         type: "doughnut",
         data: {
@@ -336,14 +347,9 @@
             legend: {
               display: true,
               position: "bottom",
-              labels: {
-                color: "#94a3b8",
-                font: { size: 9, family: "Inter" }
-              }
+              labels: { color: "#94a3b8", font: { size: 9, family: "Inter" } }
             },
-            tooltip: {
-              callbacks: { label: (c) => `${c.label}: ${c.raw}%` }
-            }
+            tooltip: { callbacks: { label: (c) => `${c.label}: ${c.raw}%` } }
           }
         }
       });
@@ -371,12 +377,11 @@
 
       function updateHeaderOffset() {
         const headerEl =
-          document.querySelector("header") ||
           document.querySelector("#site-header header") ||
+          document.querySelector("header") ||
           document.getElementById("site-header");
 
         if (!headerEl) return;
-
         const h = headerEl.getBoundingClientRect().height || 96;
         document.documentElement.style.setProperty("--ie-header-h", Math.ceil(h) + "px");
       }
@@ -394,8 +399,8 @@
         updateHeaderOffset();
         window.addEventListener("resize", updateHeaderOffset, { passive: true });
         window.addEventListener("orientationchange", updateHeaderOffset, { passive: true });
-        setTimeout(updateHeaderOffset, 50);
-        setTimeout(updateHeaderOffset, 250);
+        setTimeout(updateHeaderOffset, 60);
+        setTimeout(updateHeaderOffset, 260);
       }).catch(err => console.error(err));
     })();
   </script>
