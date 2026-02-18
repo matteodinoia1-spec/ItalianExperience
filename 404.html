@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>404 | Italian Experience</title>
+
+  <meta name="robots" content="noindex, nofollow" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@200;300;400;600&display=swap');
+
+    :root{
+      --brand-gold:#c5a059;
+      --brand-dark:#080808;
+    }
+
+    body{
+      background:var(--brand-dark);
+      color:#fff;
+      font-family:'Inter',sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <div id="header"></div>
+
+  <!-- MAIN -->
+  <main class="min-h-screen flex items-center justify-center text-center px-6 py-24">
+    <div class="max-w-2xl">
+
+      <h1 class="text-6xl md:text-7xl font-bold text-[var(--brand-gold)] mb-6"
+          style="font-family:'Playfair Display',serif;">
+        404
+      </h1>
+
+      <h2 class="text-2xl md:text-3xl font-semibold mb-4"
+          style="font-family:'Playfair Display',serif;">
+        Page Not Found
+      </h2>
+
+      <p class="text-gray-300 text-lg mb-10 leading-relaxed">
+        The page you are looking for does not exist or may have been moved.
+        Please return to the homepage or explore our main sections.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+
+        <!-- HOME -->
+        <a href="/ItalianExperience/"
+           class="px-8 py-3 rounded-full bg-[var(--brand-gold)] text-black font-semibold hover:opacity-90 transition">
+          Back to Home
+        </a>
+
+        <!-- RECRUITMENT -->
+        <a href="/ItalianExperience/recruitment/"
+           class="px-8 py-3 rounded-full border border-[var(--brand-gold)] text-[var(--brand-gold)] font-semibold hover:bg-[var(--brand-gold)] hover:text-black transition">
+          Recruitment Hub
+        </a>
+
+        <!-- GO BACK -->
+        <button onclick="history.back()"
+          class="px-8 py-3 rounded-full border border-gray-500 text-gray-200 font-semibold hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)] transition">
+          Go Back
+        </button>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <div id="footer"></div>
+
+  <!-- FETCH HEADER + FOOTER -->
+  <script>
+    fetch("/ItalianExperience/partials/header.html")
+      .then(res => res.text())
+      .then(data => document.getElementById("header").innerHTML = data);
+
+    fetch("/ItalianExperience/partials/footer.html")
+      .then(res => res.text())
+      .then(data => document.getElementById("footer").innerHTML = data);
+  </script>
+
+</body>
+</html>
