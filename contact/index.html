@@ -3,55 +3,52 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Contact Us | Italian Experience</title>
+  <title>Contact | Italian Experience</title>
 
-  <meta name="description" content="Contact Italian Experience. Reach out for general information, bespoke travel, partnerships, or media inquiries." />
-  <meta name="keywords" content="Italian Experience, contact, bespoke travel, partnerships, press, media" />
+  <meta name="description" content="Contact Italian Experience for bespoke travel, business partnerships, and premium advisory services." />
+  <meta name="keywords" content="Italian Experience, contact, bespoke travel, partnerships, advisory, luxury Italy" />
   <meta name="author" content="Italian Experience" />
   <meta name="robots" content="index, follow" />
 
   <link rel="canonical" href="https://www.italianexp.com/contact/" />
 
-  <meta property="og:title" content="Contact Us | Italian Experience" />
-  <meta property="og:description" content="Reach out to Italian Experience for general information, bespoke travel, partnerships, or media inquiries." />
+  <meta property="og:title" content="Contact | Italian Experience" />
+  <meta property="og:description" content="Contact Italian Experience for bespoke travel, partnerships, and premium advisory services." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.italianexp.com/contact/" />
   <meta property="og:image" content="https://www.italianexp.com/assets/preview.jpg" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Contact Us | Italian Experience" />
-  <meta name="twitter:description" content="Reach out to Italian Experience for general information, bespoke travel, partnerships, or media inquiries." />
+  <meta name="twitter:title" content="Contact | Italian Experience" />
+  <meta name="twitter:description" content="Contact Italian Experience for bespoke travel, partnerships, and premium advisory services." />
   <meta name="twitter:image" content="https://www.italianexp.com/assets/preview.jpg" />
 
   <script src="https://cdn.tailwindcss.com"></script>
-
   <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
-  <script src="/ItalianExperience/assets/js/site.js" defer></script>
 
   <style>
     .brand-font{font-family:'Playfair Display',serif}
 
     .contact-hero{
-      position:relative;
       width:100%;
       height:100vh;
       height:100dvh;
+      position:relative;
       overflow:hidden;
       background:#000;
       display:flex;
       align-items:center;
       justify-content:center;
-      text-align:center;
       padding:0 2rem;
     }
 
     .hero-bg{
       position:absolute;
       inset:0;
-      background-image:url("https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1800&q=80");
+      background-image:url("https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=2200&q=80");
       background-size:cover;
       background-position:center;
-      filter:brightness(0.25) contrast(1.1);
+      filter:brightness(0.28) contrast(1.15);
       transform:scale(1.03);
       z-index:0;
     }
@@ -59,142 +56,171 @@
     .hero-overlay{
       position:absolute;
       inset:0;
-      background:linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.9) 100%);
+      background:linear-gradient(
+        to bottom,
+        rgba(8,8,8,0.88) 0%,
+        rgba(8,8,8,0.55) 55%,
+        rgba(8,8,8,0.92) 100%
+      );
       z-index:1;
     }
 
-    .hero-content{
+    .contact-wrapper{
       position:relative;
       z-index:10;
-      max-width:1100px;
-      pointer-events:none;
-      padding-bottom:90px;
-    }
-
-    @keyframes scrollLine{
-      0%{transform:translateY(-18px);opacity:0}
-      30%{opacity:1}
-      100%{transform:translateY(52px);opacity:0}
-    }
-
-    .explore-indicator{
-      position:absolute;
-      bottom:48px;
-      left:50%;
-      transform:translateX(-50%);
-      z-index:20;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:14px;
-      text-decoration:none;
-      opacity:0.82;
-      transition:opacity 0.2s ease,transform 0.2s ease;
-      pointer-events:auto;
-    }
-
-    .explore-indicator:hover{
-      opacity:1;
-      transform:translateX(-50%) translateY(4px);
-    }
-
-    .explore-indicator span{
-      font-size:0.65rem;
-      text-transform:uppercase;
-      letter-spacing:0.55em;
-      color:rgba(255,255,255,0.78);
-      padding-left:0.55em;
-      white-space:nowrap;
-      text-shadow:0 8px 18px rgba(0,0,0,0.7);
-    }
-
-    .scroll-track{
-      width:1px;
-      height:54px;
-      background:rgba(255,255,255,0.25);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .scroll-dot{
       width:100%;
-      height:16px;
-      background:var(--brand-gold);
-      position:absolute;
-      top:0;
-      left:0;
-      animation:scrollLine 1.6s infinite ease-in-out;
+      max-width:1150px;
+      display:grid;
+      grid-template-columns:1fr 1.1fr;
+      gap:4rem;
+      align-items:center;
     }
 
-    .form-shell{
+    .contact-card{
       background:rgba(255,255,255,0.02);
-      border:1px solid rgba(197,160,89,0.18);
+      border:1px solid rgba(197,160,89,0.16);
       backdrop-filter:blur(18px);
       -webkit-backdrop-filter:blur(18px);
+      padding:3rem;
+      border-radius:4px;
+      box-shadow:0 25px 55px rgba(0,0,0,0.45);
     }
 
-    .input-field{
+    .field{
       width:100%;
+      padding:0.95rem 1.1rem;
       background:rgba(255,255,255,0.02);
-      border:1px solid rgba(255,255,255,0.08);
-      padding:14px 16px;
-      font-size:0.85rem;
+      border:1px solid rgba(255,255,255,0.12);
       color:#fff;
       outline:none;
+      font-size:0.9rem;
       transition:all 0.25s ease;
     }
 
-    .input-field:focus{
-      border-color:rgba(197,160,89,0.65);
-      box-shadow:0 0 0 4px rgba(197,160,89,0.08);
-      background:rgba(255,255,255,0.03);
+    .field:focus{
+      border-color:rgba(197,160,89,0.85);
+      box-shadow:0 0 0 3px rgba(197,160,89,0.12);
     }
 
-    .input-field::placeholder{
-      color:rgba(255,255,255,0.25);
+    select.field{
+      appearance:none;
+      -webkit-appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23c5a059' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;
+      background-position:right 1rem center;
+      background-size:18px;
+      padding-right:3rem;
     }
 
-    select.input-field{
-      cursor:pointer;
-    }
-
-    textarea.input-field{
-      min-height:160px;
+    textarea.field{
+      min-height:140px;
       resize:none;
       line-height:1.6;
     }
 
-    .submit-btn{
-      background:rgba(197,160,89,0.12);
-      border:1px solid rgba(197,160,89,0.35);
-      padding:14px 20px;
-      font-size:0.7rem;
-      text-transform:uppercase;
-      letter-spacing:0.35em;
-      font-weight:700;
-      transition:all 0.3s ease;
+    .btn-gold{
+      display:inline-block;
       width:100%;
-    }
-
-    .submit-btn:hover{
-      background:rgba(197,160,89,0.2);
-      border-color:rgba(197,160,89,0.85);
-      transform:translateY(-2px);
-      box-shadow:0 15px 30px rgba(0,0,0,0.5);
-    }
-
-    .disclaimer{
-      font-size:0.6rem;
-      color:rgba(255,255,255,0.3);
+      padding:1.05rem 1.2rem;
+      text-align:center;
+      border:1px solid var(--brand-gold);
+      color:var(--brand-gold);
+      font-weight:700;
       text-transform:uppercase;
-      letter-spacing:0.1em;
-      line-height:1.9;
+      font-size:0.7rem;
+      letter-spacing:0.35em;
+      transition:all 0.45s ease;
+      background:transparent;
+    }
+
+    .btn-gold:hover{
+      background:var(--brand-gold);
+      color:#080808;
+      transform:translateY(-2px);
+    }
+
+    .contact-meta{
+      border-left:1px solid rgba(197,160,89,0.22);
+      padding-left:2.5rem;
+    }
+
+    .contact-meta small{
+      font-size:0.6rem;
+      letter-spacing:0.45em;
+      text-transform:uppercase;
+      color:rgba(255,255,255,0.55);
+      display:block;
+      margin-bottom:1rem;
+    }
+
+    .contact-meta h1{
+      font-size:clamp(2.3rem, 4vw, 4.2rem);
+      line-height:1.05;
+      margin-bottom:1.5rem;
+      color:#fff;
+    }
+
+    .contact-meta p{
+      color:rgba(255,255,255,0.65);
+      font-size:1rem;
+      line-height:1.85;
+      font-weight:300;
+      max-width:520px;
+    }
+
+    .contact-meta .gold-line{
+      width:70px;
+      height:1px;
+      background:var(--brand-gold);
+      margin:1.8rem 0;
+      opacity:0.6;
+    }
+
+    .contact-footnote{
+      margin-top:2rem;
+      font-size:0.65rem;
+      text-transform:uppercase;
+      letter-spacing:0.2em;
+      color:rgba(255,255,255,0.35);
+      line-height:1.8;
+    }
+
+    @media (max-width:1024px){
+      .contact-wrapper{
+        grid-template-columns:1fr;
+        gap:2.8rem;
+      }
+
+      .contact-meta{
+        border-left:none;
+        padding-left:0;
+        text-align:center;
+      }
+
+      .contact-meta p{
+        margin:0 auto;
+      }
+
+      .contact-meta .gold-line{
+        margin:1.8rem auto;
+      }
+
+      .contact-card{
+        padding:2.2rem;
+      }
     }
 
     @media (max-width:768px){
-      .hero-content h1{
-        font-size:clamp(2.2rem, 10vw, 3.2rem) !important;
-        line-height:1.05 !important;
+      .contact-hero{
+        padding:0 1.2rem;
+      }
+
+      .contact-card{
+        padding:1.8rem;
+      }
+
+      textarea.field{
+        min-height:130px;
       }
     }
   </style>
@@ -210,113 +236,81 @@
       <div class="hero-bg" aria-hidden="true"></div>
       <div class="hero-overlay" aria-hidden="true"></div>
 
-      <div class="hero-content">
-        <h3 class="text-[#c5a059] italic brand-font text-2xl mb-4 drop-shadow-xl">
-          Direct Communication
-        </h3>
+      <div class="contact-wrapper">
 
-        <h1 class="text-5xl md:text-8xl font-bold brand-font leading-tight mb-10 text-white drop-shadow-2xl uppercase tracking-tighter">
-          Contact <br />
-          <span class="italic font-light text-white/80">Italian Experience.</span>
-        </h1>
+        <div class="contact-meta">
+          <small>Italian Experience</small>
 
-        <p class="text-slate-300 font-light text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-          Whether you are exploring bespoke travel, strategic partnerships, or simply seeking information,
-          our team is ready to assist you with clarity and discretion.
-        </p>
-      </div>
+          <h1 class="brand-font uppercase tracking-tighter font-bold">
+            Contact <span class="italic font-light text-[#c5a059]">Us.</span>
+          </h1>
 
-      <a href="#contact-form" class="explore-indicator" aria-label="Scroll to contact form">
-        <span>Start Inquiry</span>
-        <div class="scroll-track" aria-hidden="true">
-          <div class="scroll-dot"></div>
-        </div>
-      </a>
-    </section>
+          <div class="gold-line"></div>
 
-    <section id="contact-form" class="py-28 px-6 bg-[#080808]">
-      <div class="max-w-6xl mx-auto w-full">
-
-        <div class="text-center mb-20">
-          <span class="text-[#c5a059] uppercase tracking-[0.6em] text-[0.65rem] font-bold block mb-6">
-            Inquiry Form
-          </span>
-
-          <h2 class="text-4xl md:text-6xl brand-font italic text-white leading-tight mb-4">
-            Tell Us What You Need.
-          </h2>
-
-          <p class="text-slate-500 font-light text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
-            Complete the form below and our team will respond as soon as possible.
-            Email is required to ensure accurate follow-up.
+          <p>
+            Whether you are seeking bespoke travel experiences, business partnerships, or strategic advisory,
+            our team will respond with discretion and precision.
           </p>
+
+          <div class="contact-footnote">
+            Premium inquiries only <br />
+            Response time: 24-48 hours
+          </div>
         </div>
 
-        <div class="form-shell p-10 md:p-14 shadow-2xl">
+        <div class="contact-card">
 
-          <form id="contactForm" method="POST" action="#" class="space-y-10">
-
-            <div class="grid md:grid-cols-2 gap-6">
+          <form id="contactForm" method="POST" action="#">
+            
+            <div class="grid md:grid-cols-2 gap-5 mb-5">
               <div>
-                <label class="text-[0.6rem] uppercase tracking-[0.35em] text-slate-500 font-bold block mb-3">
+                <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
                   Full Name
                 </label>
-                <input type="text" name="fullName" class="input-field" placeholder="John Smith" />
+                <input type="text" name="fullName" class="field" placeholder="Your full name" />
               </div>
 
               <div>
-                <label class="text-[0.6rem] uppercase tracking-[0.35em] text-slate-500 font-bold block mb-3">
-                  Email Address <span class="text-[#c5a059]">*</span>
+                <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
+                  Email (Required)
                 </label>
-                <input type="email" name="email" class="input-field" placeholder="you@example.com" required />
+                <input type="email" name="email" class="field" placeholder="you@example.com" required />
               </div>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-6">
+            <div class="grid md:grid-cols-2 gap-5 mb-5">
               <div>
-                <label class="text-[0.6rem] uppercase tracking-[0.35em] text-slate-500 font-bold block mb-3">
+                <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
                   Phone (with prefix)
                 </label>
-                <input type="tel" name="phone" class="input-field" placeholder="+1 305 000 0000" />
+                <input type="tel" name="phone" class="field" placeholder="+39 333 123 4567" />
               </div>
 
               <div>
-                <label class="text-[0.6rem] uppercase tracking-[0.35em] text-slate-500 font-bold block mb-3">
+                <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
                   Subject of Inquiry
                 </label>
-                <select name="subject" class="input-field">
-                  <option value="general-information">General Information</option>
-                  <option value="bespoke-travel">Bespoke Travel and Experiences</option>
-                  <option value="business-partnerships">Business and Partnerships</option>
-                  <option value="press-media">Press and Media</option>
+                <select name="subject" class="field" required>
+                  <option value="" disabled selected>Select a subject</option>
+                  <option value="general information">General Information</option>
+                  <option value="bespoke travel and experiences">Bespoke Travel and Experiences</option>
+                  <option value="business and partnerships">Business and Partnerships</option>
+                  <option value="press and media">Press and Media</option>
                   <option value="other">Other</option>
                 </select>
               </div>
             </div>
 
-            <div>
-              <label class="text-[0.6rem] uppercase tracking-[0.35em] text-slate-500 font-bold block mb-3">
+            <div class="mb-8">
+              <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
                 How can we assist you today?
               </label>
-              <textarea
-                name="message"
-                class="input-field"
-                placeholder="Write your request here..."
-              ></textarea>
+              <textarea name="message" class="field" placeholder="Write your request here..." required></textarea>
             </div>
 
-            <div class="pt-4">
-              <button type="submit" class="submit-btn">
-                Submit Inquiry
-              </button>
-            </div>
-
-            <div class="pt-2 text-center">
-              <p class="disclaimer max-w-3xl mx-auto">
-                Italian Experience operates as a strategic advisory platform. We do not provide regulated legal services.
-                By submitting this form, you agree to be contacted via email regarding your inquiry.
-              </p>
-            </div>
+            <button type="submit" class="btn-gold">
+              Send Inquiry
+            </button>
 
           </form>
 
