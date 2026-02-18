@@ -20,15 +20,30 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-
   <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
+
+  <style>
+    :root { --ie-header-h: 96px; }
+
+    /* Make the hero respect a fixed header on mobile without pushing content off-screen */
+    .hero-recruitment{
+      padding-top: var(--ie-header-h);
+      min-height: 100dvh;
+      height: auto;
+    }
+
+    /* Ensure the split layout remains visible on mobile (2 rows) */
+    .hero-grid{
+      min-height: calc(100dvh - var(--ie-header-h));
+    }
+  </style>
 </head>
 
 <body class="bg-[#080808] text-white overflow-x-hidden">
 
   <div id="site-header"></div>
 
-  <section class="relative w-full h-[100vh] h-[100dvh] bg-black overflow-hidden hero-recruitment">
+  <section class="relative w-full bg-black overflow-hidden hero-recruitment">
 
     <div class="absolute inset-0 z-0 flex">
       <div id="bg-left" class="w-1/2 h-full opacity-[0.28] border-r border-white/10 bg-cover bg-center transition-all duration-1000"
@@ -40,10 +55,11 @@
       </div>
     </div>
 
-    <div class="relative z-10 w-full h-full max-w-7xl mx-auto grid md:grid-cols-2">
+    <!-- Mobile: 2 rows (Employer + Candidate). Desktop: 2 columns -->
+    <div class="relative z-10 w-full max-w-7xl mx-auto grid grid-rows-2 md:grid-rows-1 md:grid-cols-2 hero-grid">
 
       <!-- EMPLOYER PANEL -->
-      <div class="relative flex items-start md:items-center justify-center border-r border-white/10 overflow-hidden min-h-full pt-40 md:pt-0 panel-employer">
+      <div class="relative flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 overflow-hidden min-h-[50dvh] md:min-h-full panel-employer">
         <span class="absolute top-1/2 -translate-y-1/2 left-[-5%] text-[rgba(255,255,255,0.03)] font-extrabold tracking-tight pointer-events-none whitespace-nowrap text-[clamp(5rem,15vw,12rem)]">
           EMPLOYER
         </span>
@@ -131,7 +147,7 @@
       </div>
 
       <!-- CANDIDATE PANEL -->
-      <div class="relative flex items-start md:items-center justify-center overflow-hidden min-h-full pt-40 md:pt-0 panel-candidate">
+      <div class="relative flex items-center justify-center overflow-hidden min-h-[50dvh] md:min-h-full panel-candidate">
         <span class="absolute top-1/2 -translate-y-1/2 right-[-5%] text-[rgba(255,255,255,0.03)] font-extrabold tracking-tight pointer-events-none whitespace-nowrap text-[clamp(5rem,15vw,12rem)]">
           CANDIDATE
         </span>
@@ -326,9 +342,7 @@
               }
             },
             tooltip: {
-              callbacks: {
-                label: (c) => `${c.label}: ${c.raw}%`
-              }
+              callbacks: { label: (c) => `${c.label}: ${c.raw}%` }
             }
           }
         }
@@ -355,6 +369,18 @@
         });
       }
 
+      function updateHeaderOffset() {
+        const headerEl =
+          document.querySelector("header") ||
+          document.querySelector("#site-header header") ||
+          document.getElementById("site-header");
+
+        if (!headerEl) return;
+
+        const h = headerEl.getBoundingClientRect().height || 96;
+        document.documentElement.style.setProperty("--ie-header-h", Math.ceil(h) + "px");
+      }
+
       Promise.all([
         fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
         fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
@@ -364,6 +390,12 @@
 
         await loadScript(base + "/assets/js/site.js");
         if (window.IEInit) window.IEInit(document);
+
+        updateHeaderOffset();
+        window.addEventListener("resize", updateHeaderOffset, { passive: true });
+        window.addEventListener("orientationchange", updateHeaderOffset, { passive: true });
+        setTimeout(updateHeaderOffset, 50);
+        setTimeout(updateHeaderOffset, 250);
       }).catch(err => console.error(err));
     })();
   </script>
