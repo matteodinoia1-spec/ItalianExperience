@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Contact Us | Italian Experience</title>
+
+  <meta name="description" content="Contact Italian Experience. Reach out for general information, bespoke travel, partnerships, or media inquiries." />
+  <meta name="keywords" content="Italian Experience, contact, bespoke travel, partnerships, press, media" />
+  <meta name="author" content="Italian Experience" />
+  <meta name="robots" content="index, follow" />
+
+  <link rel="canonical" href="https://www.italianexp.com/contact/" />
+
+  <meta property="og:title" content="Contact Us | Italian Experience" />
+  <meta property="og:description" content="Reach out to Italian Experience for general information, bespoke travel, partnerships, or media inquiries." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.italianexp.com/contact/" />
+  <meta property="og:image" content="https://www.italianexp.com/assets/preview.jpg" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Contact Us | Italian Experience" />
+  <meta name="twitter:description" content="Reach out to Italian Experience for general information, bespoke travel, partnerships, or media inquiries." />
+  <meta name="twitter:image" content="https://www.italianexp.com/assets/preview.jpg" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
+  <script src="/ItalianExperience/assets/js/site.js" defer></script>
+
+  <style>
+    .brand-font{font-family:'Playfair Display',serif}
+
+    .contact-hero{
+      position:relative;
+      width:100%;
+      height:100vh;
+      height:100dvh;
+      overflow:hidden;
+      background:#000;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:0 2rem;
+    }
+
+    .hero-bg{
+      position:absolute;
+      inset:0;
+      background-image:url("https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1800&q=80");
+      background-size:cover;
+      background-position:center;
+      filter:brightness(0.25) contrast(1.1);
+      transform:scale(1.03);
+      z-index:0;
+    }
+
+    .hero-overlay{
+      position:absolute;
+      inset:0;
+      background:linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.9) 100%);
+      z-index:1;
+    }
+
+    .hero-content{
+      position:relative;
+      z-index:10;
+      max-width:1100px;
+      pointer-events:none;
+      padding-bottom:90px;
+    }
+
+    @keyframes scrollLine{
+      0%{transform:translateY(-18px);opacity:0}
+      30%{opacity:1}
+      100%{transform:translateY(52px);opacity:0}
+    }
+
+    .explore-indicator{
+      position:absolute;
+      bottom:48px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:20;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:14px;
+      text-decoration:none;
+      opacity:0.82;
+      transition:opacity 0.2s ease,transform 0.2s ease;
+      pointer-events:auto;
+    }
+
+    .explore-indicator:hover{
+      opacity:1;
+      transform:translateX(-50%) translateY(4px);
+    }
+
+    .explore-indicator span{
+      font-size:0.65rem;
+      text-transform:uppercase;
+      letter-spacing:0.55em;
+      color:rgba(255,255,255,0.78);
+      padding-left:0.55em;
+      white-space:nowrap;
+      text-shadow:0 8px 18px rgba(0,0,0,0.7);
+    }
+
+    .scroll-track{
+      width:1px;
+      height:54px;
+      background:rgba(255,255,255,0.25);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .scroll-dot{
+      width:100%;
+      height:16px;
+      background:var(--brand-gold);
+      position:absolute;
+      top:0;
+      left:0;
+      animation:scrollLine 1.6s infinite ease-in-out;
+    }
+
+    .form-shell{
+      background:rgba(255,255,255,0.02);
+      border:1px solid rgba(197,160,89,0.18);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+    }
+
+    .input-field{
+      width:100%;
+      background:rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.08);
+      padding:14px 16px;
+      font-size:0.85rem;
+      color:#fff;
+      outline:none;
+      transition:all 0.25s ease;
+    }
+
+    .input-field:focus{
+      border-color:rgba(197,160,89,0.65);
+      box-shadow:0 0 0 4px rgba(197,160,89,0.08);
+      background:rgba(255,255,255,0.03);
+    }
+
+    .input-field::placeholder{
+      color:rgba(255,255,255,0.25);
+    }
+
+    select.input-field{
+      cursor:pointer;
+    }
+
+    textarea.input-field{
+      min-height:160px;
+      resize:none;
+      line-height:1.6;
+    }
+
+    .submit-btn{
+      background:rgba(197,160,89,0.12);
+      border:1px solid rgba(197,160,89,0.35);
+      padding:14px 20px;
+      font-size:0.7rem;
+      text-transform:uppercase;
+      letter-spacing:0.35em;
+      font-weight:700;
+      transition:all 0.3s ease;
+      width:100%;
+    }
+
+    .submit-btn:hover{
+      background:rgba(197,160,89,0.2);
+      border-color:rgba(197,160,89,0.85);
+      transform:translateY(-2px);
+      box-shadow:0 15px 30px rgba(0,0,0,0.5);
+    }
+
+    .disclaimer{
+      font-size:0.6rem;
+      color:rgba(255,255,255,0.3);
+      text-transform:uppercase;
+      letter-spacing:0.1em;
+      line-height:1.9;
+    }
+
+    @media (max-width:768px){
+      .hero-content h1{
+        font-size:clamp(2.2rem, 10vw, 3.2rem) !important;
+        line-height:1.05 !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-[#080808] text-white overflow-x-hidden">
+
+  <div id="site-header"></div>
+
+  <main>
+
+    <section class="contact-hero" aria-label="Contact hero">
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="hero-overlay" aria-hidden="true"></div>
+
+      <div class="hero-content">
+        <h3 class="text-[#c5a059] italic brand-font text-2xl mb-4 drop-shadow-xl">
+          Direct Communication
+        </h3>
+
+        <h1 class="text-5xl md:text-8xl font-bold brand-font leading-tight mb-10 text-white drop-shadow-2xl uppercase tracking-tighter">
+          Contact <br />
+          <span class="italic font-light text-white/80">Italian Experience.</span>
+        </h1>
+
+        <p class="text-slate-300 font-light text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+          Whether you are exploring bespoke travel, strategic partnerships, or simply seeking information,
+          our team is ready to assist you with clarity and discretion.
+        </p>
+      </div>
+
+      <a href="#contact-form" class="explore-indicator" aria-label="Scroll to contact form">
+        <span>Start Inquiry</span>
+        <div class="scroll-track" aria-hidden="true">
+          <div class="scroll-dot"></div>
+        </div>
+      </a>
+    </section>
+
+    <section id="contact-form" class="py-28 px-6 bg-[#080808]">
+      <div class="max-w-6xl mx-auto w-full">
+
+        <div class="text-center mb-20">
+          <span class="text-[#c5a059] uppercase tracking-[0.6em] text-[0.65rem] font-bold block mb-6">
+            Inquiry Form
+          </span>
+
+          <h2 class="text-4xl md:text-6xl brand-font italic text-white leading-tight mb-4">
+            Tell Us What You Need.
+          </h2>
+
+          <p class="text-slate-500 font-light text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+            Complete the form below and our team will respond as soon as possible.
+            Email is required to ensure accurate follow-up.
+          </p>
+        </div>
+
+        <div class="form-shell p-10 md:p-14 shadow-2xl">
+
+          <form id="contactForm" method="POST" action="#" class="space-y-10">
+
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <label class="text-[0.6rem] uppercase tracking-[0.35em] text-slate-500 font-bold block mb-3">
+                  Full Name
+                </label>
+                <input type="text" name="fullName" class="input-field" placeholder="John Smith" />
+              </div>
+
+              <div>
+                <label class="text-[0.6rem] uppercase tracking-[0.35em] text-slate-500 font-bold block mb-3">
+                  Email Address <span class="text-[#c5a059]">*</span>
+                </label>
+                <input type="email" name="email" class="input-field" placeholder="you@example.com" required />
+              </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <label class="text-[0.6rem] uppercase tracking-[0.35em] text-slate-500 font-bold block mb-3">
+                  Phone (with prefix)
+                </label>
+                <input type="tel" name="phone" class="input-field" placeholder="+1 305 000 0000" />
+              </div>
+
+              <div>
+                <label class="text-[0.6rem] uppercase tracking-[0.35em] text-slate-500 font-bold block mb-3">
+                  Subject of Inquiry
+                </label>
+                <select name="subject" class="input-field">
+                  <option value="general-information">General Information</option>
+                  <option value="bespoke-travel">Bespoke Travel and Experiences</option>
+                  <option value="business-partnerships">Business and Partnerships</option>
+                  <option value="press-media">Press and Media</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-[0.6rem] uppercase tracking-[0.35em] text-slate-500 font-bold block mb-3">
+                How can we assist you today?
+              </label>
+              <textarea
+                name="message"
+                class="input-field"
+                placeholder="Write your request here..."
+              ></textarea>
+            </div>
+
+            <div class="pt-4">
+              <button type="submit" class="submit-btn">
+                Submit Inquiry
+              </button>
+            </div>
+
+            <div class="pt-2 text-center">
+              <p class="disclaimer max-w-3xl mx-auto">
+                Italian Experience operates as a strategic advisory platform. We do not provide regulated legal services.
+                By submitting this form, you agree to be contacted via email regarding your inquiry.
+              </p>
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script>
+    (function () {
+      const base = "/ItalianExperience";
+      const headerMount = document.getElementById("site-header");
+      const footerMount = document.getElementById("site-footer");
+
+      function inject(el, html) { if (el) el.innerHTML = html; }
+
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const s = document.createElement("script");
+          s.src = src;
+          s.defer = true;
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+
+      Promise.all([
+        fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
+        fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
+      ]).then(async ([h, f]) => {
+        inject(headerMount, h);
+        inject(footerMount, f);
+
+        await loadScript(base + "/assets/js/site.js");
+        if (window.IEInit) window.IEInit(document);
+      }).catch(err => console.error(err));
+    })();
+  </script>
+
+</body>
+</html>
