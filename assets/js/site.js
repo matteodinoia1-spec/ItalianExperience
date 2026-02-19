@@ -32,20 +32,28 @@
 
     if (!menuBtn || !closeBtn || !overlay) return;
 
+    let lastFocus = null;
+
     const lockBody = (locked) => {
       document.body.classList.toggle('menu-open', locked);
     };
 
     const openMenu = () => {
+      lastFocus = document.activeElement;
       overlay.classList.add('active');
       overlay.setAttribute('aria-hidden', 'false');
+      menuBtn.setAttribute('aria-expanded', 'true');
       lockBody(true);
+      const firstLink = overlay.querySelector('a, button');
+      if (firstLink) firstLink.focus();
     };
 
     const closeMenu = () => {
       overlay.classList.remove('active');
       overlay.setAttribute('aria-hidden', 'true');
+      menuBtn.setAttribute('aria-expanded', 'false');
       lockBody(false);
+      if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
     };
 
     menuBtn.addEventListener('click', (e) => { e.preventDefault(); openMenu(); });

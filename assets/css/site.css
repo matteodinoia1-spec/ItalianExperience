@@ -279,6 +279,7 @@ input,textarea,select,button{font-size:16px}
   box-shadow:0 20px 40px rgba(0,0,0,0.6);
 }
 .dropdown:hover .dropdown-menu{opacity:1;visibility:visible;transform:translateY(0)}
+.dropdown:focus-within .dropdown-menu{opacity:1;visibility:visible;transform:translateY(0)}
 .dropdown-item{
   display:block;
   padding:0.8rem 1.8rem;
@@ -301,7 +302,6 @@ input,textarea,select,button{font-size:16px}
   background:none;
   border:none;
   cursor:pointer;
-  outline:none;
   z-index:10002;
   transition:all 0.25s ease;
 }
@@ -423,6 +423,16 @@ input,textarea,select,button{font-size:16px}
   transition:opacity 0.2s ease,color 0.2s ease;
 }
 .mobile-sublink:hover{opacity:1;color:var(--brand-gold)}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible{
+  outline:1px solid rgba(197,160,89,0.95);
+  outline-offset:2px;
+  box-shadow:0 0 0 3px rgba(197,160,89,0.25);
+}
 
 /* FOOTER */
 .site-footer{

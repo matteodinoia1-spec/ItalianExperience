@@ -365,24 +365,24 @@
             <input type="hidden" name="zf_referrer_name" value="" />
             <input type="hidden" name="zf_redirect_url" value="" />
             <input type="hidden" name="zc_gad" value="" />
-            <input type="hidden" name="Dropdown" value="Concatc us" />
+            <input type="hidden" name="Dropdown" value="Contact us" />
             <input type="hidden" name="PhoneNumber_countrycode" id="contact-phone-hidden" />
             
             <div class="grid md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label class="input-label is-required">First Name</label>
-                <input type="text" name="Name_First" maxlength="255" class="field" placeholder="First Name" required />
+                <label class="input-label is-required" for="contact-first-name">First Name</label>
+                <input id="contact-first-name" type="text" name="Name_First" maxlength="255" class="field" placeholder="First Name" autocomplete="given-name" required />
               </div>
 
               <div>
-                <label class="input-label is-required">Last Name</label>
-                <input type="text" name="Name_Last" maxlength="255" class="field" placeholder="Last Name" required />
+                <label class="input-label is-required" for="contact-last-name">Last Name</label>
+                <input id="contact-last-name" type="text" name="Name_Last" maxlength="255" class="field" placeholder="Last Name" autocomplete="family-name" required />
               </div>
             </div>
 
             <div class="mb-6">
-              <label class="input-label is-required">Topic</label>
-              <select name="Dropdown6" class="field w-full" required>
+              <label class="input-label is-required" for="contact-topic">Topic</label>
+              <select id="contact-topic" name="Dropdown6" class="field w-full" required>
                 <option value="" selected>Select topic</option>
                 <option value="General Information">General Information</option>
                 <option value="Bespoke Travel and Experience">Bespoke Travel and Experience</option>
@@ -393,20 +393,20 @@
             </div>
 
             <div class="mb-6">
-              <label class="input-label is-required">Email</label>
-              <input type="email" name="Email" maxlength="255" class="field w-full" placeholder="you@example.com" required />
+              <label class="input-label is-required" for="contact-email">Email</label>
+              <input id="contact-email" type="email" name="Email" maxlength="255" class="field w-full" placeholder="you@example.com" autocomplete="email" required />
             </div>
 
             <div class="mb-6">
-              <label class="input-label is-required">Phone Number</label>
+              <label class="input-label is-required" for="contact-phone">Phone Number</label>
               <div class="contact-intl">
-                <input type="tel" class="field" id="contact-phone" maxlength="30" placeholder="Phone number" required />
+                <input type="tel" class="field" id="contact-phone" maxlength="30" placeholder="Phone number" autocomplete="tel-national" required />
               </div>
             </div>
 
             <div class="mb-8">
-              <label class="input-label is-required">How can we assist you today?</label>
-              <textarea name="MultiLine7" maxlength="65535" class="field" placeholder="Please describe your request..." required></textarea>
+              <label class="input-label is-required" for="contact-message">How can we assist you today?</label>
+              <textarea id="contact-message" name="MultiLine7" maxlength="65535" class="field" placeholder="Please describe your request..." required></textarea>
             </div>
 
             <button type="submit" class="btn-gold">

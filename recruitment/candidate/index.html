@@ -553,21 +553,23 @@
                 <option value="Terza scelta">Terza scelta</option>
               </select>
             </div>
-            <div class="service-full">
-              <label class="service-label is-required">Preferred Job Positions</label>
+            <fieldset class="service-full" id="candidate-roles-group" style="border:0;padding:0;margin:0;min-inline-size:0;">
+              <legend class="service-label is-required">Preferred Job Positions</legend>
+              <p id="candidate-roles-help" class="text-white/60 text-[0.62rem] tracking-[0.08em] uppercase mt-2 mb-3">Select 1 or 2 roles</p>
               <div class="service-checks">
-                <label class="service-check"><input type="checkbox" name="Checkbox" value="Server">Server</label>
-                <label class="service-check"><input type="checkbox" name="Checkbox" value="Cook">Cook</label>
-                <label class="service-check"><input type="checkbox" name="Checkbox" value="Bartender">Bartender</label>
-                <label class="service-check"><input type="checkbox" name="Checkbox" value="Housekeeping">Housekeeping</label>
-                <label class="service-check"><input type="checkbox" name="Checkbox" value="Steward">Steward</label>
-                <label class="service-check"><input type="checkbox" name="Checkbox" value="Back Server">Back Server</label>
-                <label class="service-check"><input type="checkbox" name="Checkbox" value="Food Runner">Food Runner</label>
-                <label class="service-check"><input type="checkbox" name="Checkbox" value="Sommelier">Sommelier</label>
-                <label class="service-check"><input type="checkbox" name="Checkbox" value="Supervisor">Supervisor</label>
-                <label class="service-check"><input type="checkbox" name="Checkbox" value="Banquet Staff">Banquet Staff</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Server" aria-describedby="candidate-roles-help">Server</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Cook" aria-describedby="candidate-roles-help">Cook</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Bartender" aria-describedby="candidate-roles-help">Bartender</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Housekeeping" aria-describedby="candidate-roles-help">Housekeeping</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Steward" aria-describedby="candidate-roles-help">Steward</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Back Server" aria-describedby="candidate-roles-help">Back Server</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Food Runner" aria-describedby="candidate-roles-help">Food Runner</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Sommelier" aria-describedby="candidate-roles-help">Sommelier</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Supervisor" aria-describedby="candidate-roles-help">Supervisor</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Banquet Staff" aria-describedby="candidate-roles-help">Banquet Staff</label>
               </div>
-            </div>
+              <p id="candidate-roles-error" class="text-[#c5a059] text-[0.64rem] tracking-[0.08em] uppercase mt-3 hidden" role="alert">Select 1 or 2 roles.</p>
+            </fieldset>
             <div>
               <label class="service-label is-required" for="candidate-resume">Resume</label>
               <input class="service-field service-file" id="candidate-resume" type="file" name="FileUpload" required>
@@ -684,6 +686,7 @@
       const successMsg = document.getElementById("candidate-success-msg");
       const frame = document.querySelector('iframe[name="zoho-candidate-submit-frame"]');
       const roleBoxes = Array.from(form.querySelectorAll('input[name="Checkbox"]'));
+      const roleError = document.getElementById("candidate-roles-error");
       const iti = phoneInput && window.intlTelInput ? window.intlTelInput(phoneInput, {
         initialCountry: "us",
         separateDialCode: true,
@@ -708,6 +711,7 @@
         if (roleBoxes[0]) {
           roleBoxes[0].setCustomValidity(valid ? "" : "Select 1 or 2 roles.");
         }
+        if (roleError) roleError.classList.toggle("hidden", valid);
         return valid;
       }
 
