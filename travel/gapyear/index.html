@@ -282,6 +282,25 @@
     .gap-intl .iti__selected-country{
       background:rgba(255,255,255,0.03);
       border-right:1px solid rgba(255,255,255,0.14);
+      height:100%;
+      padding:0 0.55rem 0 0.6rem;
+    }
+
+    .gap-intl .iti__selected-country-primary{
+      height:100%;
+      display:flex;
+      align-items:center;
+      gap:0.45rem;
+    }
+
+    .gap-intl .iti__selected-dial-code{
+      margin-left:0;
+      font-size:0.98rem;
+      color:rgba(255,255,255,0.95);
+    }
+
+    .gap-intl .iti__arrow{
+      margin-left:0.25rem;
     }
 
     .gap-intl .iti__country-list{
@@ -322,6 +341,12 @@
       text-transform:uppercase;
       color:#9ca3af;
       font-weight:600;
+    }
+
+    .gap-label.is-required::after{
+      content:" *";
+      color:var(--brand-gold);
+      letter-spacing:0.1em;
     }
 
     .gap-full{grid-column:1 / -1}
@@ -722,25 +747,25 @@
 
             <div class="gap-grid">
               <div>
-                <label class="gap-label" for="gapyear-name-first">First Name</label>
-                <input class="gap-field" id="gapyear-name-first" type="text" name="Name_First" maxlength="255">
+                <label class="gap-label is-required" for="gapyear-name-first">First Name</label>
+                <input class="gap-field" id="gapyear-name-first" type="text" name="Name_First" maxlength="255" required>
               </div>
               <div>
-                <label class="gap-label" for="gapyear-name-last">Last Name</label>
-                <input class="gap-field" id="gapyear-name-last" type="text" name="Name_Last" maxlength="255">
+                <label class="gap-label is-required" for="gapyear-name-last">Last Name</label>
+                <input class="gap-field" id="gapyear-name-last" type="text" name="Name_Last" maxlength="255" required>
               </div>
               <div>
-                <label class="gap-label" for="gapyear-email">E-mail</label>
+                <label class="gap-label is-required" for="gapyear-email">E-mail</label>
                 <input class="gap-field" id="gapyear-email" type="email" name="Email" maxlength="255" required>
               </div>
               <div>
-                <label class="gap-label" for="gapyear-phone">Phone</label>
+                <label class="gap-label is-required" for="gapyear-phone">Phone</label>
                 <div class="gap-intl">
                   <input class="gap-field" id="gapyear-phone" type="tel" maxlength="30" placeholder="Phone number" required>
                 </div>
               </div>
               <div class="gap-full">
-                <label class="gap-label" for="gapyear-message">Describe Your Academic Aspirations and Desired Length of Stay</label>
+                <label class="gap-label is-required" for="gapyear-message">Describe Your Academic Aspirations and Desired Length of Stay</label>
                 <textarea class="gap-field gap-textarea" id="gapyear-message" name="MultiLine1" maxlength="65535" required></textarea>
               </div>
               <div class="gap-full">

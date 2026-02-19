@@ -258,6 +258,25 @@
     .bespoke-intl .iti__selected-country{
       background:rgba(255,255,255,0.03);
       border-right:1px solid rgba(255,255,255,0.14);
+      height:100%;
+      padding:0 0.55rem 0 0.6rem;
+    }
+
+    .bespoke-intl .iti__selected-country-primary{
+      height:100%;
+      display:flex;
+      align-items:center;
+      gap:0.45rem;
+    }
+
+    .bespoke-intl .iti__selected-dial-code{
+      margin-left:0;
+      font-size:0.98rem;
+      color:rgba(255,255,255,0.95);
+    }
+
+    .bespoke-intl .iti__arrow{
+      margin-left:0.25rem;
     }
 
     .bespoke-intl .iti__country-list{
@@ -298,6 +317,12 @@
       text-transform:uppercase;
       color:#9ca3af;
       font-weight:600;
+    }
+
+    .bespoke-label.is-required::after{
+      content:" *";
+      color:var(--brand-gold);
+      letter-spacing:0.1em;
     }
 
     .bespoke-full{grid-column:1 / -1}
@@ -606,34 +631,34 @@
 
             <div class="bespoke-grid">
               <div>
-                <label class="bespoke-label" for="bespoke-name-first">First Name</label>
-                <input class="bespoke-field" id="bespoke-name-first" type="text" name="Name_First" maxlength="255">
+                <label class="bespoke-label is-required" for="bespoke-name-first">First Name</label>
+                <input class="bespoke-field" id="bespoke-name-first" type="text" name="Name_First" maxlength="255" required>
               </div>
               <div>
-                <label class="bespoke-label" for="bespoke-name-last">Last Name</label>
-                <input class="bespoke-field" id="bespoke-name-last" type="text" name="Name_Last" maxlength="255">
+                <label class="bespoke-label is-required" for="bespoke-name-last">Last Name</label>
+                <input class="bespoke-field" id="bespoke-name-last" type="text" name="Name_Last" maxlength="255" required>
               </div>
               <div>
-                <label class="bespoke-label" for="bespoke-email">E-mail</label>
+                <label class="bespoke-label is-required" for="bespoke-email">E-mail</label>
                 <input class="bespoke-field" id="bespoke-email" type="email" name="Email" maxlength="255" required>
               </div>
               <div>
-                <label class="bespoke-label" for="bespoke-phone">Phone</label>
+                <label class="bespoke-label is-required" for="bespoke-phone">Phone</label>
                 <div class="bespoke-intl">
                   <input class="bespoke-field" id="bespoke-phone" type="tel" maxlength="30" placeholder="Phone number" required>
                 </div>
                 <input type="hidden" name="PhoneNumber_countrycode" id="bespoke-phone-hidden">
               </div>
               <div>
-                <label class="bespoke-label" for="bespoke-dates">Preferred Travel Dates</label>
+                <label class="bespoke-label is-required" for="bespoke-dates">Preferred Travel Dates</label>
                 <input class="bespoke-field" id="bespoke-dates" type="text" name="SingleLine9" maxlength="255" placeholder="Preferred period (e.g. June 2026)" required>
               </div>
               <div>
-                <label class="bespoke-label" for="bespoke-guests">Number of Guests</label>
+                <label class="bespoke-label is-required" for="bespoke-guests">Number of Guests</label>
                 <input class="bespoke-field" id="bespoke-guests" type="text" name="Number" maxlength="18" required>
               </div>
               <div class="bespoke-full">
-                <label class="bespoke-label" for="bespoke-vision">Describe Your Vision</label>
+                <label class="bespoke-label is-required" for="bespoke-vision">Describe Your Vision</label>
                 <textarea class="bespoke-field bespoke-textarea" id="bespoke-vision" name="MultiLine" maxlength="65535" required></textarea>
               </div>
               <div class="bespoke-full">
