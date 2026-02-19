@@ -25,11 +25,18 @@ input,textarea,select,button{font-size:16px}
 
 .brand-font{font-family:'Playfair Display',serif}
 
+/* Header mount must not push page content down */
+#site-header{
+  position:relative;
+  height:0;
+  z-index:9999;
+}
+
 /* Shared hero system */
 .ie-hero-shell{
   position:relative;
   width:100%;
-  min-height:100vh;
+  height:100dvh;
   min-height:100dvh;
   overflow:hidden;
   background:#000;
