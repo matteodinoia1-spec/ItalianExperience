@@ -25,20 +25,6 @@ input,textarea,select,button{font-size:16px}
 
 .brand-font{font-family:'Playfair Display',serif}
 
-/* Global top blend band under the fixed header */
-.ie-global-top-blend{
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  width:100%;
-  height:110px;
-  z-index:9998;
-  pointer-events:none;
-  background:linear-gradient(to bottom, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 45%, rgba(0,0,0,0.0) 100%);
-  display:none;
-}
-
 /* Shared hero system */
 .ie-hero-shell{
   position:relative;
@@ -132,9 +118,6 @@ input,textarea,select,button{font-size:16px}
 }
 
 @media (max-width:768px){
-  .ie-global-top-blend{
-    height:130px;
-  }
   .ie-hero-offset{
     padding-top:calc(var(--ie-header-h, 110px) + env(safe-area-inset-top) + 18px);
   }
