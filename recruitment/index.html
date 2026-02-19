@@ -65,21 +65,20 @@
       }
     }
 
-    /* EXTRA SPACE + BLEND BAND ON MOBILE */
-    .mobile-top-space{ display:none; }
+    /* EXTRA SPACE + BLEND BAND ON TOP (all breakpoints) */
+    .mobile-top-space{
+      display:block;
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:110px;
+      z-index:6;
+      pointer-events:none;
+      background:linear-gradient(to bottom, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 45%, rgba(0,0,0,0.0) 100%);
+    }
 
     @media (max-width:767px){
-      .mobile-top-space{
-        display:block;
-        position:absolute;
-        top:0;
-        left:0;
-        right:0;
-        height:110px;
-        z-index:6;
-        pointer-events:none;
-        background:linear-gradient(to bottom, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 45%, rgba(0,0,0,0.0) 100%);
-      }
 
       .panel-inner{ padding-top: 46px; padding-bottom: 26px; }
       .panel-title{ font-size: clamp(2.55rem, 11vw, 3.35rem); line-height: 1.02; }
@@ -150,7 +149,7 @@
         style="background-image:url('/ItalianExperience/assets/img/recruitment/recruitment-bg-candidate.jpg');"></div>
     </div>
 
-    <!-- BLACK BLEND BAND ON TOP (mobile only) -->
+    <!-- BLACK BLEND BAND ON TOP -->
     <div class="mobile-top-space" aria-hidden="true"></div>
 
     <div class="relative z-10 w-full max-w-7xl mx-auto grid grid-rows-2 md:grid-rows-1 md:grid-cols-2 min-h-[calc(100dvh-var(--ie-header-h))]">
