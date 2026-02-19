@@ -22,7 +22,10 @@
   <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
 
   <style>
-    :root{ --ie-header-h: 120px; }
+    /* Old local fallback kept for rollback context:
+       :root{ --ie-header-h: 120px; }
+       Header height is now provided globally by assets/css/site.css + assets/js/site.js.
+    */
 
     .hero-recruitment{
       background:#000;
@@ -577,6 +580,7 @@
         });
       }
 
+      /* Old page-local offset logic replaced by global IEInit header offset system in assets/js/site.js.
       function updateHeaderOffset() {
         const headerEl =
           document.querySelector("#site-header header") ||
@@ -586,6 +590,7 @@
         const h = headerEl.getBoundingClientRect().height || 120;
         document.documentElement.style.setProperty("--ie-header-h", Math.ceil(h) + "px");
       }
+      */
 
       Promise.all([
         fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
@@ -597,11 +602,7 @@
         await loadScript(base + "/assets/js/site.js");
         if (window.IEInit) window.IEInit(document);
 
-        updateHeaderOffset();
-        window.addEventListener("resize", updateHeaderOffset, { passive: true });
-        window.addEventListener("orientationchange", updateHeaderOffset, { passive: true });
-        setTimeout(updateHeaderOffset, 60);
-        setTimeout(updateHeaderOffset, 260);
+        // Old local calls removed: global offset updater runs inside IEInit.
       }).catch(err => console.error(err));
     })();
   </script>

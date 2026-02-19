@@ -1,4 +1,6 @@
 (function () {
+  let headerOffsetBound = false;
+
   function buildExperienceLetters(root) {
     (root || document).querySelectorAll('.font-ex').forEach(ex => {
       const text = ex.getAttribute('data-text') || '';
@@ -186,6 +188,31 @@
     });
   }
 
+  function initGlobalHeaderOffset() {
+    const header = document.getElementById('main-header');
+    if (!header) return;
+
+    const update = () => {
+      const h = header.getBoundingClientRect().height;
+      if (!h) return;
+      document.documentElement.style.setProperty('--ie-header-h', Math.ceil(h) + 'px');
+    };
+
+    update();
+    window.requestAnimationFrame(update);
+    window.setTimeout(update, 80);
+    window.setTimeout(update, 240);
+
+    if (headerOffsetBound) return;
+    headerOffsetBound = true;
+
+    window.addEventListener('resize', update, { passive: true });
+    window.addEventListener('orientationchange', update, { passive: true });
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(update).catch(() => {});
+    }
+  }
+
   function IEInit(root) {
     buildExperienceLetters(root);
     initActiveNav();
@@ -194,6 +221,7 @@
     initHeaderSmartScroll();
     initLogoMouse('logo-header');
     initLogoMouse('logo-footer');
+    initGlobalHeaderOffset();
   }
 
   window.IEInit = IEInit;

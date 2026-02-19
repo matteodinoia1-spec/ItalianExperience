@@ -5,6 +5,7 @@
   --brand-obsidian:#080808;
   --it-green:#008C45;
   --it-red:#CD212A;
+  --ie-header-h:110px;
 }
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -75,7 +76,7 @@ input,textarea,select,button{font-size:16px}
   margin-inline:auto;
   padding-inline:clamp(1rem, 4vw, 2.4rem) !important;
   /* sposto il compenso dell'header sulla lockup, così solo i contenuti scendono */
-  padding-top:calc(var(--ie-header-h, 110px) + env(safe-area-inset-top) + 14px);
+  padding-top:calc(var(--ie-header-h) + env(safe-area-inset-top) + 14px);
 }
 
 .ie-hero-eyebrow{
@@ -137,7 +138,7 @@ input,textarea,select,button{font-size:16px}
   }
   .ie-hero-lockup{
     padding-inline:clamp(1rem, 5vw, 1.35rem) !important;
-    padding-top:calc(var(--ie-header-h, 110px) + env(safe-area-inset-top) + 18px);
+    padding-top:calc(var(--ie-header-h) + env(safe-area-inset-top) + 18px);
     padding-bottom:calc(78px + env(safe-area-inset-bottom)) !important;
   }
   .ie-hero-eyebrow{
