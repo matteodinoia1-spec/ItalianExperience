@@ -199,7 +199,7 @@
     .service-grid{display:grid; grid-template-columns:1fr 1fr; gap:1rem}
     .service-full{grid-column:1 / -1}
     .service-label{display:block; margin-bottom:0.45rem; font-size:0.64rem; letter-spacing:0.24em; text-transform:uppercase; color:#9ca3af; font-weight:600}
-    .service-label.is-required::after{content:" *"; color:var(--brand-gold); letter-spacing:0.1em}
+    .service-label.is-required::after{content:"\00a0*"; color:var(--brand-gold); letter-spacing:0.1em}
     .service-field{width:100%; padding:0.95rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.16); border-radius:2px; color:#fff; font-size:0.95rem; outline:none; transition:border-color .2s ease, box-shadow .2s ease, background .2s ease}
     .service-field:focus{border-color:rgba(197,160,89,0.85); box-shadow:0 0 0 1px rgba(197,160,89,0.15); background:rgba(255,255,255,0.06)}
     .service-field::placeholder{color:rgba(255,255,255,0.45)}
