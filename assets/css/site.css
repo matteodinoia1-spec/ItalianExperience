@@ -60,16 +60,10 @@ input,textarea,select,button{font-size:16px}
   position:absolute;
   inset:0;
   z-index:1;
+  background:linear-gradient(to bottom, rgba(8,8,8,0) 0%, var(--brand-obsidian) 100%) !important;
 }
 .ie-hero-overlay-soft{
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(0,0,0,0.9) 0%,
-      rgba(0,0,0,0.58) 18%,
-      rgba(8,8,8,0.2) 42%,
-      rgba(8,8,8,0.88) 100%
-    );
+  background:linear-gradient(to bottom, rgba(8,8,8,0) 0%, var(--brand-obsidian) 100%);
 }
 .ie-hero-content-layer{
   position:relative;
