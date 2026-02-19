@@ -35,7 +35,7 @@ input,textarea,select,button{font-size:16px}
   background:#000;
 }
 .ie-hero-offset{
-  padding-top:calc(var(--ie-header-h, 110px) + env(safe-area-inset-top) + 14px);
+  /* niente padding-top qui: l'immagine deve arrivare fino in alto sotto l'header */
 }
 .ie-hero-bg-layer{
   position:absolute;
@@ -67,6 +67,8 @@ input,textarea,select,button{font-size:16px}
   max-width:min(1140px, 100%);
   margin-inline:auto;
   padding-inline:clamp(1rem, 4vw, 2.4rem) !important;
+  /* sposto il compenso dell'header sulla lockup, così solo i contenuti scendono */
+  padding-top:calc(var(--ie-header-h, 110px) + env(safe-area-inset-top) + 14px);
 }
 
 .ie-hero-eyebrow{
@@ -124,10 +126,11 @@ input,textarea,select,button{font-size:16px}
 
 @media (max-width:768px){
   .ie-hero-offset{
-    padding-top:calc(var(--ie-header-h, 110px) + env(safe-area-inset-top) + 18px);
+    /* nessun padding-top sul contenitore, per evitare banda nera sopra l'immagine */
   }
   .ie-hero-lockup{
     padding-inline:clamp(1rem, 5vw, 1.35rem) !important;
+    padding-top:calc(var(--ie-header-h, 110px) + env(safe-area-inset-top) + 18px);
     padding-bottom:calc(78px + env(safe-area-inset-bottom)) !important;
   }
   .ie-hero-eyebrow{
