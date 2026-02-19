@@ -39,7 +39,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 4rem 2rem;
+      padding: 2rem 2rem 3rem;
     }
 
     .hero-bg {
@@ -69,11 +69,13 @@
       position: relative;
       z-index: 10;
       width: 100%;
-      max-width: 1150px;
+      max-width: 1060px;
       display: grid;
       grid-template-columns: 1fr 1.1fr;
-      gap: 5rem;
-      align-items: center;
+      gap: 3rem;
+      align-items: start;
+      padding-top: calc(var(--ie-header-h, 110px) + env(safe-area-inset-top) + 20px);
+      padding-bottom: clamp(1rem, 3vh, 2.5rem);
     }
 
     .contact-card {
@@ -81,7 +83,10 @@
       border: 1px solid rgba(197,160,89,0.16);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
-      padding: 3.5rem;
+      width: 100%;
+      max-width: 620px;
+      margin-left: auto;
+      padding: 2.3rem;
       border-radius: 4px;
       box-shadow: 0 25px 55px rgba(0,0,0,0.45);
     }
@@ -213,7 +218,10 @@
     @media (max-width:1024px){
       .contact-wrapper {
         grid-template-columns: 1fr;
-        gap: 4rem;
+        gap: 2.4rem;
+        max-width: 740px;
+        margin: 0 auto;
+        padding-top: calc(var(--ie-header-h, 110px) + env(safe-area-inset-top) + 16px);
       }
 
       .contact-meta {
@@ -231,18 +239,25 @@
       }
 
       .contact-card {
-        padding: 2.5rem;
+        max-width: 100%;
+        margin-left: 0;
+        padding: 1.9rem;
       }
     }
 
     @media (max-width:768px){
       .contact-hero {
-        padding: 6rem 1.2rem;
+        padding: 1rem 1rem 2rem;
         align-items: flex-start;
       }
 
+      .contact-wrapper {
+        padding-top: calc(var(--ie-header-h, 110px) + env(safe-area-inset-top) + 12px);
+        gap: 1.5rem;
+      }
+
       .contact-card {
-        padding: 1.8rem;
+        padding: 1.25rem;
       }
       
       .field {
