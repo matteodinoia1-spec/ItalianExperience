@@ -36,9 +36,42 @@ input,textarea,select,button{font-size:16px}
   background:linear-gradient(to bottom, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 45%, rgba(0,0,0,0.0) 100%);
 }
 
+/* Shared hero system */
+.ie-hero-shell{
+  position:relative;
+  width:100%;
+  min-height:100vh;
+  min-height:100dvh;
+  overflow:hidden;
+  background:#000;
+}
+.ie-hero-offset{
+  padding-top:calc(var(--ie-header-h, 110px) + env(safe-area-inset-top) + 14px);
+}
+.ie-hero-bg-layer{
+  position:absolute;
+  inset:0;
+  z-index:0;
+}
+.ie-hero-overlay-layer{
+  position:absolute;
+  inset:0;
+  z-index:1;
+}
+.ie-hero-overlay-soft{
+  background:linear-gradient(to bottom, rgba(8,8,8,0.1) 0%, rgba(8,8,8,0.85) 100%);
+}
+.ie-hero-content-layer{
+  position:relative;
+  z-index:10;
+}
+
 @media (max-width:768px){
   .ie-global-top-blend{
     height:130px;
+  }
+  .ie-hero-offset{
+    padding-top:calc(var(--ie-header-h, 110px) + env(safe-area-inset-top) + 18px);
   }
 }
 

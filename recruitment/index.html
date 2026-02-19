@@ -25,8 +25,6 @@
     :root{ --ie-header-h: 120px; }
 
     .hero-recruitment{
-      padding-top: calc(var(--ie-header-h) + env(safe-area-inset-top) + 14px);
-      min-height: 100dvh;
       background:#000;
     }
 
@@ -126,7 +124,7 @@
 
   <div id="site-header"></div>
 
-  <section class="relative w-full overflow-hidden hero-recruitment">
+  <section class="relative w-full overflow-hidden hero-recruitment ie-hero-shell ie-hero-offset">
 
     <div class="absolute inset-0 z-0 recruitment-bg">
       <div id="bg-left" class="bg-half opacity-[0.28] md:border-r border-white/10 bg-cover bg-center transition-all duration-1000"
