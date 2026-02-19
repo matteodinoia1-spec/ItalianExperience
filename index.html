@@ -32,41 +32,74 @@
 
     .brand-font{font-family:'Playfair Display',serif}
 
-    .contact-quick-btn{
-      position:fixed;
-      top:calc(env(safe-area-inset-top, 0px) + 0.9rem);
-      right:calc(env(safe-area-inset-right, 0px) + 0.9rem);
+    .contact-desktop{
+      position:absolute;
+      top:3rem;
+      right:3rem;
       z-index:140;
-      display:inline-flex;
+      color:var(--brand-gold);
+      text-decoration:none;
+      text-transform:uppercase;
+      letter-spacing:0.3em;
+      font-size:0.75rem;
+      font-weight:500;
+      opacity:0.85;
+      transition:opacity 0.3s ease, transform 0.3s ease;
+    }
+    .contact-desktop::after{
+      content:"";
+      display:block;
+      width:0;
+      height:1px;
+      margin-top:0.45rem;
+      background:var(--brand-gold);
+      transition:width 0.3s ease;
+    }
+    .contact-desktop:hover{
+      opacity:1;
+      transform:translateY(-1px);
+    }
+    .contact-desktop:hover::after{
+      width:100%;
+    }
+    .contact-desktop:focus-visible{
+      outline:none;
+      opacity:1;
+    }
+    .contact-desktop:focus-visible::after{
+      width:100%;
+    }
+
+    .contact-mobile{
+      position:fixed;
+      top:calc(env(safe-area-inset-top, 0px) + 0.75rem);
+      right:calc(env(safe-area-inset-right, 0px) + 1rem);
+      z-index:140;
+      display:none;
       align-items:center;
       justify-content:center;
       min-height:44px;
-      padding:0.72rem 1.05rem;
-      border:1px solid rgba(197,160,89,0.82);
+      padding:0.8rem 1rem;
+      border:none;
       border-radius:2px;
-      background:rgba(0,0,0,0.42);
-      color:#f5e9d3;
+      background:#000;
+      color:var(--brand-gold);
       text-decoration:none;
       text-transform:uppercase;
-      letter-spacing:0.22em;
-      font-size:0.62rem;
+      letter-spacing:0.2em;
+      font-size:0.65rem;
       font-weight:700;
       line-height:1;
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
-      transition:background 0.22s ease, color 0.22s ease, transform 0.22s ease, border-color 0.22s ease;
+      transition:opacity 0.3s ease;
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
     }
-    .contact-quick-btn:hover{
-      background:var(--brand-gold);
-      color:#080808;
-      transform:translateY(-1px);
+    .contact-mobile:hover{
+      opacity:0.86;
     }
-    .contact-quick-btn:active{transform:translateY(0)}
-    .contact-quick-btn:focus-visible{
+    .contact-mobile:focus-visible{
       outline:none;
-      box-shadow:0 0 0 2px rgba(197,160,89,0.3),0 0 0 4px rgba(8,8,8,0.9);
+      box-shadow:0 0 0 2px rgba(197,160,89,0.35);
     }
 
     /* Reveal */
@@ -532,14 +565,13 @@
       .desktop-only{display:none}
       .mobile-only{display:block}
       .scroll-indicator{display:none}
-      .contact-quick-btn{
-        top:calc(env(safe-area-inset-top, 0px) + 0.65rem);
-        right:calc(env(safe-area-inset-right, 0px) + 0.65rem);
-        min-height:46px;
-        padding:0.78rem 0.92rem;
-        font-size:0.56rem;
-        letter-spacing:0.18em;
-      }
+      .contact-desktop{display:none}
+      .contact-mobile{display:inline-flex}
+    }
+
+    @media (min-width:769px){
+      .contact-desktop{display:inline-block}
+      .contact-mobile{display:none}
     }
 
     @media (max-width:420px){
@@ -557,7 +589,7 @@
 
 <body>
 
-  <a href="./contact/index.html" target="_top" class="contact-quick-btn" aria-label="Go to contact page">Contact</a>
+  <a href="./contact/index.html" target="_top" class="contact-mobile" aria-label="Go to contact page">Contact</a>
 
   <!-- DESKTOP -->
   <div class="desktop-only">
@@ -577,6 +609,8 @@
           </div>
         </a>
       </div>
+
+      <a href="./contact/index.html" target="_top" class="contact-desktop" aria-label="Go to contact page">Contact</a>
 
       <a href="./travel/" target="_top" class="portal-pillar">
         <div class="pillar-bg">
