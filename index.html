@@ -32,6 +32,43 @@
 
     .brand-font{font-family:'Playfair Display',serif}
 
+    .contact-quick-btn{
+      position:fixed;
+      top:calc(env(safe-area-inset-top, 0px) + 0.9rem);
+      right:calc(env(safe-area-inset-right, 0px) + 0.9rem);
+      z-index:140;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:44px;
+      padding:0.72rem 1.05rem;
+      border:1px solid rgba(197,160,89,0.82);
+      border-radius:2px;
+      background:rgba(0,0,0,0.42);
+      color:#f5e9d3;
+      text-decoration:none;
+      text-transform:uppercase;
+      letter-spacing:0.22em;
+      font-size:0.62rem;
+      font-weight:700;
+      line-height:1;
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      transition:background 0.22s ease, color 0.22s ease, transform 0.22s ease, border-color 0.22s ease;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .contact-quick-btn:hover{
+      background:var(--brand-gold);
+      color:#080808;
+      transform:translateY(-1px);
+    }
+    .contact-quick-btn:active{transform:translateY(0)}
+    .contact-quick-btn:focus-visible{
+      outline:none;
+      box-shadow:0 0 0 2px rgba(197,160,89,0.3),0 0 0 4px rgba(8,8,8,0.9);
+    }
+
     /* Reveal */
     .reveal{opacity:0;transform:translateY(18px);transition:opacity 650ms ease,transform 900ms cubic-bezier(0.2,1,0.3,1)}
     .reveal.active{opacity:1;transform:translateY(0)}
@@ -495,6 +532,14 @@
       .desktop-only{display:none}
       .mobile-only{display:block}
       .scroll-indicator{display:none}
+      .contact-quick-btn{
+        top:calc(env(safe-area-inset-top, 0px) + 0.65rem);
+        right:calc(env(safe-area-inset-right, 0px) + 0.65rem);
+        min-height:46px;
+        padding:0.78rem 0.92rem;
+        font-size:0.56rem;
+        letter-spacing:0.18em;
+      }
     }
 
     @media (max-width:420px){
@@ -511,6 +556,8 @@
 </head>
 
 <body>
+
+  <a href="./contact/index.html" target="_top" class="contact-quick-btn" aria-label="Go to contact page">Contact</a>
 
   <!-- DESKTOP -->
   <div class="desktop-only">
@@ -840,13 +887,20 @@ STRATEGIC ADVISORY</p>
       initLogoMouse('logo-footer');
 
       // Mobile touch logo effect
+      function getEventClientX(e) {
+        if (e.touches && e.touches[0]) return e.touches[0].clientX;
+        if (e.changedTouches && e.changedTouches[0]) return e.changedTouches[0].clientX;
+        if (typeof e.clientX === 'number') return e.clientX;
+        return null;
+      }
+
       function handleLogoEffect(e, trigger) {
         const logoId = trigger.getAttribute('data-logo-id');
         const logo = document.getElementById(logoId);
         if (!logo) return;
 
         const rect = logo.getBoundingClientRect();
-        const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : null;
+        const clientX = getEventClientX(e);
         if (clientX == null) return;
 
         const x = clientX - rect.left;
@@ -901,6 +955,11 @@ STRATEGIC ADVISORY</p>
         trigger.addEventListener('touchstart', (e) => handleLogoEffect(e, trigger), { passive: true });
         trigger.addEventListener('touchmove', (e) => handleLogoEffect(e, trigger), { passive: true });
         trigger.addEventListener('touchend', () => resetLogo(trigger), { passive: true });
+        trigger.addEventListener('pointerdown', (e) => handleLogoEffect(e, trigger), { passive: true });
+        trigger.addEventListener('pointermove', (e) => handleLogoEffect(e, trigger), { passive: true });
+        trigger.addEventListener('pointerup', () => resetLogo(trigger), { passive: true });
+        trigger.addEventListener('pointercancel', () => resetLogo(trigger), { passive: true });
+        trigger.addEventListener('mouseleave', () => resetLogo(trigger), { passive: true });
       });
 
       // Parallax (desktop only)
