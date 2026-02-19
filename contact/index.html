@@ -24,203 +24,246 @@
   <meta name="twitter:image" content="https://www.italianexp.com/assets/preview.jpg" />
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="../assets/css/site.css" />
+  <!-- <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" /> -->
 
   <style>
-    .brand-font{font-family:'Playfair Display',serif}
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
 
-    .contact-hero{
-      width:100%;
-      height:100vh;
-      height:100dvh;
-      position:relative;
-      overflow:hidden;
-      background:#000;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:0 2rem;
+    :root {
+      --brand-gold: #c5a059;
     }
 
-    .hero-bg{
-      position:absolute;
-      inset:0;
-      background-image:url("https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=2200&q=80");
-      background-size:cover;
-      background-position:center;
-      filter:brightness(0.28) contrast(1.15);
-      transform:scale(1.03);
-      z-index:0;
+    body {
+      font-family: 'Inter', sans-serif; /* Fallback if site.css isn't loaded */
     }
 
-    .hero-overlay{
-      position:absolute;
-      inset:0;
-      background:linear-gradient(
+    .brand-font { font-family: 'Playfair Display', serif; }
+
+    .contact-hero {
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url("https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=2200&q=80");
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.28) contrast(1.15);
+      transform: scale(1.03);
+      z-index: 0;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
         to bottom,
         rgba(8,8,8,0.88) 0%,
         rgba(8,8,8,0.55) 55%,
         rgba(8,8,8,0.92) 100%
       );
-      z-index:1;
+      z-index: 1;
     }
 
-    .contact-wrapper{
-      position:relative;
-      z-index:10;
-      width:100%;
-      max-width:1150px;
-      display:grid;
-      grid-template-columns:1fr 1.1fr;
-      gap:4rem;
-      align-items:center;
+    .contact-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 1150px;
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 5rem;
+      align-items: center;
     }
 
-    .contact-card{
-      background:rgba(255,255,255,0.02);
-      border:1px solid rgba(197,160,89,0.16);
-      backdrop-filter:blur(18px);
-      -webkit-backdrop-filter:blur(18px);
-      padding:3rem;
-      border-radius:4px;
-      box-shadow:0 25px 55px rgba(0,0,0,0.45);
+    .contact-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(197,160,89,0.16);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      padding: 3.5rem;
+      border-radius: 4px;
+      box-shadow: 0 25px 55px rgba(0,0,0,0.45);
     }
 
-    .field{
-      width:100%;
-      padding:0.95rem 1.1rem;
-      background:rgba(255,255,255,0.02);
-      border:1px solid rgba(255,255,255,0.12);
-      color:#fff;
-      outline:none;
-      font-size:0.9rem;
-      transition:all 0.25s ease;
+    /* --- FIELD STYLES --- */
+    .field {
+      width: 100%;
+      padding: 1.2rem 1.25rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff;
+      outline: none;
+      font-size: 1rem;
+      transition: all 0.25s ease;
+      border-radius: 2px;
     }
 
-    .field:focus{
-      border-color:rgba(197,160,89,0.85);
-      box-shadow:0 0 0 3px rgba(197,160,89,0.12);
+    .field::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+      font-weight: 300;
     }
 
-    select.field{
-      appearance:none;
-      -webkit-appearance:none;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23c5a059' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
-      background-repeat:no-repeat;
-      background-position:right 1rem center;
-      background-size:18px;
-      padding-right:3rem;
+    .field:focus {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(197,160,89,0.85);
+      box-shadow: 0 0 0 1px rgba(197,160,89,0.12);
     }
 
-    textarea.field{
-      min-height:140px;
-      resize:none;
-      line-height:1.6;
+    select.field {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23c5a059' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1.2rem center;
+      background-size: 18px;
+      padding-right: 3rem;
+      color: rgba(255,255,255,0.9);
+    }
+    
+    select.field option {
+      background-color: #1a1a1a;
+      color: white;
+      padding: 10px;
     }
 
-    .btn-gold{
-      display:inline-block;
-      width:100%;
-      padding:1.05rem 1.2rem;
-      text-align:center;
-      border:1px solid var(--brand-gold);
-      color:var(--brand-gold);
-      font-weight:700;
-      text-transform:uppercase;
-      font-size:0.7rem;
-      letter-spacing:0.35em;
-      transition:all 0.45s ease;
-      background:transparent;
+    textarea.field {
+      min-height: 160px;
+      resize: none;
+      line-height: 1.6;
     }
 
-    .btn-gold:hover{
-      background:var(--brand-gold);
-      color:#080808;
-      transform:translateY(-2px);
+    .input-label {
+      display: block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: #94a3b8;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
     }
 
-    .contact-meta{
-      border-left:1px solid rgba(197,160,89,0.22);
-      padding-left:2.5rem;
+    .btn-gold {
+      display: inline-block;
+      width: 100%;
+      padding: 1.25rem 1.2rem;
+      text-align: center;
+      border: 1px solid var(--brand-gold);
+      color: var(--brand-gold);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.35em;
+      transition: all 0.45s ease;
+      background: transparent;
+      margin-top: 1rem;
+      cursor: pointer;
     }
 
-    .contact-meta small{
-      font-size:0.6rem;
-      letter-spacing:0.45em;
-      text-transform:uppercase;
-      color:rgba(255,255,255,0.55);
-      display:block;
-      margin-bottom:1rem;
+    .btn-gold:hover {
+      background: var(--brand-gold);
+      color: #080808;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px -5px rgba(197, 160, 89, 0.3);
     }
 
-    .contact-meta h1{
-      font-size:clamp(2.3rem, 4vw, 4.2rem);
-      line-height:1.05;
-      margin-bottom:1.5rem;
-      color:#fff;
+    .contact-meta {
+      border-left: 1px solid rgba(197,160,89,0.22);
+      padding-left: 3rem;
     }
 
-    .contact-meta p{
-      color:rgba(255,255,255,0.65);
-      font-size:1rem;
-      line-height:1.85;
-      font-weight:300;
-      max-width:520px;
+    .contact-meta small {
+      font-size: 0.6rem;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      display: block;
+      margin-bottom: 1rem;
     }
 
-    .contact-meta .gold-line{
-      width:70px;
-      height:1px;
-      background:var(--brand-gold);
-      margin:1.8rem 0;
-      opacity:0.6;
+    .contact-meta h1 {
+      font-size: clamp(2.5rem, 4vw, 4.5rem);
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      color: #fff;
     }
 
-    .contact-footnote{
-      margin-top:2rem;
-      font-size:0.65rem;
-      text-transform:uppercase;
-      letter-spacing:0.2em;
-      color:rgba(255,255,255,0.35);
-      line-height:1.8;
+    .contact-meta p {
+      color: rgba(255,255,255,0.7);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      font-weight: 300;
+      max-width: 520px;
+    }
+
+    .contact-meta .gold-line {
+      width: 80px;
+      height: 1px;
+      background: var(--brand-gold);
+      margin: 2rem 0;
+      opacity: 0.6;
+    }
+
+    .contact-footnote {
+      margin-top: 2.5rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.35);
+      line-height: 1.8;
     }
 
     @media (max-width:1024px){
-      .contact-wrapper{
-        grid-template-columns:1fr;
-        gap:2.8rem;
+      .contact-wrapper {
+        grid-template-columns: 1fr;
+        gap: 4rem;
       }
 
-      .contact-meta{
-        border-left:none;
-        padding-left:0;
-        text-align:center;
+      .contact-meta {
+        border-left: none;
+        padding-left: 0;
+        text-align: center;
       }
 
-      .contact-meta p{
-        margin:0 auto;
+      .contact-meta p {
+        margin: 0 auto;
       }
 
-      .contact-meta .gold-line{
-        margin:1.8rem auto;
+      .contact-meta .gold-line {
+        margin: 2rem auto;
       }
 
-      .contact-card{
-        padding:2.2rem;
+      .contact-card {
+        padding: 2.5rem;
       }
     }
 
     @media (max-width:768px){
-      .contact-hero{
-        padding:0 1.2rem;
+      .contact-hero {
+        padding: 6rem 1.2rem;
+        align-items: flex-start;
       }
 
-      .contact-card{
-        padding:1.8rem;
+      .contact-card {
+        padding: 1.8rem;
+      }
+      
+      .field {
+        padding: 1rem 1rem;
       }
 
-      textarea.field{
-        min-height:130px;
+      textarea.field {
+        min-height: 140px;
       }
     }
   </style>
@@ -254,7 +297,7 @@
 
           <div class="contact-footnote">
             Premium inquiries only <br />
-            
+             
           </div>
         </div>
 
@@ -271,67 +314,61 @@
             <input type="hidden" name="zf_redirect_url" value="" />
             <input type="hidden" name="zc_gad" value="" />
             
-            <div class="grid md:grid-cols-2 gap-5 mb-5">
+            <!-- ROW 1: Name (Split) -->
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
-                  First Name
-                </label>
-                <input type="text" name="Name_First" maxlength="255" class="field" placeholder="First name" required />
+                <label class="input-label">First Name</label>
+                <input type="text" name="Name_First" maxlength="255" class="field" placeholder="First Name" required />
               </div>
 
               <div>
-                <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
-                  Last Name
-                </label>
-                <input type="text" name="Name_Last" maxlength="255" class="field" placeholder="Last name" required />
+                <label class="input-label">Last Name</label>
+                <input type="text" name="Name_Last" maxlength="255" class="field" placeholder="Last Name" required />
               </div>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-5 mb-5">
+            <!-- ROW 2: Who Are You (Full Width) -->
+            <div class="mb-6">
+              <label class="input-label">Who are you?</label>
+              <select name="Dropdown" class="field w-full" required>
+                <option value="-Select-" selected disabled>- Select -</option>
+                <option value="General information">General Information</option>
+                <option value="Bespoke Travel &amp; Experiences">Bespoke Travel and Experiences</option>
+                <option value="Business &amp; Partnerships">Business and Partnerships</option>
+                <option value="Press &amp; Media">Press and Media</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <!-- ROW 3: Email (Full Width) -->
+            <div class="mb-6">
+              <label class="input-label">Email (Required)</label>
+              <input type="email" name="Email" maxlength="255" class="field w-full" placeholder="you@example.com" required />
+            </div>
+
+            <!-- ROW 4: Phone (Split: Small Prefix / Large Number) -->
+            <div class="grid grid-cols-[130px_1fr] gap-4 mb-6">
               <div>
-                <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
-                  Who are you?
-                </label>
-                <select name="Dropdown" class="field" required>
-                  <option value="-Select-" selected>-Select-</option>
-                  <option value="General information">General Information</option>
-                  <option value="Bespoke Travel &amp; Experiences">Bespoke Travel and Experiences</option>
-                  <option value="Business &amp; Partnerships">Business and Partnerships</option>
-                  <option value="Press &amp; Media">Press and Media</option>
-                  <option value="Other">Other</option>
+                <label class="input-label">Prefix</label>
+                <select
+                  name="PhoneNumber_countrycode"
+                  class="field"
+                  id="international_PhoneNumber_countrycode"
+                  required
+                >
+                  <option value="+1" selected>🇺🇸 +1</option>
+                  <option value="+39">🇮🇹 +39</option>
+                  <option value="+44">🇬🇧 +44</option>
+                  <option value="+33">🇫🇷 +33</option>
+                  <option value="+49">🇩🇪 +49</option>
+                  <option value="+971">🇦🇪 +971</option>
+                  <option value="+86">🇨🇳 +86</option>
+                  <option value="">Other</option>
                 </select>
               </div>
 
               <div>
-                <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
-                  Email (Required)
-                </label>
-                <input type="email" name="Email" maxlength="255" class="field" placeholder="you@example.com" required />
-              </div>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-5 mb-5">
-              <div>
-                <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
-                  Phone Prefix
-                </label>
-                <input
-                  type="text"
-                  class="field"
-                  name="PhoneNumber_countrycode"
-                  compname="PhoneNumber"
-                  phoneFormat="1"
-                  id="international_PhoneNumber_countrycode"
-                  maxlength="20"
-                  placeholder="+39"
-                  required
-                />
-              </div>
-
-              <div>
-                <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
-                  Phone Number
-                </label>
+                <label class="input-label">Phone Number</label>
                 <input
                   type="text"
                   class="field"
@@ -339,18 +376,16 @@
                   compname="PhoneNumber_countrycodeval"
                   phoneFormat="1"
                   id="international_PhoneNumber_countrycodeval"
-                  maxlength="10"
-                  placeholder="3331234567"
+                  maxlength="20"
+                  placeholder="333 123 4567"
                   required
                 />
               </div>
             </div>
 
             <div class="mb-8">
-              <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
-                How can we assist you today?
-              </label>
-              <textarea name="MultiLine" maxlength="65535" class="field" placeholder="Write your request here..." required></textarea>
+              <label class="input-label">How can we assist you today?</label>
+              <textarea name="MultiLine" maxlength="65535" class="field" placeholder="Please describe your request..." required></textarea>
             </div>
 
             <button type="submit" class="btn-gold">
@@ -387,14 +422,26 @@
       }
 
       Promise.all([
-        fetch("../partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
-        fetch("../partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
+        fetch(base + "/partials/header.html").then(r => { 
+            // Silent fail for demo if partials missing
+            if (!r.ok) return ""; 
+            return r.text(); 
+        }),
+        fetch(base + "/partials/footer.html").then(r => { 
+            if (!r.ok) return ""; 
+            return r.text(); 
+        })
       ]).then(async ([h, f]) => {
-        inject(headerMount, h);
-        inject(footerMount, f);
+        if(headerMount) inject(headerMount, h);
+        if(footerMount) inject(footerMount, f);
 
-        await loadScript("../assets/js/site.js");
-        if (window.IEInit) window.IEInit(document);
+        // Try load JS
+        try {
+            await loadScript(base + "/assets/js/site.js");
+            if (window.IEInit) window.IEInit(document);
+        } catch(e) {
+            console.log("Site JS not loaded (expected in preview)");
+        }
       }).catch(err => console.error(err));
     })();
   </script>
