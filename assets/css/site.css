@@ -26,14 +26,20 @@ input,textarea,select,button{font-size:16px}
 
 /* Global top blend band under the fixed header */
 .ie-global-top-blend{
-  position:fixed;
+  position:absolute;
   top:0;
   left:0;
   right:0;
   height:110px;
-  z-index:9998;
+  z-index:12;
   pointer-events:none;
   background:linear-gradient(to bottom, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 45%, rgba(0,0,0,0.0) 100%);
+}
+
+@media (max-width:768px){
+  .ie-global-top-blend{
+    height:130px;
+  }
 }
 
 /* HEADER GLASS */
