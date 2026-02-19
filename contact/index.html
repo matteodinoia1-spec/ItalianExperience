@@ -25,6 +25,8 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.2/build/css/intlTelInput.css" />
+  <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.2/build/js/intlTelInput.min.js"></script>
 
   <style>
     .brand-font { font-family: 'Playfair Display', serif; }
@@ -147,6 +149,54 @@
       margin-bottom: 0.75rem;
       font-weight: 600;
     }
+
+    .input-label.is-required::after {
+      content: " *";
+      color: var(--brand-gold);
+      letter-spacing: 0.1em;
+    }
+
+    .contact-intl .iti { width: 100%; }
+    .contact-intl .iti__selected-country {
+      height: 100%;
+      padding: 0 0.55rem 0 0.6rem;
+      background: rgba(255,255,255,0.03);
+      border-right: 1px solid rgba(255,255,255,0.14);
+    }
+    .contact-intl .iti__selected-country-primary {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .contact-intl .iti__selected-dial-code {
+      margin-left: 0;
+      font-size: 0.98rem;
+      color: rgba(255,255,255,0.95);
+    }
+    .contact-intl .iti__country-list {
+      background: #111;
+      border: 1px solid rgba(197,160,89,0.24);
+      color: #fff;
+    }
+    .contact-intl .iti__country.iti__highlight {
+      background: rgba(197,160,89,0.18);
+    }
+
+    .contact-success {
+      display: none;
+      margin-top: 0.8rem;
+      border: 1px solid rgba(197,160,89,0.35);
+      background: rgba(197,160,89,0.08);
+      color: #f8f3e8;
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.9rem 1rem;
+      text-align: center;
+    }
+
+    .contact-success.is-visible { display: block; }
 
     .btn-gold {
       display: inline-block;
@@ -304,90 +354,59 @@
         </div>
 
         <div class="contact-card">
-
           <form
             id="contactForm"
             method="POST"
-            action="https://forms.zohopublic.com/italianrecruitment/form/Contactus1/formperma/tQiH2syGzKN5IPbkQnBj_k6qrzcs9VFhwhEodrWISvw/htmlRecords/submit"
+            action="https://forms.zohopublic.com/italianrecruitment/form/ItalianExperience/formperma/dSUYWQws7Sq0pF8lp6bSn-L3IVYXlfjJkrN7lkFScAM/htmlRecords/submit"
             accept-charset="UTF-8"
             enctype="multipart/form-data"
+            target="zoho-contact-submit-frame"
           >
             <input type="hidden" name="zf_referrer_name" value="" />
             <input type="hidden" name="zf_redirect_url" value="" />
             <input type="hidden" name="zc_gad" value="" />
+            <input type="hidden" name="Dropdown" value="Concatc us" />
+            <input type="hidden" name="PhoneNumber_countrycode" id="contact-phone-hidden" />
             
-            <!-- ROW 1: Name (Split) -->
             <div class="grid md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label class="input-label">First Name</label>
+                <label class="input-label is-required">First Name</label>
                 <input type="text" name="Name_First" maxlength="255" class="field" placeholder="First Name" required />
               </div>
 
               <div>
-                <label class="input-label">Last Name</label>
+                <label class="input-label is-required">Last Name</label>
                 <input type="text" name="Name_Last" maxlength="255" class="field" placeholder="Last Name" required />
               </div>
             </div>
 
-            <!-- ROW 2: Who Are You (Full Width) -->
             <div class="mb-6">
-              <label class="input-label">Who are you?</label>
-              <select name="Dropdown" class="field w-full" required>
-                <option value="-Select-" selected disabled>- Select -</option>
-                <option value="General information">General Information</option>
-                <option value="Bespoke Travel &amp; Experiences">Bespoke Travel and Experiences</option>
-                <option value="Business &amp; Partnerships">Business and Partnerships</option>
-                <option value="Press &amp; Media">Press and Media</option>
+              <label class="input-label is-required">Topic</label>
+              <select name="Dropdown6" class="field w-full" required>
+                <option value="" selected>Select topic</option>
+                <option value="General Information">General Information</option>
+                <option value="Bespoke Travel and Experience">Bespoke Travel and Experience</option>
+                <option value="Business and Partnerships">Business and Partnerships</option>
+                <option value="Press and Media">Press and Media</option>
                 <option value="Other">Other</option>
               </select>
             </div>
 
-            <!-- ROW 3: Email (Full Width) -->
             <div class="mb-6">
-              <label class="input-label">Email (Required)</label>
+              <label class="input-label is-required">Email</label>
               <input type="email" name="Email" maxlength="255" class="field w-full" placeholder="you@example.com" required />
             </div>
 
-            <!-- ROW 4: Phone (Split: Small Prefix / Large Number) -->
-            <div class="grid grid-cols-[130px_1fr] gap-4 mb-6">
-              <div>
-                <label class="input-label">Prefix</label>
-                <select
-                  name="PhoneNumber_countrycode"
-                  class="field"
-                  id="international_PhoneNumber_countrycode"
-                  required
-                >
-                  <option value="+1" selected>🇺🇸 +1</option>
-                  <option value="+39">🇮🇹 +39</option>
-                  <option value="+44">🇬🇧 +44</option>
-                  <option value="+33">🇫🇷 +33</option>
-                  <option value="+49">🇩🇪 +49</option>
-                  <option value="+971">🇦🇪 +971</option>
-                  <option value="+86">🇨🇳 +86</option>
-                  <option value="">Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="input-label">Phone Number</label>
-                <input
-                  type="text"
-                  class="field"
-                  name="PhoneNumber_countrycodeval"
-                  compname="PhoneNumber_countrycodeval"
-                  phoneFormat="1"
-                  id="international_PhoneNumber_countrycodeval"
-                  maxlength="20"
-                  placeholder="333 123 4567"
-                  required
-                />
+            <div class="mb-6">
+              <label class="input-label is-required">Phone Number</label>
+              <div class="contact-intl">
+                <input type="tel" class="field" id="contact-phone" maxlength="30" placeholder="Phone number" required />
               </div>
             </div>
 
             <div class="mb-8">
-              <label class="input-label">How can we assist you today?</label>
-              <textarea name="MultiLine" maxlength="65535" class="field" placeholder="Please describe your request..." required></textarea>
+              <label class="input-label is-required">How can we assist you today?</label>
+              <textarea name="MultiLine7" maxlength="65535" class="field" placeholder="Please describe your request..." required></textarea>
             </div>
 
             <button type="submit" class="btn-gold">
@@ -395,6 +414,8 @@
             </button>
 
           </form>
+          <div class="contact-success" id="contact-success-msg">Thank you for your submission.</div>
+          <iframe title="Zoho contact submit frame" name="zoho-contact-submit-frame" style="display:none;"></iframe>
 
         </div>
 
@@ -434,6 +455,56 @@
         await loadScript(base + "/assets/js/site.js");
         if (window.IEInit) window.IEInit(document);
       }).catch(err => console.error(err));
+    })();
+  </script>
+
+  <script>
+    (function () {
+      const form = document.getElementById("contactForm");
+      if (!form) return;
+
+      const phoneInput = document.getElementById("contact-phone");
+      const phoneHidden = document.getElementById("contact-phone-hidden");
+      const successMsg = document.getElementById("contact-success-msg");
+      const frame = document.querySelector('iframe[name="zoho-contact-submit-frame"]');
+      const iti = phoneInput && window.intlTelInput ? window.intlTelInput(phoneInput, {
+        initialCountry: "us",
+        separateDialCode: true,
+        preferredCountries: ["us", "it", "gb", "fr", "de", "es"],
+        loadUtils: () => import("https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.2/build/js/utils.js")
+      }) : null;
+      let submitted = false;
+
+      function syncPhone() {
+        if (!phoneHidden || !phoneInput) return;
+        const rawPhone = phoneInput.value ? phoneInput.value.trim() : "";
+        if (!rawPhone) {
+          phoneHidden.value = "";
+          return;
+        }
+        phoneHidden.value = iti ? (iti.getNumber() || "") : rawPhone;
+      }
+
+      if (phoneInput) {
+        phoneInput.addEventListener("input", syncPhone);
+        phoneInput.addEventListener("countrychange", syncPhone);
+      }
+
+      form.addEventListener("submit", function () {
+        submitted = true;
+        syncPhone();
+      });
+
+      if (frame) {
+        frame.addEventListener("load", function () {
+          if (!submitted || !successMsg) return;
+          successMsg.classList.add("is-visible");
+          form.reset();
+          if (iti) iti.setCountry("us");
+          syncPhone();
+          submitted = false;
+        });
+      }
     })();
   </script>
 

@@ -25,6 +25,8 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.2/build/css/intlTelInput.css" />
+  <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.2/build/js/intlTelInput.min.js"></script>
 
   <style>
     .brand-font{font-family:'Playfair Display',serif}
@@ -171,6 +173,50 @@
       letter-spacing:0.12em;
     }
 
+    .hero-form-cta{
+      margin-top:1.5rem;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(197,160,89,0.8);
+      color:#f8f3e8;
+      text-transform:uppercase;
+      letter-spacing:0.24em;
+      font-size:0.62rem;
+      font-weight:700;
+      padding:0.9rem 1.1rem;
+      transition:all .25s ease;
+      pointer-events:auto;
+      background:rgba(0,0,0,0.22);
+    }
+
+    .hero-form-cta:hover{background:var(--brand-gold); color:#080808; transform:translateY(-1px)}
+
+    .service-contact{position:relative; padding:6.5rem 1.25rem 7rem; background:radial-gradient(circle at 10% 10%, rgba(197,160,89,0.12), transparent 40%), #080808; border-top:1px solid rgba(197,160,89,0.15)}
+    .service-contact-shell{max-width:980px; margin:0 auto; display:grid; grid-template-columns:0.9fr 1.1fr; gap:2.25rem; align-items:start}
+    .service-contact-meta{padding-right:1rem; border-right:1px solid rgba(197,160,89,0.2)}
+    .service-contact-card{background:rgba(255,255,255,0.02); border:1px solid rgba(197,160,89,0.18); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:4px; padding:1.5rem; box-shadow:0 20px 40px rgba(0,0,0,0.35)}
+    .service-grid{display:grid; grid-template-columns:1fr 1fr; gap:1rem}
+    .service-full{grid-column:1 / -1}
+    .service-label{display:block; margin-bottom:0.45rem; font-size:0.64rem; letter-spacing:0.24em; text-transform:uppercase; color:#9ca3af; font-weight:600}
+    .service-label.is-required::after{content:" *"; color:var(--brand-gold); letter-spacing:0.1em}
+    .service-field{width:100%; padding:0.95rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.16); border-radius:2px; color:#fff; font-size:0.95rem; outline:none; transition:border-color .2s ease, box-shadow .2s ease, background .2s ease}
+    .service-field:focus{border-color:rgba(197,160,89,0.85); box-shadow:0 0 0 1px rgba(197,160,89,0.15); background:rgba(255,255,255,0.06)}
+    .service-field::placeholder{color:rgba(255,255,255,0.45)}
+    .service-select{appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23c5a059' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 0.9rem center; background-size:14px; padding-right:2.1rem}
+    .service-intl .iti{width:100%}
+    .service-intl .iti__selected-country{height:100%; padding:0 0.55rem 0 0.6rem; background:rgba(255,255,255,0.03); border-right:1px solid rgba(255,255,255,0.14)}
+    .service-intl .iti__selected-country-primary{height:100%; display:flex; align-items:center; gap:0.45rem}
+    .service-intl .iti__selected-dial-code{margin-left:0; font-size:0.98rem; color:rgba(255,255,255,0.95)}
+    .service-intl .iti__arrow{margin-left:0.25rem}
+    .service-intl .iti__country-list{background:#111; border:1px solid rgba(197,160,89,0.24); color:#fff}
+    .service-intl .iti__country.iti__highlight{background:rgba(197,160,89,0.18)}
+    .service-textarea{min-height:145px; resize:vertical; line-height:1.6}
+    .service-btn{width:100%; margin-top:0.25rem; border:1px solid var(--brand-gold); color:var(--brand-gold); background:transparent; text-transform:uppercase; letter-spacing:0.3em; font-size:0.68rem; font-weight:700; padding:1rem 1.1rem; transition:all .3s ease; cursor:pointer}
+    .service-btn:hover{background:var(--brand-gold); color:#080808; transform:translateY(-1px)}
+    .service-success{display:none; margin-top:0.8rem; border:1px solid rgba(197,160,89,0.35); background:rgba(197,160,89,0.08); color:#f8f3e8; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; padding:0.9rem 1rem; text-align:center}
+    .service-success.is-visible{display:block}
+
     @media (max-width:1024px){
       .hero-bg-estates{
         filter:brightness(0.6) contrast(1.1);
@@ -184,6 +230,17 @@
           rgba(0,0,0,0.12) 100%
         );
       }
+    }
+
+    @media (max-width:960px){
+      .service-contact-shell{grid-template-columns:1fr; gap:1.5rem}
+      .service-contact-meta{border-right:none; padding-right:0; text-align:center}
+    }
+
+    @media (max-width:640px){
+      .service-contact{padding:4.75rem 1rem 5rem}
+      .service-contact-card{padding:1rem}
+      .service-grid{grid-template-columns:1fr; gap:0.85rem}
     }
 
   </style>
@@ -215,6 +272,7 @@
           Strategic advisory for the acquisition of prestigious Italian real estate. We navigate legal frameworks,
           fiscal structures, and cultural value to protect your long-term investment.
         </p>
+        <a class="hero-form-cta" href="#estates-contact" aria-label="Go to contact form">Contact Form</a>
       </div>
 
       <a href="#framework" class="explore-indicator" aria-label="Explore the strategy">
@@ -336,6 +394,73 @@
       </div>
     </section>
 
+    <section id="estates-contact" class="service-contact" aria-label="Estates contact form">
+      <div class="service-contact-shell">
+        <div class="service-contact-meta">
+          <span class="text-[#c5a059] uppercase tracking-[0.55em] text-[0.58rem] font-bold block mb-4">Contact Advisory</span>
+          <h2 class="text-4xl md:text-5xl brand-font italic text-white leading-tight mb-6">Start Your Estates Strategy.</h2>
+          <p class="text-slate-400 leading-relaxed text-sm md:text-base max-w-[36ch]">Share your acquisition target and investment horizon. We will design a compliant and strategic entry path.</p>
+        </div>
+        <div class="service-contact-card">
+          <form action="https://forms.zohopublic.com/italianrecruitment/form/ItalianExperience/formperma/dSUYWQws7Sq0pF8lp6bSn-L3IVYXlfjJkrN7lkFScAM/htmlRecords/submit" id="estates-form" method="POST" accept-charset="UTF-8" enctype="multipart/form-data" target="zoho-estates-submit-frame">
+            <input type="hidden" name="zf_referrer_name" value="Estates Page">
+            <input type="hidden" name="zf_redirect_url" value="">
+            <input type="hidden" name="zc_gad" value="">
+            <input type="hidden" name="Dropdown" value="Estates">
+            <input type="hidden" name="PhoneNumber_countrycode" id="estates-phone-hidden">
+            <div class="service-grid">
+              <div>
+                <label class="service-label is-required" for="estates-name-first">First Name</label>
+                <input class="service-field" id="estates-name-first" type="text" name="Name_First" maxlength="255" required>
+              </div>
+              <div>
+                <label class="service-label is-required" for="estates-name-last">Last Name</label>
+                <input class="service-field" id="estates-name-last" type="text" name="Name_Last" maxlength="255" required>
+              </div>
+              <div>
+                <label class="service-label is-required" for="estates-email">E-mail</label>
+                <input class="service-field" id="estates-email" type="email" name="Email" maxlength="255" required>
+              </div>
+              <div>
+                <label class="service-label is-required" for="estates-phone">Phone</label>
+                <div class="service-intl">
+                  <input class="service-field" id="estates-phone" type="tel" maxlength="30" placeholder="Phone number" required>
+                </div>
+              </div>
+              <div>
+                <label class="service-label is-required" for="estates-range">Target Investment Range</label>
+                <input class="service-field" id="estates-range" type="text" name="SingleLine7" maxlength="255" required>
+              </div>
+              <div>
+                <label class="service-label is-required" for="estates-category">Preferred Asset Category</label>
+                <select class="service-field service-select" id="estates-category" name="Dropdown5" required>
+                  <option value="">Select category</option>
+                  <option value="Private luxury villa">Private luxury villa</option>
+                  <option value="Historic palazzo">Historic palazzo</option>
+                  <option value="Vineyard & Winery">Vineyard & Winery</option>
+                  <option value="Investment Portfolio">Investment Portfolio</option>
+                  <option value="Coastal Estate">Coastal Estate</option>
+                </select>
+              </div>
+              <div class="service-full">
+                <label class="service-label is-required" for="estates-timeline">Expected Acquisition Timeline</label>
+                <input class="service-field" id="estates-timeline" type="text" name="SingleLine8" maxlength="255" required>
+              </div>
+              <div class="service-full">
+                <label class="service-label is-required" for="estates-goals">Describe Your Investment Goals</label>
+                <textarea class="service-field service-textarea" id="estates-goals" name="MultiLine6" maxlength="65535" required></textarea>
+              </div>
+              <div class="service-full">
+                <button class="service-btn" type="submit">Submit Request</button>
+              </div>
+            </div>
+          </form>
+          <div class="service-success" id="estates-success-msg">Thank you for your submission.</div>
+          <iframe title="Zoho estates submit frame" name="zoho-estates-submit-frame" style="display:none;"></iframe>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <div id="site-footer"></div>
@@ -369,6 +494,55 @@
         await loadScript(base + "/assets/js/site.js");
         if (window.IEInit) window.IEInit(document);
       }).catch(err => console.error(err));
+    })();
+  </script>
+
+  <script>
+    (function () {
+      const form = document.getElementById("estates-form");
+      if (!form) return;
+      const phoneInput = document.getElementById("estates-phone");
+      const phoneHidden = document.getElementById("estates-phone-hidden");
+      const successMsg = document.getElementById("estates-success-msg");
+      const frame = document.querySelector('iframe[name="zoho-estates-submit-frame"]');
+      const iti = phoneInput && window.intlTelInput ? window.intlTelInput(phoneInput, {
+        initialCountry: "us",
+        separateDialCode: true,
+        preferredCountries: ["us", "it", "gb", "fr", "de", "es"],
+        loadUtils: () => import("https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.2/build/js/utils.js")
+      }) : null;
+      let submitted = false;
+
+      function syncPhone() {
+        if (!phoneHidden || !phoneInput) return;
+        const rawPhone = phoneInput.value ? phoneInput.value.trim() : "";
+        if (!rawPhone) {
+          phoneHidden.value = "";
+          return;
+        }
+        phoneHidden.value = iti ? (iti.getNumber() || "") : rawPhone;
+      }
+
+      if (phoneInput) {
+        phoneInput.addEventListener("input", syncPhone);
+        phoneInput.addEventListener("countrychange", syncPhone);
+      }
+
+      form.addEventListener("submit", function () {
+        submitted = true;
+        syncPhone();
+      });
+
+      if (frame) {
+        frame.addEventListener("load", function () {
+          if (!submitted || !successMsg) return;
+          successMsg.classList.add("is-visible");
+          form.reset();
+          if (iti) iti.setCountry("us");
+          syncPhone();
+          submitted = false;
+        });
+      }
     })();
   </script>
 

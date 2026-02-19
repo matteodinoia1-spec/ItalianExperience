@@ -30,6 +30,8 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.2/build/css/intlTelInput.css" />
+  <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.2/build/js/intlTelInput.min.js"></script>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
@@ -197,6 +199,54 @@
       background:linear-gradient(to bottom, transparent, rgba(255,255,255,0.1) 15%, rgba(255,255,255,0.1) 85%, transparent);
     }
 
+    .hero-form-cta{
+      margin-top:1.5rem;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(197,160,89,0.8);
+      color:#f8f3e8;
+      text-transform:uppercase;
+      letter-spacing:0.24em;
+      font-size:0.62rem;
+      font-weight:700;
+      padding:0.9rem 1.1rem;
+      transition:all .25s ease;
+      pointer-events:auto;
+      background:rgba(0,0,0,0.22);
+    }
+
+    .hero-form-cta:hover{background:var(--brand-gold); color:#080808; transform:translateY(-1px)}
+
+    .service-contact{position:relative; padding:6.5rem 1.25rem 7rem; background:radial-gradient(circle at 10% 10%, rgba(197,160,89,0.12), transparent 40%), #080808; border-top:1px solid rgba(197,160,89,0.15)}
+    .service-contact-shell{max-width:980px; margin:0 auto; display:grid; grid-template-columns:0.9fr 1.1fr; gap:2.25rem; align-items:start}
+    .service-contact-meta{padding-right:1rem; border-right:1px solid rgba(197,160,89,0.2)}
+    .service-contact-card{background:rgba(255,255,255,0.02); border:1px solid rgba(197,160,89,0.18); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:4px; padding:1.5rem; box-shadow:0 20px 40px rgba(0,0,0,0.35)}
+    .service-grid{display:grid; grid-template-columns:1fr 1fr; gap:1rem}
+    .service-full{grid-column:1 / -1}
+    .service-label{display:block; margin-bottom:0.45rem; font-size:0.64rem; letter-spacing:0.24em; text-transform:uppercase; color:#9ca3af; font-weight:600}
+    .service-label.is-required::after{content:" *"; color:var(--brand-gold); letter-spacing:0.1em}
+    .service-field{width:100%; padding:0.95rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.16); border-radius:2px; color:#fff; font-size:0.95rem; outline:none; transition:border-color .2s ease, box-shadow .2s ease, background .2s ease}
+    .service-field:focus{border-color:rgba(197,160,89,0.85); box-shadow:0 0 0 1px rgba(197,160,89,0.15); background:rgba(255,255,255,0.06)}
+    .service-field::placeholder{color:rgba(255,255,255,0.45)}
+    .service-select{appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23c5a059' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 0.9rem center; background-size:14px; padding-right:2.1rem}
+    .service-intl .iti{width:100%}
+    .service-intl .iti__selected-country{height:100%; padding:0 0.55rem 0 0.6rem; background:rgba(255,255,255,0.03); border-right:1px solid rgba(255,255,255,0.14)}
+    .service-intl .iti__selected-country-primary{height:100%; display:flex; align-items:center; gap:0.45rem}
+    .service-intl .iti__selected-dial-code{margin-left:0; font-size:0.98rem; color:rgba(255,255,255,0.95)}
+    .service-intl .iti__arrow{margin-left:0.25rem}
+    .service-intl .iti__country-list{background:#111; border:1px solid rgba(197,160,89,0.24); color:#fff}
+    .service-intl .iti__country.iti__highlight{background:rgba(197,160,89,0.18)}
+    .service-checks{display:grid; grid-template-columns:1fr 1fr; gap:0.55rem}
+    .service-check{display:flex; gap:0.5rem; align-items:flex-start; font-size:0.78rem; color:#cbd5e1}
+    .service-check input{accent-color:#c5a059; margin-top:0.2rem}
+    .service-note{font-size:0.62rem; color:#9ca3af; letter-spacing:0.08em; text-transform:uppercase; line-height:1.6}
+    .service-file{padding:0.7rem 0.9rem}
+    .service-btn{width:100%; margin-top:0.25rem; border:1px solid var(--brand-gold); color:var(--brand-gold); background:transparent; text-transform:uppercase; letter-spacing:0.3em; font-size:0.68rem; font-weight:700; padding:1rem 1.1rem; transition:all .3s ease; cursor:pointer}
+    .service-btn:hover{background:var(--brand-gold); color:#080808; transform:translateY(-1px)}
+    .service-success{display:none; margin-top:0.8rem; border:1px solid rgba(197,160,89,0.35); background:rgba(197,160,89,0.08); color:#f8f3e8; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; padding:0.9rem 1rem; text-align:center}
+    .service-success.is-visible{display:block}
+
     @media (max-width:1024px){
       .hero-side{
         width:100%;
@@ -211,6 +261,18 @@
       .glass-card{padding:1.8rem;}
       .explore-indicator{bottom:40px;}
       .timeline-line{display:none;}
+      .service-checks{grid-template-columns:1fr}
+    }
+
+    @media (max-width:960px){
+      .service-contact-shell{grid-template-columns:1fr; gap:1.5rem}
+      .service-contact-meta{border-right:none; padding-right:0; text-align:center}
+    }
+
+    @media (max-width:640px){
+      .service-contact{padding:4.75rem 1rem 5rem}
+      .service-contact-card{padding:1rem}
+      .service-grid{grid-template-columns:1fr; gap:0.85rem}
     }
   </style>
 </head>
@@ -241,6 +303,7 @@
         Whether you are pursuing a life-changing cultural program in the United States or a strategic career move,
         we provide full support to help you represent authentic Italian excellence.
       </p>
+      <a class="hero-form-cta" href="#candidate-contact" aria-label="Go to contact form">Contact Form</a>
     </div>
 
     <a href="#ambassador" class="explore-indicator" aria-label="Explore section">
@@ -444,6 +507,87 @@
     </div>
   </section>
 
+  <section id="candidate-contact" class="service-contact" aria-label="Candidate contact form">
+    <div class="service-contact-shell">
+      <div class="service-contact-meta">
+        <span class="text-[#c5a059] uppercase tracking-[0.55em] text-[0.58rem] font-bold block mb-4">Application Contact</span>
+        <h2 class="text-4xl md:text-5xl brand-font italic text-white leading-tight mb-6">Start Your Candidate Journey.</h2>
+        <p class="text-slate-400 leading-relaxed text-sm md:text-base max-w-[36ch]">Complete your profile and preferred roles. Our team will assess your fit for premium U.S. hospitality placements.</p>
+      </div>
+      <div class="service-contact-card">
+        <form action="https://forms.zohopublic.com/italianrecruitment/form/ItalianExperience/formperma/dSUYWQws7Sq0pF8lp6bSn-L3IVYXlfjJkrN7lkFScAM/htmlRecords/submit" id="candidate-form" method="POST" accept-charset="UTF-8" enctype="multipart/form-data" target="zoho-candidate-submit-frame">
+          <input type="hidden" name="zf_referrer_name" value="Candidate Page">
+          <input type="hidden" name="zf_redirect_url" value="">
+          <input type="hidden" name="zc_gad" value="">
+          <input type="hidden" name="Dropdown" value="Candidate">
+          <input type="hidden" name="PhoneNumber_countrycode" id="candidate-phone-hidden">
+          <div class="service-grid">
+            <div>
+              <label class="service-label is-required" for="candidate-name-first">First Name</label>
+              <input class="service-field" id="candidate-name-first" type="text" name="Name_First" maxlength="255" required>
+            </div>
+            <div>
+              <label class="service-label is-required" for="candidate-name-last">Last Name</label>
+              <input class="service-field" id="candidate-name-last" type="text" name="Name_Last" maxlength="255" required>
+            </div>
+            <div>
+              <label class="service-label is-required" for="candidate-email">E-mail</label>
+              <input class="service-field" id="candidate-email" type="email" name="Email" maxlength="255" required>
+            </div>
+            <div>
+              <label class="service-label is-required" for="candidate-phone">Phone</label>
+              <div class="service-intl">
+                <input class="service-field" id="candidate-phone" type="tel" maxlength="30" placeholder="Phone number" required>
+              </div>
+            </div>
+            <div>
+              <label class="service-label is-required" for="candidate-birth">Date of Birth</label>
+              <input class="service-field" id="candidate-birth" type="text" name="Date" maxlength="25" placeholder="dd-MMM-yyyy" required>
+            </div>
+            <div>
+              <label class="service-label is-required" for="candidate-country">Country of Birth</label>
+              <select class="service-field service-select" id="candidate-country" name="Dropdown3" required>
+                <option value="">Select option</option>
+                <option value="Prima scelta">Prima scelta</option>
+                <option value="Seconda scelta">Seconda scelta</option>
+                <option value="Terza scelta">Terza scelta</option>
+              </select>
+            </div>
+            <div class="service-full">
+              <label class="service-label is-required">Preferred Job Positions (max 2)</label>
+              <div class="service-checks">
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Server">Server</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Cook">Cook</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Bartender">Bartender</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Housekeeping">Housekeeping</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Steward">Steward</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Back Server">Back Server</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Food Runner">Food Runner</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Sommelier">Sommelier</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Supervisor">Supervisor</label>
+                <label class="service-check"><input type="checkbox" name="Checkbox" value="Banquet Staff">Banquet Staff</label>
+              </div>
+              <p class="service-note">Select up to 2 roles based on real work experience.</p>
+            </div>
+            <div>
+              <label class="service-label is-required" for="candidate-resume">Resume</label>
+              <input class="service-field service-file" id="candidate-resume" type="file" name="FileUpload" required>
+            </div>
+            <div>
+              <label class="service-label is-required" for="candidate-photo">Picture of You</label>
+              <input class="service-field service-file" id="candidate-photo" type="file" accept="image/*" name="ImageUpload" required>
+            </div>
+            <div class="service-full">
+              <button class="service-btn" type="submit">Submit Application</button>
+            </div>
+          </div>
+        </form>
+        <div class="service-success" id="candidate-success-msg">Thank you for your submission.</div>
+        <iframe title="Zoho candidate submit frame" name="zoho-candidate-submit-frame" style="display:none;"></iframe>
+      </div>
+    </div>
+  </section>
+
   <div id="site-footer"></div>
 
   <script>
@@ -529,6 +673,74 @@
         await loadScript(base + "/assets/js/site.js");
         if (window.IEInit) window.IEInit(document);
       }).catch(err => console.error(err));
+    })();
+  </script>
+
+  <script>
+    (function () {
+      const form = document.getElementById("candidate-form");
+      if (!form) return;
+      const phoneInput = document.getElementById("candidate-phone");
+      const phoneHidden = document.getElementById("candidate-phone-hidden");
+      const successMsg = document.getElementById("candidate-success-msg");
+      const frame = document.querySelector('iframe[name="zoho-candidate-submit-frame"]');
+      const roleBoxes = Array.from(form.querySelectorAll('input[name="Checkbox"]'));
+      const iti = phoneInput && window.intlTelInput ? window.intlTelInput(phoneInput, {
+        initialCountry: "us",
+        separateDialCode: true,
+        preferredCountries: ["us", "it", "gb", "fr", "de", "es"],
+        loadUtils: () => import("https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.2/build/js/utils.js")
+      }) : null;
+      let submitted = false;
+
+      function syncPhone() {
+        if (!phoneHidden || !phoneInput) return;
+        const rawPhone = phoneInput.value ? phoneInput.value.trim() : "";
+        if (!rawPhone) {
+          phoneHidden.value = "";
+          return;
+        }
+        phoneHidden.value = iti ? (iti.getNumber() || "") : rawPhone;
+      }
+
+      function validateRoles() {
+        const checked = roleBoxes.filter((box) => box.checked);
+        const valid = checked.length > 0 && checked.length <= 2;
+        if (roleBoxes[0]) {
+          roleBoxes[0].setCustomValidity(valid ? "" : "Select 1 or 2 roles.");
+        }
+        return valid;
+      }
+
+      roleBoxes.forEach((box) => box.addEventListener("change", validateRoles));
+
+      if (phoneInput) {
+        phoneInput.addEventListener("input", syncPhone);
+        phoneInput.addEventListener("countrychange", syncPhone);
+      }
+
+      form.addEventListener("submit", function (event) {
+        const rolesOk = validateRoles();
+        if (!rolesOk) {
+          event.preventDefault();
+          form.reportValidity();
+          return;
+        }
+        submitted = true;
+        syncPhone();
+      });
+
+      if (frame) {
+        frame.addEventListener("load", function () {
+          if (!submitted || !successMsg) return;
+          successMsg.classList.add("is-visible");
+          form.reset();
+          if (iti) iti.setCountry("us");
+          syncPhone();
+          validateRoles();
+          submitted = false;
+        });
+      }
     })();
   </script>
 
