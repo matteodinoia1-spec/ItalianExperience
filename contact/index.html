@@ -24,7 +24,7 @@
   <meta name="twitter:image" content="https://www.italianexp.com/assets/preview.jpg" />
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" /> -->
+  <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
@@ -405,6 +405,7 @@
 
   <script>
     (function () {
+      const base = "/ItalianExperience";
       const headerMount = document.getElementById("site-header");
       const footerMount = document.getElementById("site-footer");
 
@@ -422,26 +423,14 @@
       }
 
       Promise.all([
-        fetch(base + "/partials/header.html").then(r => { 
-            // Silent fail for demo if partials missing
-            if (!r.ok) return ""; 
-            return r.text(); 
-        }),
-        fetch(base + "/partials/footer.html").then(r => { 
-            if (!r.ok) return ""; 
-            return r.text(); 
-        })
+        fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
+        fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
       ]).then(async ([h, f]) => {
-        if(headerMount) inject(headerMount, h);
-        if(footerMount) inject(footerMount, f);
+        inject(headerMount, h);
+        inject(footerMount, f);
 
-        // Try load JS
-        try {
-            await loadScript(base + "/assets/js/site.js");
-            if (window.IEInit) window.IEInit(document);
-        } catch(e) {
-            console.log("Site JS not loaded (expected in preview)");
-        }
+        await loadScript(base + "/assets/js/site.js");
+        if (window.IEInit) window.IEInit(document);
       }).catch(err => console.error(err));
     })();
   </script>
