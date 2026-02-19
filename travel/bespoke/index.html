@@ -70,6 +70,29 @@
       padding:0 1.5rem;
     }
 
+    .hero-form-cta{
+      margin-top:1.5rem;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(197,160,89,0.8);
+      color:#f8f3e8;
+      text-transform:uppercase;
+      letter-spacing:0.24em;
+      font-size:0.62rem;
+      font-weight:700;
+      padding:0.9rem 1.1rem;
+      transition:all .25s ease;
+      pointer-events:auto;
+      background:rgba(0,0,0,0.22);
+    }
+
+    .hero-form-cta:hover{
+      background:var(--brand-gold);
+      color:#080808;
+      transform:translateY(-1px);
+    }
+
     @keyframes scrollLine{
       0%{transform:translateY(-18px);opacity:0}
       30%{opacity:1}
@@ -224,7 +247,7 @@
 
     .bespoke-phone-wrap{
       display:grid;
-      grid-template-columns:110px 1fr;
+      grid-template-columns:92px 1fr;
       gap:0.55rem;
     }
 
@@ -396,6 +419,9 @@
         <p class="ie-hero-lead max-w-[340px] md:max-w-none">
           Curated Experiences Across Italy
         </p>
+        <a class="hero-form-cta" href="#bespoke-contact" aria-label="Go to contact form">
+          Contact Form
+        </a>
       </div>
 
       <a href="#advisory" class="explore-indicator" aria-label="Explore section">
@@ -552,7 +578,7 @@
       </div>
     </section>
 
-    <section class="bespoke-contact" aria-label="Bespoke contact form">
+    <section id="bespoke-contact" class="bespoke-contact" aria-label="Bespoke contact form">
       <div class="bespoke-contact-shell">
         <div class="bespoke-contact-meta">
           <span class="text-[#c5a059] uppercase tracking-[0.55em] text-[0.58rem] font-bold block mb-4">
@@ -576,11 +602,11 @@
             <div class="bespoke-grid">
               <div>
                 <label class="bespoke-label" for="bespoke-name-first">First Name</label>
-                <input class="bespoke-field" id="bespoke-name-first" type="text" name="Name_First" maxlength="255" required>
+                <input class="bespoke-field" id="bespoke-name-first" type="text" name="Name_First" maxlength="255">
               </div>
               <div>
                 <label class="bespoke-label" for="bespoke-name-last">Last Name</label>
-                <input class="bespoke-field" id="bespoke-name-last" type="text" name="Name_Last" maxlength="255" required>
+                <input class="bespoke-field" id="bespoke-name-last" type="text" name="Name_Last" maxlength="255">
               </div>
               <div>
                 <label class="bespoke-label" for="bespoke-email">E-mail</label>
@@ -597,21 +623,21 @@
                     <option value="+49">+49 DE</option>
                     <option value="+34">+34 ES</option>
                   </select>
-                  <input class="bespoke-field" id="bespoke-phone" type="tel" maxlength="20" placeholder="Phone number">
+                  <input class="bespoke-field" id="bespoke-phone" type="tel" maxlength="20" placeholder="Phone number" required>
                 </div>
                 <input type="hidden" name="PhoneNumber_countrycode" id="bespoke-phone-hidden">
               </div>
               <div>
                 <label class="bespoke-label" for="bespoke-dates">Preferred Travel Dates</label>
-                <input class="bespoke-field" id="bespoke-dates" type="text" name="SingleLine9" maxlength="255" placeholder="Preferred period (e.g. June 2026)">
+                <input class="bespoke-field" id="bespoke-dates" type="text" name="SingleLine9" maxlength="255" placeholder="Preferred period (e.g. June 2026)" required>
               </div>
               <div>
                 <label class="bespoke-label" for="bespoke-guests">Number of Guests</label>
-                <input class="bespoke-field" id="bespoke-guests" type="text" name="Number" maxlength="18">
+                <input class="bespoke-field" id="bespoke-guests" type="text" name="Number" maxlength="18" required>
               </div>
               <div class="bespoke-full">
                 <label class="bespoke-label" for="bespoke-vision">Describe Your Vision</label>
-                <textarea class="bespoke-field bespoke-textarea" id="bespoke-vision" name="MultiLine" maxlength="65535"></textarea>
+                <textarea class="bespoke-field bespoke-textarea" id="bespoke-vision" name="MultiLine" maxlength="65535" required></textarea>
               </div>
               <div class="bespoke-full">
                 <button class="bespoke-btn" type="submit">Submit Request</button>
