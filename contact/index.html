@@ -260,44 +260,89 @@
 
         <div class="contact-card">
 
-          <form id="contactForm" method="POST" action="#">
+          <form
+            id="contactForm"
+            method="POST"
+            action="https://forms.zohopublic.com/italianrecruitment/form/Contactus1/formperma/tQiH2syGzKN5IPbkQnBj_k6qrzcs9VFhwhEodrWISvw/htmlRecords/submit"
+            accept-charset="UTF-8"
+            enctype="multipart/form-data"
+          >
+            <input type="hidden" name="zf_referrer_name" value="" />
+            <input type="hidden" name="zf_redirect_url" value="" />
+            <input type="hidden" name="zc_gad" value="" />
             
             <div class="grid md:grid-cols-2 gap-5 mb-5">
               <div>
                 <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
-                  Full Name
+                  First Name
                 </label>
-                <input type="text" name="fullName" class="field" placeholder="Your full name" />
+                <input type="text" name="Name_First" maxlength="255" class="field" placeholder="First name" required />
               </div>
 
               <div>
                 <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
-                  Email (Required)
+                  Last Name
                 </label>
-                <input type="email" name="email" class="field" placeholder="you@example.com" required />
+                <input type="text" name="Name_Last" maxlength="255" class="field" placeholder="Last name" required />
               </div>
             </div>
 
             <div class="grid md:grid-cols-2 gap-5 mb-5">
               <div>
                 <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
-                  Phone (with prefix)
+                  Who are you?
                 </label>
-                <input type="tel" name="phone" class="field" placeholder="+39 333 123 4567" />
+                <select name="Dropdown" class="field" required>
+                  <option value="-Select-" selected>-Select-</option>
+                  <option value="General information">General Information</option>
+                  <option value="Bespoke Travel &amp; Experiences">Bespoke Travel and Experiences</option>
+                  <option value="Business &amp; Partnerships">Business and Partnerships</option>
+                  <option value="Press &amp; Media">Press and Media</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
 
               <div>
                 <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
-                  Subject of Inquiry
+                  Email (Required)
                 </label>
-                <select name="subject" class="field" required>
-                  <option value="" disabled selected>Select a subject</option>
-                  <option value="general information">General Information</option>
-                  <option value="bespoke travel and experiences">Bespoke Travel and Experiences</option>
-                  <option value="business and partnerships">Business and Partnerships</option>
-                  <option value="press and media">Press and Media</option>
-                  <option value="other">Other</option>
-                </select>
+                <input type="email" name="Email" maxlength="255" class="field" placeholder="you@example.com" required />
+              </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-5 mb-5">
+              <div>
+                <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
+                  Phone Prefix
+                </label>
+                <input
+                  type="text"
+                  class="field"
+                  name="PhoneNumber_countrycode"
+                  compname="PhoneNumber"
+                  phoneFormat="1"
+                  id="international_PhoneNumber_countrycode"
+                  maxlength="20"
+                  placeholder="+39"
+                  required
+                />
+              </div>
+
+              <div>
+                <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
+                  Phone Number
+                </label>
+                <input
+                  type="text"
+                  class="field"
+                  name="PhoneNumber_countrycodeval"
+                  compname="PhoneNumber_countrycodeval"
+                  phoneFormat="1"
+                  id="international_PhoneNumber_countrycodeval"
+                  maxlength="10"
+                  placeholder="3331234567"
+                  required
+                />
               </div>
             </div>
 
@@ -305,7 +350,7 @@
               <label class="block text-[0.65rem] uppercase tracking-[0.35em] text-slate-400 mb-2 font-bold">
                 How can we assist you today?
               </label>
-              <textarea name="message" class="field" placeholder="Write your request here..." required></textarea>
+              <textarea name="MultiLine" maxlength="65535" class="field" placeholder="Write your request here..." required></textarea>
             </div>
 
             <button type="submit" class="btn-gold">
