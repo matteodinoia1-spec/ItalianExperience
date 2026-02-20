@@ -474,9 +474,39 @@ textarea:focus-visible{
 /* Optional helper when overlay open */
 body.menu-open{overflow:hidden}
 
+/* ─── Spacing Tier Tokens ─── */
+:root{
+  --ie-space-hero:clamp(3rem, 8vw, 7rem);
+  --ie-space-core:clamp(5rem, 10vw, 8rem);
+  --ie-space-dense:clamp(3.5rem, 7vw, 6rem);
+}
+
+/* ─── Scroll Reveal System (GPU-accelerated) ─── */
+.ie-reveal{
+  opacity:0;
+  transform:translateY(16px);
+  transition:opacity 700ms cubic-bezier(0.25,1,0.35,1),transform 800ms cubic-bezier(0.25,1,0.35,1);
+}
+.ie-reveal.is-visible{
+  opacity:1;
+  transform:translateY(0);
+}
+.ie-reveal[data-delay="1"]{transition-delay:120ms}
+.ie-reveal[data-delay="2"]{transition-delay:240ms}
+
+.ie-img-reveal{
+  transform:scale(1.02);
+  transition:transform 1.4s cubic-bezier(0.25,1,0.35,1);
+}
+.ie-img-reveal.is-visible{
+  transform:scale(1);
+}
+
 /* Reduced motion: shorten/disable non-essential transitions */
 @media (prefers-reduced-motion:reduce){
   .glass-header{transition-duration:0.15s}
   .letter{will-change:auto;transition-duration:0.08s}
   .nav-link,.dropdown-menu,#central-menu-btn,.dropdown-item,.mobile-link,.mobile-linkish,.mobile-acc-btn,.chev,.mobile-sub{transition-duration:0.08s}
+  .ie-reveal{transition:none;opacity:1;transform:none}
+  .ie-img-reveal{transition:none;transform:none}
 }

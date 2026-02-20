@@ -150,7 +150,7 @@
     }
 
     .location-section{
-      height:850px;
+      height:min(850px, 85vh);
       position:relative;
       border-bottom:1px solid rgba(255,255,255,0.05);
     }
@@ -467,7 +467,7 @@
   <main>
 
     <section id="advisory" class="py-32 md:py-48 flex items-center justify-center bg-[#080808]">
-      <div class="max-w-4xl px-8 md:px-10 text-center">
+      <div class="max-w-4xl px-8 md:px-10 text-center ie-reveal">
 
         <span class="text-[#c5a059] uppercase tracking-[0.7em] text-[0.55rem] md:text-[0.65rem] font-bold block mb-12">
           Private Advisory
@@ -568,7 +568,7 @@
       <div class="max-w-6xl mx-auto px-10">
         <div class="grid md:grid-cols-3 gap-20">
 
-          <div class="border-l border-[#c5a059]/30 pl-10 group">
+          <div class="border-l border-[#c5a059]/30 pl-10 group ie-reveal">
             <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic transition-all group-hover:opacity-60">
               01
             </span>
@@ -580,7 +580,7 @@
             </p>
           </div>
 
-          <div class="border-l border-[#c5a059]/30 pl-10 group">
+          <div class="border-l border-[#c5a059]/30 pl-10 group ie-reveal" data-delay="1">
             <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic transition-all group-hover:opacity-60">
               02
             </span>
@@ -592,7 +592,7 @@
             </p>
           </div>
 
-          <div class="border-l border-[#c5a059]/30 pl-10 group">
+          <div class="border-l border-[#c5a059]/30 pl-10 group ie-reveal" data-delay="2">
             <span class="text-6xl brand-font text-[#c5a059] mb-8 block opacity-20 italic transition-all group-hover:opacity-60">
               03
             </span>
@@ -610,7 +610,7 @@
 
     <section id="bespoke-contact" class="bespoke-contact" aria-label="Bespoke contact form">
       <div class="bespoke-contact-shell">
-        <div class="bespoke-contact-meta">
+        <div class="bespoke-contact-meta ie-reveal">
           <span class="text-[#c5a059] uppercase tracking-[0.55em] text-[0.58rem] font-bold block mb-4">
             Contact Advisory
           </span>

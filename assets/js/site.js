@@ -188,6 +188,27 @@
     });
   }
 
+  function initRevealObserver() {
+    var targets = document.querySelectorAll('.ie-reveal, .ie-img-reveal');
+    if (!targets.length) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      targets.forEach(function (el) { el.classList.add('is-visible'); });
+      return;
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -32px 0px' });
+
+    targets.forEach(function (el) { observer.observe(el); });
+  }
+
   function initGlobalHeaderOffset() {
     const header = document.getElementById('main-header');
     if (!header) return;
@@ -222,6 +243,7 @@
     initLogoMouse('logo-header');
     initLogoMouse('logo-footer');
     initGlobalHeaderOffset();
+    initRevealObserver();
   }
 
   window.IEInit = IEInit;
