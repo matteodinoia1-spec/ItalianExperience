@@ -17,9 +17,11 @@ body{
   min-height:100vh;
   position:relative;
   -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
   overflow-x:clip;
   -webkit-text-size-adjust:100%;
 }
+body.overflow-x-hidden{overflow-x:clip}
 a{color:inherit}
 img,video,svg,canvas{max-width:100%;height:auto}
 input,textarea,select,button{font-size:16px}
@@ -37,7 +39,9 @@ input,textarea,select,button{font-size:16px}
 .ie-hero-shell{
   position:relative;
   width:100%;
+  height:100vh;
   height:100dvh;
+  min-height:100vh;
   min-height:100dvh;
   overflow:hidden;
   background:#000;
@@ -458,21 +462,21 @@ textarea:focus-visible{
     align-items:center;
     height:160px;
     padding:1rem 0;
-    gap:10px;
+    gap:4px;
   }
   .glass-header.scrolled{
     height:130px;
     padding:0.6rem 0;
   }
-  .logo-wrap{transform:scale(0.80);transform-origin:center top}
+  .logo-wrap{transform:scale(0.80);transform-origin:center top;margin-bottom:-10px}
   .glass-header.scrolled .logo-wrap{padding-bottom:2px}
-  #central-menu-btn{display:flex;margin-top:12px}
+  #central-menu-btn{display:flex;margin-top:0}
 }
 @media (max-width:350px){
-  .logo-wrap{transform:scale(0.65)}
+  .logo-wrap{transform:scale(0.65);margin-bottom:-18px}
   .glass-header{height:140px}
   .glass-header.scrolled{height:120px}
-  #central-menu-btn{margin-top:8px}
+  #central-menu-btn{margin-top:0}
 }
 
 /* Optional helper when overlay open */
