@@ -15,6 +15,7 @@
   <meta property="og:url" content="https://www.italianexp.com/" />
 
   <link rel="stylesheet" href="/ItalianExperience/assets/css/tailwind.css" />
+  <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700&family=Inter:wght@300;400;600&family=Great+Vibes&family=Montserrat:wght@900&display=swap');
@@ -665,28 +666,12 @@
 
 <body>
 
-  <a href="./contact/index.html" target="_top" class="contact-mobile" aria-label="Go to contact page">Contact</a>
+  <div id="site-header"></div>
 
   <!-- DESKTOP -->
   <div class="desktop-only">
 
     <section class="portal-wrapper" aria-label="Italian Experience Portal">
-
-      <div class="absolute top-12 left-12 z-[100] scale-[0.35] md:scale-[0.64] origin-top-left pointer-events-auto">
-        <a href="./" target="_top" class="block no-underline">
-          <div class="pure-logo" id="logo-main">
-            <span class="font-it text-[100px]">Italian</span>
-            <div class="font-ex text-[55px]" data-text="EXPERIENCE"></div>
-            <div class="tricolore">
-              <div style="background:var(--it-green)"></div>
-              <div style="background:#fff"></div>
-              <div style="background:var(--it-red)"></div>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <a href="./contact/index.html" target="_top" class="contact-desktop" aria-label="Go to contact page">Contact</a>
 
       <a href="./travel/" target="_top" class="portal-pillar">
         <div class="pillar-bg">
@@ -931,6 +916,30 @@ STRATEGIC ADVISORY</p>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      const base = "/ItalianExperience";
+      const headerMount = document.getElementById("site-header");
+
+      function inject(el, html) { if (el) el.innerHTML = html; }
+
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const s = document.createElement("script");
+          s.src = src;
+          s.defer = true;
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+
+      fetch(base + "/partials/header.html")
+        .then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); })
+        .then(async (h) => {
+          inject(headerMount, h);
+          await loadScript(base + "/assets/js/site.js");
+          if (window.IEInit) window.IEInit(document);
+        })
+        .catch(err => console.error(err));
 
       // Build EXPERIENCE letters
       document.querySelectorAll('.font-ex').forEach(ex => {
@@ -1007,7 +1016,6 @@ STRATEGIC ADVISORY</p>
         }, { passive: true });
       }
 
-      initLogoMouse('logo-main');
       initLogoMouse('logo-footer');
 
       // Mobile touch logo effect
