@@ -220,6 +220,9 @@ input,textarea,select,button{font-size:16px}
   border-bottom:1px solid rgba(255,255,255,0.08);
   box-shadow:0 10px 30px rgba(0,0,0,0.5);
 }
+.glass-header.scrolled .tricolore{
+  bottom:3px;
+}
 .glass-header.scrolled::before{
   opacity:0.7;
 }
@@ -438,7 +441,7 @@ textarea:focus-visible{
 /* FOOTER */
 .site-footer{
   background:#000;
-  padding:6rem 2rem;
+  padding:var(--ie-space-footer) 2rem;
   border-top:1px solid rgba(255,255,255,0.05);
   display:flex;
   flex-direction:column;
@@ -462,6 +465,7 @@ textarea:focus-visible{
     padding:0.6rem 0;
   }
   .logo-wrap{transform:scale(0.80);transform-origin:center top}
+  .glass-header.scrolled .logo-wrap{padding-bottom:2px}
   #central-menu-btn{display:flex;margin-top:12px}
 }
 @media (max-width:350px){
@@ -476,10 +480,15 @@ body.menu-open{overflow:hidden}
 
 /* ─── Spacing Tier Tokens ─── */
 :root{
-  --ie-space-hero:clamp(3rem, 8vw, 7rem);
-  --ie-space-core:clamp(5rem, 10vw, 8rem);
-  --ie-space-dense:clamp(3.5rem, 7vw, 6rem);
+  --ie-space-hero:clamp(3rem, 8vw, 7rem);       /* Tier A */
+  --ie-space-core:clamp(5rem, 10vw, 8rem);       /* Tier B */
+  --ie-space-dense:clamp(3.5rem, 7vw, 6rem);     /* Tier C */
+  --ie-space-footer:clamp(4rem, 6vw, 6rem);      /* Tier D */
 }
+
+/* ─── Spacing Tier Utilities ─── */
+.ie-section-core{ padding-block:var(--ie-space-core); }
+.ie-section-dense{ padding-block:var(--ie-space-dense); }
 
 /* ─── Scroll Reveal System (GPU-accelerated) ─── */
 .ie-reveal{
