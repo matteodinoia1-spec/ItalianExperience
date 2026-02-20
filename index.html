@@ -206,6 +206,8 @@
       overflow:visible;
       transition:font-size 220ms ease;
     }
+    .title-portal.fit-title{min-height:28px}
+    .card-title.fit-title{min-height:22px}
 
     /* Desktop */
     .desktop-only{display:block}
@@ -1121,20 +1123,22 @@ STRATEGIC ADVISORY</p>
         });
       }
 
-      window.addEventListener('resize', fitAllGroupsRaf, { passive: true });
-      window.addEventListener('orientationchange', fitAllGroupsRaf, { passive: true });
-
-      // run immediato + dopo layout + dopo font
-      fitAllGroups();
-      setTimeout(fitAllGroups, 200);
-      setTimeout(fitAllGroups, 700);
+      function runFitOnce() {
+        fitAllGroupsRaf();
+      }
 
       if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(() => {
-          fitAllGroups();
-          setTimeout(fitAllGroups, 200);
-        });
+        document.fonts.ready.then(runFitOnce);
+      } else {
+        runFitOnce();
       }
+
+      let resizeDebounce = 0;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeDebounce);
+        resizeDebounce = setTimeout(fitAllGroupsRaf, 150);
+      }, { passive: true });
+      window.addEventListener('orientationchange', fitAllGroupsRaf, { passive: true });
 
     });
   </script>
