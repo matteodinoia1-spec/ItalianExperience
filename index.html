@@ -142,12 +142,27 @@
       left:50%;
       transform:translateX(-50%);
       z-index:90;
-      pointer-events:none;
       display:flex;
       flex-direction:column;
       align-items:center;
+      justify-content:center;
       gap:14px;
       text-shadow:0 8px 18px rgba(0,0,0,0.7);
+      min-height:44px;
+      min-width:44px;
+      padding:0.5rem;
+      box-sizing:border-box;
+      text-decoration:none;
+      color:inherit;
+      border-radius:4px;
+      transition:background 0.2s ease, outline 0.2s ease;
+    }
+    .scroll-indicator:hover{
+      background:rgba(255,255,255,0.06);
+    }
+    .scroll-indicator:focus-visible{
+      outline:1px solid rgba(197,160,89,0.5);
+      outline-offset:4px;
     }
     .scroll-indicator span{
       font-size:0.65rem;
@@ -383,6 +398,32 @@
       background:rgba(0,0,0,0.38);
       backdrop-filter:blur(18px);
     }
+    .editorial-cta-wrap{
+      text-align:center;
+      margin-top:clamp(2.4rem,5vw,4rem);
+    }
+    .editorial-cta{
+      display:inline-block;
+      border:1px solid var(--brand-gold);
+      color:var(--brand-gold);
+      padding:1rem 2.5rem;
+      font-size:0.75rem;
+      text-transform:uppercase;
+      letter-spacing:0.45em;
+      text-decoration:none;
+      transition:background 0.25s ease, color 0.25s ease;
+      min-height:44px;
+      box-sizing:border-box;
+      line-height:1.2;
+    }
+    .editorial-cta:hover{
+      background:var(--brand-gold);
+      color:#000;
+    }
+    .editorial-cta:focus-visible{
+      outline:1px solid var(--brand-gold);
+      outline-offset:3px;
+    }
     .quote-text{
       font-family:'Playfair Display',serif;
       font-style:italic;
@@ -532,6 +573,9 @@
       font-weight:700;
       letter-spacing:0.15em;
       white-space:nowrap;
+      min-height:44px;
+      padding-block:0.5rem;
+      box-sizing:border-box;
     }
 
     .cta-arrow{width:18px;height:1px;background:var(--brand-gold);position:relative}
@@ -691,14 +735,14 @@
         </div>
       </a>
 
-      <div class="scroll-indicator" aria-hidden="true">
+      <a href="#essence" class="scroll-indicator" aria-label="Scroll to Discover">
         <span>Scroll</span>
-        <div class="scroll-track"><div class="scroll-dot"></div></div>
-      </div>
+        <div class="scroll-track" aria-hidden="true"><div class="scroll-dot"></div></div>
+      </a>
 
     </section>
 
-    <section class="essence-section" aria-label="The Essence">
+    <section id="essence" class="essence-section" aria-label="The Essence">
       <div class="essence-bg" aria-hidden="true">
         <img id="essence-parallax" src="/ItalianExperience/assets/img/home/home-essence-bg.avif" alt="" loading="lazy" decoding="async" />
       </div>
@@ -729,6 +773,10 @@
             <div class="mt-10 h-px w-20" style="background:var(--brand-gold)"></div>
           </div>
         </div>
+      </div>
+
+      <div class="editorial-cta-wrap">
+        <a href="./contact/" class="editorial-cta">Begin the conversation</a>
       </div>
 
       <div class="footer-bar">
