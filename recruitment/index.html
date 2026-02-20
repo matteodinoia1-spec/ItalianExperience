@@ -79,6 +79,11 @@
     }
 
     @media (max-width:767px){
+      .hero-recruitment.ie-hero-shell{
+        height:auto;
+        min-height:100dvh;
+        overflow:visible;
+      }
 
       .panel-inner{ padding-top: 46px; padding-bottom: 26px; }
       .panel-title{ font-size: clamp(1.95rem, 10.5vw, 3.05rem); line-height: 1.02; }
@@ -609,6 +614,32 @@
         if (window.IEInit) window.IEInit(document);
 
         // Old local calls removed: global offset updater runs inside IEInit.
+
+        // #region agent log
+        setTimeout(function(){try{
+          var shell=document.querySelector('.ie-hero-shell');
+          var grid=document.querySelector('.recruitment-grid');
+          var panels=document.querySelectorAll('.panel-employer,.panel-candidate');
+          var footer=document.querySelector('.site-footer p');
+          var isMob=window.matchMedia('(max-width:767px)').matches;
+          var shellCS=shell?getComputedStyle(shell):{};
+          var gridCS=grid?getComputedStyle(grid):{};
+          var footerCS=footer?getComputedStyle(footer):{};
+          var panelData=[];panels.forEach(function(p){panelData.push({cl:p.className.substring(0,30),oh:p.offsetHeight,sh:p.scrollHeight});});
+          var activeEls=document.querySelectorAll('.active');var activeList=[];activeEls.forEach(function(a){activeList.push(a.tagName+'.'+a.className.substring(0,40)+(a.textContent||'').substring(0,20));});
+          var sublinks=document.querySelectorAll('.dropdown-item,.mobile-sublink');var sublinkData=[];sublinks.forEach(function(s){sublinkData.push({href:s.getAttribute('href'),hasActive:s.classList.contains('active'),text:(s.textContent||'').trim()});});
+          var payload={sessionId:'09411e',location:'recruitment/index.html:postInit',message:'debug-diagnostics',data:{
+            isMobile:isMob,vw:window.innerWidth,vh:window.innerHeight,
+            shellHeight:shellCS.height,shellMinHeight:shellCS.minHeight,shellOverflow:shellCS.overflow,shellOverflowY:shellCS.overflowY,shellScrollH:shell?shell.scrollHeight:0,shellOffsetH:shell?shell.offsetHeight:0,
+            gridPaddingTop:gridCS.paddingTop,gridOffsetH:grid?grid.offsetHeight:0,gridScrollH:grid?grid.scrollHeight:0,gridAlignContent:gridCS.alignContent,gridMinHeight:gridCS.minHeight,
+            panels:panelData,
+            footerFontSize:footerCS.fontSize,footerLetterSpacing:footerCS.letterSpacing,footerText:footer?footer.textContent.trim():'',footerWidth:footer?footer.offsetWidth:0,footerScrollW:footer?footer.scrollWidth:0,footerParentW:footer&&footer.parentElement?footer.parentElement.offsetWidth:0,
+            pathname:window.location.pathname,activeElements:activeList,sublinks:sublinkData
+          },timestamp:Date.now()};
+          fetch('http://127.0.0.1:7325/ingest/5d501d79-293b-4261-99ad-d8e23d42466f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'09411e'},body:JSON.stringify(payload)}).catch(function(){});
+        }catch(e){fetch('http://127.0.0.1:7325/ingest/5d501d79-293b-4261-99ad-d8e23d42466f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'09411e'},body:JSON.stringify({sessionId:'09411e',location:'recruitment/index.html:postInit',message:'debug-error',data:{err:e.message},timestamp:Date.now()})}).catch(function(){});}
+        },500);
+        // #endregion
       }).catch(err => console.error(err));
     })();
   </script>

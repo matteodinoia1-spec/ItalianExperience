@@ -127,6 +127,13 @@
 
     document.querySelectorAll(`[data-nav="${section}"]`).forEach(el => el.classList.add('active'));
 
+    const norm = p => p.toLowerCase().replace(/\/+$/, '/');
+    const currentPath = norm(path);
+    document.querySelectorAll('.dropdown-item, .mobile-sublink').forEach(a => {
+      const href = norm(a.getAttribute('href') || '');
+      if (href && currentPath === href) a.classList.add('active');
+    });
+
     const map = { travel: 'm-travel', recruitment: 'm-recruitment', flavors: 'm-flavors' };
     const panelId = map[section];
     if (panelId) {
@@ -137,6 +144,10 @@
         if (panel) panel.hidden = false;
       }
     }
+
+    // #region agent log
+    try{var dItems=document.querySelectorAll('.dropdown-item.active,.mobile-sublink.active');var matched=[];dItems.forEach(function(a){matched.push({href:a.getAttribute('href'),text:(a.textContent||'').trim()});});fetch('http://127.0.0.1:7325/ingest/5d501d79-293b-4261-99ad-d8e23d42466f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'09411e'},body:JSON.stringify({sessionId:'09411e',hypothesisId:'H-E-postfix',location:'site.js:initActiveNav',message:'nav-active-state-postfix',data:{path:path,currentPath:currentPath,section:section,activeSublinks:matched},timestamp:Date.now()})}).catch(function(){});}catch(e){}
+    // #endregion
   }
 
   function initLogoMouse(id) {
