@@ -166,23 +166,35 @@
       const itRect = it.getBoundingClientRect();
       const itX = itRect.left + itRect.width / 2 - r.left;
       const dIt = Math.abs(x - itX);
-      const pIt = Math.max(0, (200 - dIt) / 200);
+      const range = itRect.width;
 
-      it.style.textShadow = `0 0 ${15 * pIt}px rgba(197,160,89,0.5)`;
-      it.style.transform = `scale(${1 + pIt * 0.05})`;
+      if (dIt < range) {
+        const pIt = (range - dIt) / range;
+        it.style.textShadow = `0 0 ${10 * pIt}px rgba(197,160,89,0.45)`;
+        it.style.transform = `scale(${1 + pIt * 0.03})`;
+      } else {
+        it.style.textShadow = '';
+        it.style.transform = '';
+      }
 
       letters.forEach(l => {
         const lr = l.getBoundingClientRect();
         const lx = lr.left + lr.width / 2 - r.left;
         const dx = Math.abs(x - lx);
+        const letterRange = 80;
 
-        if (dx < 110) {
-          const p = (110 - dx) / 110;
-          l.style.color = (x > lx + 14) ? green : (x < lx - 14 ? red : '#FFF');
-          l.style.transform = `scale(${1 + p * 0.42}) translateY(${-p * 10}px)`;
+        if (dx < letterRange) {
+          const p = (letterRange - dx) / letterRange;
+          if (lx < x - 15) l.style.color = green;
+          else if (lx > x + 15) l.style.color = red;
+          else l.style.color = '#FFFFFF';
+
+          l.style.textShadow = `0 0 ${15 * p}px currentColor`;
+          l.style.transform = `scale(${1 + p * 0.2}) translateY(${-p * 4}px)`;
           l.style.zIndex = '20';
         } else {
           l.style.color = '';
+          l.style.textShadow = '';
           l.style.transform = '';
           l.style.zIndex = '10';
         }
@@ -192,7 +204,12 @@
     el.addEventListener('mouseleave', () => {
       it.style.textShadow = '';
       it.style.transform = '';
-      letters.forEach(l => { l.style.color = ''; l.style.transform = ''; l.style.zIndex = ''; });
+      letters.forEach(l => {
+        l.style.color = '';
+        l.style.textShadow = '';
+        l.style.transform = '';
+        l.style.zIndex = '';
+      });
     });
   }
 

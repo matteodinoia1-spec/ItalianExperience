@@ -232,6 +232,17 @@ input,textarea,select,button{font-size:16px}
 }
 
 /* LOGO */
+.logo-link{
+  display:block;
+  opacity:0.85;
+  transition:opacity 0.3s ease;
+}
+.logo-link:hover{opacity:1}
+.pure-logo{
+  max-width:fit-content;
+  padding:0.5rem;
+  transition:opacity 0.3s ease;
+}
 .logo-wrap{
   display:flex;
   align-items:baseline;
@@ -243,7 +254,12 @@ input,textarea,select,button{font-size:16px}
 }
 .font-it{font-family:'Great Vibes',cursive;color:var(--brand-gold);line-height:1;white-space:nowrap}
 .font-ex{font-family:'Montserrat',sans-serif;color:var(--brand-gold);font-weight:900;display:flex;letter-spacing:-0.02em}
-.letter{display:inline-block;position:relative;will-change:transform;transition:transform 180ms cubic-bezier(0.25,1,0.35,1),color 180ms cubic-bezier(0.25,1,0.35,1)}
+.letter{
+  display:inline-block;
+  position:relative;
+  will-change:transform,color,text-shadow;
+  transition:all 0.2s ease-out;
+}
 .tricolore{
   position:absolute;display:flex;height:3px;bottom:-6px;right:2px;width:92px;pointer-events:none;
 }
