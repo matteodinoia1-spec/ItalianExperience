@@ -93,7 +93,7 @@
       display:flex;
       flex-direction:row;
       background:var(--brand-obsidian);
-      border-top:1px solid rgba(255,255,255,0.05);
+      border-top:none;
     }
     .service-panel{
       position:relative;
@@ -101,13 +101,15 @@
       height:100%;
       overflow:hidden;
       border-radius:0 !important;
+      border:none !important;
+      box-shadow:none !important;
       display:flex;
       flex-direction:column;
       justify-content:flex-end;
       padding:6rem 3.5rem;
       text-decoration:none;
       transition:flex 0.8s cubic-bezier(0.23,1,0.32,1);
-      border-right:1px solid rgba(197,160,89,0.15);
+      border-right:none !important;
     }
     .service-panel:last-child{border-right:none}
     .service-panel:hover{flex:1.8}
@@ -150,7 +152,7 @@
         height:70vh;
         width:100%;
         border-right:none;
-        border-bottom:1px solid rgba(197,160,89,0.1);
+        border-bottom:none !important;
       }
     }
     @media (max-width:768px){

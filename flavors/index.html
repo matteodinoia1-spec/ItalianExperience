@@ -60,19 +60,21 @@
       position:relative;
       overflow:hidden;
       border-radius:0 !important;
+      border:none !important;
+      box-shadow:none !important;
       display:flex;
       flex-direction:column;
       justify-content:flex-end;
       cursor:pointer;
       min-height:420px;
-      border-bottom:1px solid rgba(255,255,255,0.06);
+      border-bottom:none !important;
       transition:all 0.85s cubic-bezier(0.23, 1, 0.32, 1);
     }
 
     @media (min-width:1024px){
       .hub-panel{
-        border-bottom:none;
-        border-right:1px solid rgba(255,255,255,0.06);
+        border-bottom:none !important;
+        border-right:none !important;
         min-height:0;
       }
       .hub-panel:hover{
