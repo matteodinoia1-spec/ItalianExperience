@@ -4,8 +4,11 @@
     top: 1.5rem;
     left: 50%;
     transform: translateX(-50%);
+    display: block;
     width: calc(100% - 2rem);
     max-width: 1240px;
+    height: auto;
+    min-height: 0;
     z-index: 10000;
     background: rgba(255, 255, 255, 0.07);
     backdrop-filter: blur(30px) saturate(180%);
@@ -112,6 +115,8 @@
     gap: 0.5rem;
     align-items: center;
     height: 100%;
+    margin-left: auto;
+    justify-content: flex-end;
   }
 
   @media (min-width: 1024px) {
