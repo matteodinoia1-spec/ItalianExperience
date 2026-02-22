@@ -626,7 +626,8 @@ form button[type="submit"]{
 }
 
 /* Dynamic mouse shimmer for glass surfaces (aligned to home hero cards) */
-:is(.glass-surface,.premium-card,.glass-header){
+/* #main-header excluded so desktop dropdowns can overflow */
+:is(.glass-surface,.premium-card,.glass-header):not(#main-header){
   position:relative;
   isolation:isolate;
   overflow:hidden;
