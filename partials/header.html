@@ -1,137 +1,427 @@
-<!-- MOBILE MENU OVERLAY -->
-<div id="mobile-menu-overlay" aria-hidden="true">
-  <div class="mobile-close">
-    <button id="close-menu" type="button" aria-label="Close menu" class="text-white/80 hover:text-white">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
+<style>
+  .glass-header {
+    position: fixed;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 2rem);
+    max-width: 1240px;
+    z-index: 10000;
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 0.4rem 2.5rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+    max-height: 90px;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+  }
+
+  @media (min-width: 1024px) {
+    .glass-header {
+      overflow: visible;
+      max-height: none;
+    }
+  }
+
+  .glass-header.scrolled {
+    top: 1rem;
+    width: calc(100% - 4rem);
+    padding: 0.35rem 2rem;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .header-main-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 75px;
+    transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .glass-header.scrolled .header-main-row {
+    height: 65px;
+  }
+
+  .logo-link {
+    text-decoration: none;
+    cursor: pointer;
+    display: block;
+  }
+
+  .pure-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    user-select: none;
+  }
+
+  .font-it {
+    font-family: "Great Vibes", cursive;
+    color: #c5a059;
+    font-size: 2.8rem;
+    white-space: nowrap;
+    transition: all 0.4s ease;
+    line-height: 1;
+  }
+
+  .glass-header.scrolled .font-it {
+    font-size: 2.4rem;
+  }
+
+  .font-ex {
+    font-family: "Montserrat", sans-serif;
+    color: #c5a059;
+    font-size: 1.3rem;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    display: flex;
+    white-space: nowrap;
+    position: relative;
+    line-height: 1;
+  }
+
+  .glass-header.scrolled .font-ex {
+    font-size: 1.1rem;
+  }
+
+  .letter {
+    display: inline-block;
+    transition: all 0.25s ease-out;
+    will-change: transform, color;
+  }
+
+  .tricolore-line {
+    position: absolute;
+    bottom: 18%;
+    right: -10px;
+    display: flex;
+    height: 2px;
+    width: 50px;
+  }
+
+  .tricolore-line div {
+    flex: 1;
+  }
+
+  .nav-container-desktop {
+    display: none;
+    gap: 0.5rem;
+    align-items: center;
+    height: 100%;
+  }
+
+  @media (min-width: 1024px) {
+    .nav-container-desktop {
+      display: flex;
+    }
+  }
+
+  .nav-link {
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    opacity: 0.75;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    height: 40px;
+  }
+
+  .nav-link:hover {
+    opacity: 1;
+    color: #c5a059;
+  }
+
+  .nav-link.active {
+    opacity: 1;
+    color: #c5a059;
+    text-shadow: 0 0 10px rgba(197, 160, 89, 0.35);
+  }
+
+  .dropdown {
+    position: relative;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    transform: translateY(10px);
+    background: rgba(18, 18, 18, 0.98);
+    backdrop-filter: blur(25px);
+    min-width: 240px;
+    border-radius: 12px;
+    padding: 1rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .dropdown:hover .dropdown-menu,
+  .dropdown:focus-within .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .dropdown-item {
+    display: block;
+    padding: 0.8rem 1.75rem;
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: all 0.2s;
+  }
+
+  .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #c5a059;
+    padding-left: 2.2rem;
+  }
+
+  .dropdown-item.active {
+    color: #c5a059;
+    padding-left: 2.2rem;
+  }
+
+  .nav-container-mobile {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.4s ease;
+  }
+
+  .glass-header.is-open {
+    max-height: 95vh;
+    background: rgba(10, 10, 10, 0.98);
+    overflow-y: auto;
+  }
+
+  .glass-header.is-open .nav-container-mobile {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (min-width: 1024px) {
+    .nav-container-mobile {
+      display: none;
+    }
+  }
+
+  .mobile-link-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 1.25rem 0.5rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    background: transparent;
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .mobile-submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.5s ease;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+  }
+
+  .mobile-nav-item.open .mobile-submenu {
+    max-height: 500px;
+    padding: 1rem 0;
+    margin-top: 0.5rem;
+  }
+
+  .mobile-sub-link {
+    display: block;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.85);
+    padding: 0.75rem 1rem;
+    font-size: 0.92rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .mobile-sub-link:hover {
+    color: #c5a059;
+  }
+
+  .mobile-link-main.active,
+  .mobile-sub-link.active {
+    color: #c5a059;
+  }
+
+  #menu-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #fff;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    color: #000;
+    font-weight: 800;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    border: 0;
+    cursor: pointer;
+  }
+
+  @media (min-width: 1024px) {
+    #menu-toggle-btn {
+      display: none;
+    }
+  }
+
+  .burger-line {
+    width: 14px;
+    height: 2px;
+    background: #000;
+    transition: all 0.3s ease;
+  }
+
+  #menu-toggle-btn.is-open #line-1 {
+    transform: translateY(3px) rotate(45deg);
+  }
+
+  #menu-toggle-btn.is-open #line-2 {
+    transform: translateY(-3px) rotate(-45deg);
+  }
+</style>
+
+<nav class="glass-header" id="main-header" aria-label="Navigazione Principale">
+  <div class="header-main-row">
+    <a href="/ItalianExperience/" class="logo-link" id="logo-header" aria-label="Go to Home">
+      <div class="pure-logo">
+        <span class="font-it">Italian</span>
+        <div class="font-ex" data-text="EXPERIENCE"></div>
+        <div class="tricolore-line" aria-hidden="true">
+          <div style="background:#008C45;"></div>
+          <div style="background:#FFFFFF;"></div>
+          <div style="background:#CD212A;"></div>
+        </div>
+      </div>
+    </a>
+
+    <div class="nav-container-desktop" aria-label="Desktop navigation">
+      <div class="nav-item"><a href="/ItalianExperience/" class="nav-link" data-nav="home">Home</a></div>
+
+      <div class="nav-item dropdown">
+        <a href="/ItalianExperience/travel/" class="nav-link" data-nav="travel">
+          Travel
+          <svg style="margin-left:4px;opacity:0.4;" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+        </a>
+        <div class="dropdown-menu">
+          <a href="/ItalianExperience/travel/bespoke/" class="dropdown-item">Bespoke Travel</a>
+          <a href="/ItalianExperience/travel/gapyear/" class="dropdown-item">Gap Year Program</a>
+          <a href="/ItalianExperience/travel/culinary/" class="dropdown-item">Culinary Academy</a>
+        </div>
+      </div>
+
+      <div class="nav-item dropdown">
+        <a href="/ItalianExperience/recruitment/" class="nav-link" data-nav="recruitment">
+          Recruitment
+          <svg style="margin-left:4px;opacity:0.4;" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+        </a>
+        <div class="dropdown-menu">
+          <a href="/ItalianExperience/recruitment/employer/" class="dropdown-item">Per Aziende</a>
+          <a href="/ItalianExperience/recruitment/candidate/" class="dropdown-item">Per Candidati</a>
+        </div>
+      </div>
+
+      <div class="nav-item dropdown">
+        <a href="/ItalianExperience/flavors/" class="nav-link" data-nav="flavors">
+          Flavors
+          <svg style="margin-left:4px;opacity:0.4;" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+        </a>
+        <div class="dropdown-menu">
+          <a href="/ItalianExperience/flavors/for-your-home/" class="dropdown-item">For your home</a>
+          <a href="/ItalianExperience/flavors/for-your-business/" class="dropdown-item">For your business</a>
+          <a href="/ItalianExperience/flavors/aziende-italiane/" class="dropdown-item">Aziende Italiane</a>
+        </div>
+      </div>
+
+      <div class="nav-item"><a href="/ItalianExperience/estates/" class="nav-link" data-nav="estates">Estates</a></div>
+      <div class="nav-item"><a href="/ItalianExperience/contact/" class="nav-link" data-nav="contact">Contact</a></div>
+    </div>
+
+    <button id="menu-toggle-btn" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Apri menu mobile">
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div class="burger-line" id="line-1"></div>
+        <div class="burger-line" id="line-2"></div>
+      </div>
+      <span id="menu-btn-text" style="margin-left:0.5rem;">Menu</span>
     </button>
   </div>
 
-  <nav class="mobile-menu" aria-label="Mobile navigation">
-    <a href="/ItalianExperience/" class="mobile-link" data-close data-nav="home">Home</a>
+  <div class="nav-container-mobile" id="mobile-nav">
+    <div class="mobile-nav-item"><a href="/ItalianExperience/" class="mobile-link-main" data-close data-nav="home">Home</a></div>
 
-    <div class="mobile-acc-row">
-      <a href="/ItalianExperience/travel/" class="mobile-linkish" data-close data-nav="travel">Travel</a>
-      <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-travel" aria-label="Toggle Travel">
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
+    <div class="mobile-nav-item">
+      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false">
+        <span>Travel</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
       </button>
-    </div>
-    <div id="m-travel" class="mobile-sub" hidden>
-      <div class="mobile-sub-inner">
-        <a href="/ItalianExperience/travel/bespoke/" class="mobile-sublink" data-close>Bespoke</a>
-        <a href="/ItalianExperience/travel/gapyear/" class="mobile-sublink" data-close>Gap Year</a>
-        <a href="/ItalianExperience/travel/culinary/" class="mobile-sublink" data-close>Culinary Academy</a>
+      <div class="mobile-submenu">
+        <a href="/ItalianExperience/travel/" class="mobile-sub-link" data-close data-nav="travel">Travel Home</a>
+        <a href="/ItalianExperience/travel/bespoke/" class="mobile-sub-link" data-close>Bespoke Travel</a>
+        <a href="/ItalianExperience/travel/gapyear/" class="mobile-sub-link" data-close>Gap Year Program</a>
+        <a href="/ItalianExperience/travel/culinary/" class="mobile-sub-link" data-close>Culinary Academy</a>
       </div>
     </div>
 
-    <div class="mobile-acc-row">
-      <a href="/ItalianExperience/recruitment/" class="mobile-linkish" data-close data-nav="recruitment">Recruitment</a>
-      <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-recruitment" aria-label="Toggle Recruitment">
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
+    <div class="mobile-nav-item">
+      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false">
+        <span>Recruitment</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
       </button>
-    </div>
-    <div id="m-recruitment" class="mobile-sub" hidden>
-      <div class="mobile-sub-inner">
-        <a href="/ItalianExperience/recruitment/employer/" class="mobile-sublink" data-close>Employer</a>
-        <a href="/ItalianExperience/recruitment/candidate/" class="mobile-sublink" data-close>Candidate</a>
+      <div class="mobile-submenu">
+        <a href="/ItalianExperience/recruitment/" class="mobile-sub-link" data-close data-nav="recruitment">Recruitment Home</a>
+        <a href="/ItalianExperience/recruitment/employer/" class="mobile-sub-link" data-close>Per Aziende</a>
+        <a href="/ItalianExperience/recruitment/candidate/" class="mobile-sub-link" data-close>Per Candidati</a>
       </div>
     </div>
 
-    <div class="mobile-acc-row">
-      <a href="/ItalianExperience/flavors/" class="mobile-linkish" data-close data-nav="flavors">Flavors</a>
-      <button class="mobile-acc-btn" type="button" aria-expanded="false" aria-controls="m-flavors" aria-label="Toggle Flavors">
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
+    <div class="mobile-nav-item">
+      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false">
+        <span>Flavors</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
       </button>
-    </div>
-    <div id="m-flavors" class="mobile-sub" hidden>
-      <div class="mobile-sub-inner">
-        <a href="/ItalianExperience/flavors/for-your-home/" class="mobile-sublink" data-close>For your home</a>
-        <a href="/ItalianExperience/flavors/for-your-business/" class="mobile-sublink" data-close>For your business</a>
-        <a href="/ItalianExperience/flavors/aziende-italiane/" class="mobile-sublink" data-close>Aziende Italiane</a>
+      <div class="mobile-submenu">
+        <a href="/ItalianExperience/flavors/" class="mobile-sub-link" data-close data-nav="flavors">Flavors Home</a>
+        <a href="/ItalianExperience/flavors/for-your-home/" class="mobile-sub-link" data-close>For your home</a>
+        <a href="/ItalianExperience/flavors/for-your-business/" class="mobile-sub-link" data-close>For your business</a>
+        <a href="/ItalianExperience/flavors/aziende-italiane/" class="mobile-sub-link" data-close>Aziende Italiane</a>
       </div>
     </div>
 
-    <a href="/ItalianExperience/estates/" class="mobile-link" data-close data-nav="estates">Estates</a>
-    <a href="/ItalianExperience/contact/" class="mobile-link" data-close data-nav="contact">Contact</a>
-  </nav>
-</div>
-
-<!-- HEADER -->
-<nav class="glass-header" id="main-header" aria-label="Header">
-  <a href="/ItalianExperience/" class="block no-underline logo-link" aria-label="Go to Home">
-    <div class="logo-wrap pure-logo" id="logo-header">
-      <span class="font-it text-[70px]">Italian</span>
-      <div class="font-ex text-[35px]" data-text="EXPERIENCE"></div>
-      <div class="tricolore" aria-hidden="true">
-        <div style="background:var(--it-green)"></div>
-        <div style="background:#fff"></div>
-        <div style="background:var(--it-red)"></div>
-      </div>
-    </div>
-  </a>
-
-  <button id="central-menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu-overlay">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-linecap="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" stroke="rgba(197,160,89,0.4)" stroke-width="1" />
-      <line x1="8" y1="10" x2="16" y2="10" stroke="#c5a059" stroke-width="2.5" />
-      <line x1="10" y1="14" x2="14" y2="14" stroke="#c5a059" stroke-width="2.5" />
-    </svg>
-    <span>Menu</span>
-  </button>
-
-  <div class="nav-container" aria-label="Desktop navigation">
-    <a href="/ItalianExperience/" class="nav-link" data-nav="home">Home</a>
-
-    <div class="dropdown">
-      <a href="/ItalianExperience/travel/" class="nav-link" data-nav="travel">
-        Travel
-        <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
-      </a>
-      <div class="dropdown-menu">
-        <a href="/ItalianExperience/travel/bespoke/" class="dropdown-item">Bespoke</a>
-        <a href="/ItalianExperience/travel/gapyear/" class="dropdown-item">Gap Year</a>
-        <a href="/ItalianExperience/travel/culinary/" class="dropdown-item">Culinary Academy</a>
-      </div>
-    </div>
-
-    <div class="dropdown">
-      <a href="/ItalianExperience/recruitment/" class="nav-link" data-nav="recruitment">
-        Recruitment
-        <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
-      </a>
-      <div class="dropdown-menu">
-        <a href="/ItalianExperience/recruitment/employer/" class="dropdown-item">Employer</a>
-        <a href="/ItalianExperience/recruitment/candidate/" class="dropdown-item">Candidate</a>
-      </div>
-    </div>
-
-    <div class="dropdown">
-      <a href="/ItalianExperience/flavors/" class="nav-link" data-nav="flavors">
-        Flavors
-        <svg class="inline ml-1 opacity-40" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
-          <path d="m6 9 6 6 6-6"></path>
-        </svg>
-      </a>
-      <div class="dropdown-menu">
-        <a href="/ItalianExperience/flavors/for-your-home/" class="dropdown-item">For your home</a>
-        <a href="/ItalianExperience/flavors/for-your-business/" class="dropdown-item">For your business</a>
-        <a href="/ItalianExperience/flavors/aziende-italiane/" class="dropdown-item">Aziende Italiane</a>
-      </div>
-    </div>
-
-    <a href="/ItalianExperience/estates/" class="nav-link" data-nav="estates">Estates</a>
-    <a href="/ItalianExperience/contact/" class="nav-link" data-nav="contact">Contact</a>
+    <div class="mobile-nav-item"><a href="/ItalianExperience/estates/" class="mobile-link-main" data-close data-nav="estates">Estates</a></div>
+    <div class="mobile-nav-item"><a href="/ItalianExperience/contact/" class="mobile-link-main" data-close data-nav="contact">Contact</a></div>
   </div>
 </nav>
