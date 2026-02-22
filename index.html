@@ -358,6 +358,7 @@
       backdrop-filter:blur(22px);
       border:1px solid rgba(197,160,89,0.15);
       padding:clamp(2.2rem,5vw,5.5rem);
+      border-radius:var(--radius-premium);
     }
     .essence-title{
       font-family:'Playfair Display',serif;
@@ -652,6 +653,10 @@
       overflow-wrap:anywhere;
     }
 
+    .essence-cta{
+      border-radius:var(--radius-premium);
+    }
+
     @media (max-width:768px){
       .desktop-only{display:none}
       .mobile-only{display:block}
@@ -772,7 +777,7 @@
         <img id="essence-parallax" src="/ItalianExperience/assets/img/home/home-essence-bg.avif" alt="" loading="lazy" decoding="async" />
       </div>
 
-      <div class="essence-card reveal">
+      <div class="essence-card premium-card reveal">
         <span class="text-[0.7rem] uppercase tracking-[0.75em] text-[#c5a059] block mb-8">Discovery & Identity</span>
         <h2 class="essence-title">Ambassadors of the <br><span class="italic" style="color:var(--brand-gold)">Italian Soul.</span></h2>
         <p class="essence-p">Born among the icons of global hospitality, we curate experiences that transcend luxury. It’s not just about where you go; it’s about the legacy you feel.</p>

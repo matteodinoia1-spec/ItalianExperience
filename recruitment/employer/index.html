@@ -167,6 +167,17 @@
       height:280px;
     }
 
+    .economic-chart-box{
+      border-radius:var(--radius-premium);
+      backdrop-filter:blur(18px) saturate(150%);
+      -webkit-backdrop-filter:blur(18px) saturate(150%);
+      box-shadow:0 20px 40px rgba(0,0,0,0.45);
+    }
+
+    .economic-stat-box{
+      border-radius:var(--radius-premium);
+    }
+
     .legal-notice{
       font-size:0.6rem;
       line-height:2;
@@ -597,7 +608,7 @@
           </div>
         </div>
 
-        <div class="bg-[#080808] p-10 border border-white/5 shadow-2xl">
+        <div class="economic-chart-box bg-[#080808] p-10 border border-white/5 shadow-2xl">
           <h4 class="text-center brand-font italic text-xl mb-10 text-white">
             Payroll Contribution Analysis
           </h4>
@@ -607,12 +618,12 @@
           </div>
 
           <div class="mt-12 grid grid-cols-2 gap-6 text-center">
-            <div class="bg-white/5 p-6 border border-white/5">
+            <div class="economic-stat-box bg-white/5 p-6 border border-white/5">
               <span class="text-[0.5rem] text-slate-500 uppercase block mb-2 tracking-widest">Standard Cost</span>
               <span class="text-2xl font-bold text-white">7.65%</span>
             </div>
 
-            <div class="bg-[#c5a059]/10 p-6 border border-[#c5a059]/20">
+            <div class="economic-stat-box bg-[#c5a059]/10 p-6 border border-[#c5a059]/20">
               <span class="text-[0.5rem] text-[#c5a059] uppercase block mb-2 tracking-widest">Our Program</span>
               <span class="text-2xl font-bold text-[#c5a059]">0.00%</span>
             </div>
