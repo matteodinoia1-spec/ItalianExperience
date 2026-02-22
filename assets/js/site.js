@@ -132,19 +132,20 @@
   }
 
   function initMobileAccordion() {
-    const inlineAccordions = Array.from(document.querySelectorAll('.accordion-toggle'));
+    const inlineNav = document.getElementById('mobile-nav');
+    const inlineAccordions = inlineNav ? Array.from(inlineNav.querySelectorAll('.accordion-toggle')) : [];
     if (inlineAccordions.length) {
-      const inlineNav = document.getElementById('mobile-nav');
       if (inlineNav && inlineNav.dataset.ieAccordionInit === '1') return;
       if (inlineNav) inlineNav.dataset.ieAccordionInit = '1';
 
       inlineAccordions.forEach(toggle => {
-        toggle.addEventListener('click', () => {
+        toggle.addEventListener('click', (e) => {
+          e.preventDefault();
           const parent = toggle.closest('.mobile-nav-item');
           if (!parent) return;
 
           const wasOpen = parent.classList.contains('open');
-          document.querySelectorAll('.mobile-nav-item').forEach(item => {
+          inlineNav.querySelectorAll('.mobile-nav-item').forEach(item => {
             item.classList.remove('open');
             const btn = item.querySelector('.accordion-toggle');
             if (btn) btn.setAttribute('aria-expanded', 'false');
@@ -233,10 +234,11 @@
       }
     }
 
-    const inlineBtn = Array.from(document.querySelectorAll('.accordion-toggle')).find(btn => {
+    const inlineNav = document.getElementById('mobile-nav');
+    const inlineBtn = inlineNav ? Array.from(inlineNav.querySelectorAll('.accordion-toggle')).find(btn => {
       const label = btn.querySelector('span');
       return label && label.textContent && label.textContent.trim().toLowerCase() === section;
-    });
+    }) : null;
     if (inlineBtn) {
       const inlineItem = inlineBtn.closest('.mobile-nav-item');
       if (inlineItem) {
