@@ -35,11 +35,16 @@
     const inlineHeader = document.getElementById('main-header');
     const inlineMenuText = document.getElementById('menu-btn-text');
     if (inlineMenuBtn && inlineHeader) {
+      const isTabletOverlay = () => window.innerWidth >= 769 && window.innerWidth <= 1023;
+      const syncInlineBodyLock = (open) => {
+        document.body.classList.toggle('menu-open', open && isTabletOverlay());
+      };
+
       const closeInlineMenu = () => {
         inlineHeader.classList.remove('is-open');
         inlineMenuBtn.classList.remove('is-open');
         inlineMenuBtn.setAttribute('aria-expanded', 'false');
-        document.body.classList.remove('menu-open');
+        syncInlineBodyLock(false);
         if (inlineMenuText) inlineMenuText.textContent = 'Menu';
       };
 
@@ -47,7 +52,7 @@
         inlineHeader.classList.add('is-open');
         inlineMenuBtn.classList.add('is-open');
         inlineMenuBtn.setAttribute('aria-expanded', 'true');
-        document.body.classList.add('menu-open');
+        syncInlineBodyLock(true);
         if (inlineMenuText) inlineMenuText.textContent = 'Chiudi';
       };
 
@@ -71,6 +76,7 @@
 
       window.addEventListener('resize', () => {
         if (window.innerWidth >= 1024) closeInlineMenu();
+        else syncInlineBodyLock(inlineHeader.classList.contains('is-open'));
       }, { passive: true });
 
       return;
