@@ -624,3 +624,37 @@ form button[type="submit"]{
   -webkit-backdrop-filter:blur(18px) saturate(150%);
   box-shadow:0 12px 28px rgba(0,0,0,0.35);
 }
+
+/* Dynamic mouse shimmer for glass surfaces */
+:is(.glass-surface,.premium-card,.hero-glass-card,.glass-header){
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+}
+
+:is(.glass-surface,.premium-card,.hero-glass-card,.glass-header)::after{
+  content:"";
+  position:absolute;
+  inset:-30%;
+  pointer-events:none;
+  opacity:0;
+  background:radial-gradient(
+    240px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255,255,255,0.22) 0%,
+    rgba(255,255,255,0.1) 20%,
+    rgba(255,255,255,0) 62%
+  );
+  transition:opacity 0.25s ease;
+  z-index:0;
+}
+
+:is(.glass-surface,.premium-card,.hero-glass-card,.glass-header) > *{
+  position:relative;
+  z-index:1;
+}
+
+@media (hover:hover){
+  :is(.glass-surface,.premium-card,.hero-glass-card,.glass-header):hover::after{
+    opacity:1;
+  }
+}

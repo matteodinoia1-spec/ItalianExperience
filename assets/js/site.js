@@ -348,6 +348,23 @@
     });
   }
 
+  function initDynamicShimmer(root) {
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+    const scope = root || document;
+    const surfaces = scope.querySelectorAll('.glass-surface, .premium-card, .hero-glass-card, .glass-header');
+    if (!surfaces.length) return;
+
+    surfaces.forEach((el) => {
+      el.addEventListener('mousemove', (e) => {
+        const rect = el.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / Math.max(rect.width, 1)) * 100;
+        const y = ((e.clientY - rect.top) / Math.max(rect.height, 1)) * 100;
+        el.style.setProperty('--mouse-x', `${x}%`);
+        el.style.setProperty('--mouse-y', `${y}%`);
+      }, { passive: true });
+    });
+  }
+
   function initGlobalHeaderOffset() {
     const header = document.getElementById('main-header');
     if (!header) return;
@@ -376,6 +393,7 @@
   function IEInit(root) {
     buildExperienceLetters(root);
     applyPremiumCards(root);
+    initDynamicShimmer(root);
     initActiveNav();
     initMobileAccordion();
     initMobileMenu();
