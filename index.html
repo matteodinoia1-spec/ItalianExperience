@@ -657,12 +657,285 @@
       border-radius:var(--radius-premium);
     }
 
+    /* New Desktop Hero Effect */
+    .hero-container-root{
+      margin:0;
+      padding:0;
+      background:var(--brand-obsidian);
+      color:#fff;
+      font-family:'Inter',sans-serif;
+      overflow-x:hidden;
+      width:100%;
+    }
+    .hero-top-nav{
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:200px;
+      z-index:1000;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:0 3rem;
+      pointer-events:none;
+    }
+    .hero-contact-link{
+      position:absolute;
+      right:3rem;
+      top:4.5rem;
+      pointer-events:auto;
+      color:#fff;
+      font-size:0.7rem;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:0.3em;
+      text-decoration:none;
+      opacity:0.6;
+      transition:transform 0.05s linear, opacity 0.05s linear;
+      will-change:transform, opacity;
+    }
+    .hero-contact-link::after{
+      content:"";
+      position:absolute;
+      bottom:-4px;
+      left:0;
+      width:0;
+      height:1px;
+      background:var(--brand-gold);
+      transition:width 0.4s ease;
+    }
+    .hero-contact-link:hover{opacity:1;color:var(--brand-gold)}
+    .hero-contact-link:hover::after{width:100%}
+    .hero-logo-container{
+      pointer-events:auto;
+      text-align:center;
+      transition:transform 0.05s linear, opacity 0.05s linear;
+      will-change:transform, opacity;
+      margin-top:1rem;
+    }
+    .hero-pure-logo{
+      display:inline-flex;
+      align-items:baseline;
+      gap:20px;
+      position:relative;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .hero-font-it-logo{font-family:'Great Vibes',cursive;color:var(--brand-gold);font-size:6.5rem;line-height:1}
+    .hero-font-ex-logo{font-family:'Montserrat',sans-serif;color:var(--brand-gold);font-size:2.8rem;font-weight:900;letter-spacing:0.12em;display:flex;line-height:1}
+    .hero-letter{display:inline-block;transition:all 0.2s ease-out}
+    .hero-tricolore-line{
+      position:absolute;
+      bottom:-15px;
+      left:50%;
+      transform:translateX(-50%);
+      display:flex;
+      height:4px;
+      width:140px;
+    }
+    .hero-tricolore-line div{flex:1}
+    .hero-scroll-indicator{
+      position:fixed;
+      bottom:2.5rem;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:1000;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:1rem;
+      opacity:0.5;
+      transition:opacity 0.4s ease, transform 0.4s ease;
+      pointer-events:none;
+    }
+    .hero-scroll-text{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.4em;color:var(--brand-gold)}
+    .hero-scroll-line{
+      width:1px;
+      height:50px;
+      background:linear-gradient(to bottom, var(--brand-gold), transparent);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero-scroll-line::after{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:#fff;
+      animation:hero-scroll-anim 2s infinite cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes hero-scroll-anim{
+      0%{transform:translateY(-100%)}
+      100%{transform:translateY(100%)}
+    }
+    .hero-portal-wrapper{
+      display:flex;
+      width:100%;
+      height:100vh;
+      position:relative;
+      overflow:hidden;
+      background:var(--brand-obsidian);
+    }
+    .hero-pillar{
+      position:relative;
+      flex:1;
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-decoration:none;
+      transition:flex 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      border-right:1px solid rgba(255,255,255,0.05);
+      overflow:hidden;
+      z-index:10;
+      padding:2rem;
+    }
+    .hero-pillar:last-child{border-right:none}
+    .hero-pillar:hover{flex:3.5}
+    .hero-pillar-bg{
+      position:absolute;
+      inset:0;
+      z-index:0;
+      filter:brightness(0.22);
+      transition:transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
+    }
+    .hero-pillar-bg img{width:100%;height:100%;object-fit:cover}
+    .hero-pillar:hover .hero-pillar-bg{filter:brightness(0.4);transform:scale(1.05)}
+    .hero-pillar-inner{
+      position:relative;
+      z-index:5;
+      text-align:center;
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      pointer-events:none;
+      margin-top:160px;
+      transition:transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hero-pillar:hover .hero-pillar-inner{transform:translateY(-15px)}
+    .hero-pillar-label-gold{
+      font-size:0.65rem;
+      text-transform:uppercase;
+      letter-spacing:0.4em;
+      color:var(--brand-gold);
+      font-weight:700;
+      margin-bottom:0.8rem;
+      text-shadow:0 2px 10px rgba(0,0,0,0.9);
+    }
+    .hero-title-portal{
+      font-family:'Playfair Display',serif;
+      font-size:clamp(2.2rem, 3.8vw, 3.2rem);
+      font-style:italic;
+      color:#fff;
+      line-height:1;
+      margin-bottom:0;
+      text-shadow:0 4px 15px rgba(0,0,0,0.8);
+    }
+    .hero-glass-card{
+      position:relative;
+      background:rgba(255,255,255,0);
+      backdrop-filter:blur(0px);
+      border:1px solid rgba(255,255,255,0);
+      padding:2.5rem 1.5rem;
+      width:100%;
+      max-width:350px;
+      border-radius:var(--radius-premium);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      transition:all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor:pointer;
+      pointer-events:auto;
+      overflow:hidden;
+    }
+    @media (hover:hover){
+      .hero-glass-card::before{
+        content:"";
+        position:absolute;
+        inset:0;
+        background:radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.08), transparent 40%);
+        opacity:0;
+        transition:opacity 0.5s ease;
+        pointer-events:none;
+        z-index:-1;
+      }
+      .hero-pillar:hover .hero-glass-card{
+        background:var(--ice-bg);
+        backdrop-filter:blur(20px) saturate(180%);
+        border:1px solid var(--ice-border);
+        box-shadow:0 30px 60px rgba(0,0,0,0.4);
+      }
+      .hero-glass-card:hover{
+        background:rgba(255,255,255,0.12) !important;
+        border-color:rgba(255,255,255,0.3) !important;
+        transform:scale(1.03);
+      }
+      .hero-glass-card:hover::before{opacity:1}
+    }
+    .hero-pillar-desc{
+      font-size:0.85rem;
+      color:rgba(255,255,255,0.6);
+      max-width:260px;
+      line-height:1.6;
+      margin-top:0;
+      max-height:0;
+      opacity:0;
+      overflow:hidden;
+      transition:all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hero-pillar:hover .hero-pillar-desc{opacity:1;max-height:100px;margin-top:1.2rem}
+    .hero-submenu-list{
+      width:100%;
+      max-height:0;
+      opacity:0;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      gap:0.4rem;
+      transition:all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hero-pillar:hover .hero-submenu-list{
+      max-height:400px;
+      opacity:1;
+      margin-top:1.5rem;
+      padding-top:1.25rem;
+      border-top:1px solid rgba(255,255,255,0.1);
+    }
+    .hero-submenu-link{
+      display:block;
+      color:var(--brand-gold);
+      text-transform:uppercase;
+      font-size:0.65rem;
+      letter-spacing:0.2em;
+      text-decoration:none;
+      font-weight:700;
+      padding:0.6rem;
+      transition:all 0.3s ease;
+      border-radius:6px;
+    }
+    .hero-submenu-link:hover{background:rgba(255,255,255,0.06);color:#fff;transform:translateX(5px)}
+
     @media (max-width:768px){
       .desktop-only{display:none}
       .mobile-only{display:block}
       .scroll-indicator{display:none}
       .contact-desktop{display:none}
       .contact-mobile{display:inline-flex}
+      .hero-top-nav{height:120px;padding:0 1.5rem}
+      .hero-contact-link{right:1.5rem;top:2rem;font-size:0.6rem}
+      .hero-font-it-logo{font-size:3.8rem}
+      .hero-font-ex-logo{font-size:1.6rem}
+      .hero-portal-wrapper{flex-direction:column;height:auto}
+      .hero-pillar{height:80vh;flex:none;border-right:none;border-bottom:1px solid rgba(255,255,255,0.1)}
+      .hero-pillar-inner{margin-top:0}
+      .hero-glass-card{background:rgba(10,10,10,0.4);opacity:1;max-width:95%}
+      .hero-pillar-desc{opacity:1;max-height:100px;margin-top:1rem}
+      .hero-scroll-indicator{display:none}
     }
 
     @media (min-width:769px){
@@ -689,88 +962,97 @@
 
 <body>
 
-  <a href="./contact/index.html" target="_top" class="contact-mobile" aria-label="Go to contact page">Contact</a>
+  <a href="/ItalianExperience/contact/" target="_top" class="contact-mobile" aria-label="Go to contact page">Contact</a>
 
   <!-- DESKTOP -->
   <div class="desktop-only">
-
-    <section class="portal-wrapper" aria-label="Italian Experience Portal">
-
-      <div class="absolute top-12 left-12 z-[100] pointer-events-auto">
-        <a href="./" target="_top" class="block no-underline">
-          <div class="pure-logo" id="logo-main">
-            <span class="font-it text-[70px]">Italian</span>
-            <div class="font-ex text-[35px]" data-text="EXPERIENCE"></div>
-            <div class="tricolore">
-              <div style="background:var(--it-green)"></div>
-              <div style="background:#fff"></div>
-              <div style="background:var(--it-red)"></div>
+    <div class="hero-container-root">
+      <header class="hero-top-nav">
+        <div class="hero-logo-container" id="hero-main-logo">
+          <a href="/ItalianExperience/" class="hero-logo-link" id="hero-logo-prism" aria-label="Go to home">
+            <div class="hero-pure-logo">
+              <span class="hero-font-it-logo">Italian</span>
+              <div class="hero-font-ex-logo" data-text="EXPERIENCE"></div>
+              <div class="hero-tricolore-line">
+                <div style="background:var(--it-green)"></div>
+                <div style="background:#fff"></div>
+                <div style="background:var(--it-red)"></div>
+              </div>
             </div>
-          </div>
-        </a>
+          </a>
+        </div>
+        <a href="/ItalianExperience/contact/" class="hero-contact-link" id="hero-contact-link">Contact</a>
+      </header>
+
+      <div class="hero-scroll-indicator" id="hero-scroll-indicator">
+        <span class="hero-scroll-text">Scroll</span>
+        <div class="hero-scroll-line"></div>
       </div>
 
-      <a href="./contact/index.html" target="_top" class="contact-desktop" aria-label="Go to contact page">Contact</a>
+      <main class="hero-portal-wrapper" aria-label="Italian Experience Portal">
+        <section class="hero-pillar">
+          <a href="/ItalianExperience/travel/" style="position:absolute;inset:0;z-index:1;cursor:pointer;" aria-label="Travel"></a>
+          <div class="hero-pillar-bg"><img src="/ItalianExperience/assets/img/home/home-pillar-travel.avif" alt="Travel"></div>
+          <div class="hero-pillar-inner">
+            <div class="hero-glass-card">
+              <span class="hero-pillar-label-gold">Bespoke Travel</span>
+              <h2 class="hero-title-portal">Travel</h2>
+              <p class="hero-pillar-desc">Elite strategic curation for metropolitan and coastal odysseys across Italy.</p>
+              <div class="hero-submenu-list">
+                <a href="/ItalianExperience/travel/bespoke/" class="hero-submenu-link">Bespoke Travel</a>
+                <a href="/ItalianExperience/travel/gapyear/" class="hero-submenu-link">Gap Year Program</a>
+                <a href="/ItalianExperience/travel/culinary/" class="hero-submenu-link">Culinary Academy</a>
+              </div>
+            </div>
+          </div>
+        </section>
 
-      <a href="./travel/" target="_top" class="portal-pillar">
-        <div class="pillar-bg">
-          <img src="/ItalianExperience/assets/img/home/home-pillar-travel.avif" alt="Travel" loading="eager" fetchpriority="high" decoding="async">
-        </div>
-        <div class="pillar-inner">
-          <span class="label">Bespoke Curation</span>
-          <div class="gold-line"></div>
-          <h2 class="title-portal fit-title" data-fit-min="18" data-fit-group="pillars">Travel</h2>
-          <p class="description">Elite strategic curation for metropolitan and coastal odysseys.</p>
-        </div>
-      </a>
+        <section class="hero-pillar">
+          <a href="/ItalianExperience/recruitment/" style="position:absolute;inset:0;z-index:1;cursor:pointer;" aria-label="Recruitment"></a>
+          <div class="hero-pillar-bg"><img src="/ItalianExperience/assets/img/home/home-pillar-recruitment.avif" alt="Recruitment"></div>
+          <div class="hero-pillar-inner">
+            <div class="hero-glass-card">
+              <span class="hero-pillar-label-gold">Staffing Excellence</span>
+              <h2 class="hero-title-portal">Recruitment</h2>
+              <p class="hero-pillar-desc">Heritage ambassadors for prestigious hospitality and private staffing recruitment.</p>
+              <div class="hero-submenu-list">
+                <a href="/ItalianExperience/recruitment/employer/" class="hero-submenu-link">For Employers</a>
+                <a href="/ItalianExperience/recruitment/candidate/" class="hero-submenu-link">For Candidates</a>
+              </div>
+            </div>
+          </div>
+        </section>
 
-      <a href="./recruitment/" target="_top" class="portal-pillar">
-        <div class="pillar-bg">
-          <img src="/ItalianExperience/assets/img/home/home-pillar-recruitment.avif" alt="Recruitment" loading="lazy" decoding="async">
-        </div>
-        <div class="pillar-inner">
-          <span class="label">Staffing Excellence</span>
-          <div class="gold-line"></div>
-          <h2 class="title-portal fit-title" data-fit-min="18" data-fit-group="pillars">Recruitment</h2>
-          <p class="description">Heritage ambassadors for prestigious hospitality.</p>
-        </div>
-      </a>
+        <section class="hero-pillar">
+          <a href="/ItalianExperience/flavors/" style="position:absolute;inset:0;z-index:1;cursor:pointer;" aria-label="Flavors"></a>
+          <div class="hero-pillar-bg"><img src="/ItalianExperience/assets/img/home/home-pillar-flavors.avif" alt="Flavors"></div>
+          <div class="hero-pillar-inner">
+            <div class="hero-glass-card">
+              <span class="hero-pillar-label-gold">Premium Imports</span>
+              <h2 class="hero-title-portal">Flavors</h2>
+              <p class="hero-pillar-desc">A personally tested selection of authentic, premium culinary staples.</p>
+              <div class="hero-submenu-list">
+                <a href="/ItalianExperience/flavors/for-your-home/" class="hero-submenu-link">For your home</a>
+                <a href="/ItalianExperience/flavors/for-your-business/" class="hero-submenu-link">For your business</a>
+                <a href="/ItalianExperience/flavors/aziende-italiane/" class="hero-submenu-link">Aziende Italiane</a>
+              </div>
+            </div>
+          </div>
+        </section>
 
-      <a href="./flavors/" target="_top" class="portal-pillar">
-        <div class="pillar-bg">
-          <img src="/ItalianExperience/assets/img/home/home-pillar-flavors.avif" alt="Flavors" loading="lazy" decoding="async">
-        </div>
-        <div class="pillar-inner">
-          <span class="label">Premium Imports</span>
-          <div class="gold-line"></div>
-          <h2 class="title-portal fit-title" data-fit-min="18" data-fit-group="pillars">Flavors</h2>
-          <p class="description">A personally tested selection of authentic culinary staples.</p>
-        </div>
-      </a>
-
-      <a href="./estates/" target="_top" class="portal-pillar">
-        <div class="pillar-bg">
-          <img
-            src="/ItalianExperience/assets/img/estates/hero-estates.jpg"
-            srcset="/ItalianExperience/assets/img/home/home-pillar-estates-960.jpg 960w, /ItalianExperience/assets/img/estates/hero-estates.jpg 1920w"
-            sizes="(min-width: 1024px) 25vw, 100vw"
-            alt="Estates"
-            loading="lazy" decoding="async">
-        </div>
-        <div class="pillar-inner">
-          <span class="label">Asset Strategy</span>
-          <div class="gold-line"></div>
-          <h2 class="title-portal fit-title" data-fit-min="18" data-fit-group="pillars">Estates</h2>
-          <p class="description">Consultancy for the acquisition of prestigious assets.</p>
-        </div>
-      </a>
-
-      <a href="#essence" class="scroll-indicator" aria-label="Scroll to Discover">
-        <span>Scroll</span>
-        <div class="scroll-track" aria-hidden="true"><div class="scroll-dot"></div></div>
-      </a>
-
-    </section>
+        <section class="hero-pillar">
+          <a href="/ItalianExperience/estates/" style="position:absolute;inset:0;z-index:1;cursor:pointer;" aria-label="Estates"></a>
+          <div class="hero-pillar-bg"><img src="/ItalianExperience/assets/img/estates/hero-estates.jpg" alt="Estates"></div>
+          <div class="hero-pillar-inner">
+            <div class="hero-glass-card">
+              <span class="hero-pillar-label-gold">Asset Strategy</span>
+              <h2 class="hero-title-portal">Estates</h2>
+              <p class="hero-pillar-desc">Strategic consultancy for the acquisition of prestigious assets.</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
 
     <section id="essence" class="essence-section premium-card" aria-label="The Essence">
       <div class="essence-bg" aria-hidden="true">
@@ -962,6 +1244,97 @@ STRATEGIC ADVISORY</p>
         ex.innerHTML = text.split('').map(c => `<span class="letter">${c}</span>`).join('');
       });
 
+      const heroEx = document.querySelector('.hero-font-ex-logo');
+      if (heroEx) {
+        const text = heroEx.getAttribute('data-text') || 'EXPERIENCE';
+        heroEx.innerHTML = text.split('').map(char => `<span class="hero-letter">${char}</span>`).join('');
+      }
+
+      const prismLogo = document.getElementById('hero-logo-prism');
+      const logoContainer = document.getElementById('hero-main-logo');
+      const contactLink = document.getElementById('hero-contact-link');
+      const scrollIndicator = document.getElementById('hero-scroll-indicator');
+      if (prismLogo && logoContainer && contactLink) {
+        const prLetters = prismLogo.querySelectorAll('.hero-letter');
+        const italianWord = prismLogo.querySelector('.hero-font-it-logo');
+
+        prismLogo.addEventListener('mousemove', (e) => {
+          if (!italianWord) return;
+          const rect = prismLogo.getBoundingClientRect();
+          const mouseX = e.clientX - rect.left;
+          const itRect = italianWord.getBoundingClientRect();
+          const itDist = Math.abs(mouseX - (itRect.left + itRect.width / 2 - rect.left));
+
+          if (itDist < 350) {
+            const power = (350 - itDist) / 350;
+            italianWord.style.textShadow = `0 0 ${50 * power}px rgba(197, 160, 89, 0.8)`;
+            italianWord.style.transform = `scale(${1 + power * 0.05})`;
+          }
+
+          prLetters.forEach(l => {
+            const lr = l.getBoundingClientRect();
+            const lx = lr.left + lr.width / 2 - rect.left;
+            const dist = Math.abs(mouseX - lx);
+            if (dist < 150) {
+              const p = (150 - dist) / 150;
+              if (lx < mouseX - 15) l.style.color = '#008C45';
+              else if (lx > mouseX + 15) l.style.color = '#CD212A';
+              else l.style.color = '#FFFFFF';
+              l.style.transform = `scale(${1 + p * 0.35}) translateY(${-p * 15}px)`;
+              l.style.textShadow = `0 0 ${20 * p}px currentColor`;
+            } else {
+              l.style.color = '';
+              l.style.transform = '';
+              l.style.textShadow = '';
+            }
+          });
+        }, { passive: true });
+
+        prismLogo.addEventListener('mouseleave', () => {
+          prLetters.forEach(l => { l.style.color = ''; l.style.transform = ''; l.style.textShadow = ''; });
+          if (italianWord) { italianWord.style.textShadow = ''; italianWord.style.transform = ''; }
+        }, { passive: true });
+
+        window.addEventListener('scroll', () => {
+          const scrollY = window.scrollY;
+          const scrollTarget = 450;
+          if (scrollY <= scrollTarget) {
+            const progress = scrollY / scrollTarget;
+            const logoScale = 1 - (progress * 0.4);
+            const logoOpacity = 1 - (progress * 1.2);
+            const logoTranslateY = -(progress * 250);
+            logoContainer.style.transform = `scale(${Math.max(logoScale, 0)}) translateY(${logoTranslateY}px)`;
+            logoContainer.style.opacity = Math.max(logoOpacity, 0);
+
+            const contactOpacity = 0.6 - (progress * 0.6);
+            const contactTranslateY = -(progress * 150);
+            contactLink.style.transform = `translateY(${contactTranslateY}px)`;
+            contactLink.style.opacity = Math.max(contactOpacity, 0);
+
+            if (scrollIndicator) {
+              scrollIndicator.style.opacity = Math.max(0.5 - (progress * 2), 0);
+            }
+          } else {
+            logoContainer.style.opacity = 0;
+            contactLink.style.opacity = 0;
+            if (scrollIndicator) scrollIndicator.style.opacity = 0;
+          }
+        }, { passive: true });
+      }
+
+      const glassCards = document.querySelectorAll('.hero-glass-card');
+      if (window.matchMedia("(pointer: fine)").matches) {
+        glassCards.forEach(card => {
+          card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / card.clientWidth) * 100;
+            const y = ((e.clientY - rect.top) / card.clientHeight) * 100;
+            card.style.setProperty('--mouse-x', `${x}%`);
+            card.style.setProperty('--mouse-y', `${y}%`);
+          }, { passive: true });
+        });
+      }
+
       // Reveal
       const obs = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -1031,7 +1404,6 @@ STRATEGIC ADVISORY</p>
         }, { passive: true });
       }
 
-      initLogoMouse('logo-main');
       initLogoMouse('logo-footer');
 
       // Mobile touch logo effect
