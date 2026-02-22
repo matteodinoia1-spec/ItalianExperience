@@ -6,6 +6,10 @@
   --it-green:#008C45;
   --it-red:#CD212A;
   --ie-header-h:110px;
+  --radius-premium:12px;
+  --ice-bg:rgba(255,255,255,0.07);
+  --ice-border:rgba(255,255,255,0.12);
+  --ice-shadow:0 20px 50px rgba(0,0,0,0.55);
 }
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -544,4 +548,43 @@ body.menu-open{overflow:hidden}
   .nav-link,.dropdown-menu,#central-menu-btn,.dropdown-item,.mobile-link,.mobile-linkish,.mobile-acc-btn,.chev,.mobile-sub{transition-duration:0.08s}
   .ie-reveal{transition:none;opacity:1;transform:none}
   .ie-img-reveal{transition:none;transform:none}
+}
+
+/* ─── Ice Glass System ─── */
+.premium-card{
+  background:linear-gradient(145deg, rgba(255,255,255,0.11), rgba(255,255,255,0.035));
+  border:1px solid var(--ice-border);
+  backdrop-filter:blur(26px) saturate(165%);
+  -webkit-backdrop-filter:blur(26px) saturate(165%);
+  box-shadow:var(--ice-shadow);
+  border-radius:var(--radius-premium) !important;
+}
+
+/* Radius unification for primary content blocks and controls */
+.service-contact-card,
+.service-field,
+.service-select,
+.service-textarea,
+.quote-box,
+.disclosure-container,
+.info-box,
+.chart-container,
+.portal-card,
+.service-panel,
+.hub-panel,
+.btn-panel,
+.dropdown-menu,
+#mobile-menu-overlay,
+.mobile-sub,
+.mobile-submenu,
+.scroll-indicator,
+.explore-indicator{
+  border-radius:var(--radius-premium) !important;
+}
+
+/* Keep panel/card image crops coherent with premium radius */
+.portal-card,
+.service-panel,
+.hub-panel{
+  overflow:hidden;
 }

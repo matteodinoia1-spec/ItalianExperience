@@ -316,6 +316,26 @@
     targets.forEach(function (el) { observer.observe(el); });
   }
 
+  function applyPremiumCards(root) {
+    const scope = root || document;
+    const selectors = [
+      '.service-contact-card',
+      '.quote-box',
+      '.disclosure-container',
+      '.info-box',
+      '.chart-container',
+      '.portal-card',
+      '.service-panel',
+      '.hub-panel',
+      '.service-contact .max-w-6xl > div',
+      '.service-contact .max-w-5xl > div'
+    ];
+
+    selectors.forEach(sel => {
+      scope.querySelectorAll(sel).forEach(el => el.classList.add('premium-card'));
+    });
+  }
+
   function initGlobalHeaderOffset() {
     const header = document.getElementById('main-header');
     if (!header) return;
@@ -343,6 +363,7 @@
 
   function IEInit(root) {
     buildExperienceLetters(root);
+    applyPremiumCards(root);
     initActiveNav();
     initMobileAccordion();
     initMobileMenu();
