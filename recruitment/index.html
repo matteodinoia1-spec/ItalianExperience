@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -16,630 +16,417 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.italianexp.com/recruitment/" />
 
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@900&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/ItalianExperience/assets/css/tailwind.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
   <style>
-    /* Old local fallback kept for rollback context:
-       :root{ --ie-header-h: 120px; }
-       Header height is now provided globally by assets/css/site.css + assets/js/site.js.
-    */
-
-    .hero-recruitment{
-      background:#000;
+    :root {
+      --brand-gold: #c5a059;
+      --it-gold: #c5a059;
+      --brand-obsidian: #080808;
+      --ice-bg: rgba(255, 255, 255, 0.05);
+      --ice-border: rgba(255, 255, 255, 0.12);
+      --radius-premium: 12px;
+      --ie-header-h: 0px;
     }
 
-    .panel-title{
-      font-size:clamp(2.1rem, 5.8vw, 4.6rem);
-      line-height:0.98;
-      letter-spacing:-0.03em;
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      background: var(--brand-obsidian);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
     }
 
-    .recruitment-grid{
-      padding-top: calc(var(--ie-header-h) + env(safe-area-inset-top) + 24px);
-      align-content: center;
-      min-height: calc(100dvh - var(--ie-header-h));
-    }
+    .text-gold { color: var(--it-gold); }
 
-    /* BACKGROUND SPLIT */
-    .recruitment-bg{ display:flex; flex-direction:column; }
-    .bg-half{ width:100%; height:50%; }
-
-    @media (min-width:768px){
-      .recruitment-bg{ flex-direction:row; }
-      .bg-half{ width:50%; height:100%; }
-    }
-
-    /* FIX: align mobile split exactly with the 2 rows that contain the content */
-    @media (max-width:767px){
-      .recruitment-bg{
-        /* Make bg cover the full container, not just the content area */
-        height: 100% !important; 
-      }
-      
-      /* CALCOLO CORRETTO PER L'ALLINEAMENTO:
-         Il contenuto (grid) inizia dopo il padding superiore.
-         L'immagine superiore deve coprire il Padding + Metà dell'altezza rimanente.
-         Formula: 50% dell'altezza totale + Metà del Padding Superiore.
-      */
-      #bg-left {
-        height: calc(50% + (var(--ie-header-h) + env(safe-area-inset-top) + 24px) / 2);
-        background-position: center;
-      }
-
-      /* L'immagine inferiore deve coprire il resto.
-         Formula: 50% dell'altezza totale - Metà del Padding Superiore.
-      */
-      #bg-right {
-        height: calc(50% - (var(--ie-header-h) + env(safe-area-inset-top) + 24px) / 2);
-        background-position: center;
-      }
-    }
-
-    @media (max-width:767px){
-      .hero-recruitment.ie-hero-shell{
-        height:auto;
-        min-height:100dvh;
-        overflow:visible;
-      }
-
-      .panel-inner{ padding-top: 46px; padding-bottom: 26px; }
-      .panel-title{ font-size: clamp(1.95rem, 10.5vw, 3.05rem); line-height: 1.02; }
-      .panel-label{ letter-spacing: 0.4em; }
-    }
-
-    /* Mobile modal */
-    .ie-modal{
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      background: rgba(0,0,0,0.82);
-      backdrop-filter: blur(14px);
-      display: none;
-    }
-    .ie-modal.is-open{ display:block; }
-    .ie-modal-card{
-      position:absolute;
-      inset: 12px;
-      border: 1px solid rgba(197,160,89,0.18);
-      background: rgba(8,8,8,0.94);
+    .recruitment-wrapper {
+      display: flex;
+      width: 100%;
+      height: 100vh;
+      position: relative;
       overflow: hidden;
     }
-    .ie-modal-scroll{
+
+    .pillar {
+      position: relative;
+      flex: 1;
       height: 100%;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 18px 16px 22px 16px;
-    }
-    .ie-modal-close{
-      position: sticky;
-      top: 0;
-      display:flex;
-      justify-content:flex-end;
-      padding: 6px 0 10px 0;
-      z-index: 5;
-      background:linear-gradient(to bottom, rgba(8,8,8,0.98) 0%, rgba(8,8,8,0) 100%);
-    }
-    .ie-xbtn{
-      width: 44px;
-      height: 44px;
-      border: 1px solid rgba(197,160,89,0.35);
-      color: #c5a059;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size: 18px;
-      line-height: 1;
-      background: rgba(0,0,0,0.35);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: flex 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+      padding: 2rem;
+      padding-top: calc(var(--ie-header-h) + 20px);
     }
 
-    .ie-hub-cta{
-      border-radius: var(--radius-premium) !important;
-      backdrop-filter: blur(16px) saturate(150%);
-      -webkit-backdrop-filter: blur(16px) saturate(150%);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+    .pillar:last-child { border-right: none; }
+    .pillar:hover { flex: 2.5; }
+
+    .pillar-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      filter: brightness(0.25);
+      transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
     }
-    .ie-hub-toggle{
+
+    .pillar-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .pillar:hover .pillar-bg {
+      filter: brightness(0.4);
+      transform: scale(1.05);
+    }
+
+    .glass-card {
+      position: relative;
+      z-index: 5;
+      background: var(--ice-bg);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
+      border: 1px solid var(--ice-border);
       border-radius: var(--radius-premium);
-      padding: 0.55rem 0.9rem;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      padding: 3rem 2.5rem;
+      width: 100%;
+      max-width: 520px;
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      transition: background 0.5s ease, border-color 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease, min-height 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      pointer-events: auto;
+      overflow: hidden;
     }
-    .ie-detail-card{
-      border-radius: var(--radius-premium);
-      background: linear-gradient(145deg, rgba(255,255,255,0.09), rgba(255,255,255,0.025));
-      border: 1px solid rgba(255,255,255,0.12);
-      backdrop-filter: blur(18px) saturate(160%);
-      -webkit-backdrop-filter: blur(18px) saturate(160%);
-      box-shadow: 0 16px 32px rgba(0,0,0,0.35);
+
+    .glass-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.12), transparent 45%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      z-index: -1;
     }
-    @media (min-width:768px){
-      .ie-modal{ display:none !important; }
+
+    .glass-card:hover::before { opacity: 1; }
+
+    .glass-card:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: scale(1.03);
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.65);
+      min-height: 650px;
+      justify-content: flex-start;
+    }
+
+    .label-gold {
+      color: var(--it-gold);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      display: block;
+    }
+
+    .pillar-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 4.5vw, 4.2rem);
+      font-style: italic;
+      line-height: 1.05;
+      margin-bottom: 0;
+      transition: all 0.5s ease;
+    }
+
+    .glass-card:hover .pillar-title {
+      text-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      margin-bottom: 1.5rem;
+    }
+
+    .pillar-desc {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      max-width: 380px;
+      margin-left: auto;
+      margin-right: auto;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .pillar:hover .pillar-desc {
+      opacity: 1;
+      max-height: 150px;
+      margin-top: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .details-box {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: left;
+    }
+
+    .pillar:hover .details-box {
+      max-height: 800px;
+      opacity: 1;
+      padding-top: 2.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .feature-item i {
+      color: var(--it-gold);
+      margin-top: 0.3rem;
+      font-size: 0.85rem;
+    }
+
+    .feature-text h4 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.3rem;
+    }
+
+    .feature-text p {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.4);
+      font-style: italic;
+    }
+
+    .cta-button {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 1.1rem 3rem;
+      border: 1px solid var(--it-gold);
+      color: var(--it-gold);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-decoration: none;
+      transition: all 0.4s ease;
+      border-radius: 4px;
+    }
+
+    .cta-button:hover {
+      background: var(--it-gold);
+      color: #000;
+    }
+
+    @media (max-width: 768px) {
+      .recruitment-wrapper {
+        flex-direction: column;
+        height: auto;
+      }
+
+      .pillar {
+        height: auto;
+        min-height: 90vh;
+        flex: none;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 4rem;
+      }
+
+      .glass-card {
+        max-width: 90%;
+        padding: 2.5rem 1.5rem;
+        transform: none !important;
+        min-height: auto !important;
+      }
+
+      .pillar-desc {
+        opacity: 1;
+        max-height: 1000px;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .details-box {
+        max-height: 1000px;
+        opacity: 1;
+        margin-top: 2rem;
+        padding-top: 2rem;
+      }
     }
   </style>
 </head>
 
-<body class="bg-[#080808] text-white overflow-x-hidden">
-
+<body>
   <div id="site-header"></div>
 
-  <section class="relative w-full overflow-hidden hero-recruitment ie-hero-shell ie-hero-offset">
-
-    <div class="absolute inset-0 z-0 recruitment-bg">
-      <div id="bg-left" class="bg-half opacity-[0.28] md:border-r border-white/10 bg-cover bg-center transition-all duration-1000"
-        style="background-image:url('/ItalianExperience/assets/img/recruitment/recruitment-bg-employer.jpg');"></div>
-
-      <div id="bg-right" class="bg-half opacity-[0.28] bg-cover bg-center transition-all duration-1000"
-        style="background-image:url('/ItalianExperience/assets/img/recruitment/recruitment-bg-candidate.jpg');"></div>
-    </div>
-
-    <div class="relative z-10 w-full max-w-7xl mx-auto grid grid-rows-2 md:grid-rows-1 md:grid-cols-2 recruitment-grid">
-
-      <!-- EMPLOYER -->
-      <div class="relative flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 overflow-hidden min-h-[50dvh] md:min-h-full panel-employer">
-        <span class="absolute top-1/2 -translate-y-1/2 left-[-5%] text-[rgba(255,255,255,0.03)] font-extrabold tracking-tight pointer-events-none whitespace-nowrap text-[clamp(5rem,15vw,12rem)]">
-          EMPLOYER
-        </span>
-
-        <div class="relative z-10 text-center max-w-[520px] px-8 panel-inner transition-all duration-500" id="content-employer-main">
-          <span class="text-[#c5a059] uppercase panel-label text-[0.6rem] mb-4 block font-bold">
-            Strategic Partnership
-          </span>
-
-          <h2 class="panel-title text-5xl md:text-7xl brand-font mb-6 italic text-white">
-            I am an <br />Employer
-          </h2>
-
-          <p class="text-slate-300/80 font-light text-sm max-w-xs mx-auto mb-7 leading-relaxed">
-            Acquire authentic Italian personnel and elite talent through our meticulously tailored recruitment framework.
-          </p>
-
-          <a href="/ItalianExperience/recruitment/employer/"
-            class="ie-hub-cta inline-block border border-[#c5a059] text-[#c5a059] px-10 py-4 text-[0.65rem] uppercase tracking-[0.25em] font-semibold hover:bg-[#c5a059] hover:text-[#080808] transition-all duration-500">
-            Explore
-          </a>
-
-          <button type="button"
-            class="ie-hub-toggle block mx-auto mt-7 text-[0.55rem] uppercase tracking-[0.15em] text-slate-400 hover:text-white transition-all duration-300 border-b border-transparent hover:border-white"
-            onclick="showDetails('employer')">
-            Why Choose Us <i class="fas fa-chart-pie ml-1"></i>
-          </button>
-        </div>
-
-        <div class="hidden md:flex absolute inset-0 bg-[rgba(8,8,8,0.97)] flex-col justify-center items-center px-8 py-14 opacity-0 invisible scale-[1.02] transition-all duration-500 overflow-y-auto"
-          id="details-employer">
-
-          <h3 class="text-[#c5a059] brand-font italic text-3xl mb-4 text-center">Why Choose Us</h3>
-
-          <p class="text-[0.65rem] text-slate-400 mb-10 max-w-md mx-auto leading-relaxed text-center">
-            We handle the entire recruitment cycle, allowing you to focus on your core operations while we increase your company's global competitiveness.
-          </p>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl w-full mb-10">
-            <div class="ie-detail-card flex items-start gap-3 text-left p-4 border border-white/5 bg-white/5">
-              <i class="fas fa-search-plus text-[#c5a059] text-sm mt-1"></i>
-              <div>
-                <h4 class="text-[0.65rem] font-bold uppercase tracking-wider text-white">Needs Analysis</h4>
-                <p class="text-[0.55rem] text-slate-500 italic">Customized approach to fit your specific culture.</p>
-              </div>
-            </div>
-
-            <div class="ie-detail-card flex items-start gap-3 text-left p-4 border border-white/5 bg-white/5">
-              <i class="fas fa-video text-[#c5a059] text-sm mt-1"></i>
-              <div>
-                <h4 class="text-[0.65rem] font-bold uppercase tracking-wider text-white">Vetted Screening</h4>
-                <p class="text-[0.55rem] text-slate-500 italic">Rigorous phone and video evaluations.</p>
-              </div>
-            </div>
-
-            <div class="ie-detail-card flex items-start gap-3 text-left p-4 border border-white/5 bg-white/5">
-              <i class="fas fa-check-double text-[#c5a059] text-sm mt-1"></i>
-              <div>
-                <h4 class="text-[0.65rem] font-bold uppercase tracking-wider text-white">Reference Checks</h4>
-                <p class="text-[0.55rem] text-slate-500 italic">Thorough verification for quality assurance.</p>
-              </div>
-            </div>
-
-            <div class="ie-detail-card flex items-start gap-3 text-left p-4 border border-white/5 bg-white/5">
-              <i class="fas fa-piggy-bank text-[#c5a059] text-sm mt-1"></i>
-              <div>
-                <h4 class="text-[0.65rem] font-bold uppercase tracking-wider text-white">FICA Tax Savings</h4>
-                <p class="text-[0.55rem] text-slate-500 italic">Total exemption through cultural exchange.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="w-full max-w-[170px] h-[170px] mb-10">
-            <canvas id="employerChart"></canvas>
-          </div>
-
-          <button type="button"
-            class="ie-hub-toggle text-[#c5a059] text-[0.6rem] uppercase tracking-[0.25em] border-b border-[#c5a059] pb-1 hover:text-white hover:border-white transition-all duration-300"
-            onclick="hideDetails('employer')">
-            Return
-          </button>
-        </div>
+  <main class="recruitment-wrapper">
+    <section class="pillar">
+      <div class="pillar-bg">
+        <img src="/ItalianExperience/assets/img/recruitment/recruitment-bg-employer.jpg" alt="Employer" onerror="this.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80'">
       </div>
 
-      <!-- CANDIDATE -->
-      <div class="relative flex items-center justify-center overflow-hidden min-h-[50dvh] md:min-h-full panel-candidate">
-        <span class="absolute top-1/2 -translate-y-1/2 right-[-5%] text-[rgba(255,255,255,0.03)] font-extrabold tracking-tight pointer-events-none whitespace-nowrap text-[clamp(5rem,15vw,12rem)]">
-          CANDIDATE
-        </span>
+      <div class="glass-card">
+        <span class="label-gold">Strategic Partnership</span>
+        <h2 class="pillar-title">I am an <br>Employer</h2>
+        <p class="pillar-desc">Acquire authentic Italian personnel and elite talent through our meticulously tailored recruitment framework.</p>
 
-        <div class="relative z-10 text-center max-w-[520px] px-8 panel-inner transition-all duration-500" id="content-candidate-main">
-          <span class="text-[#c5a059] uppercase panel-label text-[0.6rem] mb-4 block font-bold">
-            Career Mastery
-          </span>
-
-          <h2 class="panel-title text-5xl md:text-7xl brand-font mb-6 italic text-white">
-            I am a <br />Candidate
-          </h2>
-
-          <p class="text-slate-300/80 font-light text-sm max-w-xs mx-auto mb-7 leading-relaxed">
-            Dedicated to assisting elite candidates in launching prestigious careers through curated opportunities.
-          </p>
-
-          <a href="/ItalianExperience/recruitment/candidate/"
-            class="ie-hub-cta inline-block border border-[#c5a059] text-[#c5a059] px-10 py-4 text-[0.65rem] uppercase tracking-[0.25em] font-semibold hover:bg-[#c5a059] hover:text-[#080808] transition-all duration-500">
-            Live the Dream
-          </a>
-
-          <button type="button"
-            class="ie-hub-toggle block mx-auto mt-7 text-[0.55rem] uppercase tracking-[0.15em] text-slate-400 hover:text-white transition-all duration-300 border-b border-transparent hover:border-white"
-            onclick="showDetails('candidate')">
-            View Roadmap <i class="fas fa-map-signs ml-1"></i>
-          </button>
-        </div>
-
-        <div class="hidden md:flex absolute inset-0 bg-[rgba(8,8,8,0.97)] flex-col justify-center items-center px-8 py-14 opacity-0 invisible scale-[1.02] transition-all duration-500 overflow-y-auto"
-          id="details-candidate">
-
-          <h3 class="text-[#c5a059] brand-font italic text-3xl mb-4 text-center">Candidate Solutions</h3>
-
-          <p class="text-[0.65rem] text-slate-400 mb-10 max-w-md mx-auto leading-relaxed text-center">
-            Whether you are aiming for an international cultural program or a strategic local career move, we provide end-to-end support.
-          </p>
-
-          <div class="w-full max-w-md space-y-8 text-left mb-10">
-            <div class="flex gap-4">
-              <div class="flex flex-col items-center">
-                <div class="w-8 h-8 rounded-full border border-[#c5a059] text-[#c5a059] flex items-center justify-center text-xs font-bold">1</div>
-                <div class="w-px h-full bg-white/10 mt-2"></div>
-              </div>
-              <div class="pb-4">
-                <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-1">Interview and Selection</h4>
-                <p class="text-[0.6rem] text-slate-400 italic">Individual screening sessions to evaluate your profile and expectations.</p>
+        <div class="details-box">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+            <div class="feature-item">
+              <i class="fas fa-search-plus"></i>
+              <div class="feature-text">
+                <h4>Needs Analysis</h4>
+                <p>Customized approach to fit your specific company culture.</p>
               </div>
             </div>
 
-            <div class="flex gap-4">
-              <div class="flex flex-col items-center">
-                <div class="w-8 h-8 rounded-full border border-[#c5a059] text-[#c5a059] flex items-center justify-center text-xs font-bold">2</div>
-                <div class="w-px h-full bg-white/10 mt-2"></div>
-              </div>
-
-              <div class="pb-4">
-                <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-2">Strategic Placement</h4>
-
-                <div class="space-y-3">
-                  <div class="ie-detail-card bg-white/5 p-3 border-l-2 border-[#c5a059]">
-                    <p class="text-[0.55rem] font-bold text-white uppercase tracking-tight">International Pathway</p>
-                    <p class="text-[0.5rem] text-slate-500">Visa programs, housing, and travel logistics.</p>
-                  </div>
-
-                  <div class="ie-detail-card bg-white/5 p-3 border-l-2 border-slate-500">
-                    <p class="text-[0.55rem] font-bold text-white uppercase tracking-tight">Local Opportunities</p>
-                    <p class="text-[0.5rem] text-slate-500">Direct recruitment within Italy and Europe.</p>
-                  </div>
-                </div>
+            <div class="feature-item">
+              <i class="fas fa-video"></i>
+              <div class="feature-text">
+                <h4>Vetted Screening</h4>
+                <p>Rigorous evaluations to ensure the highest standards.</p>
               </div>
             </div>
 
-            <div class="flex gap-4">
-              <div class="flex flex-col items-center">
-                <div class="w-8 h-8 rounded-full bg-[#c5a059] text-black flex items-center justify-center text-xs font-bold shadow-[0_0_15px_rgba(197,160,89,0.5)]">3</div>
-                <div class="w-px h-full bg-white/10 mt-2"></div>
-              </div>
-              <div class="pb-4">
-                <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-1">Total Support</h4>
-                <p class="text-[0.6rem] text-slate-400 italic">Insurance, group departures, and full relocation guidance.</p>
-              </div>
-            </div>
-
-            <div class="flex gap-4">
-              <div class="flex flex-col items-center">
-                <div class="w-8 h-8 rounded-full border border-[#c5a059] text-[#c5a059] flex items-center justify-center text-xs font-bold">4</div>
-              </div>
-              <div>
-                <h4 class="text-[0.7rem] uppercase font-bold text-white tracking-widest mb-1">Career Evolution</h4>
-                <p class="text-[0.6rem] text-slate-400 italic">Continuous follow-up and career development access.</p>
+            <div class="feature-item">
+              <i class="fas fa-check-double"></i>
+              <div class="feature-text">
+                <h4>Reference Checks</h4>
+                <p>Thorough verification for absolute quality assurance.</p>
               </div>
             </div>
           </div>
 
-          <button type="button"
-            class="ie-hub-toggle text-[#c5a059] text-[0.6rem] uppercase tracking-[0.25em] border-b border-[#c5a059] pb-1 hover:text-white hover:border-white transition-all duration-300"
-            onclick="hideDetails('candidate')">
-            Return
-          </button>
+          <div class="text-center mt-6">
+            <a href="/ItalianExperience/recruitment/employer/" class="cta-button">Explore Solutions</a>
+          </div>
         </div>
       </div>
+    </section>
 
-    </div>
-  </section>
-
-  <!-- MOBILE MODALS -->
-  <div id="modal-employer" class="ie-modal" aria-hidden="true">
-    <div class="ie-modal-card">
-      <div class="ie-modal-scroll">
-        <div class="ie-modal-close">
-          <button type="button" class="ie-xbtn" aria-label="Close" onclick="closeModal('employer')">✕</button>
-        </div>
-
-        <h3 class="text-[#c5a059] brand-font italic text-3xl mb-3 text-center">Why Choose Us</h3>
-        <p class="text-[0.78rem] text-slate-300/80 mb-6 leading-relaxed text-center">
-          We handle the entire recruitment cycle, allowing you to focus on your core operations while we increase your company's global competitiveness.
-        </p>
-
-        <div class="grid grid-cols-1 gap-3 mb-6">
-          <div class="ie-detail-card flex items-start gap-3 text-left p-4 border border-white/10 bg-white/5">
-            <i class="fas fa-search-plus text-[#c5a059] text-sm mt-1"></i>
-            <div>
-              <h4 class="text-[0.72rem] font-bold uppercase tracking-wider text-white">Needs Analysis</h4>
-              <p class="text-[0.62rem] text-slate-400 italic">Customized approach to fit your specific culture.</p>
-            </div>
-          </div>
-
-          <div class="ie-detail-card flex items-start gap-3 text-left p-4 border border-white/10 bg-white/5">
-            <i class="fas fa-video text-[#c5a059] text-sm mt-1"></i>
-            <div>
-              <h4 class="text-[0.72rem] font-bold uppercase tracking-wider text-white">Vetted Screening</h4>
-              <p class="text-[0.62rem] text-slate-400 italic">Rigorous phone and video evaluations.</p>
-            </div>
-          </div>
-
-          <div class="ie-detail-card flex items-start gap-3 text-left p-4 border border-white/10 bg-white/5">
-            <i class="fas fa-check-double text-[#c5a059] text-sm mt-1"></i>
-            <div>
-              <h4 class="text-[0.72rem] font-bold uppercase tracking-wider text-white">Reference Checks</h4>
-              <p class="text-[0.62rem] text-slate-400 italic">Thorough verification for quality assurance.</p>
-            </div>
-          </div>
-
-          <div class="ie-detail-card flex items-start gap-3 text-left p-4 border border-white/10 bg-white/5">
-            <i class="fas fa-piggy-bank text-[#c5a059] text-sm mt-1"></i>
-            <div>
-              <h4 class="text-[0.72rem] font-bold uppercase tracking-wider text-white">FICA Tax Savings</h4>
-              <p class="text-[0.62rem] text-slate-400 italic">Total exemption through cultural exchange.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="w-full max-w-[170px] h-[170px] mx-auto mb-6">
-          <canvas id="employerChartMobile"></canvas>
-        </div>
-
-        <a href="/ItalianExperience/recruitment/employer/"
-          class="ie-hub-cta block text-center border border-[#c5a059] text-[#c5a059] px-8 py-4 text-[0.65rem] uppercase tracking-[0.25em] font-semibold hover:bg-[#c5a059] hover:text-[#080808] transition-all duration-500">
-          Explore Employer
-        </a>
+    <section class="pillar">
+      <div class="pillar-bg">
+        <img src="/ItalianExperience/assets/img/recruitment/recruitment-bg-candidate.jpg" alt="Candidate" onerror="this.src='https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1600&q=80'">
       </div>
-    </div>
-  </div>
 
-  <div id="modal-candidate" class="ie-modal" aria-hidden="true">
-    <div class="ie-modal-card">
-      <div class="ie-modal-scroll">
-        <div class="ie-modal-close">
-          <button type="button" class="ie-xbtn" aria-label="Close" onclick="closeModal('candidate')">✕</button>
-        </div>
+      <div class="glass-card">
+        <span class="label-gold">Career Mastery</span>
+        <h2 class="pillar-title">I am a <br>Candidate</h2>
+        <p class="pillar-desc">Dedicated to assisting elite candidates in launching prestigious careers through curated opportunities.</p>
 
-        <h3 class="text-[#c5a059] brand-font italic text-3xl mb-3 text-center">Candidate Solutions</h3>
-        <p class="text-[0.78rem] text-slate-300/80 mb-6 leading-relaxed text-center">
-          Whether you are aiming for an international cultural program or a strategic local career move, we provide end-to-end support.
-        </p>
-
-        <div class="space-y-4 mb-6">
-          <div class="ie-detail-card border border-white/10 bg-white/5 p-4">
-            <p class="text-[0.7rem] uppercase font-bold tracking-widest text-white mb-1">1. Interview and Selection</p>
-            <p class="text-[0.65rem] text-slate-300/80 italic">Individual screening sessions to evaluate your profile and expectations.</p>
-          </div>
-
-          <div class="ie-detail-card border border-white/10 bg-white/5 p-4">
-            <p class="text-[0.7rem] uppercase font-bold tracking-widest text-white mb-2">2. Strategic Placement</p>
-            <div class="space-y-2">
-              <div class="bg-black/30 p-3 border-l-2 border-[#c5a059]">
-                <p class="text-[0.65rem] font-bold uppercase tracking-tight text-white">International Pathway</p>
-                <p class="text-[0.6rem] text-slate-300/70">Visa programs, housing, and travel logistics.</p>
+        <div class="details-box">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            <div class="feature-item">
+              <span class="text-gold font-bold text-lg mr-2">01</span>
+              <div class="feature-text">
+                <h4>Selection</h4>
+                <p>Individual sessions to evaluate your profile and goals.</p>
               </div>
-              <div class="bg-black/30 p-3 border-l-2 border-slate-500">
-                <p class="text-[0.65rem] font-bold uppercase tracking-tight text-white">Local Opportunities</p>
-                <p class="text-[0.6rem] text-slate-300/70">Direct recruitment within Italy and Europe.</p>
+            </div>
+
+            <div class="feature-item">
+              <span class="text-gold font-bold text-lg mr-2">02</span>
+              <div class="feature-text">
+                <h4>Placement</h4>
+                <p>Strategic positioning in USA, Europe or local markets.</p>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <span class="text-gold font-bold text-lg mr-2">03</span>
+              <div class="feature-text">
+                <h4>Relocation</h4>
+                <p>Visa support, housing, and relocation guidance.</p>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <span class="text-gold font-bold text-lg mr-2">04</span>
+              <div class="feature-text">
+                <h4>Evolution</h4>
+                <p>Continuous follow-up and career development access.</p>
               </div>
             </div>
           </div>
 
-          <div class="ie-detail-card border border-white/10 bg-white/5 p-4">
-            <p class="text-[0.7rem] uppercase font-bold tracking-widest text-white mb-1">3. Total Support</p>
-            <p class="text-[0.65rem] text-slate-300/80 italic">Insurance, group departures, and full relocation guidance.</p>
-          </div>
-
-          <div class="ie-detail-card border border-white/10 bg-white/5 p-4">
-            <p class="text-[0.7rem] uppercase font-bold tracking-widest text-white mb-1">4. Career Evolution</p>
-            <p class="text-[0.65rem] text-slate-300/80 italic">Continuous follow-up and career development access.</p>
+          <div class="text-center mt-10">
+            <a href="/ItalianExperience/recruitment/candidate/" class="cta-button">Live the Dream</a>
           </div>
         </div>
-
-        <a href="/ItalianExperience/recruitment/candidate/"
-          class="ie-hub-cta block text-center border border-[#c5a059] text-[#c5a059] px-8 py-4 text-[0.65rem] uppercase tracking-[0.25em] font-semibold hover:bg-[#c5a059] hover:text-[#080808] transition-all duration-500">
-          Explore Candidate
-        </a>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 
   <div id="site-footer"></div>
 
   <script>
-    let employerChart = null;
-    let employerChartMobile = null;
-
-    function isMobile() { return window.matchMedia("(max-width: 767px)").matches; }
-
-    function openModal(type) {
-      const el = document.getElementById(`modal-${type}`);
-      if (!el) return;
-      el.classList.add("is-open");
-      el.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-      if (type === "employer" && !employerChartMobile) initChartMobile();
-    }
-
-    function closeModal(type) {
-      const el = document.getElementById(`modal-${type}`);
-      if (!el) return;
-      el.classList.remove("is-open");
-      el.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    }
-
-    function showDetails(type) {
-      if (isMobile()) { openModal(type); return; }
-
-      const mainContent = document.getElementById(`content-${type}-main`);
-      const detailsPanel = document.getElementById(`details-${type}`);
-      const bg = document.getElementById(type === "employer" ? "bg-left" : "bg-right");
-      if (!mainContent || !detailsPanel || !bg) return;
-
-      mainContent.style.opacity = "0";
-      mainContent.style.transform = "translateY(-18px)";
-
-      bg.style.opacity = "0.55";
-      bg.style.transform = "scale(1.05)";
-
-      setTimeout(() => {
-        detailsPanel.classList.remove("opacity-0", "invisible", "scale-[1.02]");
-        detailsPanel.classList.add("opacity-100", "visible", "scale-100");
-        if (type === "employer" && !employerChart) initChartDesktop();
-      }, 220);
-    }
-
-    function hideDetails(type) {
-      const mainContent = document.getElementById(`content-${type}-main`);
-      const detailsPanel = document.getElementById(`details-${type}`);
-      const bg = document.getElementById(type === "employer" ? "bg-left" : "bg-right");
-      if (!mainContent || !detailsPanel || !bg) return;
-
-      detailsPanel.classList.add("opacity-0", "invisible", "scale-[1.02]");
-      detailsPanel.classList.remove("opacity-100", "visible", "scale-100");
-
-      bg.style.opacity = "0.28";
-      bg.style.transform = "scale(1)";
-
-      setTimeout(() => {
-        mainContent.style.opacity = "1";
-        mainContent.style.transform = "translateY(0)";
-      }, 250);
-    }
-
-    function buildChart(ctx) {
-      return new Chart(ctx, {
-        type: "doughnut",
-        data: {
-          labels: ["Tax Savings", "Operating Cost"],
-          datasets: [{
-            data: [15, 85],
-            backgroundColor: ["#c5a059", "#1a1a1a"],
-            borderColor: "rgba(255,255,255,0.08)",
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: "80%",
-          plugins: {
-            legend: { display: true, position: "bottom", labels: { color: "#94a3b8", font: { size: 9, family: "Inter" } } },
-            tooltip: { callbacks: { label: (c) => `${c.label}: ${c.raw}%` } }
-          }
-        }
-      });
-    }
-
-    function initChartDesktop() {
-      const canvas = document.getElementById("employerChart");
-      if (!canvas) return;
-      employerChart = buildChart(canvas.getContext("2d"));
-    }
-
-    function initChartMobile() {
-      const canvas = document.getElementById("employerChartMobile");
-      if (!canvas) return;
-      employerChartMobile = buildChart(canvas.getContext("2d"));
-    }
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") { closeModal("employer"); closeModal("candidate"); }
-    });
-
-    document.getElementById("modal-employer")?.addEventListener("click", (e) => {
-      if (e.target && e.target.id === "modal-employer") closeModal("employer");
-    });
-    document.getElementById("modal-candidate")?.addEventListener("click", (e) => {
-      if (e.target && e.target.id === "modal-candidate") closeModal("candidate");
-    });
-  </script>
-
-  <script>
-    (function () {
-      const base = "/ItalianExperience";
-      const headerMount = document.getElementById("site-header");
-      const footerMount = document.getElementById("site-footer");
-
-      function inject(el, html) { if (el) el.innerHTML = html; }
-
-      function loadScript(src) {
-        return new Promise((resolve, reject) => {
-          const s = document.createElement("script");
-          s.src = src;
-          s.defer = true;
-          s.onload = resolve;
-          s.onerror = reject;
-          document.head.appendChild(s);
+    document.addEventListener('DOMContentLoaded', () => {
+      const glassCards = document.querySelectorAll('.glass-card');
+      glassCards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / card.clientWidth) * 100;
+          const y = ((e.clientY - rect.top) / card.clientHeight) * 100;
+          card.style.setProperty('--mouse-x', `${x}%`);
+          card.style.setProperty('--mouse-y', `${y}%`);
         });
-      }
+      });
 
-      /* Old page-local offset logic replaced by global IEInit header offset system in assets/js/site.js.
-      function updateHeaderOffset() {
-        const headerEl =
-          document.querySelector("#site-header header") ||
-          document.querySelector("header");
+      (function () {
+        const base = "/ItalianExperience";
+        const headerMount = document.getElementById("site-header");
+        const footerMount = document.getElementById("site-footer");
 
-        if (!headerEl) return;
-        const h = headerEl.getBoundingClientRect().height || 120;
-        document.documentElement.style.setProperty("--ie-header-h", Math.ceil(h) + "px");
-      }
-      */
+        function inject(el, html) { if (el) el.innerHTML = html; }
 
-      Promise.all([
-        fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
-        fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
-      ]).then(async ([h, f]) => {
-        inject(headerMount, h);
-        inject(footerMount, f);
+        function loadScript(src) {
+          return new Promise((resolve, reject) => {
+            const s = document.createElement("script");
+            s.src = src;
+            s.defer = true;
+            s.onload = resolve;
+            s.onerror = reject;
+            document.head.appendChild(s);
+          });
+        }
 
-        await loadScript(base + "/assets/js/site.js");
-        if (window.IEInit) window.IEInit(document);
+        Promise.all([
+          fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
+          fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
+        ]).then(async ([h, f]) => {
+          inject(headerMount, h);
+          inject(footerMount, f);
 
-        // Old local calls removed: global offset updater runs inside IEInit.
-      }).catch(err => console.error(err));
-    })();
+          await loadScript(base + "/assets/js/site.js");
+          if (window.IEInit) window.IEInit(document);
+        }).catch(err => console.error("Error loading components:", err));
+      })();
+    });
   </script>
-
 </body>
 </html>
