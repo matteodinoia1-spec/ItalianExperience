@@ -1323,8 +1323,20 @@ STRATEGIC ADVISORY</p>
       }
 
       const glassCards = document.querySelectorAll('.hero-glass-card');
-      if (window.matchMedia("(pointer: fine)").matches) {
-        glassCards.forEach(card => {
+      glassCards.forEach(card => {
+        const pillar = card.closest('.hero-pillar');
+        const mainLink = pillar ? pillar.querySelector('a[href]') : null;
+        const mainHref = mainLink ? mainLink.getAttribute('href') : '';
+
+        if (mainHref) {
+          card.style.cursor = 'pointer';
+          card.addEventListener('click', (event) => {
+            if (event.target.closest('.hero-submenu-link')) return;
+            window.location.href = mainHref;
+          });
+        }
+
+        if (window.matchMedia("(pointer: fine)").matches) {
           card.addEventListener('mousemove', (e) => {
             const rect = card.getBoundingClientRect();
             const x = ((e.clientX - rect.left) / card.clientWidth) * 100;
@@ -1332,8 +1344,8 @@ STRATEGIC ADVISORY</p>
             card.style.setProperty('--mouse-x', `${x}%`);
             card.style.setProperty('--mouse-y', `${y}%`);
           }, { passive: true });
-        });
-      }
+        }
+      });
 
       // Reveal
       const obs = new IntersectionObserver((entries) => {

@@ -625,36 +625,36 @@ form button[type="submit"]{
   box-shadow:0 12px 28px rgba(0,0,0,0.35);
 }
 
-/* Dynamic mouse shimmer for glass surfaces */
-:is(.glass-surface,.premium-card,.hero-glass-card,.glass-header){
+/* Dynamic mouse shimmer for glass surfaces (aligned to home hero cards) */
+:is(.glass-surface,.premium-card,.glass-header){
   position:relative;
   isolation:isolate;
   overflow:hidden;
 }
 
-:is(.glass-surface,.premium-card,.hero-glass-card,.glass-header)::after{
+:is(.glass-surface,.premium-card,.glass-header)::after{
   content:"";
   position:absolute;
-  inset:-30%;
+  inset:0;
   pointer-events:none;
   opacity:0;
   background:radial-gradient(
-    240px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(255,255,255,0.22) 0%,
-    rgba(255,255,255,0.1) 20%,
-    rgba(255,255,255,0) 62%
+    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255,255,255,0.08) 0%,
+    rgba(255,255,255,0.03) 22%,
+    rgba(255,255,255,0) 40%
   );
-  transition:opacity 0.25s ease;
+  transition:opacity 0.5s ease;
   z-index:0;
 }
 
-:is(.glass-surface,.premium-card,.hero-glass-card,.glass-header) > *{
+:is(.glass-surface,.premium-card,.glass-header) > *{
   position:relative;
   z-index:1;
 }
 
 @media (hover:hover){
-  :is(.glass-surface,.premium-card,.hero-glass-card,.glass-header):hover::after{
+  :is(.glass-surface,.premium-card,.glass-header):hover::after{
     opacity:1;
   }
 }

@@ -218,9 +218,17 @@
   }
 
   .glass-header.is-open {
+    height: auto !important;
     max-height: 95vh;
+    max-height: calc(100dvh - 1rem);
     background: rgba(10, 10, 10, 0.98);
+    overflow: visible;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .glass-header.is-open .header-main-row {
+    height: 70px;
   }
 
   .glass-header.is-open .nav-container-mobile {
