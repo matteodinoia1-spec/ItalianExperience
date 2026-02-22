@@ -39,6 +39,7 @@
         inlineHeader.classList.remove('is-open');
         inlineMenuBtn.classList.remove('is-open');
         inlineMenuBtn.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('menu-open');
         if (inlineMenuText) inlineMenuText.textContent = 'Menu';
       };
 
@@ -46,6 +47,7 @@
         inlineHeader.classList.add('is-open');
         inlineMenuBtn.classList.add('is-open');
         inlineMenuBtn.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('menu-open');
         if (inlineMenuText) inlineMenuText.textContent = 'Chiudi';
       };
 
