@@ -383,6 +383,27 @@
       min-width: 44px;
       justify-content: center;
     }
+
+    .glass-header.is-open,
+    .glass-header.scrolled.is-open {
+      top: 0 !important;
+      left: 0 !important;
+      transform: none !important;
+      width: 100% !important;
+      max-width: none !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      max-height: 100vh !important;
+      max-height: 100dvh !important;
+      border-radius: 0 !important;
+      padding: 0.35rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px)) !important;
+      overflow-y: auto !important;
+    }
+
+    .glass-header.is-open .nav-container-mobile {
+      margin-top: 1.25rem;
+      padding-bottom: 1.5rem;
+    }
   }
 
   @media (max-width: 390px) {
