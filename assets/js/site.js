@@ -40,6 +40,12 @@
         document.body.classList.toggle('menu-open', open && isTabletOverlay());
       };
 
+      if (inlineHeader.dataset.ieMenuInit === '1') {
+        syncInlineBodyLock(inlineHeader.classList.contains('is-open'));
+        return;
+      }
+      inlineHeader.dataset.ieMenuInit = '1';
+
       const closeInlineMenu = () => {
         inlineHeader.classList.remove('is-open');
         inlineMenuBtn.classList.remove('is-open');
@@ -128,6 +134,10 @@
   function initMobileAccordion() {
     const inlineAccordions = Array.from(document.querySelectorAll('.accordion-toggle'));
     if (inlineAccordions.length) {
+      const inlineNav = document.getElementById('mobile-nav');
+      if (inlineNav && inlineNav.dataset.ieAccordionInit === '1') return;
+      if (inlineNav) inlineNav.dataset.ieAccordionInit = '1';
+
       inlineAccordions.forEach(toggle => {
         toggle.addEventListener('click', () => {
           const parent = toggle.closest('.mobile-nav-item');
