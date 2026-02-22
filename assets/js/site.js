@@ -35,7 +35,7 @@
     const inlineHeader = document.getElementById('main-header');
     const inlineMenuText = document.getElementById('menu-btn-text');
     if (inlineMenuBtn && inlineHeader) {
-      const isTabletOverlay = () => window.innerWidth >= 769 && window.innerWidth <= 1023;
+      const isTabletOverlay = () => window.innerWidth >= 768 && window.innerWidth <= 1023;
       const syncInlineBodyLock = (open) => {
         document.body.classList.toggle('menu-open', open && isTabletOverlay());
       };

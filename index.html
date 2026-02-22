@@ -920,6 +920,24 @@
     }
     .hero-submenu-link:hover{background:rgba(255,255,255,0.06);color:#fff;transform:translateX(5px)}
 
+    @media (max-width:1023px){
+      .mobile-only .premium-card,
+      .mobile-only .portal-card,
+      .mobile-only .mobile-editorial{
+        border:none !important;
+        border-radius:0 !important;
+        box-shadow:none !important;
+      }
+
+      .mobile-only .portal-card{
+        border-bottom:none !important;
+      }
+
+      .mobile-only .mobile-editorial{
+        border-top:none !important;
+      }
+    }
+
     @media (max-width:768px){
       .desktop-only{display:none}
       .mobile-only{display:block}
