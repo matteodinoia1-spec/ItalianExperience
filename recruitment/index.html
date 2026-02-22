@@ -250,16 +250,21 @@
 
       .pillar {
         height: auto;
-        min-height: 90vh;
+        min-height: 72vh;
         flex: none;
         border-right: none;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        padding-bottom: 4rem;
+        padding-top: 1.5rem;
+        padding-bottom: 2.5rem;
+      }
+
+      .pillar:first-child {
+        padding-top: calc(var(--ie-header-h) + 1rem);
       }
 
       .glass-card {
-        max-width: 90%;
-        padding: 2.5rem 1.5rem;
+        max-width: 92%;
+        padding: 2rem 1.25rem;
         transform: none !important;
         min-height: auto !important;
       }
@@ -267,15 +272,15 @@
       .pillar-desc {
         opacity: 1;
         max-height: 1000px;
-        margin-top: 1.5rem;
-        margin-bottom: 1.5rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
       }
 
       .details-box {
         max-height: 1000px;
         opacity: 1;
-        margin-top: 2rem;
-        padding-top: 2rem;
+        margin-top: 1.25rem;
+        padding-top: 1.25rem;
       }
     }
   </style>
