@@ -165,13 +165,14 @@
     top: 100%;
     left: 0;
     transform: translateY(10px);
-    background: rgba(18, 18, 18, 0.98);
-    backdrop-filter: blur(25px);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+    backdrop-filter: blur(24px) saturate(165%);
+    -webkit-backdrop-filter: blur(24px) saturate(165%);
     min-width: 240px;
     border-radius: var(--radius-premium, 12px);
     padding: 1rem 0;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55);
     opacity: 0;
     visibility: hidden;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -267,7 +268,11 @@
     max-height: 0;
     overflow: hidden;
     transition: all 0.5s ease;
-    background: rgba(255, 255, 255, 0.03);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
     border-radius: var(--radius-premium, 12px);
   }
 
@@ -337,7 +342,7 @@
     transform: translateY(-3px) rotate(-45deg);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1023px) {
     .glass-header {
       padding: 0.3rem 1rem;
     }
@@ -409,7 +414,7 @@
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       background: rgba(10, 10, 10, 0.97);
-      z-index: 9999;
+      z-index: 10001;
     }
 
     .glass-header.is-open .nav-container-mobile {
