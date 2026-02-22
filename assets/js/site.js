@@ -141,6 +141,7 @@
       inlineAccordions.forEach(toggle => {
         toggle.addEventListener('click', (e) => {
           e.preventDefault();
+          e.stopPropagation();
           const parent = toggle.closest('.mobile-nav-item');
           if (!parent) return;
 

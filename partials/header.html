@@ -220,6 +220,8 @@
 
   #main-header.is-open {
     background: rgba(10, 10, 10, 0.98);
+    overflow: visible;
+    max-height: none;
   }
 
   #main-header.is-open .header-main-row {
@@ -230,6 +232,11 @@
     display: flex;
     opacity: 1;
     transform: translateY(0);
+    overflow: visible;
+  }
+
+  #main-header #mobile-nav .mobile-nav-item.open {
+    overflow: visible;
   }
 
   @media (min-width: 1024px) {
@@ -272,9 +279,11 @@
   }
 
   #main-header #mobile-nav .mobile-nav-item.open > .mobile-submenu {
-    display: block;
+    display: block !important;
     padding: 1rem 0;
     margin-top: 0.5rem;
+    overflow: visible;
+    visibility: visible;
   }
 
   .mobile-sub-link {
@@ -425,6 +434,13 @@
       opacity: 1;
       transform: translateY(0);
       pointer-events: auto;
+      overflow-x: visible;
+      overflow-y: auto;
+    }
+
+    #main-header.is-open #mobile-nav .mobile-nav-item.open > .mobile-submenu {
+      display: block !important;
+      visibility: visible;
     }
   }
 
