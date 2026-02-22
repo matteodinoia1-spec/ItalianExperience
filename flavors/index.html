@@ -208,9 +208,19 @@
     }
 
     /* Keep header shimmer strictly inside header bounds on this page */
+    #main-header.glass-header{
+      overflow:hidden !important;
+    }
+
     #main-header.glass-header::after{
       inset:0 !important;
       clip-path:inset(0 round var(--radius-premium, 12px));
+    }
+
+    /* Disable shimmer glow on hero hub panels for this page */
+    .hub-grid .hub-panel::after{
+      content:none !important;
+      display:none !important;
     }
 
     @media (max-width:768px){

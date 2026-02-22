@@ -342,7 +342,7 @@
     transform: translateY(-3px) rotate(-45deg);
   }
 
-  @media (max-width: 1023px) {
+  @media (min-width: 769px) and (max-width: 1023px) {
     .glass-header {
       padding: 0.3rem 1rem;
     }
@@ -402,12 +402,12 @@
 
     .nav-container-mobile {
       position: fixed;
-      top: calc(env(safe-area-inset-top, 0px) + 70px);
+      top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      margin-top: 0;
-      padding: 0.75rem 1rem calc(1.4rem + env(safe-area-inset-bottom, 0px));
+      margin-top: 0 !important;
+      padding: calc(env(safe-area-inset-top, 0px) + 70px + 0.75rem) 1rem calc(1.4rem + env(safe-area-inset-bottom, 0px));
       display: none;
       opacity: 0;
       transform: translateY(-8px);
@@ -421,6 +421,77 @@
       display: flex;
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .glass-header {
+      padding: 0.3rem 1rem;
+    }
+
+    .glass-header:not(.is-open) {
+      height: 82px;
+    }
+
+    .glass-header.scrolled:not(.is-open) {
+      height: 70px;
+    }
+
+    .font-it {
+      font-size: 2.15rem;
+    }
+
+    .font-ex {
+      font-size: 0.96rem;
+      letter-spacing: -0.02em;
+    }
+
+    .glass-header.scrolled .font-it {
+      font-size: 1.95rem;
+    }
+
+    .glass-header.scrolled .font-ex {
+      font-size: 0.86rem;
+    }
+
+    .pure-logo {
+      gap: 8px;
+      max-width: min(64vw, 320px);
+    }
+
+    .tricolore-line {
+      width: 36px;
+      right: -6px;
+      bottom: 14%;
+    }
+
+    #menu-toggle-btn {
+      padding: 0.55rem 0.85rem;
+      min-width: 44px;
+      justify-content: center;
+    }
+
+    .nav-container-mobile {
+      position: static;
+      top: auto;
+      left: auto;
+      right: auto;
+      bottom: auto;
+      margin-top: 2rem;
+      padding: 0;
+      display: flex;
+      opacity: 0;
+      transform: translateY(-10px);
+      overflow: visible;
+      background: transparent;
+      z-index: auto;
+    }
+
+    .glass-header.is-open .nav-container-mobile {
+      opacity: 1;
+      transform: translateY(0);
+      margin-top: 1.25rem;
+      padding-bottom: 1.5rem;
     }
   }
 
