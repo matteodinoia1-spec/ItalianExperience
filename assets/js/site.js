@@ -320,6 +320,18 @@
     const scope = root || document;
     const selectors = [
       '.service-contact-card',
+      '.contact-card',
+      '.support-card',
+      '.location-card',
+      '.bespoke-contact-card',
+      '.gap-contact-card',
+      '.program-card',
+      '.feature-card',
+      '.category-card',
+      '.bento-card',
+      '.glass-card',
+      '.disclosure-card',
+      '.ie-modal-card',
       '.quote-box',
       '.disclosure-container',
       '.info-box',
