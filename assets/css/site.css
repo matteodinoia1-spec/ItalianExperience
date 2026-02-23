@@ -560,15 +560,6 @@ body.menu-open{overflow:hidden}
   border-radius:var(--radius-premium) !important;
 }
 
-@supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))){
-  .premium-card,
-  .glass-header,
-  .dropdown-menu,
-  .mobile-submenu{
-    background:rgba(15,15,15,0.9) !important;
-  }
-}
-
 /* Radius unification for primary content blocks and controls */
 .service-contact-card,
 .service-field,
