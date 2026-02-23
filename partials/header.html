@@ -1,4 +1,5 @@
 <style>
+  /* Rettangolo fluttuante in cima allo schermo */
   .glass-header {
     position: fixed;
     top: 1.5rem;
@@ -10,13 +11,13 @@
     height: auto;
     min-height: 0;
     z-index: 10000;
-    background: rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(30px) saturate(180%);
     -webkit-backdrop-filter: blur(30px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: var(--radius-premium, 12px);
-    padding: 0.4rem 2.5rem;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+    padding: 0.5rem var(--ie-content-padding-inline, 2rem);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), 0 24px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.05);
     max-height: 90px;
     transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     overflow: hidden;
@@ -36,8 +37,9 @@
   .glass-header.scrolled {
     top: 1rem;
     width: calc(100% - 4rem);
-    padding: 0.35rem 2rem;
-    background: rgba(255, 255, 255, 0.12);
+    padding: 0.4rem var(--ie-content-padding-inline, 1.5rem);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35), 0 20px 40px rgba(0, 0, 0, 0.4);
   }
 
   .glass-header.scrolled:not(.is-open) {
@@ -48,14 +50,18 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 1.5rem;
     height: 100%;
+    min-height: 56px;
     transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  /* Sinistra box: logo con animazione al passaggio del mouse */
   .logo-link {
     text-decoration: none;
     cursor: pointer;
     display: block;
+    flex-shrink: 0;
   }
 
   .pure-logo {
@@ -65,6 +71,12 @@
     position: relative;
     user-select: none;
     max-width: min(68vw, 420px);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  #logo-header:hover .pure-logo,
+  #logo-header:focus-visible .pure-logo {
+    transform: scale(1.03);
   }
 
   .font-it {
@@ -74,6 +86,11 @@
     white-space: nowrap;
     transition: all 0.4s ease;
     line-height: 1;
+  }
+
+  #logo-header:hover .font-it,
+  #logo-header:focus-visible .font-it {
+    text-shadow: 0 0 20px rgba(197, 160, 89, 0.5);
   }
 
   .glass-header.scrolled .font-it {
@@ -98,8 +115,20 @@
 
   .letter {
     display: inline-block;
-    transition: all 0.25s ease-out;
+    transition: transform 0.25s ease-out, color 0.25s ease-out;
     will-change: transform, color;
+  }
+
+  #logo-header:hover .letter,
+  #logo-header:focus-visible .letter {
+    color: #fff;
+    text-shadow: 0 0 12px currentColor;
+    transform: translateY(-2px);
+  }
+
+  #logo-header:hover .letter:nth-child(odd),
+  #logo-header:focus-visible .letter:nth-child(odd) {
+    transition-delay: 0.02s;
   }
 
   .tricolore-line {
@@ -109,21 +138,35 @@
     display: flex;
     height: 2px;
     width: 50px;
+    transition: width 0.35s ease, opacity 0.3s ease;
   }
 
   .tricolore-line div {
     flex: 1;
+    transition: opacity 0.3s ease;
   }
 
+  #logo-header:hover .tricolore-line,
+  #logo-header:focus-visible .tricolore-line {
+    width: 56px;
+  }
+
+  #logo-header:hover .tricolore-line div,
+  #logo-header:focus-visible .tricolore-line div {
+    opacity: 1;
+  }
+
+  /* Destra box: nomi e link allineati a destra */
   .nav-container-desktop {
     display: none;
-    gap: 0.2rem;
+    gap: 0.25rem;
     align-items: center;
     height: 100%;
     margin-left: auto;
     justify-content: flex-end;
     width: auto;
     flex: 0 0 auto;
+    text-align: right;
   }
 
   @media (min-width: 1024px) {
@@ -138,6 +181,7 @@
       margin-left: auto;
       justify-content: flex-end;
       flex-wrap: nowrap;
+      text-align: right;
     }
 
     .nav-container-desktop .nav-item {
@@ -147,7 +191,10 @@
 
     .nav-container-desktop .nav-link {
       display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
       width: auto;
+      text-align: right;
     }
   }
 
@@ -159,11 +206,13 @@
     letter-spacing: 0.08em;
     text-decoration: none;
     transition: all 0.3s ease;
-    opacity: 0.75;
+    opacity: 0.85;
     display: flex;
     align-items: center;
-    padding: 0.5rem 0.55rem;
+    justify-content: flex-end;
+    padding: 0.5rem 0.6rem;
     height: 40px;
+    text-align: right;
   }
 
   .nav-link:hover {
