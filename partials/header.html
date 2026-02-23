@@ -1,4 +1,631 @@
 <style>
+  .glass-header {
+    position: fixed;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: block;
+    width: calc(100% - 2rem);
+    max-width: 1240px;
+    height: auto;
+    min-height: 0;
+    z-index: 10000;
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-premium, 12px);
+    padding: 0.4rem 2.5rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+    max-height: 90px;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+  }
+
+  .glass-header:not(.is-open) {
+    height: 92px;
+  }
+
+  @media (min-width: 1024px) {
+    .glass-header {
+      overflow: visible;
+      max-height: none;
+    }
+  }
+
+  .glass-header.scrolled {
+    top: 1rem;
+    width: calc(100% - 4rem);
+    padding: 0.35rem 2rem;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .glass-header.scrolled:not(.is-open) {
+    height: 78px;
+  }
+
+  .header-main-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .logo-link {
+    text-decoration: none;
+    cursor: pointer;
+    display: block;
+  }
+
+  .pure-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    user-select: none;
+    max-width: min(68vw, 420px);
+  }
+
+  .font-it {
+    font-family: "Great Vibes", cursive;
+    color: #c5a059;
+    font-size: 2.8rem;
+    white-space: nowrap;
+    transition: all 0.4s ease;
+    line-height: 1;
+  }
+
+  .glass-header.scrolled .font-it {
+    font-size: 2.4rem;
+  }
+
+  .font-ex {
+    font-family: "Montserrat", sans-serif;
+    color: #c5a059;
+    font-size: 1.3rem;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    display: flex;
+    white-space: nowrap;
+    position: relative;
+    line-height: 1;
+  }
+
+  .glass-header.scrolled .font-ex {
+    font-size: 1.1rem;
+  }
+
+  .letter {
+    display: inline-block;
+    transition: all 0.25s ease-out;
+    will-change: transform, color;
+  }
+
+  .tricolore-line {
+    position: absolute;
+    bottom: 18%;
+    right: -10px;
+    display: flex;
+    height: 2px;
+    width: 50px;
+  }
+
+  .tricolore-line div {
+    flex: 1;
+  }
+
+  .nav-container-desktop {
+    display: none;
+    gap: 0.5rem;
+    align-items: center;
+    height: 100%;
+    margin-left: auto;
+    justify-content: flex-end;
+  }
+
+  @media (min-width: 1024px) {
+    .nav-container-desktop {
+      display: flex;
+    }
+  }
+
+  .nav-link {
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    opacity: 0.75;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    height: 40px;
+  }
+
+  .nav-link:hover {
+    opacity: 1;
+    color: #c5a059;
+  }
+
+  .nav-link.active {
+    opacity: 1;
+    color: #c5a059;
+    text-shadow: 0 0 10px rgba(197, 160, 89, 0.35);
+  }
+
+  .dropdown {
+    position: relative;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    transform: translateY(10px);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+    backdrop-filter: blur(24px) saturate(165%);
+    -webkit-backdrop-filter: blur(24px) saturate(165%);
+    min-width: 240px;
+    border-radius: var(--radius-premium, 12px);
+    padding: 1rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .dropdown:hover .dropdown-menu,
+  .dropdown:focus-within .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .dropdown-item {
+    display: block;
+    padding: 0.8rem 1.75rem;
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: all 0.2s;
+  }
+
+  .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #c5a059;
+    padding-left: 2.2rem;
+  }
+
+  .dropdown-item.active {
+    color: #c5a059;
+    padding-left: 2.2rem;
+  }
+
+  .nav-container-mobile {
+    margin-top: 2rem;
+    display: none;
+    flex-direction: column;
+    gap: 0.25rem;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.4s ease;
+  }
+
+  .glass-header.is-open {
+    background: rgba(10, 10, 10, 0.98);
+  }
+
+  .glass-header.is-open .header-main-row {
+    height: 70px;
+  }
+
+  .glass-header.is-open .nav-container-mobile {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (min-width: 1024px) {
+    .nav-container-mobile {
+      display: none;
+    }
+  }
+
+  .mobile-link-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 1.25rem 0.5rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    background: transparent;
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .mobile-submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.5s ease;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+    border-radius: var(--radius-premium, 12px);
+  }
+
+  .mobile-nav-item.open .mobile-submenu {
+    max-height: 500px;
+    padding: 1rem 0;
+    margin-top: 0.5rem;
+  }
+
+  .mobile-sub-link {
+    display: block;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.85);
+    padding: 0.75rem 1rem;
+    font-size: 0.92rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .mobile-sub-link:hover {
+    color: #c5a059;
+  }
+
+  .mobile-link-main.active,
+  .mobile-sub-link.active {
+    color: #c5a059;
+  }
+
+  #menu-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px) saturate(170%);
+    -webkit-backdrop-filter: blur(16px) saturate(170%);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    padding: 0.6rem 1.5rem;
+    border-radius: var(--radius-premium, 12px);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+    flex-shrink: 0;
+    margin-left: 0.9rem;
+  }
+
+  @media (min-width: 1024px) {
+    #menu-toggle-btn {
+      display: none;
+    }
+  }
+
+  .burger-line {
+    width: 14px;
+    height: 2px;
+    background: #ffffff;
+    transition: all 0.3s ease;
+  }
+
+  #menu-toggle-btn.is-open #line-1 {
+    transform: translateY(3px) rotate(45deg);
+  }
+
+  #menu-toggle-btn.is-open #line-2 {
+    transform: translateY(-3px) rotate(-45deg);
+  }
+
+  @media (min-width: 769px) and (max-width: 1023px) {
+    .glass-header {
+      padding: 0.3rem 1rem;
+    }
+
+    .glass-header:not(.is-open) {
+      height: 82px;
+    }
+
+    .glass-header.scrolled:not(.is-open) {
+      height: 70px;
+    }
+
+    .font-it {
+      font-size: 2.15rem;
+    }
+
+    .font-ex {
+      font-size: 0.96rem;
+      letter-spacing: -0.02em;
+    }
+
+    .glass-header.scrolled .font-it {
+      font-size: 1.95rem;
+    }
+
+    .glass-header.scrolled .font-ex {
+      font-size: 0.86rem;
+    }
+
+    .pure-logo {
+      gap: 8px;
+      max-width: min(64vw, 320px);
+    }
+
+    .tricolore-line {
+      width: 36px;
+      right: -6px;
+      bottom: 14%;
+    }
+
+    #menu-toggle-btn {
+      padding: 0.55rem 0.85rem;
+      min-width: 44px;
+      justify-content: center;
+    }
+
+    .glass-header.is-open,
+    .glass-header.scrolled.is-open {
+      top: 0 !important;
+      left: 0 !important;
+      transform: none !important;
+      width: 100% !important;
+      max-width: none !important;
+      border-radius: 0 !important;
+      max-height: none !important;
+      height: auto !important;
+      overflow: visible !important;
+    }
+
+    .nav-container-mobile {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin-top: 0 !important;
+      padding: calc(env(safe-area-inset-top, 0px) + 82px + 0.75rem) 1rem calc(1.4rem + env(safe-area-inset-bottom, 0px));
+      display: none;
+      opacity: 0;
+      transform: translateY(-8px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      background: rgba(10, 10, 10, 0.97);
+      z-index: 10001;
+    }
+
+    .glass-header.is-open .nav-container-mobile {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .glass-header {
+      padding: 0.3rem 1rem;
+    }
+
+    .glass-header:not(.is-open) {
+      height: 82px;
+    }
+
+    .glass-header.scrolled:not(.is-open) {
+      height: 70px;
+    }
+
+    .font-it {
+      font-size: 2.15rem;
+    }
+
+    .font-ex {
+      font-size: 0.96rem;
+      letter-spacing: -0.02em;
+    }
+
+    .glass-header.scrolled .font-it {
+      font-size: 1.95rem;
+    }
+
+    .glass-header.scrolled .font-ex {
+      font-size: 0.86rem;
+    }
+
+    .pure-logo {
+      gap: 8px;
+      max-width: min(64vw, 320px);
+    }
+
+    .tricolore-line {
+      width: 36px;
+      right: -6px;
+      bottom: 14%;
+    }
+
+    #menu-toggle-btn {
+      padding: 0.55rem 0.85rem;
+      min-width: 44px;
+      justify-content: center;
+    }
+
+    .glass-header.is-open {
+      height: auto !important;
+      max-height: 95vh;
+      max-height: calc(100dvh - 1rem);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-container-mobile {
+      position: static;
+      top: auto;
+      left: auto;
+      right: auto;
+      bottom: auto;
+      margin-top: 2rem;
+      padding: 0;
+      display: none;
+      opacity: 0;
+      transform: translateY(-10px);
+      overflow: visible;
+      background: transparent;
+      z-index: auto;
+    }
+
+    .glass-header.is-open .nav-container-mobile {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+      margin-top: 1.25rem;
+      padding-bottom: 1.5rem;
+    }
+  }
+
+  @media (max-width: 390px) {
+    #menu-btn-text {
+      display: none;
+    }
+
+    #menu-toggle-btn {
+      padding: 0.55rem 0.7rem;
+      margin-left: 0.55rem;
+      gap: 0;
+    }
+  }
+</style>
+
+<nav class="glass-header glass-surface" id="main-header" aria-label="Navigazione Principale">
+  <div class="header-main-row">
+    <a href="/ItalianExperience/" class="logo-link" id="logo-header" aria-label="Go to Home">
+      <div class="pure-logo">
+        <span class="font-it">Italian</span>
+        <div class="font-ex" data-text="EXPERIENCE"></div>
+        <div class="tricolore-line" aria-hidden="true">
+          <div style="background:#008C45;"></div>
+          <div style="background:#FFFFFF;"></div>
+          <div style="background:#CD212A;"></div>
+        </div>
+      </div>
+    </a>
+
+    <div class="nav-container-desktop" aria-label="Desktop navigation">
+      <div class="nav-item"><a href="/ItalianExperience/" class="nav-link" data-nav="home">Home</a></div>
+
+      <div class="nav-item dropdown">
+        <a href="/ItalianExperience/travel/" class="nav-link" data-nav="travel">
+          Travel
+          <svg style="margin-left:4px;opacity:0.4;" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+        </a>
+        <div class="dropdown-menu glass-surface">
+          <a href="/ItalianExperience/travel/bespoke/" class="dropdown-item">Bespoke Travel</a>
+          <a href="/ItalianExperience/travel/gapyear/" class="dropdown-item">Gap Year Program</a>
+          <a href="/ItalianExperience/travel/culinary/" class="dropdown-item">Culinary Academy</a>
+        </div>
+      </div>
+
+      <div class="nav-item dropdown">
+        <a href="/ItalianExperience/recruitment/" class="nav-link" data-nav="recruitment">
+          Recruitment
+          <svg style="margin-left:4px;opacity:0.4;" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+        </a>
+        <div class="dropdown-menu glass-surface">
+          <a href="/ItalianExperience/recruitment/employer/" class="dropdown-item">Per Aziende</a>
+          <a href="/ItalianExperience/recruitment/candidate/" class="dropdown-item">Per Candidati</a>
+        </div>
+      </div>
+
+      <div class="nav-item dropdown">
+        <a href="/ItalianExperience/flavors/" class="nav-link" data-nav="flavors">
+          Flavors
+          <svg style="margin-left:4px;opacity:0.4;" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+        </a>
+        <div class="dropdown-menu glass-surface">
+          <a href="/ItalianExperience/flavors/for-your-home/" class="dropdown-item">For your home</a>
+          <a href="/ItalianExperience/flavors/for-your-business/" class="dropdown-item">For your business</a>
+          <a href="/ItalianExperience/flavors/aziende-italiane/" class="dropdown-item">Aziende Italiane</a>
+        </div>
+      </div>
+
+      <div class="nav-item"><a href="/ItalianExperience/estates/" class="nav-link" data-nav="estates">Estates</a></div>
+      <div class="nav-item"><a href="/ItalianExperience/contact/" class="nav-link" data-nav="contact">Contact</a></div>
+    </div>
+
+    <button id="menu-toggle-btn" class="glass-surface" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Apri menu mobile">
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div class="burger-line" id="line-1"></div>
+        <div class="burger-line" id="line-2"></div>
+      </div>
+      <span id="menu-btn-text" style="margin-left:0.5rem;">Menu</span>
+    </button>
+  </div>
+
+  <div class="nav-container-mobile" id="mobile-nav">
+    <div class="mobile-nav-item"><a href="/ItalianExperience/" class="mobile-link-main" data-close data-nav="home">Home</a></div>
+
+    <div class="mobile-nav-item">
+      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false">
+        <span>Travel</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+      </button>
+      <div class="mobile-submenu glass-surface">
+        <a href="/ItalianExperience/travel/" class="mobile-sub-link" data-close data-nav="travel">Travel Home</a>
+        <a href="/ItalianExperience/travel/bespoke/" class="mobile-sub-link" data-close>Bespoke Travel</a>
+        <a href="/ItalianExperience/travel/gapyear/" class="mobile-sub-link" data-close>Gap Year Program</a>
+        <a href="/ItalianExperience/travel/culinary/" class="mobile-sub-link" data-close>Culinary Academy</a>
+      </div>
+    </div>
+
+    <div class="mobile-nav-item">
+      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false">
+        <span>Recruitment</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+      </button>
+      <div class="mobile-submenu glass-surface">
+        <a href="/ItalianExperience/recruitment/" class="mobile-sub-link" data-close data-nav="recruitment">Recruitment Home</a>
+        <a href="/ItalianExperience/recruitment/employer/" class="mobile-sub-link" data-close>Per Aziende</a>
+        <a href="/ItalianExperience/recruitment/candidate/" class="mobile-sub-link" data-close>Per Candidati</a>
+      </div>
+    </div>
+
+    <div class="mobile-nav-item">
+      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false">
+        <span>Flavors</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+      </button>
+      <div class="mobile-submenu glass-surface">
+        <a href="/ItalianExperience/flavors/" class="mobile-sub-link" data-close data-nav="flavors">Flavors Home</a>
+        <a href="/ItalianExperience/flavors/for-your-home/" class="mobile-sub-link" data-close>For your home</a>
+        <a href="/ItalianExperience/flavors/for-your-business/" class="mobile-sub-link" data-close>For your business</a>
+        <a href="/ItalianExperience/flavors/aziende-italiane/" class="mobile-sub-link" data-close>Aziende Italiane</a>
+      </div>
+    </div>
+
+    <div class="mobile-nav-item"><a href="/ItalianExperience/estates/" class="mobile-link-main" data-close data-nav="estates">Estates</a></div>
+    <div class="mobile-nav-item"><a href="/ItalianExperience/contact/" class="mobile-link-main" data-close data-nav="contact">Contact</a></div>
+  </div>
+</nav>
+
+<style>
   #main-header {
     position: fixed;
     top: 1.5rem;
