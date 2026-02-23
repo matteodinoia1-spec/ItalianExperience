@@ -15,7 +15,7 @@
     -webkit-backdrop-filter: blur(30px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: var(--radius-premium, 12px);
-    padding: 0.4rem var(--ie-content-padding-inline, clamp(1rem, 4vw, 2.4rem));
+    padding: 0.4rem 2.5rem;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
     max-height: 90px;
     transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -36,7 +36,7 @@
   .glass-header.scrolled {
     top: 1rem;
     width: calc(100% - 4rem);
-    padding: 0.35rem var(--ie-content-padding-inline, clamp(1rem, 4vw, 2.4rem));
+    padding: 0.35rem 2rem;
     background: rgba(255, 255, 255, 0.12);
   }
 
@@ -48,10 +48,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    position: relative;
-    z-index: 10003;
-    min-height: 56px;
     height: 100%;
     transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -69,19 +65,6 @@
     position: relative;
     user-select: none;
     max-width: min(68vw, 420px);
-  }
-
-  #logo-header:hover .font-it,
-  #logo-header:focus-visible .font-it {
-    text-shadow: 0 0 12px rgba(197, 160, 89, 0.45);
-    transform: scale(1.025);
-  }
-
-  #logo-header:hover .letter,
-  #logo-header:focus-visible .letter {
-    color: #ffffff;
-    text-shadow: 0 0 14px currentColor;
-    transform: translateY(-2px);
   }
 
   .font-it {
@@ -139,35 +122,11 @@
     height: 100%;
     margin-left: auto;
     justify-content: flex-end;
-    flex-wrap: nowrap;
-    text-align: right;
-  }
-
-  .nav-item {
-    display: flex;
-    align-items: center;
-  }
-
-  .nav-item .nav-link {
-    text-align: center;
-    justify-content: center;
   }
 
   @media (min-width: 1024px) {
-    .header-main-row {
-      display: grid;
-      grid-template-columns: auto minmax(0, 1fr);
-      align-items: center;
-    }
-
-    .logo-link {
-      justify-self: start;
-    }
-
     .nav-container-desktop {
       display: flex;
-      justify-self: end;
-      width: 100%;
     }
   }
 
@@ -182,7 +141,6 @@
     opacity: 0.75;
     display: flex;
     align-items: center;
-    white-space: nowrap;
     padding: 0.5rem 0.75rem;
     height: 40px;
   }
@@ -205,27 +163,22 @@
   .dropdown-menu {
     position: absolute;
     top: 100%;
-    left: auto;
-    right: 0;
+    left: 0;
     transform: translateY(10px);
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
-    backdrop-filter: blur(24px) saturate(165%);
-    -webkit-backdrop-filter: blur(24px) saturate(165%);
+    background: rgba(18, 18, 18, 0.98);
+    backdrop-filter: blur(25px);
     min-width: 240px;
     border-radius: var(--radius-premium, 12px);
     padding: 1rem 0;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9);
     opacity: 0;
     visibility: hidden;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: 60;
-    text-align: left;
   }
 
   .dropdown:hover .dropdown-menu,
-  .dropdown:focus-within .dropdown-menu,
-  .dropdown.is-open .dropdown-menu {
+  .dropdown:focus-within .dropdown-menu {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
@@ -241,7 +194,6 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     transition: all 0.2s;
-    text-align: left;
   }
 
   .dropdown-item:hover {
@@ -257,7 +209,7 @@
 
   .nav-container-mobile {
     margin-top: 2rem;
-    display: none;
+    display: flex;
     flex-direction: column;
     gap: 0.25rem;
     opacity: 0;
@@ -266,7 +218,13 @@
   }
 
   .glass-header.is-open {
+    height: auto !important;
+    max-height: 95vh;
+    max-height: calc(100dvh - 1rem);
     background: rgba(10, 10, 10, 0.98);
+    overflow: visible;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .glass-header.is-open .header-main-row {
@@ -274,7 +232,6 @@
   }
 
   .glass-header.is-open .nav-container-mobile {
-    display: flex;
     opacity: 1;
     transform: translateY(0);
   }
@@ -310,13 +267,8 @@
     max-height: 0;
     overflow: hidden;
     transition: all 0.5s ease;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
-    backdrop-filter: blur(18px) saturate(160%);
-    -webkit-backdrop-filter: blur(18px) saturate(160%);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+    background: rgba(255, 255, 255, 0.03);
     border-radius: var(--radius-premium, 12px);
-    text-align: left;
   }
 
   .mobile-nav-item.open .mobile-submenu {
@@ -333,7 +285,6 @@
     font-size: 0.92rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    text-align: left;
   }
 
   .mobile-sub-link:hover {
@@ -386,9 +337,9 @@
     transform: translateY(-3px) rotate(-45deg);
   }
 
-  @media (min-width: 769px) and (max-width: 1023px) {
+  @media (max-width: 768px) {
     .glass-header {
-      padding: 0.3rem var(--ie-content-padding-inline, clamp(1rem, 4vw, 2.4rem));
+      padding: 0.3rem 1rem;
     }
 
     .glass-header:not(.is-open) {
@@ -441,114 +392,30 @@
       width: 100% !important;
       max-width: none !important;
       border-radius: 0 !important;
-      max-height: none !important;
-      height: auto !important;
       overflow: visible !important;
     }
 
     .nav-container-mobile {
       position: fixed;
-      top: 0;
+      top: calc(env(safe-area-inset-top, 0px) + 70px);
       left: 0;
       right: 0;
       bottom: 0;
-      margin-top: 0 !important;
-      padding: calc(env(safe-area-inset-top, 0px) + 82px + 0.75rem) var(--ie-content-padding-inline, 1rem) calc(1.4rem + env(safe-area-inset-bottom, 0px));
+      margin-top: 0;
+      padding: 0.75rem 1rem calc(1.4rem + env(safe-area-inset-bottom, 0px));
       display: none;
       opacity: 0;
       transform: translateY(-8px);
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       background: rgba(10, 10, 10, 0.97);
-      z-index: 10002;
-      pointer-events: none;
+      z-index: 9999;
     }
 
     .glass-header.is-open .nav-container-mobile {
       display: flex;
       opacity: 1;
       transform: translateY(0);
-      pointer-events: auto;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .glass-header {
-      padding: 0.3rem var(--ie-content-padding-inline, 1rem);
-    }
-
-    .glass-header:not(.is-open) {
-      height: 82px;
-    }
-
-    .glass-header.scrolled:not(.is-open) {
-      height: 70px;
-    }
-
-    .font-it {
-      font-size: 2.15rem;
-    }
-
-    .font-ex {
-      font-size: 0.96rem;
-      letter-spacing: -0.02em;
-    }
-
-    .glass-header.scrolled .font-it {
-      font-size: 1.95rem;
-    }
-
-    .glass-header.scrolled .font-ex {
-      font-size: 0.86rem;
-    }
-
-    .pure-logo {
-      gap: 8px;
-      max-width: min(64vw, 320px);
-    }
-
-    .tricolore-line {
-      width: 36px;
-      right: -6px;
-      bottom: 14%;
-    }
-
-    #menu-toggle-btn {
-      padding: 0.55rem 0.85rem;
-      min-width: 44px;
-      justify-content: center;
-    }
-
-    .glass-header.is-open {
-      height: auto !important;
-      max-height: 95vh;
-      max-height: calc(100dvh - 1rem);
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .nav-container-mobile {
-      position: static;
-      top: auto;
-      left: auto;
-      right: auto;
-      bottom: auto;
-      margin-top: 2rem;
-      padding: 0;
-      display: none;
-      opacity: 0;
-      transform: translateY(-10px);
-      overflow: visible;
-      background: transparent;
-      z-index: auto;
-    }
-
-    .glass-header.is-open .nav-container-mobile {
-      display: flex;
-      opacity: 1;
-      transform: translateY(0);
-      margin-top: 1.25rem;
-      padding-bottom: 1.5rem;
     }
   }
 
@@ -562,17 +429,6 @@
       margin-left: 0.55rem;
       gap: 0;
     }
-  }
-
-  .logo-link:focus-visible,
-  .nav-link:focus-visible,
-  .dropdown-item:focus-visible,
-  .mobile-link-main:focus-visible,
-  .mobile-sub-link:focus-visible,
-  #menu-toggle-btn:focus-visible {
-    outline: 1px solid rgba(197, 160, 89, 0.95);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.22);
   }
 </style>
 
@@ -645,11 +501,11 @@
     <div class="mobile-nav-item"><a href="/ItalianExperience/" class="mobile-link-main" data-close data-nav="home">Home</a></div>
 
     <div class="mobile-nav-item">
-      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false" aria-controls="mobile-submenu-travel">
+      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false">
         <span>Travel</span>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
       </button>
-      <div class="mobile-submenu glass-surface" id="mobile-submenu-travel">
+      <div class="mobile-submenu glass-surface">
         <a href="/ItalianExperience/travel/" class="mobile-sub-link" data-close data-nav="travel">Travel Home</a>
         <a href="/ItalianExperience/travel/bespoke/" class="mobile-sub-link" data-close>Bespoke Travel</a>
         <a href="/ItalianExperience/travel/gapyear/" class="mobile-sub-link" data-close>Gap Year Program</a>
@@ -658,11 +514,11 @@
     </div>
 
     <div class="mobile-nav-item">
-      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false" aria-controls="mobile-submenu-recruitment">
+      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false">
         <span>Recruitment</span>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
       </button>
-      <div class="mobile-submenu glass-surface" id="mobile-submenu-recruitment">
+      <div class="mobile-submenu glass-surface">
         <a href="/ItalianExperience/recruitment/" class="mobile-sub-link" data-close data-nav="recruitment">Recruitment Home</a>
         <a href="/ItalianExperience/recruitment/employer/" class="mobile-sub-link" data-close>Per Aziende</a>
         <a href="/ItalianExperience/recruitment/candidate/" class="mobile-sub-link" data-close>Per Candidati</a>
@@ -670,11 +526,11 @@
     </div>
 
     <div class="mobile-nav-item">
-      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false" aria-controls="mobile-submenu-flavors">
+      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false">
         <span>Flavors</span>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
       </button>
-      <div class="mobile-submenu glass-surface" id="mobile-submenu-flavors">
+      <div class="mobile-submenu glass-surface">
         <a href="/ItalianExperience/flavors/" class="mobile-sub-link" data-close data-nav="flavors">Flavors Home</a>
         <a href="/ItalianExperience/flavors/for-your-home/" class="mobile-sub-link" data-close>For your home</a>
         <a href="/ItalianExperience/flavors/for-your-business/" class="mobile-sub-link" data-close>For your business</a>

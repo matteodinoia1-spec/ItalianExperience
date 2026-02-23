@@ -35,7 +35,7 @@
     const inlineHeader = document.getElementById('main-header');
     const inlineMenuText = document.getElementById('menu-btn-text');
     if (inlineMenuBtn && inlineHeader) {
-      const isTabletOverlay = () => window.innerWidth >= 769 && window.innerWidth <= 1179;
+      const isTabletOverlay = () => window.innerWidth >= 768 && window.innerWidth <= 1023;
       const syncInlineBodyLock = (open) => {
         document.body.classList.toggle('menu-open', open && isTabletOverlay());
       };
@@ -271,11 +271,7 @@
       if (href && currentPath === href) a.classList.add('active');
     });
 
-    const map = {
-      travel: 'mobile-submenu-travel',
-      recruitment: 'mobile-submenu-recruitment',
-      flavors: 'mobile-submenu-flavors'
-    };
+    const map = { travel: 'm-travel', recruitment: 'm-recruitment', flavors: 'm-flavors' };
     const panelId = map[section];
     if (panelId) {
       const btn = document.querySelector(`.accordion-toggle[aria-controls="${panelId}"]`);
