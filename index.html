@@ -1255,6 +1255,19 @@ STRATEGIC ADVISORY</p>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
+      const rafThrottle = (fn) => {
+        let rafId = 0;
+        let lastArgs = null;
+        return (...args) => {
+          lastArgs = args;
+          if (rafId) return;
+          rafId = requestAnimationFrame(() => {
+            rafId = 0;
+            fn(...lastArgs);
+          });
+        };
+      };
 
       // Build EXPERIENCE letters
       document.querySelectorAll('.font-ex').forEach(ex => {
@@ -1275,8 +1288,7 @@ STRATEGIC ADVISORY</p>
       if (prismLogo && logoContainer && contactLink) {
         const prLetters = prismLogo.querySelectorAll('.hero-letter');
         const italianWord = prismLogo.querySelector('.hero-font-it-logo');
-
-        prismLogo.addEventListener('mousemove', (e) => {
+        const handlePrismMouseMove = rafThrottle((e) => {
           if (!italianWord) return;
           const rect = prismLogo.getBoundingClientRect();
           const mouseX = e.clientX - rect.left;
@@ -1287,6 +1299,9 @@ STRATEGIC ADVISORY</p>
             const power = (350 - itDist) / 350;
             italianWord.style.textShadow = `0 0 ${50 * power}px rgba(197, 160, 89, 0.8)`;
             italianWord.style.transform = `scale(${1 + power * 0.05})`;
+          } else {
+            italianWord.style.textShadow = '';
+            italianWord.style.transform = '';
           }
 
           prLetters.forEach(l => {
@@ -1306,14 +1321,18 @@ STRATEGIC ADVISORY</p>
               l.style.textShadow = '';
             }
           });
-        }, { passive: true });
+        });
+
+        if (hasFinePointer) {
+          prismLogo.addEventListener('mousemove', handlePrismMouseMove, { passive: true });
+        }
 
         prismLogo.addEventListener('mouseleave', () => {
           prLetters.forEach(l => { l.style.color = ''; l.style.transform = ''; l.style.textShadow = ''; });
           if (italianWord) { italianWord.style.textShadow = ''; italianWord.style.transform = ''; }
         }, { passive: true });
 
-        window.addEventListener('scroll', () => {
+        const handleHeroScroll = rafThrottle(() => {
           const scrollY = window.scrollY;
           const scrollTarget = 450;
           if (scrollY <= scrollTarget) {
@@ -1337,7 +1356,9 @@ STRATEGIC ADVISORY</p>
             contactLink.style.opacity = 0;
             if (scrollIndicator) scrollIndicator.style.opacity = 0;
           }
-        }, { passive: true });
+        });
+        window.addEventListener('scroll', handleHeroScroll, { passive: true });
+        handleHeroScroll();
       }
 
       const glassCards = document.querySelectorAll('.hero-glass-card');
@@ -1354,14 +1375,15 @@ STRATEGIC ADVISORY</p>
           });
         }
 
-        if (window.matchMedia("(pointer: fine)").matches) {
-          card.addEventListener('mousemove', (e) => {
+        if (hasFinePointer) {
+          const handleCardMouseMove = rafThrottle((e) => {
             const rect = card.getBoundingClientRect();
             const x = ((e.clientX - rect.left) / card.clientWidth) * 100;
             const y = ((e.clientY - rect.top) / card.clientHeight) * 100;
             card.style.setProperty('--mouse-x', `${x}%`);
             card.style.setProperty('--mouse-y', `${y}%`);
-          }, { passive: true });
+          });
+          card.addEventListener('mousemove', handleCardMouseMove, { passive: true });
         }
       });
 
@@ -1385,12 +1407,14 @@ STRATEGIC ADVISORY</p>
       function initLogoMouse(id) {
         const el = document.getElementById(id);
         if (!el) return;
-        if (!window.matchMedia("(pointer: fine)").matches) return;
+        if (!hasFinePointer) return;
 
         const it = el.querySelector('.font-it');
         const letters = el.querySelectorAll('.letter');
+        const green = getComputedStyle(document.documentElement).getPropertyValue('--it-green').trim();
+        const red = getComputedStyle(document.documentElement).getPropertyValue('--it-red').trim();
 
-        el.addEventListener('mousemove', (e) => {
+        const handleLogoMouseMove = rafThrottle((e) => {
           const r = el.getBoundingClientRect();
           const x = e.clientX - r.left;
 
@@ -1409,9 +1433,6 @@ STRATEGIC ADVISORY</p>
 
             if (dx < 110) {
               const p = (110 - dx) / 110;
-              const green = getComputedStyle(document.documentElement).getPropertyValue('--it-green').trim();
-              const red = getComputedStyle(document.documentElement).getPropertyValue('--it-red').trim();
-
               l.style.color = (x > lx + 14) ? green : (x < lx - 14 ? red : '#FFF');
               l.style.transform = `scale(${1 + p * 0.42}) translateY(${-p * 10}px)`;
               l.style.zIndex = "20";
@@ -1421,7 +1442,9 @@ STRATEGIC ADVISORY</p>
               l.style.zIndex = "10";
             }
           });
-        }, { passive: true });
+        });
+
+        el.addEventListener('mousemove', handleLogoMouseMove, { passive: true });
 
         el.addEventListener('mouseleave', () => {
           it.style.textShadow = '';

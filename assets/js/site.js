@@ -1,5 +1,20 @@
 (function () {
   let headerOffsetBound = false;
+  const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+
+  function rafThrottle(callback) {
+    let scheduled = false;
+    let lastArgs = null;
+    return function throttled(...args) {
+      lastArgs = args;
+      if (scheduled) return;
+      scheduled = true;
+      window.requestAnimationFrame(() => {
+        scheduled = false;
+        callback.apply(this, lastArgs);
+      });
+    };
+  }
 
   function buildExperienceLetters(root) {
     (root || document).querySelectorAll('.font-ex').forEach(ex => {
@@ -15,7 +30,7 @@
 
     let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
 
-    window.addEventListener('scroll', () => {
+    const onScroll = rafThrottle(() => {
       const y = window.pageYOffset || document.documentElement.scrollTop;
 
       if (!usesInlineMobile) {
@@ -27,7 +42,10 @@
       else header.classList.remove('scrolled');
 
       lastScrollY = y <= 0 ? 0 : y;
-    }, { passive: true });
+    });
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
   }
 
   function initMobileMenu() {
@@ -299,7 +317,7 @@
 
   function initLogoMouse(id) {
     const el = document.getElementById(id);
-    if (!el) return;
+    if (!el || !hasFinePointer) return;
 
     const it = el.querySelector('.font-it');
     const letters = el.querySelectorAll('.letter');
@@ -307,15 +325,35 @@
 
     const green = getComputedStyle(document.documentElement).getPropertyValue('--it-green').trim();
     const red = getComputedStyle(document.documentElement).getPropertyValue('--it-red').trim();
+    let logoRect = null;
+    let itCenterX = 0;
+    let itRange = 0;
+    let letterCenters = [];
 
-    el.addEventListener('mousemove', (e) => {
-      const r = el.getBoundingClientRect();
-      const x = e.clientX - r.left;
-
+    const measure = () => {
+      logoRect = el.getBoundingClientRect();
       const itRect = it.getBoundingClientRect();
-      const itX = itRect.left + itRect.width / 2 - r.left;
-      const dIt = Math.abs(x - itX);
-      const range = itRect.width;
+      itCenterX = itRect.left + itRect.width / 2 - logoRect.left;
+      itRange = Math.max(itRect.width, 1);
+      letterCenters = Array.from(letters).map((letter) => {
+        const lr = letter.getBoundingClientRect();
+        return lr.left + lr.width / 2 - logoRect.left;
+      });
+    };
+
+    const onResize = rafThrottle(() => measure());
+    measure();
+    window.addEventListener('resize', onResize, { passive: true });
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(measure).catch(() => {});
+    }
+
+    const onMove = rafThrottle((e) => {
+      if (!logoRect) return;
+      const x = e.clientX - logoRect.left;
+
+      const dIt = Math.abs(x - itCenterX);
+      const range = itRange;
 
       if (dIt < range) {
         const pIt = (range - dIt) / range;
@@ -326,9 +364,8 @@
         it.style.transform = '';
       }
 
-      letters.forEach(l => {
-        const lr = l.getBoundingClientRect();
-        const lx = lr.left + lr.width / 2 - r.left;
+      letters.forEach((l, index) => {
+        const lx = letterCenters[index] || 0;
         const dx = Math.abs(x - lx);
         const letterRange = 80;
 
@@ -349,6 +386,9 @@
         }
       });
     });
+
+    el.addEventListener('mouseenter', measure, { passive: true });
+    el.addEventListener('mousemove', onMove, { passive: true });
 
     el.addEventListener('mouseleave', () => {
       it.style.textShadow = '';
@@ -416,19 +456,26 @@
   }
 
   function initDynamicShimmer(root) {
-    if (!window.matchMedia('(pointer: fine)').matches) return;
+    if (!hasFinePointer) return;
     const scope = root || document;
     const surfaces = scope.querySelectorAll('.glass-surface, .premium-card, .hero-glass-card, .glass-header');
     if (!surfaces.length) return;
 
     surfaces.forEach((el) => {
-      el.addEventListener('mousemove', (e) => {
-        const rect = el.getBoundingClientRect();
+      let rect = null;
+      const measure = () => {
+        rect = el.getBoundingClientRect();
+      };
+      const onMove = rafThrottle((e) => {
+        if (!rect) measure();
         const x = ((e.clientX - rect.left) / Math.max(rect.width, 1)) * 100;
         const y = ((e.clientY - rect.top) / Math.max(rect.height, 1)) * 100;
         el.style.setProperty('--mouse-x', `${x}%`);
         el.style.setProperty('--mouse-y', `${y}%`);
-      }, { passive: true });
+      });
+
+      el.addEventListener('mouseenter', measure, { passive: true });
+      el.addEventListener('mousemove', onMove, { passive: true });
     });
   }
 

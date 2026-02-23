@@ -239,8 +239,8 @@ input,textarea,select,button{font-size:16px}
   height:90px;
   padding:0 2rem;
   background:rgba(15,15,15,0.45);
-  backdrop-filter:blur(40px) saturate(180%);
-  -webkit-backdrop-filter:blur(40px) saturate(180%);
+  backdrop-filter:blur(22px) saturate(165%);
+  -webkit-backdrop-filter:blur(22px) saturate(165%);
   border-bottom:1px solid rgba(255,255,255,0.08);
   box-shadow:0 10px 30px rgba(0,0,0,0.5);
 }
@@ -278,7 +278,7 @@ input,textarea,select,button{font-size:16px}
   display:inline-block;
   position:relative;
   will-change:transform,color,text-shadow;
-  transition:all 0.2s ease-out;
+  transition:transform 0.2s ease-out,color 0.2s ease-out,text-shadow 0.2s ease-out;
 }
 .tricolore{
   position:absolute;display:flex;height:3px;bottom:-6px;right:2px;width:92px;pointer-events:none;
@@ -315,7 +315,8 @@ input,textarea,select,button{font-size:16px}
   position:absolute;top:100%;right:0;
   min-width:260px;
   background:rgba(10,10,10,0.96);
-  backdrop-filter:blur(35px);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
   border:1px solid rgba(255,255,255,0.1);
   opacity:0;visibility:hidden;transform:translateY(10px);
   transition:opacity 0.3s cubic-bezier(0.25,1,0.35,1),visibility 0.3s cubic-bezier(0.25,1,0.35,1),transform 0.3s cubic-bezier(0.25,1,0.35,1);
@@ -364,7 +365,8 @@ input,textarea,select,button{font-size:16px}
 #mobile-menu-overlay{
   position:fixed;inset:0;
   background:rgba(8,8,8,0.98);
-  backdrop-filter:blur(50px) saturate(160%);
+  backdrop-filter:blur(20px) saturate(145%);
+  -webkit-backdrop-filter:blur(20px) saturate(145%);
   z-index:10000;
   opacity:0;visibility:hidden;
   transition:opacity 0.35s ease,visibility 0.35s ease;
@@ -570,8 +572,8 @@ body.menu-open{overflow:hidden}
 .premium-card{
   background:linear-gradient(145deg, rgba(255,255,255,0.11), rgba(255,255,255,0.035));
   border:1px solid var(--ice-border);
-  backdrop-filter:blur(26px) saturate(165%);
-  -webkit-backdrop-filter:blur(26px) saturate(165%);
+  backdrop-filter:blur(16px) saturate(155%);
+  -webkit-backdrop-filter:blur(16px) saturate(155%);
   box-shadow:var(--ice-shadow);
   border-radius:var(--radius-premium) !important;
 }
@@ -636,9 +638,25 @@ body.menu-open{overflow:hidden}
 .essence-cta,
 form button[type="submit"]{
   border-radius:var(--radius-premium) !important;
-  backdrop-filter:blur(18px) saturate(150%);
-  -webkit-backdrop-filter:blur(18px) saturate(150%);
+  backdrop-filter:blur(12px) saturate(145%);
+  -webkit-backdrop-filter:blur(12px) saturate(145%);
   box-shadow:0 12px 28px rgba(0,0,0,0.35);
+}
+
+@supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+  .glass-header.scrolled,
+  .dropdown-menu,
+  #mobile-menu-overlay,
+  .premium-card,
+  .hero-form-cta,
+  .service-btn,
+  .bespoke-btn,
+  .gap-btn,
+  .enroll-btn,
+  .essence-cta,
+  form button[type="submit"]{
+    background:rgba(12,12,12,0.88) !important;
+  }
 }
 
 /* Dynamic mouse shimmer for glass surfaces (aligned to home hero cards) */
