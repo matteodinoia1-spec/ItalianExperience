@@ -5,6 +5,12 @@
   --brand-obsidian:#080808;
   --it-green:#008C45;
   --it-red:#CD212A;
+  --ie-ease-standard:cubic-bezier(0.16,1,0.3,1);
+  --ie-dur-fast:220ms;
+  --ie-dur-base:320ms;
+  --ie-dur-slow:480ms;
+  --ie-space-section-y:6.5rem;
+  --ie-space-section-y-mobile:4.75rem;
   --ie-header-h:110px;
   --ie-header-top-gap:1.5rem;
   --ie-header-clearance:calc(var(--ie-header-h) + var(--ie-header-top-gap) + env(safe-area-inset-top));
@@ -201,7 +207,7 @@ input,textarea,select,button{font-size:16px}
   }
 }
 
-@media (max-width:420px){
+@media (max-width:640px){
   .ie-hero-lockup{
     padding-bottom:calc(86px + env(safe-area-inset-bottom)) !important;
   }
@@ -594,6 +600,7 @@ body.menu-open{overflow:hidden}
 /* Radius unification for primary content blocks and controls */
 .service-contact-card,
 .service-field,
+.field,
 .service-select,
 .service-textarea,
 .gap-field,
@@ -613,6 +620,7 @@ body.menu-open{overflow:hidden}
 .program-card,
 .feature-card,
 .category-card,
+.hub-glass-card,
 .bento-card,
 .glass-card,
 .disclosure-card,
@@ -642,6 +650,24 @@ body.menu-open{overflow:hidden}
   overflow:hidden;
 }
 
+/* Card motion consistency across internal families */
+.glass-card,
+.premium-card,
+.hub-glass-card,
+.bento-card,
+.support-card,
+.program-card,
+.feature-card,
+.category-card,
+.portal-card{
+  transition:
+    background-color var(--ie-dur-base) var(--ie-ease-standard),
+    border-color var(--ie-dur-base) var(--ie-ease-standard),
+    transform var(--ie-dur-base) var(--ie-ease-standard),
+    box-shadow var(--ie-dur-base) var(--ie-ease-standard),
+    filter var(--ie-dur-slow) var(--ie-ease-standard) !important;
+}
+
 /* Premium CTA consistency across forms/pages */
 .hero-form-cta,
 .service-btn,
@@ -649,11 +675,117 @@ body.menu-open{overflow:hidden}
 .gap-btn,
 .enroll-btn,
 .essence-cta,
+.btn-gold,
+.btn-outline,
+.cta-button,
+.btn-panel,
+.request-info-btn,
 form button[type="submit"]{
   border-radius:var(--radius-premium) !important;
   backdrop-filter:blur(12px) saturate(145%);
   -webkit-backdrop-filter:blur(12px) saturate(145%);
   box-shadow:0 12px 28px rgba(0,0,0,0.35);
+  letter-spacing:0.26em;
+  text-transform:uppercase;
+  transition:
+    background-color var(--ie-dur-base) var(--ie-ease-standard),
+    color var(--ie-dur-base) var(--ie-ease-standard),
+    border-color var(--ie-dur-base) var(--ie-ease-standard),
+    transform var(--ie-dur-fast) var(--ie-ease-standard),
+    box-shadow var(--ie-dur-base) var(--ie-ease-standard) !important;
+}
+
+.hero-form-cta:hover,
+.service-btn:hover,
+.bespoke-btn:hover,
+.gap-btn:hover,
+.enroll-btn:hover,
+.essence-cta:hover,
+.btn-gold:hover,
+.btn-outline:hover,
+.cta-button:hover,
+.btn-panel:hover,
+.request-info-btn:hover,
+form button[type="submit"]:hover{
+  transform:translateY(-1px);
+}
+
+.hero-form-cta:focus-visible,
+.service-btn:focus-visible,
+.bespoke-btn:focus-visible,
+.gap-btn:focus-visible,
+.enroll-btn:focus-visible,
+.essence-cta:focus-visible,
+.btn-gold:focus-visible,
+.btn-outline:focus-visible,
+.cta-button:focus-visible,
+.btn-panel:focus-visible,
+.request-info-btn:focus-visible,
+form button[type="submit"]:focus-visible{
+  outline:2px solid color-mix(in srgb, var(--brand-gold) 72%, #ffffff 28%);
+  outline-offset:2px;
+}
+
+.hero-form-cta:active,
+.service-btn:active,
+.bespoke-btn:active,
+.gap-btn:active,
+.enroll-btn:active,
+.essence-cta:active,
+.btn-gold:active,
+.btn-outline:active,
+.cta-button:active,
+.btn-panel:active,
+.request-info-btn:active,
+form button[type="submit"]:active{
+  transform:translateY(0);
+}
+
+/* Shared UI microcopy rhythm for internal forms/labels */
+.service-label,
+.bespoke-label,
+.gap-label{
+  font-size:0.64rem;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+}
+
+/* Internal advisory/contact section rhythm */
+.service-contact,
+.bespoke-contact,
+.gap-contact{
+  padding:var(--ie-space-section-y) 1.25rem 7rem !important;
+}
+
+@media (max-width:1024px){
+  .service-contact-shell,
+  .bespoke-contact-shell,
+  .gap-contact-shell{
+    grid-template-columns:1fr !important;
+    gap:1.5rem !important;
+  }
+
+  .service-contact-meta,
+  .bespoke-contact-meta,
+  .gap-contact-meta{
+    border-right:none !important;
+    padding-right:0 !important;
+    text-align:center;
+  }
+}
+
+@media (max-width:640px){
+  .service-contact,
+  .bespoke-contact,
+  .gap-contact{
+    padding:var(--ie-space-section-y-mobile) 1rem 5rem !important;
+  }
+
+  .service-contact-card,
+  .bespoke-contact-card,
+  .gap-contact-card{
+    padding:1rem !important;
+  }
 }
 
 @supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
