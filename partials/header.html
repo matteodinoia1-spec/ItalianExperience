@@ -122,11 +122,32 @@
     height: 100%;
     margin-left: auto;
     justify-content: flex-end;
+    width: auto;
+    flex: 0 0 auto;
   }
 
   @media (min-width: 1024px) {
+    .header-main-row {
+      width: 100%;
+    }
+
     .nav-container-desktop {
       display: flex;
+      width: auto;
+      max-width: 100%;
+      margin-left: auto;
+      justify-content: flex-end;
+      flex-wrap: nowrap;
+    }
+
+    .nav-container-desktop .nav-item {
+      flex: 0 0 auto;
+      width: auto;
+    }
+
+    .nav-container-desktop .nav-link {
+      display: inline-flex;
+      width: auto;
     }
   }
 
