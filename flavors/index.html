@@ -114,6 +114,19 @@
       position:relative;
       z-index:10;
       width:100%;
+      display:flex;
+      justify-content:center;
+      pointer-events:none;
+      transition:transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hub-panel:hover .hub-content{
+      transform:translateY(-15px);
+    }
+
+    .hub-glass-card{
+      position:relative;
+      width:100%;
       max-width:360px;
       padding:2.5rem 1.5rem;
       border-radius:var(--radius-premium);
@@ -122,11 +135,10 @@
       border:1px solid rgba(255,255,255,0);
       text-align:center;
       overflow:hidden;
-      pointer-events:none;
       transition:all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .hub-content::before{
+    .hub-glass-card::before{
       content:"";
       position:absolute;
       inset:0;
@@ -137,15 +149,14 @@
       z-index:-1;
     }
 
-    .hub-panel:hover .hub-content{
-      transform:translateY(-15px);
+    .hub-panel:hover .hub-glass-card{
       background:var(--ice-bg);
       backdrop-filter:blur(20px) saturate(180%);
       border:1px solid var(--ice-border);
       box-shadow:0 30px 60px rgba(0,0,0,0.4);
     }
 
-    .hub-panel:hover .hub-content::before{
+    .hub-panel:hover .hub-glass-card::before{
       opacity:1;
     }
 
@@ -292,6 +303,9 @@
       }
 
       .hub-content{
+      }
+
+      .hub-glass-card{
         max-width:95%;
         padding:2rem 1.2rem;
         background:rgba(10,10,10,0.4);
@@ -337,10 +351,12 @@
         <div class="hub-gradient" aria-hidden="true"></div>
 
         <div class="hub-content">
-          <p class="hub-kicker">Gourmet Experience</p>
-          <div class="hub-line"></div>
-          <h2 class="hub-title">For Your Home</h2>
-          <p class="hub-sub">E-Commerce Store</p>
+          <div class="hub-glass-card">
+            <p class="hub-kicker">Gourmet Experience</p>
+            <div class="hub-line"></div>
+            <h2 class="hub-title">For Your Home</h2>
+            <p class="hub-sub">E-Commerce Store</p>
+          </div>
         </div>
       </a>
 
@@ -349,10 +365,12 @@
         <div class="hub-gradient" aria-hidden="true"></div>
 
         <div class="hub-content">
-          <p class="hub-kicker">Professional Supply</p>
-          <div class="hub-line"></div>
-          <h2 class="hub-title">For Your Business</h2>
-          <p class="hub-sub">Wholesale</p>
+          <div class="hub-glass-card">
+            <p class="hub-kicker">Professional Supply</p>
+            <div class="hub-line"></div>
+            <h2 class="hub-title">For Your Business</h2>
+            <p class="hub-sub">Wholesale</p>
+          </div>
         </div>
       </a>
 
@@ -361,14 +379,16 @@
         <div class="hub-gradient" aria-hidden="true"></div>
 
         <div class="hub-content">
-          <p class="hub-kicker">Expansion Advisory</p>
-          <div class="hub-line"></div>
-          <h2 class="hub-title">Italian Companies</h2>
-          <p class="hub-sub">Export to USA Market</p>
+          <div class="hub-glass-card">
+            <p class="hub-kicker">Expansion Advisory</p>
+            <div class="hub-line"></div>
+            <h2 class="hub-title">Italian Companies</h2>
+            <p class="hub-sub">Export to USA Market</p>
 
-          <p class="hub-disclaimer">
-            This specific service is available exclusively for the Italian market. Content is provided in Italian.
-          </p>
+            <p class="hub-disclaimer">
+              This specific service is available exclusively for the Italian market. Content is provided in Italian.
+            </p>
+          </div>
         </div>
       </a>
 

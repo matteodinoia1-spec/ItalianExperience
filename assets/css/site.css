@@ -6,6 +6,7 @@
   --it-green:#008C45;
   --it-red:#CD212A;
   --ie-header-h:110px;
+  --ie-header-top-gap:1.5rem;
   --ie-content-padding-inline:clamp(1rem, 4vw, 2.4rem);
   --radius-premium:12px;
   --ice-bg:rgba(255,255,255,0.07);
@@ -33,10 +34,10 @@ input,textarea,select,button{font-size:16px}
 
 .brand-font{font-family:'Playfair Display',serif}
 
-/* Header mount must not push page content down */
+/* Reserve space for the fixed header at page top */
 #site-header{
   position:relative;
-  height:0;
+  height:calc(var(--ie-header-h) + var(--ie-header-top-gap) + env(safe-area-inset-top));
   z-index:9999;
 }
 
@@ -96,8 +97,7 @@ input,textarea,select,button{font-size:16px}
   max-width:min(1140px, 100%);
   margin-inline:auto;
   padding-inline:var(--ie-content-padding-inline) !important;
-  /* sposto il compenso dell'header sulla lockup, così solo i contenuti scendono */
-  padding-top:calc(var(--ie-header-h) + env(safe-area-inset-top) + 14px);
+  padding-top:14px;
 }
 
 .ie-hero-eyebrow{
@@ -162,7 +162,7 @@ input,textarea,select,button{font-size:16px}
   }
   .ie-hero-lockup{
     padding-inline:var(--ie-content-padding-inline) !important;
-    padding-top:calc(var(--ie-header-h) + env(safe-area-inset-top) + 18px);
+    padding-top:18px;
     padding-bottom:calc(78px + env(safe-area-inset-bottom)) !important;
   }
   .ie-hero-eyebrow{
@@ -521,6 +521,12 @@ textarea:focus-visible{
   .glass-header{height:140px}
   .glass-header.scrolled{height:120px}
   #central-menu-btn{margin-top:0}
+}
+
+@media (max-width:768px){
+  :root{
+    --ie-header-top-gap:1rem;
+  }
 }
 
 /* Optional helper when overlay open */
