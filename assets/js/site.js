@@ -85,7 +85,7 @@
       });
 
       window.addEventListener('resize', () => {
-        if (window.innerWidth >= 1180) closeInlineMenu();
+        if (window.innerWidth >= 1024) closeInlineMenu();
         else syncInlineBodyLock(inlineHeader.classList.contains('is-open'));
       }, { passive: true });
 
@@ -143,7 +143,7 @@
     const dropdowns = Array.from(document.querySelectorAll('.nav-container-desktop .dropdown'));
     if (!dropdowns.length) return;
 
-    const isDesktop = () => window.innerWidth >= 1180;
+    const isDesktop = () => window.innerWidth >= 1024;
     const supportsHover = () => window.matchMedia('(hover: hover)').matches;
     const closeAll = () => dropdowns.forEach(d => d.classList.remove('is-open'));
 
