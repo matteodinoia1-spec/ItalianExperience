@@ -26,7 +26,7 @@
     height: 92px;
   }
 
-  @media (min-width: 1024px) {
+  @media (min-width: 1180px) {
     .glass-header {
       overflow: visible;
       max-height: none;
@@ -49,6 +49,8 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+    position: relative;
+    z-index: 10003;
     height: 100%;
     transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -136,10 +138,16 @@
     height: 100%;
     margin-left: auto;
     justify-content: flex-end;
+    flex-wrap: nowrap;
     text-align: right;
   }
 
-  @media (min-width: 1024px) {
+  .nav-item {
+    display: flex;
+    align-items: center;
+  }
+
+  @media (min-width: 1180px) {
     .header-main-row {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
@@ -168,6 +176,7 @@
     opacity: 0.75;
     display: flex;
     align-items: center;
+    white-space: nowrap;
     padding: 0.5rem 0.75rem;
     height: 40px;
   }
@@ -190,7 +199,8 @@
   .dropdown-menu {
     position: absolute;
     top: 100%;
-    left: 0;
+    left: auto;
+    right: 0;
     transform: translateY(10px);
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
     backdrop-filter: blur(24px) saturate(165%);
@@ -207,7 +217,8 @@
   }
 
   .dropdown:hover .dropdown-menu,
-  .dropdown:focus-within .dropdown-menu {
+  .dropdown:focus-within .dropdown-menu,
+  .dropdown.is-open .dropdown-menu {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
@@ -260,7 +271,7 @@
     transform: translateY(0);
   }
 
-  @media (min-width: 1024px) {
+  @media (min-width: 1180px) {
     .nav-container-mobile {
       display: none;
     }
@@ -344,7 +355,7 @@
     margin-left: 0.9rem;
   }
 
-  @media (min-width: 1024px) {
+  @media (min-width: 1180px) {
     #menu-toggle-btn {
       display: none;
     }
@@ -365,7 +376,7 @@
     transform: translateY(-3px) rotate(-45deg);
   }
 
-  @media (min-width: 769px) and (max-width: 1023px) {
+  @media (min-width: 769px) and (max-width: 1179px) {
     .glass-header {
       padding: 0.3rem 1rem;
     }
@@ -439,7 +450,7 @@
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       background: rgba(10, 10, 10, 0.97);
-      z-index: 10001;
+      z-index: 10002;
       pointer-events: none;
     }
 
@@ -542,6 +553,17 @@
       gap: 0;
     }
   }
+
+  .logo-link:focus-visible,
+  .nav-link:focus-visible,
+  .dropdown-item:focus-visible,
+  .mobile-link-main:focus-visible,
+  .mobile-sub-link:focus-visible,
+  #menu-toggle-btn:focus-visible {
+    outline: 1px solid rgba(197, 160, 89, 0.95);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.22);
+  }
 </style>
 
 <nav class="glass-header glass-surface" id="main-header" aria-label="Navigazione Principale">
@@ -613,11 +635,11 @@
     <div class="mobile-nav-item"><a href="/ItalianExperience/" class="mobile-link-main" data-close data-nav="home">Home</a></div>
 
     <div class="mobile-nav-item">
-      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false">
+      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false" aria-controls="mobile-submenu-travel">
         <span>Travel</span>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
       </button>
-      <div class="mobile-submenu glass-surface">
+      <div class="mobile-submenu glass-surface" id="mobile-submenu-travel">
         <a href="/ItalianExperience/travel/" class="mobile-sub-link" data-close data-nav="travel">Travel Home</a>
         <a href="/ItalianExperience/travel/bespoke/" class="mobile-sub-link" data-close>Bespoke Travel</a>
         <a href="/ItalianExperience/travel/gapyear/" class="mobile-sub-link" data-close>Gap Year Program</a>
@@ -626,11 +648,11 @@
     </div>
 
     <div class="mobile-nav-item">
-      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false">
+      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false" aria-controls="mobile-submenu-recruitment">
         <span>Recruitment</span>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
       </button>
-      <div class="mobile-submenu glass-surface">
+      <div class="mobile-submenu glass-surface" id="mobile-submenu-recruitment">
         <a href="/ItalianExperience/recruitment/" class="mobile-sub-link" data-close data-nav="recruitment">Recruitment Home</a>
         <a href="/ItalianExperience/recruitment/employer/" class="mobile-sub-link" data-close>Per Aziende</a>
         <a href="/ItalianExperience/recruitment/candidate/" class="mobile-sub-link" data-close>Per Candidati</a>
@@ -638,11 +660,11 @@
     </div>
 
     <div class="mobile-nav-item">
-      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false">
+      <button type="button" class="mobile-link-main accordion-toggle" aria-expanded="false" aria-controls="mobile-submenu-flavors">
         <span>Flavors</span>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
       </button>
-      <div class="mobile-submenu glass-surface">
+      <div class="mobile-submenu glass-surface" id="mobile-submenu-flavors">
         <a href="/ItalianExperience/flavors/" class="mobile-sub-link" data-close data-nav="flavors">Flavors Home</a>
         <a href="/ItalianExperience/flavors/for-your-home/" class="mobile-sub-link" data-close>For your home</a>
         <a href="/ItalianExperience/flavors/for-your-business/" class="mobile-sub-link" data-close>For your business</a>
