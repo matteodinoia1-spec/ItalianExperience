@@ -108,26 +108,27 @@
       justify-content:flex-end;
       padding:6rem 3.5rem;
       text-decoration:none;
-      transition:flex 0.7s cubic-bezier(0.16,1,0.3,1);
+      transition:flex 0.8s cubic-bezier(0.16,1,0.3,1);
       border-right:none !important;
-      will-change:flex;
-      contain:layout paint;
     }
     .service-panel:last-child{border-right:none}
-    .service-panel:hover{flex:1.8}
+    .service-panel:hover{flex:3.2}
 
     .panel-bg{
       position:absolute;inset:0;z-index:0;
-      transition:transform 1s cubic-bezier(0.16,1,0.3,1),filter 0.55s ease;
+      transition:transform 1.2s cubic-bezier(0.16,1,0.3,1),filter 0.8s ease;
       filter:grayscale(100%) brightness(0.2);
-      transform:translateZ(0);
-      backface-visibility:hidden;
-      will-change:transform,filter;
     }
     .panel-bg img{width:100%;height:100%;object-fit:cover}
     .service-panel:hover .panel-bg{transform:scale(1.1);filter:grayscale(0%) brightness(0.4)}
 
-    .panel-content{position:relative;z-index:10;pointer-events:none}
+    .panel-content{
+      position:relative;
+      z-index:10;
+      pointer-events:none;
+      transition:transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    .service-panel:hover .panel-content{transform:translateY(-15px)}
     .gold-line{width:40px;height:2px;background:var(--brand-gold);margin-bottom:2rem;transition:width 0.6s ease}
     .service-panel:hover .gold-line{width:80px}
 

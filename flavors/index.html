@@ -39,6 +39,11 @@
       flex-direction:column;
       overflow:hidden;
     }
+    .hub-grid.ie-hero-shell.ie-hero-offset{
+      margin-top:calc(-1 * var(--ie-header-clearance)) !important;
+      min-height:100vh;
+      min-height:100dvh;
+    }
 
     @media (max-width:1024px){
       .hub-grid{
@@ -72,9 +77,7 @@
       border-bottom:none !important;
       border-right:1px solid rgba(255,255,255,0.05);
       padding:2rem;
-      transition:flex 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-      will-change:flex;
-      contain:layout paint;
+      transition:flex 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @media (min-width:1025px){
@@ -83,7 +86,7 @@
         border-right:none !important;
         min-height:0;
       }
-      .hub-panel:hover{flex:2.9}
+      .hub-panel:hover{flex:3.2}
       .hub-panel:last-child{
         border-right:none;
       }
@@ -95,11 +98,9 @@
       background-size:cover;
       background-position:center top;
       filter:brightness(0.22);
-      transform:translateZ(0) scale(1.02);
-      transition:transform 0.95s cubic-bezier(0.16, 1, 0.3, 1), filter 0.55s ease;
+      transform:scale(1.02);
+      transition:transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
       z-index:0;
-      backface-visibility:hidden;
-      will-change:transform,filter;
     }
 
     .hub-panel:hover .hub-bg{
@@ -343,7 +344,7 @@
       .hub-panel{transition:none}
       .hub-bg{transition:filter 0.4s ease}
       .hub-panel:hover{flex:1}
-      .hub-panel:hover .hub-bg{transform:translateZ(0) scale(1.02)}
+      .hub-panel:hover .hub-bg{transform:scale(1.02)}
       .hub-panel:hover .hub-content{transform:none}
     }
   </style>
