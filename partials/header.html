@@ -91,6 +91,36 @@
     line-height: 1;
   }
 
+  @media (max-width: 1023px) {
+    .pure-logo {
+      gap: clamp(8px, 2.2vw, 12px);
+    }
+
+    .font-it {
+      font-size: clamp(1.8rem, 7.8vw, 2.35rem);
+    }
+
+    .font-ex {
+      font-size: clamp(0.72rem, 3.2vw, 1rem);
+      letter-spacing: -0.2px;
+    }
+
+    .tricolore-line {
+      width: clamp(34px, 10vw, 46px);
+      right: -7px;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .font-it {
+      font-size: clamp(1.55rem, 9vw, 2rem);
+    }
+
+    .font-ex {
+      font-size: clamp(0.64rem, 3.6vw, 0.88rem);
+    }
+  }
+
   .glass-header.scrolled .font-ex {
     font-size: 1.1rem;
   }
@@ -220,6 +250,36 @@
     max-height: 95vh;
     background: rgba(10, 10, 10, 0.98);
     overflow-y: auto;
+  }
+
+  @media (max-width: 1023px) {
+    .glass-header.is-open,
+    .glass-header.is-open.scrolled {
+      top: 0;
+      left: 0;
+      transform: none;
+      width: 100%;
+      max-width: none;
+      height: 100dvh;
+      max-height: 100dvh;
+      border-radius: 0;
+      padding: 1rem 1rem 2rem;
+      border-left: 0;
+      border-right: 0;
+      border-top: 0;
+      z-index: 11000;
+      background: rgba(8, 8, 8, 0.98);
+    }
+
+    .glass-header.is-open .header-main-row {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      backdrop-filter: blur(14px) saturate(150%);
+      -webkit-backdrop-filter: blur(14px) saturate(150%);
+      background: rgba(8, 8, 8, 0.55);
+      padding-bottom: 0.5rem;
+    }
   }
 
   .glass-header.is-open .nav-container-mobile {
