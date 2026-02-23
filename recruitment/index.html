@@ -29,7 +29,7 @@
       --ice-bg: rgba(255, 255, 255, 0.05);
       --ice-border: rgba(255, 255, 255, 0.12);
       --radius-premium: 12px;
-      --ie-header-h: 0px;
+      --ie-header-h: 110px;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -234,12 +234,32 @@
       letter-spacing: 0.25em;
       text-decoration: none;
       transition: all 0.4s ease;
-      border-radius: 4px;
+      border-radius: var(--radius-premium);
     }
 
     .cta-button:hover {
       background: var(--it-gold);
       color: #000;
+    }
+
+    @media (hover: none), (pointer: coarse) {
+      .pillar:hover { flex: 1; }
+      .glass-card {
+        min-height: auto;
+        justify-content: flex-start;
+      }
+      .pillar-desc {
+        opacity: 1;
+        max-height: 160px;
+        margin-top: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .details-box {
+        max-height: 900px;
+        opacity: 1;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
     }
 
     @media (max-width: 768px) {
@@ -303,6 +323,7 @@
   <div id="site-header"></div>
 
   <main class="recruitment-wrapper">
+    <h1 class="sr-only">Italian Experience Recruitment Hub</h1>
     <section class="pillar">
       <div class="pillar-bg">
         <img src="/ItalianExperience/assets/img/recruitment/recruitment-bg-employer.jpg" alt="Employer" onerror="this.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80'">

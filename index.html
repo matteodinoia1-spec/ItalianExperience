@@ -956,6 +956,27 @@
       .hero-scroll-indicator{display:none}
     }
 
+    @media (hover:none), (pointer:coarse){
+      .hero-pillar-desc{
+        opacity:1;
+        max-height:140px;
+        margin-top:1rem;
+      }
+      .hero-submenu-list{
+        max-height:420px;
+        opacity:1;
+        margin-top:1.2rem;
+        padding-top:1rem;
+        border-top:1px solid rgba(255,255,255,0.12);
+      }
+      .hero-glass-card{
+        background:var(--ice-bg);
+        backdrop-filter:blur(20px) saturate(180%);
+        -webkit-backdrop-filter:blur(20px) saturate(180%);
+        border:1px solid var(--ice-border);
+      }
+    }
+
     @media (min-width:769px){
       .contact-desktop{display:inline-block}
       .contact-mobile{display:none}
@@ -1008,6 +1029,7 @@
       </div>
 
       <main class="hero-portal-wrapper" aria-label="Italian Experience Portal">
+        <h1 class="sr-only">Italian Experience Strategic Advisory Portal</h1>
         <section class="hero-pillar">
           <a href="/ItalianExperience/travel/" style="position:absolute;inset:0;z-index:1;cursor:pointer;" aria-label="Travel"></a>
           <div class="hero-pillar-bg"><img src="/ItalianExperience/assets/img/home/home-pillar-travel.avif" alt="Travel"></div>
