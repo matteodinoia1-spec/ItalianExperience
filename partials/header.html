@@ -48,6 +48,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 1rem;
     height: 100%;
     transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -65,6 +66,19 @@
     position: relative;
     user-select: none;
     max-width: min(68vw, 420px);
+  }
+
+  #logo-header:hover .font-it,
+  #logo-header:focus-visible .font-it {
+    text-shadow: 0 0 12px rgba(197, 160, 89, 0.45);
+    transform: scale(1.025);
+  }
+
+  #logo-header:hover .letter,
+  #logo-header:focus-visible .letter {
+    color: #ffffff;
+    text-shadow: 0 0 14px currentColor;
+    transform: translateY(-2px);
   }
 
   .font-it {
@@ -122,11 +136,24 @@
     height: 100%;
     margin-left: auto;
     justify-content: flex-end;
+    text-align: right;
   }
 
   @media (min-width: 1024px) {
+    .header-main-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+    }
+
+    .logo-link {
+      justify-self: start;
+    }
+
     .nav-container-desktop {
       display: flex;
+      justify-self: end;
+      width: 100%;
     }
   }
 
@@ -176,6 +203,7 @@
     opacity: 0;
     visibility: hidden;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 60;
   }
 
   .dropdown:hover .dropdown-menu,
@@ -412,12 +440,14 @@
       -webkit-overflow-scrolling: touch;
       background: rgba(10, 10, 10, 0.97);
       z-index: 10001;
+      pointer-events: none;
     }
 
     .glass-header.is-open .nav-container-mobile {
       display: flex;
       opacity: 1;
       transform: translateY(0);
+      pointer-events: auto;
     }
   }
 

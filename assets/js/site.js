@@ -62,14 +62,18 @@
         if (inlineMenuText) inlineMenuText.textContent = 'Chiudi';
       };
 
-      inlineMenuBtn.addEventListener('click', () => {
+      inlineMenuBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         const isOpen = inlineHeader.classList.contains('is-open');
         if (isOpen) closeInlineMenu();
         else openInlineMenu();
       });
 
       document.addEventListener('click', (e) => {
-        if (!inlineHeader.contains(e.target)) closeInlineMenu();
+        const t = e.target;
+        if (t && t.closest && (t.closest('#menu-toggle-btn') || t.closest('#mobile-nav'))) return;
+        if (!inlineHeader.contains(t)) closeInlineMenu();
       });
 
       document.addEventListener('keydown', (e) => {
@@ -253,7 +257,6 @@
   function initLogoMouse(id) {
     const el = document.getElementById(id);
     if (!el) return;
-    if (!window.matchMedia('(pointer: fine)').matches) return;
 
     const it = el.querySelector('.font-it');
     const letters = el.querySelectorAll('.letter');
