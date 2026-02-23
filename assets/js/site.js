@@ -1,6 +1,9 @@
 (function () {
   let headerOffsetBound = false;
   const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+  const logoInitIds = new Set();
+  const shimmerBound = new WeakSet();
+  const GLOBAL_INIT_FLAG = '__ieGlobalInitDone';
 
   function rafThrottle(callback) {
     let scheduled = false;
@@ -317,7 +320,7 @@
 
   function initLogoMouse(id) {
     const el = document.getElementById(id);
-    if (!el || !hasFinePointer) return;
+    if (!el || !hasFinePointer || logoInitIds.has(id)) return;
 
     const it = el.querySelector('.font-it');
     const letters = el.querySelectorAll('.letter');
@@ -400,6 +403,8 @@
         l.style.zIndex = '';
       });
     });
+
+    logoInitIds.add(id);
   }
 
   function initRevealObserver() {
@@ -462,6 +467,7 @@
     if (!surfaces.length) return;
 
     surfaces.forEach((el) => {
+      if (shimmerBound.has(el)) return;
       let rect = null;
       const measure = () => {
         rect = el.getBoundingClientRect();
@@ -476,6 +482,7 @@
 
       el.addEventListener('mouseenter', measure, { passive: true });
       el.addEventListener('mousemove', onMove, { passive: true });
+      shimmerBound.add(el);
     });
   }
 
@@ -505,6 +512,14 @@
   }
 
   function IEInit(root) {
+    if (window[GLOBAL_INIT_FLAG]) {
+      applyPremiumCards(root);
+      initDynamicShimmer(root);
+      initRevealObserver();
+      return;
+    }
+    window[GLOBAL_INIT_FLAG] = true;
+
     buildExperienceLetters(root);
     applyPremiumCards(root);
     initDynamicShimmer(root);
