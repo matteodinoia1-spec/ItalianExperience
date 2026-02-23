@@ -667,6 +667,7 @@
       font-family:'Inter',sans-serif;
       overflow-x:hidden;
       width:100%;
+      position:relative;
     }
     .hero-top-nav{
       position:fixed;
@@ -737,16 +738,16 @@
     }
     .hero-tricolore-line div{flex:1}
     .hero-scroll-indicator{
-      position:fixed;
+      position:absolute;
       bottom:2.5rem;
       left:50%;
       transform:translateX(-50%);
-      z-index:1000;
+      z-index:30;
       display:flex;
       flex-direction:column;
       align-items:center;
       gap:1rem;
-      opacity:0.5;
+      opacity:0.75;
       transition:opacity 0.4s ease, transform 0.4s ease;
       pointer-events:none;
     }
@@ -1349,13 +1350,9 @@ STRATEGIC ADVISORY</p>
             contactLink.style.transform = `translateY(${contactTranslateY}px)`;
             contactLink.style.opacity = Math.max(contactOpacity, 0);
 
-            if (scrollIndicator) {
-              scrollIndicator.style.opacity = Math.max(0.5 - (progress * 2), 0);
-            }
           } else {
             logoContainer.style.opacity = 0;
             contactLink.style.opacity = 0;
-            if (scrollIndicator) scrollIndicator.style.opacity = 0;
           }
         });
         window.addEventListener('scroll', handleHeroScroll, { passive: true });

@@ -72,7 +72,9 @@
       border-bottom:none !important;
       border-right:1px solid rgba(255,255,255,0.05);
       padding:2rem;
-      transition:flex 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      transition:flex 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change:flex;
+      contain:layout paint;
     }
 
     @media (min-width:1025px){
@@ -93,9 +95,11 @@
       background-size:cover;
       background-position:center top;
       filter:brightness(0.22);
-      transform:scale(1.02);
-      transition:transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
+      transform:translateZ(0) scale(1.02);
+      transition:transform 0.95s cubic-bezier(0.16, 1, 0.3, 1), filter 0.55s ease;
       z-index:0;
+      backface-visibility:hidden;
+      will-change:transform,filter;
     }
 
     .hub-panel:hover .hub-bg{
@@ -206,7 +210,7 @@
       max-height:0;
       opacity:0;
       overflow:hidden;
-      transition:all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      transition:opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1), margin-top 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .hub-panel:hover .hub-sub{
@@ -227,7 +231,7 @@
       max-height:0;
       opacity:0;
       overflow:hidden;
-      transition:all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      transition:opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1), margin-top 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .hub-panel:hover .hub-disclaimer{
@@ -334,6 +338,13 @@
         max-height:120px;
         margin-top:0.9rem;
       }
+    }
+    @media (hover:none){
+      .hub-panel{transition:none}
+      .hub-bg{transition:filter 0.4s ease}
+      .hub-panel:hover{flex:1}
+      .hub-panel:hover .hub-bg{transform:translateZ(0) scale(1.02)}
+      .hub-panel:hover .hub-content{transform:none}
     }
   </style>
 </head>

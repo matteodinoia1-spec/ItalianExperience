@@ -55,7 +55,7 @@ input,textarea,select,button{font-size:16px}
   height:100vh;
   height:100dvh;
   min-height:100vh;
-  min-height:100dvh;
+  min-height:calc(100dvh + 2.5rem);
   overflow:hidden;
   background:#000;
 }
@@ -85,7 +85,7 @@ input,textarea,select,button{font-size:16px}
 .ie-hero-content-layer{
   position:relative;
   z-index:10;
-  padding-top:calc(var(--ie-header-clearance) + 0.5rem);
+  padding-top:0;
 }
 
 /* Allineamento contenuti con header (pagine con header) */
@@ -106,7 +106,7 @@ input,textarea,select,button{font-size:16px}
   max-width:min(1140px, 100%);
   margin-inline:auto;
   padding-inline:var(--ie-content-padding-inline) !important;
-  padding-top:14px;
+  padding-top:calc(var(--ie-header-clearance) + 1rem);
   padding-bottom:clamp(82px, 11vh, 132px);
 }
 
@@ -171,11 +171,11 @@ input,textarea,select,button{font-size:16px}
     margin-top:calc(-1 * var(--ie-header-clearance));
   }
   .ie-hero-content-layer{
-    padding-top:calc(var(--ie-header-clearance) + 0.35rem);
+    padding-top:0;
   }
   .ie-hero-lockup{
     padding-inline:var(--ie-content-padding-inline) !important;
-    padding-top:18px;
+    padding-top:calc(var(--ie-header-clearance) + 0.75rem);
     padding-bottom:calc(78px + env(safe-area-inset-bottom)) !important;
   }
   .ie-hero-eyebrow{

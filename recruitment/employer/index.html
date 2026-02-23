@@ -69,6 +69,19 @@
       pointer-events:none;
       padding:0 1.5rem;
     }
+    .hero-content.ie-hero-lockup{
+      padding-top:calc(var(--ie-header-clearance) + 1rem);
+      padding-bottom:clamp(132px, 19vh, 196px) !important;
+    }
+    .hero-content .ie-hero-title{
+      font-size:clamp(2rem, 6vw, 5rem);
+      line-height:0.96;
+      max-width:16ch;
+      margin-inline:auto;
+    }
+    .hero-content .ie-hero-lead{
+      max-width:58ch;
+    }
 
     @keyframes scrollLine{
       0%{transform:translateY(-18px);opacity:0}
@@ -260,6 +273,17 @@
     @media (max-width:768px){
       .process-step::after{display:none}
       .chart-container{height:240px}
+      .hero-content.ie-hero-lockup{
+        padding-bottom:calc(118px + env(safe-area-inset-bottom)) !important;
+      }
+      .hero-content .ie-hero-title{
+        font-size:clamp(1.7rem, 9.2vw, 2.6rem);
+        max-width:13ch;
+      }
+      .hero-content .ie-hero-lead{
+        font-size:clamp(0.66rem, 2.7vw, 0.82rem);
+        line-height:1.45;
+      }
     }
 
     @media (max-width:1024px){
@@ -322,7 +346,7 @@
           Bespoke Strategic Alignment
         </h3>
 
-        <h1 class="ie-hero-title mb-8">
+        <h1 class="ie-hero-title ie-hero-title-compact mb-8">
           Master Talent Curators <br />
           & <span class="italic font-light opacity-80">Cultural Architects.</span>
         </h1>

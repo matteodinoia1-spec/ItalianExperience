@@ -156,6 +156,19 @@
       width:100%;
       height:100%;
     }
+    .hero-content.ie-hero-lockup{
+      padding-top:calc(var(--ie-header-clearance) + 1rem);
+      padding-bottom:clamp(132px, 19vh, 196px) !important;
+    }
+    .hero-content .ie-hero-title{
+      font-size:clamp(1.95rem, 6.1vw, 5rem);
+      line-height:0.96;
+      max-width:15ch;
+      margin-inline:auto;
+    }
+    .hero-content .ie-hero-copy{
+      max-width:56ch;
+    }
 
     .glass-card{
       background:rgba(255,255,255,0.02);
@@ -263,6 +276,17 @@
       .explore-indicator{bottom:40px;}
       .timeline-line{display:none;}
       .service-checks{grid-template-columns:1fr}
+      .hero-content.ie-hero-lockup{
+        padding-bottom:calc(118px + env(safe-area-inset-bottom)) !important;
+      }
+      .hero-content .ie-hero-title{
+        font-size:clamp(1.65rem, 9.2vw, 2.55rem);
+        max-width:13ch;
+      }
+      .hero-content .ie-hero-copy{
+        font-size:clamp(0.82rem, 3.2vw, 0.98rem);
+        line-height:1.5;
+      }
     }
 
     @media (max-width:1024px){
@@ -300,7 +324,7 @@
         Excellence Across the Atlantic
       </h3>
 
-      <h1 class="ie-hero-title mb-8 drop-shadow-2xl">
+      <h1 class="ie-hero-title ie-hero-title-compact mb-8 drop-shadow-2xl">
         Represent Italy <br>
         <span class="italic font-light text-[#c5a059]">with the American Dream.</span>
       </h1>
