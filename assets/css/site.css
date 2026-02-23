@@ -7,6 +7,7 @@
   --it-red:#CD212A;
   --ie-header-h:110px;
   --ie-header-top-gap:1.5rem;
+  --ie-header-clearance:calc(var(--ie-header-h) + var(--ie-header-top-gap) + env(safe-area-inset-top));
   --ie-content-padding-inline:clamp(1rem, 4vw, 2.4rem);
   --radius-premium:12px;
   --ice-bg:rgba(255,255,255,0.07);
@@ -37,7 +38,7 @@ input,textarea,select,button{font-size:16px}
 /* Reserve space for the fixed header at page top */
 #site-header{
   position:relative;
-  height:calc(var(--ie-header-h) + var(--ie-header-top-gap) + env(safe-area-inset-top));
+  height:var(--ie-header-clearance);
   z-index:9999;
 }
 
@@ -53,7 +54,8 @@ input,textarea,select,button{font-size:16px}
   background:#000;
 }
 .ie-hero-offset{
-  /* niente padding-top qui: l'immagine deve arrivare fino in alto sotto l'header */
+  /* Pull the first hero back to viewport top while keeping header mount flow */
+  margin-top:calc(-1 * var(--ie-header-clearance));
 }
 .ie-hero-bg-layer{
   position:absolute;
@@ -77,6 +79,7 @@ input,textarea,select,button{font-size:16px}
 .ie-hero-content-layer{
   position:relative;
   z-index:10;
+  padding-top:calc(var(--ie-header-clearance) + 0.5rem);
 }
 
 /* Allineamento contenuti con header (pagine con header) */
@@ -98,6 +101,7 @@ input,textarea,select,button{font-size:16px}
   margin-inline:auto;
   padding-inline:var(--ie-content-padding-inline) !important;
   padding-top:14px;
+  padding-bottom:clamp(82px, 11vh, 132px);
 }
 
 .ie-hero-eyebrow{
@@ -150,7 +154,7 @@ input,textarea,select,button{font-size:16px}
 }
 
 .ie-hero-shell .explore-indicator{
-  bottom:clamp(18px, 5.5vh, 54px) !important;
+  bottom:calc(clamp(14px, 4.4vh, 36px) + env(safe-area-inset-bottom)) !important;
 }
 
 @media (max-width:768px){
@@ -158,7 +162,10 @@ input,textarea,select,button{font-size:16px}
     --ie-content-padding-inline:clamp(1rem, 5vw, 1.35rem);
   }
   .ie-hero-offset{
-    /* nessun padding-top sul contenitore, per evitare banda nera sopra l'immagine */
+    margin-top:calc(-1 * var(--ie-header-clearance));
+  }
+  .ie-hero-content-layer{
+    padding-top:calc(var(--ie-header-clearance) + 0.35rem);
   }
   .ie-hero-lockup{
     padding-inline:var(--ie-content-padding-inline) !important;
@@ -190,7 +197,7 @@ input,textarea,select,button{font-size:16px}
     max-width:36ch;
   }
   .ie-hero-shell .explore-indicator{
-    bottom:calc(16px + env(safe-area-inset-bottom)) !important;
+    bottom:calc(14px + env(safe-area-inset-bottom)) !important;
   }
 }
 
