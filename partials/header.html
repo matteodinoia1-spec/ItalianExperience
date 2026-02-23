@@ -1,5 +1,5 @@
 <style>
-  .glass-header {
+  #main-header {
     position: fixed;
     top: 1.5rem;
     left: 50%;
@@ -22,25 +22,25 @@
     overflow: hidden;
   }
 
-  .glass-header:not(.is-open) {
+  #main-header:not(.is-open) {
     height: 92px;
   }
 
   @media (min-width: 1024px) {
-    .glass-header {
+    #main-header {
       overflow: visible;
       max-height: none;
     }
   }
 
-  .glass-header.scrolled {
+  #main-header.scrolled {
     top: 1rem;
     width: calc(100% - 4rem);
     padding: 0.35rem 2rem;
     background: rgba(255, 255, 255, 0.12);
   }
 
-  .glass-header.scrolled:not(.is-open) {
+  #main-header.scrolled:not(.is-open) {
     height: 78px;
   }
 
@@ -76,7 +76,7 @@
     line-height: 1;
   }
 
-  .glass-header.scrolled .font-it {
+  #main-header.scrolled .font-it {
     font-size: 2.4rem;
   }
 
@@ -92,7 +92,7 @@
     line-height: 1;
   }
 
-  .glass-header.scrolled .font-ex {
+  #main-header.scrolled .font-ex {
     font-size: 1.1rem;
   }
 
@@ -173,6 +173,7 @@
     padding: 1rem 0;
     border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55);
+    z-index: 10030;
     opacity: 0;
     visibility: hidden;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -491,37 +492,54 @@
       justify-content: center;
     }
 
-    #main-header.is-open {
+    #main-header.is-open,
+    #main-header.scrolled.is-open {
+      top: 0 !important;
+      left: 0 !important;
+      transform: none !important;
+      width: 100% !important;
+      max-width: none !important;
+      border-radius: 0 !important;
+      max-height: none !important;
       height: auto !important;
-      max-height: 95vh;
-      max-height: calc(100dvh - 1rem);
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
+      overflow: visible !important;
+      padding: 0.3rem 1rem !important;
     }
 
     #main-header #mobile-nav {
-      position: static;
-      top: auto;
-      left: auto;
-      right: auto;
-      bottom: auto;
-      margin-top: 2rem;
-      padding: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin-top: 0 !important;
+      padding: calc(env(safe-area-inset-top, 0px) + 82px + 0.75rem) 1rem calc(1.4rem + env(safe-area-inset-bottom, 0px));
       display: none;
       opacity: 0;
-      transform: translateY(-10px);
-      overflow: visible;
-      background: transparent;
-      z-index: auto;
-      pointer-events: auto;
+      transform: translateY(-8px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      background: rgba(10, 10, 10, 0.97);
+      z-index: 10002;
+      pointer-events: none;
+    }
+
+    #main-header.scrolled #mobile-nav {
+      padding-top: calc(env(safe-area-inset-top, 0px) + 70px + 0.75rem);
     }
 
     #main-header.is-open #mobile-nav {
       display: flex;
       opacity: 1;
       transform: translateY(0);
-      margin-top: 1.25rem;
-      padding-bottom: 1.5rem;
+      pointer-events: auto;
+      overflow-x: visible;
+      overflow-y: auto;
+    }
+
+    #main-header.is-open #mobile-nav .mobile-nav-item.open > .mobile-submenu {
+      display: block !important;
+      visibility: visible;
     }
   }
 
