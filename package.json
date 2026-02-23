@@ -4,8 +4,13 @@
   "description": "",
   "main": "tailwind.config.js",
   "scripts": {
+    "start": "node scripts/serve-static.mjs",
+    "serve": "npm run start",
     "check:links": "node scripts/check-links.mjs",
-    "test": "npm run check:links"
+    "check:audit": "node scripts/audit-static.mjs",
+    "check:smoke": "node scripts/smoke-e2e.mjs",
+    "check": "npm run check:links && npm run check:audit && npm run check:smoke",
+    "test": "npm run check"
   },
   "repository": {
     "type": "git",
