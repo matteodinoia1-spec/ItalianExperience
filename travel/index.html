@@ -108,15 +108,11 @@
       justify-content:flex-end;
       padding:6rem 3.5rem;
       text-decoration:none;
-      transition:flex 0.8s cubic-bezier(0.16,1,0.3,1);
+      transition:transform 0.6s cubic-bezier(0.16,1,0.3,1);
       border-right:none !important;
+      will-change:transform;
     }
     .service-panel:last-child{border-right:none}
-
-    @media (min-width:1025px){
-      .services-horizontal:hover .service-panel{flex:0.9}
-      .services-horizontal .service-panel:hover{flex:1.6}
-    }
 
     .panel-bg{
       position:absolute;inset:0;z-index:0;
