@@ -520,19 +520,30 @@
     });
   }
 
-  // Ensure the header user avatar links to profile.html (all portal pages)
+  // Ensure the entire header user block (username + avatar) links to profile.html (all portal pages)
   function ensureHeaderAvatarLinksToProfile() {
-    const container = document.querySelector("header .w-10.h-10.rounded-full");
-    if (!container || !container.querySelector("img")) return;
-    if (container.parentElement && container.parentElement.tagName === "A") return;
+    const textBlock = document.querySelector("header .text-right");
+    const avatarBlock = document.querySelector("header .w-10.h-10.rounded-full");
+    if (!textBlock || !avatarBlock || !avatarBlock.querySelector("img")) return;
+
+    const userBlock = textBlock.parentElement;
+    if (!userBlock || userBlock.tagName !== "DIV") return;
+    if (userBlock.parentElement && userBlock.parentElement.tagName === "A") return;
+
+    // If the avatar was previously wrapped in a link, unwrap it so we have one link around the whole block
+    const avatarParent = avatarBlock.parentElement;
+    if (avatarParent && avatarParent.tagName === "A") {
+      avatarParent.parentNode.insertBefore(avatarBlock, avatarParent);
+      avatarParent.remove();
+    }
 
     const base = derivePortalBasePath();
     const link = document.createElement("a");
     link.setAttribute("href", base + "profile.html");
     link.setAttribute("aria-label", "Vai al profilo");
-    link.className = "flex items-center focus:outline-none focus:ring-2 focus:ring-[#c5a059] focus:ring-offset-2 rounded-full";
-    container.parentNode.insertBefore(link, container);
-    link.appendChild(container);
+    link.className = "flex items-center space-x-3 border-l pl-6 border-gray-100 focus:outline-none focus:ring-2 focus:ring-[#c5a059] focus:ring-offset-2 rounded";
+    userBlock.parentNode.insertBefore(link, userBlock);
+    link.appendChild(userBlock);
   }
 
   function updateHeaderUserBlock() {
