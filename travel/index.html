@@ -112,7 +112,11 @@
       border-right:none !important;
     }
     .service-panel:last-child{border-right:none}
-    .service-panel:hover{flex:3.2}
+
+    @media (min-width:1025px){
+      .services-horizontal:hover .service-panel{flex:0.9}
+      .services-horizontal .service-panel:hover{flex:1.6}
+    }
 
     .panel-bg{
       position:absolute;inset:0;z-index:0;
