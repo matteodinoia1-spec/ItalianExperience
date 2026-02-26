@@ -1488,7 +1488,7 @@
     const status = (formData.get("status") || "new").toString();
     const note = (formData.get("note") || "").toString();
     const fonte = (formData.get("fonte") || "").toString();
-    const client_name = (formData.get("client_name") || "").toString().trim();
+    // client_name: kept in form for display only; candidates table has no client_name (relationship via job_offers -> clients)
 
     if (window.IESupabase) {
       const { data, error } = await window.IESupabase.insertCandidate({
@@ -1499,7 +1499,6 @@
         status: status,
         notes: note,
         source: fonte,
-        client_name: client_name || null,
       });
       if (error) {
         window.IESupabase.showError(error.message || "Errore nel salvataggio del candidato.", "saveCandidate");

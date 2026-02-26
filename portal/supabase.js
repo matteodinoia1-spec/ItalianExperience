@@ -8,7 +8,8 @@
 // Expected table/column names (adjust if your DB differs):
 //   profiles: id (uuid, = auth.users.id), email, full_name
 //   candidates: id, created_by (uuid), first_name, last_name, position,
-//               client_name, address, status, source, notes, created_at
+//               address, status, source, notes, created_at
+//               (no client_name; relationship is via candidate_job_associations -> job_offers -> clients)
 //   job_offers: id, created_by, title, position, client_name, location,
 //               description, requirements, notes, status, created_at
 //   candidate_job_associations: id, candidate_id, job_offer_id, status, notes,
@@ -208,8 +209,9 @@
 
   /**
    * Insert a new candidate (created_by = current user id).
-   * Expects table: candidates (id, created_by, first_name, last_name, position, client_name, address, status, source, notes, created_at, ...)
-   * @param {object} payload - { first_name, last_name, position, client_name, address, status, source, notes }
+   * Expects table: candidates (id, created_by, first_name, last_name, position, address, status, source, notes, created_at, ...).
+   * Client is linked via candidate_job_associations -> job_offers -> clients; do not send client_name.
+   * @param {object} payload - { first_name, last_name, position, address, status, source, notes }
    * @returns {Promise<{ data: object | null, error: object | null }>}
    */
   async function insertCandidate(payload) {
@@ -226,7 +228,6 @@
         first_name: payload.first_name || "",
         last_name: payload.last_name || "",
         position: payload.position || null,
-        client_name: payload.client_name || null,
         address: payload.address || null,
         status: payload.status || "new",
         source: payload.source || null,
