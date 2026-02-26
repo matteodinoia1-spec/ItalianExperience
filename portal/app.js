@@ -12,6 +12,85 @@
 (function () {
   "use strict";
 
+  // ---------------------------------------------------------------------------
+  // Static fallback markup for the sidebar (used when fetch() is unavailable,
+  // e.g. Safari / local file://, or when sidebar.html cannot be loaded).
+  //
+  // IMPORTANT: keep this in sync with portal/sidebar.html.
+  // ---------------------------------------------------------------------------
+
+  var SIDEBAR_FALLBACK_HTML = [
+    '<aside id="sidebar" class="sidebar h-screen flex flex-col text-white fixed lg:static left-0 top-0 shadow-2xl">',
+    '  <div class="p-8">',
+    '    <div class="flex items-center space-x-3 mb-10">',
+    '      <div',
+    '        class="w-10 h-10 bg-[#c5a059] rounded-full flex items-center justify-center text-white font-bold text-xl serif italic"',
+    '        aria-hidden="true"',
+    "      >",
+    "        IE",
+    "      </div>",
+    "      <div>",
+    '        <h2 class="text-lg font-bold serif leading-tight">Italian</h2>',
+    '        <p class="text-[10px] uppercase tracking-widest opacity-60">Experience Portal</p>',
+    "      </div>",
+    "    </div>",
+    "",
+    '    <nav class="space-y-2" aria-label="Portal navigation">',
+    '      <a href="dashboard.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">',
+    '        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"',
+    '          stroke="currentColor" aria-hidden="true">',
+    '          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"',
+    '            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />',
+    "        </svg>",
+    '        <span class="text-sm font-medium">Dashboard</span>',
+    "      </a>",
+    "",
+    '      <a href="candidati.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">',
+    '        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"',
+    '          stroke="currentColor" aria-hidden="true">',
+    '          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"',
+    '            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />',
+    "        </svg>",
+    '        <span class="text-sm font-medium">Candidati</span>',
+    "      </a>",
+    "",
+    '      <a href="offerte.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">',
+    '        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"',
+    '          stroke="currentColor" aria-hidden="true">',
+    '          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"',
+    '            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />',
+    "        </svg>",
+    '        <span class="text-sm font-medium">Offerte di Lavoro</span>',
+    "      </a>",
+    "    </nav>",
+    "  </div>",
+    "",
+    '  <div class="mt-auto p-8 border-t border-white/10 sidebar-footer">',
+    '    <a href="#" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg mb-2">',
+    '      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"',
+    '        stroke="currentColor" aria-hidden="true">',
+    '        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"',
+    '          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />',
+    '        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"',
+    '          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />',
+    "      </svg>",
+    '      <span class="text-sm font-medium">Impostazioni</span>',
+    "    </a>",
+    '    <a href="index.html"',
+    '      class="flex items-center space-x-4 py-3 px-4 text-red-400 hover:text-red-300 transition">',
+    '      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"',
+    '        stroke="currentColor" aria-hidden="true">',
+    '        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"',
+    '          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />',
+    "      </svg>",
+    '      <span class="text-sm font-medium">Logout</span>',
+    "    </a>",
+    "  </div>",
+    "",
+    "</aside>",
+    "",
+  ].join("\n");
+
   document.addEventListener("DOMContentLoaded", function () {
     ensureSidebarLoaded()
       .then(function () {
@@ -45,6 +124,13 @@
       return Promise.resolve();
     }
 
+    // In modalità file:// (es. apertura locale in Safari) evitiamo fetch,
+    // che è spesso bloccato, e usiamo direttamente il fallback inline.
+    if (window.location.protocol === "file:") {
+      applySidebarHtml(container, SIDEBAR_FALLBACK_HTML);
+      return Promise.resolve();
+    }
+
     const base = derivePortalBasePath();
     const url = base + "sidebar.html";
 
@@ -56,31 +142,43 @@
         return res.text();
       })
       .then(function (html) {
-        const tpl = document.createElement("template");
-        tpl.innerHTML = html.trim();
-
-        const fetchedAside =
-          tpl.content.querySelector("#sidebar") || tpl.content.firstElementChild;
-
-        if (fetchedAside) {
-          // Copia classi e attributi (tranne id) dal file sorgente
-          if (fetchedAside.className) {
-            container.className = fetchedAside.className;
-          }
-          Array.from(fetchedAside.attributes).forEach(function (attr) {
-            if (attr.name === "id" || attr.name === "class") return;
-            container.setAttribute(attr.name, attr.value);
-          });
-
-          container.innerHTML = fetchedAside.innerHTML;
-        } else {
-          // Fallback: inietta l'HTML così com'è
-          container.innerHTML = html;
-        }
+        applySidebarHtml(container, html);
       })
       .catch(function (error) {
         console.error("[ItalianExperience] Unable to load sidebar fragment", error);
+        // Fallback silenzioso: usiamo il markup inline così la UI resta funzionale.
+        applySidebarHtml(container, SIDEBAR_FALLBACK_HTML);
       });
+  }
+
+  function applySidebarHtml(container, html) {
+    if (!container || !html) return;
+
+    try {
+      const tpl = document.createElement("template");
+      tpl.innerHTML = String(html).trim();
+
+      const fetchedAside =
+        tpl.content.querySelector("#sidebar") || tpl.content.firstElementChild;
+
+      if (fetchedAside) {
+        // Copia classi e attributi (tranne id) dal file sorgente
+        if (fetchedAside.className) {
+          container.className = fetchedAside.className;
+        }
+        Array.from(fetchedAside.attributes).forEach(function (attr) {
+          if (attr.name === "id" || attr.name === "class") return;
+          container.setAttribute(attr.name, attr.value);
+        });
+
+        container.innerHTML = fetchedAside.innerHTML;
+      } else {
+        // Fallback: inietta l'HTML così com'è
+        container.innerHTML = html;
+      }
+    } catch (error) {
+      console.error("[ItalianExperience] Failed to apply sidebar HTML", error);
+    }
   }
 
   function initLayout() {
@@ -302,15 +400,22 @@
 
   // Compute the base path where portal HTML files live
   function derivePortalBasePath() {
-    const { pathname } = window.location;
-    if (!pathname) return "";
+    try {
+      // new URL('.', href) restituisce sempre la directory dell'HTML corrente,
+      // includendo protocollo (http/https/file) e host se presenti.
+      const url = new URL(".", window.location.href);
+      return url.href;
+    } catch (error) {
+      const pathname = window.location.pathname || "";
+      if (!pathname) return "";
 
-    const segments = pathname.split("/").filter(Boolean);
-    if (!segments.length) return "";
+      const segments = pathname.split("/").filter(Boolean);
+      if (!segments.length) return "";
 
-    // Strip the last segment (file name)
-    segments.pop();
-    return "/" + segments.join("/") + (segments.length ? "/" : "");
+      // Strip the last segment (file name)
+      segments.pop();
+      return "/" + segments.join("/") + (segments.length ? "/" : "");
+    }
   }
 
   // Basic helper for programmatic navigation
@@ -331,7 +436,7 @@
     if (addCandidateBtn) {
       addCandidateBtn.addEventListener("click", function (event) {
         event.preventDefault();
-        openCandidateModal();
+        navigateTo("add-candidato.html");
       });
     }
 
@@ -341,7 +446,7 @@
     if (addOfferBtn) {
       addOfferBtn.addEventListener("click", function (event) {
         event.preventDefault();
-        openOfferModal();
+        navigateTo("add-offerta.html");
       });
     }
 
@@ -651,37 +756,61 @@
   }
 
   async function loadFormFragment(url, formSelector) {
-    const res = await fetch(url, { credentials: "same-origin" });
-    if (!res.ok) {
+    // In modalità file:// evitiamo fetch (bloccato in Safari e in molti browser)
+    // e mostriamo un messaggio elegante che invita ad aprire la pagina completa.
+    if (window.location.protocol === "file:") {
       const box = document.createElement("div");
       box.className = "glass-card rounded-2xl p-6";
-      box.innerHTML = `<div class="text-sm font-semibold text-gray-700">Unable to load form.</div>`;
+      box.innerHTML =
+        '<div class="text-sm font-semibold text-gray-700 mb-1">Form non disponibile in modalità file locale.</div>' +
+        '<p class="text-xs text-gray-500">Apri la pagina completa tramite la sidebar o il pulsante principale per utilizzare questo form.</p>';
       return box;
     }
 
-    const html = await res.text();
-    const doc = new DOMParser().parseFromString(html, "text/html");
+    try {
+      const res = await fetch(url, { credentials: "same-origin" });
+      if (!res.ok) {
+        const box = document.createElement("div");
+        box.className = "glass-card rounded-2xl p-6";
+        box.innerHTML =
+          '<div class="text-sm font-semibold text-gray-700">Unable to load form.</div>';
+        return box;
+      }
 
-    const form = doc.querySelector(formSelector);
-    if (!form) {
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+
+      const form = doc.querySelector(formSelector);
+      if (!form) {
+        const box = document.createElement("div");
+        box.className = "glass-card rounded-2xl p-6";
+        box.innerHTML =
+          '<div class="text-sm font-semibold text-gray-700">Form not found in source page.</div>';
+        return box;
+      }
+
+      // Try to capture the small intro block above the form (title + subtitle)
+      const intro =
+        form.previousElementSibling && form.previousElementSibling.matches(".mb-6")
+          ? form.previousElementSibling
+          : null;
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "space-y-6";
+
+      if (intro) wrapper.appendChild(intro.cloneNode(true));
+      wrapper.appendChild(form.cloneNode(true));
+
+      return wrapper;
+    } catch (error) {
+      console.error("[ItalianExperience] Unable to load form fragment", error);
       const box = document.createElement("div");
       box.className = "glass-card rounded-2xl p-6";
-      box.innerHTML = `<div class="text-sm font-semibold text-gray-700">Form not found in source page.</div>`;
+      box.innerHTML =
+        '<div class="text-sm font-semibold text-gray-700 mb-1">Unable to load form.</div>' +
+        '<p class="text-xs text-gray-500">Se stai eseguendo il portale da file locali, apri la pagina completa dal menu per compilare il form.</p>';
       return box;
     }
-
-    // Try to capture the small intro block above the form (title + subtitle)
-    const intro = form.previousElementSibling && form.previousElementSibling.matches(".mb-6")
-      ? form.previousElementSibling
-      : null;
-
-    const wrapper = document.createElement("div");
-    wrapper.className = "space-y-6";
-
-    if (intro) wrapper.appendChild(intro.cloneNode(true));
-    wrapper.appendChild(form.cloneNode(true));
-
-    return wrapper;
   }
 
   // ---------------------------------------------------------------------------
