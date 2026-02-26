@@ -56,6 +56,12 @@
       overflow: hidden;
     }
 
+    /* Allinea il contenuto iniziale sotto l'header fisso */
+    .recruitment-wrapper.ie-hero-offset {
+      margin-top: 0;
+      padding-top: calc(var(--ie-header-clearance) + 0.75rem);
+    }
+
     .pillar {
       position: relative;
       flex: 1;
@@ -258,6 +264,10 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         padding-top: 1rem;
         padding-bottom: 1.75rem;
+      }
+
+      .recruitment-wrapper.ie-hero-offset {
+        padding-top: calc(var(--ie-header-clearance) + 0.5rem);
       }
 
       .pillar:first-child {

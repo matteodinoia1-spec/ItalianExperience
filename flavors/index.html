@@ -39,8 +39,10 @@
       flex-direction:column;
       overflow:hidden;
     }
+    /* Usa lo spazio dell'header e abbassa il contenuto iniziale */
     .hub-grid.ie-hero-shell.ie-hero-offset{
       margin-top:calc(-1 * var(--ie-header-clearance)) !important;
+      padding-top:calc(var(--ie-header-clearance) + 0.75rem);
       min-height:100vh;
       min-height:100dvh;
     }
