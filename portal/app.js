@@ -742,6 +742,107 @@
     });
   }
 
+  function openCandidateDetailModalFromRow(rowElement) {
+    if (!rowElement) return;
+
+    const photoEl = rowElement.querySelector("td:nth-child(1) img");
+    const nameCell = rowElement.querySelector("td:nth-child(2)");
+    const positionCell = rowElement.querySelector("td:nth-child(3)");
+    const clientCell = rowElement.querySelector("td:nth-child(4)");
+    const addressCell = rowElement.querySelector("td:nth-child(5)");
+    const statusBadge = rowElement.querySelector("td:nth-child(6) .badge");
+    const sourceCell = rowElement.querySelector("td:nth-child(7)");
+    const dateCell = rowElement.querySelector("td:nth-child(8)");
+
+    const fullName = nameCell ? nameCell.textContent.trim() : "Candidate details";
+    const position = positionCell ? positionCell.textContent.trim() : "";
+    const clientName = clientCell ? clientCell.textContent.trim() : "—";
+    const address = addressCell ? addressCell.textContent.trim() : "—";
+    const source = sourceCell ? sourceCell.textContent.trim() : "—";
+    const dateAdded = dateCell ? dateCell.textContent.trim() : "—";
+    const statusHtml = statusBadge ? statusBadge.outerHTML : "";
+    const statusLabel = statusBadge ? statusBadge.textContent.trim() : "";
+    const photoUrl = photoEl ? photoEl.getAttribute("src") : "";
+
+    openModal({
+      title: fullName,
+      fullPageHref: null,
+      render: (mount) => {
+        mount.innerHTML = `
+          <div class="space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-100">
+                  ${
+                    photoUrl
+                      ? '<img src="' +
+                        photoUrl +
+                        '" alt="' +
+                        fullName +
+                        '" class="w-full h-full object-cover" />'
+                      : ""
+                  }
+                </div>
+                <div>
+                  <h3 class="serif text-xl font-bold text-[#1b4332] leading-tight">${fullName}</h3>
+                  ${
+                    position
+                      ? '<p class="text-sm text-gray-600 mt-1">' + position + "</p>"
+                      : ""
+                  }
+                </div>
+              </div>
+              <div class="flex flex-col items-start md:items-end gap-2 text-xs">
+                ${
+                  statusHtml
+                    ? '<div class="flex items-center gap-2">' +
+                      '<span class="text-[10px] uppercase tracking-[0.18em] text-gray-400 font-semibold">Status</span>' +
+                      statusHtml +
+                      "</div>"
+                    : ""
+                }
+                <div class="px-3 py-1 rounded-full bg-[#c5a059]/10 border border-[#c5a059]/30 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#c5a059]">
+                  Candidate Profile
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6">
+              <dl class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                <div class="space-y-1">
+                  <dt class="text-[10px] uppercase tracking-[0.18em] text-gray-400 font-semibold">Client</dt>
+                  <dd class="font-medium text-gray-800">${clientName}</dd>
+                </div>
+                <div class="space-y-1">
+                  <dt class="text-[10px] uppercase tracking-[0.18em] text-gray-400 font-semibold">Location</dt>
+                  <dd class="text-gray-700 italic">${address}</dd>
+                </div>
+                <div class="space-y-1">
+                  <dt class="text-[10px] uppercase tracking-[0.18em] text-gray-400 font-semibold">Source</dt>
+                  <dd class="text-gray-700">${source}</dd>
+                </div>
+                <div class="space-y-1">
+                  <dt class="text-[10px] uppercase tracking-[0.18em] text-gray-400 font-semibold">Date added</dt>
+                  <dd class="text-gray-700">${dateAdded}</dd>
+                </div>
+              </dl>
+
+              ${
+                statusLabel
+                  ? '<div class="mt-6 text-xs text-gray-500 border-t border-gray-100 pt-4">' +
+                    "This candidate is currently in <span class='font-semibold text-[#1b4332]'>" +
+                    statusLabel +
+                    "</span> status in your pipeline." +
+                    "</div>"
+                  : ""
+              }
+            </div>
+          </div>
+        `;
+      },
+    });
+  }
+
   function renderModalLoading() {
     return `
       <div class="glass-card rounded-2xl p-6" style="border-radius: 1.25rem;">
@@ -1552,6 +1653,15 @@
     }
 
     tbody.addEventListener("click", function (event) {
+      const viewBtn = event.target.closest("[data-action='view-candidate']");
+      if (viewBtn) {
+        const rowElement = viewBtn.closest("tr");
+        if (rowElement) {
+          openCandidateDetailModalFromRow(rowElement);
+        }
+        return;
+      }
+
       const archiveBtn = event.target.closest("[data-action='archive-candidate']");
       if (archiveBtn) {
         const id = archiveBtn.getAttribute("data-id");
@@ -1621,7 +1731,7 @@
             </td>
             <td class="px-6 py-4">
               <div class="flex items-center space-x-2">
-                <button type="button" class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View">
+                <button type="button" data-action="view-candidate" class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
