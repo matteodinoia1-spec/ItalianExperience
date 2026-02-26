@@ -66,7 +66,7 @@
     "  </div>",
     "",
     '  <div class="mt-auto p-8 border-t border-white/10 sidebar-footer">',
-    '    <a href="#" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg mb-2">',
+    '    <a href="profile.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg mb-2">',
     '      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"',
     '        stroke="currentColor" aria-hidden="true">',
     '        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"',
@@ -113,6 +113,7 @@
         initForms();
         initDataViews();
         initLogoutLink();
+        ensureHeaderAvatarLinksToProfile();
         updateHeaderUserBlock();
       })
       .catch(function (error) {
@@ -121,6 +122,7 @@
         initForms();
         initDataViews();
         initLogoutLink();
+        ensureHeaderAvatarLinksToProfile();
         updateHeaderUserBlock();
       });
   });
@@ -394,9 +396,9 @@
       candidati: "candidati.html",
       "offerte di lavoro": "offerte.html",
       clienti: "clients.html",
-      impostazioni: "profile.htm",
-      profilo: "profile.htm",
-      settings: "profile.htm",
+      impostazioni: "profile.html",
+      profilo: "profile.html",
+      settings: "profile.html",
     };
 
     const links = document.querySelectorAll(".sidebar .nav-link");
@@ -516,6 +518,21 @@
       await window.IESupabase.logout();
       window.IESupabase.redirectToLogin();
     });
+  }
+
+  // Ensure the header user avatar links to profile.html (all portal pages)
+  function ensureHeaderAvatarLinksToProfile() {
+    const container = document.querySelector("header .w-10.h-10.rounded-full");
+    if (!container || !container.querySelector("img")) return;
+    if (container.parentElement && container.parentElement.tagName === "A") return;
+
+    const base = derivePortalBasePath();
+    const link = document.createElement("a");
+    link.setAttribute("href", base + "profile.html");
+    link.setAttribute("aria-label", "Vai al profilo");
+    link.className = "flex items-center focus:outline-none focus:ring-2 focus:ring-[#c5a059] focus:ring-offset-2 rounded-full";
+    container.parentNode.insertBefore(link, container);
+    link.appendChild(container);
   }
 
   function updateHeaderUserBlock() {
