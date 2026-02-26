@@ -91,7 +91,20 @@
     "",
   ].join("\n");
 
-  document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", async function () {
+    const pageKey = getCurrentPageKey();
+
+    // Protected pages: require Supabase auth (redirect to login if not authenticated)
+    const protectedPages = ["dashboard", "candidati", "offerte", "add-candidato", "add-offerta"];
+    if (protectedPages.indexOf(pageKey) !== -1 && window.IESupabase) {
+      try {
+        await window.IESupabase.requireAuth();
+        await loadCurrentUserProfile();
+      } catch (e) {
+        return;
+      }
+    }
+
     ensureSidebarLoaded()
       .then(function () {
         initLayout();
@@ -99,13 +112,16 @@
         initButtons();
         initForms();
         initDataViews();
+        initLogoutLink();
+        updateHeaderUserBlock();
       })
       .catch(function (error) {
         console.error("[ItalianExperience] Sidebar loading failed", error);
-        // Fallback: inizializza comunque il resto dell'app
         initButtons();
         initForms();
         initDataViews();
+        initLogoutLink();
+        updateHeaderUserBlock();
       });
   });
 
@@ -473,6 +489,38 @@
     });
   }
 
+  function initLogoutLink() {
+    const logoutLink = document.querySelector('.sidebar a[href="index.html"], .sidebar-footer a[href="index.html"], #sidebar a[href*="index.html"]');
+    const links = document.querySelectorAll('#sidebar a, .sidebar a');
+    let logoutEl = null;
+    links.forEach(function (a) {
+      const href = (a.getAttribute("href") || "").trim();
+      const text = (a.textContent || "").toLowerCase();
+      if ((href === "index.html" || href.endsWith("/index.html")) && text.includes("logout")) {
+        logoutEl = a;
+      }
+    });
+    if (!logoutEl) return;
+    logoutEl.addEventListener("click", async function (e) {
+      if (!window.IESupabase) return;
+      e.preventDefault();
+      await window.IESupabase.logout();
+      window.IESupabase.redirectToLogin();
+    });
+  }
+
+  function updateHeaderUserBlock() {
+    if (!window.IESupabase) return;
+    const displayName = getCurrentUserDisplayName();
+    const nameEl = document.querySelector("header .text-right p.text-sm");
+    const avatarEl = document.querySelector("header .w-10.h-10.rounded-full img");
+    if (nameEl) nameEl.textContent = displayName;
+    if (avatarEl && displayName) {
+      avatarEl.setAttribute("src", "https://ui-avatars.com/api/?name=" + encodeURIComponent(displayName.replace(/\s+/g, "+")) + "&background=1b4332&color=fff");
+      avatarEl.setAttribute("alt", displayName);
+    }
+  }
+
   function findButtonByText(text) {
     if (!text) return null;
     const normalized = text.trim().toLowerCase();
@@ -661,7 +709,23 @@
     openModal({
       title: "Associate Candidate",
       fullPageHref: null,
-      render: (mount) => {
+      render: async (mount) => {
+        const candidateOptions =
+          window.IESupabase
+            ? (await window.IESupabase.fetchMyCandidates()).data || []
+            : IE_STORE.candidates;
+        const candidateSelectOptions =
+          window.IESupabase
+            ? candidateOptions
+                .map(function (c) {
+                  return "<option value=\"" + (c.id || "") + "\">" + (c.first_name || "") + " " + (c.last_name || "") + " – " + (c.position || "") + "</option>";
+                })
+                .join("")
+            : candidateOptions
+                .map(function (c) {
+                  return "<option value=\"" + (c.slug || c.id) + "\">" + (c.nome || "") + " " + (c.cognome || "") + " – " + (c.posizione || "") + "</option>";
+                })
+                .join("");
         mount.innerHTML = `
           <div class="space-y-6">
             <div class="glass-card rounded-2xl p-6">
@@ -671,10 +735,7 @@
                   <label class="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Select Candidate</label>
                   <select name="candidate" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none appearance-none cursor-pointer">
                     <option value="">Choose a candidate...</option>
-                    <option value="alessandro-rossi">Alessandro Rossi – Sommelier Senior</option>
-                    <option value="giulia-bianchi">Giulia Bianchi – Chef de Rang</option>
-                    <option value="luca-moretti">Luca Moretti – Maître d'Hôtel</option>
-                    <option value="elena-martini">Elena Martini – Pastry Chef</option>
+                    ${candidateSelectOptions}
                   </select>
                 </div>
 
@@ -732,9 +793,31 @@
         const form = mount.querySelector("#associateCandidateForm");
         if (!form) return;
 
-        form.addEventListener("submit", function (event) {
+        form.addEventListener("submit", async function (event) {
           event.preventDefault();
           const formData = new FormData(form);
+          if (window.IESupabase) {
+            const candidateId = (formData.get("candidate") || "").toString().trim();
+            const jobOfferId = window.IE_ACTIVE_JOB_OFFER_ID || (await window.IESupabase.fetchJobOffers()).data?.[0]?.id;
+            if (!candidateId || !jobOfferId) {
+              window.IESupabase.showError("Seleziona un candidato e assicurati che ci sia un'offerta attiva.");
+              return;
+            }
+            const { error } = await window.IESupabase.linkCandidateToJob({
+              candidate_id: candidateId,
+              job_offer_id: jobOfferId,
+              status: (formData.get("status") || "new").toString(),
+              notes: (formData.get("notes") || "").toString(),
+            });
+            if (error) {
+              window.IESupabase.showError(error.message || "Errore nel salvataggio dell'associazione.");
+              return;
+            }
+            window.IESupabase.showSuccess("Associazione salvata con successo.");
+            closeModal();
+            renderAssociationsForActiveOffer();
+            return;
+          }
           saveCandidateAssociation(formData);
           closeModal();
         });
@@ -1273,9 +1356,24 @@
     };
   }
 
+  let IE_CURRENT_PROFILE = null;
+
+  async function loadCurrentUserProfile() {
+    if (!window.IESupabase) return;
+    const { data } = await window.IESupabase.getProfile();
+    IE_CURRENT_PROFILE = data || null;
+  }
+
   function getCurrentUserDisplayName() {
-    // In a real app, this will read from auth/session.
-    return "Matteo Di Noia";
+    if (IE_CURRENT_PROFILE?.full_name) return IE_CURRENT_PROFILE.full_name;
+    if (IE_CURRENT_PROFILE?.email) return IE_CURRENT_PROFILE.email;
+    if (window.IESupabase) {
+      try {
+        const session = window.IESupabase.supabase?.auth?.getSession?.();
+        if (session?.data?.session?.user?.email) return session.data.session.user.email;
+      } catch (e) {}
+    }
+    return "User";
   }
 
   function markUpdated(record) {
@@ -1320,14 +1418,58 @@
     return null;
   }
 
-  function fetchCandidates(filters) {
-    console.info("[ItalianExperience] fetchCandidates() – filters:", filters || {});
+  async function fetchCandidates(filters) {
+    if (window.IESupabase) {
+      const { data: rows, error } = await window.IESupabase.fetchMyCandidates();
+      if (error) {
+        console.error("[ItalianExperience] fetchCandidates Supabase error:", error);
+        return [];
+      }
+      const mapped = (rows || []).map(function (r) {
+        return {
+          id: r.id,
+          nome: r.first_name || "",
+          cognome: r.last_name || "",
+          posizione: r.position || "",
+          indirizzo: r.address || "",
+          status: r.status || "new",
+          note: r.notes || "",
+          fonte: r.source || "",
+          client_name: r.client_name || null,
+          foto_url: r.photo_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent((r.first_name || "") + "+" + (r.last_name || "")) + "&background=dbeafe&color=1e40af",
+          created_at: r.created_at,
+          is_archived: r.is_archived || false,
+        };
+      });
+      return applyCandidateFilters(mapped, filters || {});
+    }
     const base = IE_STORE.candidates.filter((c) => !c._deleted);
     return Promise.resolve(applyCandidateFilters(base, filters || {}));
   }
 
-  function fetchJobOffers(filters) {
-    console.info("[ItalianExperience] fetchJobOffers() – filters:", filters || {});
+  async function fetchJobOffers(filters) {
+    if (window.IESupabase) {
+      const { data: rows, error } = await window.IESupabase.fetchJobOffers();
+      if (error) {
+        console.error("[ItalianExperience] fetchJobOffers Supabase error:", error);
+        return [];
+      }
+      const mapped = (rows || []).map(function (r) {
+        return {
+          id: r.id,
+          titolo_posizione: r.title || "",
+          client_id: null,
+          client_name: r.client_name || null,
+          descrizione: r.description || "",
+          citta: r.location || "",
+          stato: "",
+          stato_offerta: r.status || "open",
+          created_at: r.created_at,
+          is_archived: r.is_archived || false,
+        };
+      });
+      return applyJobOfferFilters(mapped, filters || {});
+    }
     const base = IE_STORE.jobOffers.filter((o) => !o._deleted);
     return Promise.resolve(applyJobOfferFilters(base, filters || {}));
   }
@@ -1338,20 +1480,48 @@
     return Promise.resolve(applyClientFilters(base, filters || {}));
   }
 
-  function saveCandidate(formData) {
+  async function saveCandidate(formData) {
+    const nome = (formData.get("nome") || "").toString().trim();
+    const cognome = (formData.get("cognome") || "").toString().trim();
+    const posizione = (formData.get("posizione") || "").toString().trim();
+    const indirizzo = (formData.get("indirizzo") || "").toString().trim();
+    const status = (formData.get("status") || "new").toString();
+    const note = (formData.get("note") || "").toString();
+    const fonte = (formData.get("fonte") || "").toString();
+    const client_name = (formData.get("client_name") || "").toString().trim();
+
+    if (window.IESupabase) {
+      const { data, error } = await window.IESupabase.insertCandidate({
+        first_name: nome,
+        last_name: cognome,
+        position: posizione,
+        address: indirizzo,
+        status: status,
+        notes: note,
+        source: fonte,
+        client_name: client_name || null,
+      });
+      if (error) {
+        window.IESupabase.showError(error.message || "Errore nel salvataggio del candidato.", "saveCandidate");
+        return;
+      }
+      window.IESupabase.showSuccess("Candidato salvato con successo.");
+      navigateTo("candidati.html");
+      return;
+    }
+
     const now = new Date().toISOString();
     const currentUser = getCurrentUserDisplayName();
-
     const candidate = {
       id: "cand-" + Math.random().toString(36).slice(2, 10),
       slug: null,
-      nome: (formData.get("nome") || "").toString().trim(),
-      cognome: (formData.get("cognome") || "").toString().trim(),
-      posizione: (formData.get("posizione") || "").toString().trim(),
-      indirizzo: (formData.get("indirizzo") || "").toString().trim(),
-      status: (formData.get("status") || "new").toString(),
-      note: (formData.get("note") || "").toString(),
-      fonte: (formData.get("fonte") || "").toString(),
+      nome: nome,
+      cognome: cognome,
+      posizione: posizione,
+      indirizzo: indirizzo,
+      status: status,
+      note: note,
+      fonte: fonte,
       cv_url: null,
       foto_url: null,
       created_at: now,
@@ -1363,14 +1533,12 @@
 
     const cvFile = formData.get("cv_file");
     if (cvFile && typeof cvFile === "object" && cvFile.name) {
-      candidate.cv_url = `/uploads/cv/${encodeURIComponent(cvFile.name)}`;
+      candidate.cv_url = "/uploads/cv/" + encodeURIComponent(cvFile.name);
     }
-
     const photoFile = formData.get("foto_file");
     if (photoFile && typeof photoFile === "object" && photoFile.name) {
-      candidate.foto_url = `/uploads/foto/${encodeURIComponent(photoFile.name)}`;
+      candidate.foto_url = "/uploads/foto/" + encodeURIComponent(photoFile.name);
     }
-
     candidate.slug =
       (candidate.nome + "-" + candidate.cognome)
         .toLowerCase()
@@ -1378,50 +1546,69 @@
         .replace(/[^a-z0-9-]/g, "") || candidate.id;
 
     IE_STORE.candidates.push(candidate);
-
-    console.info("[ItalianExperience] saveCandidate() – payload ready for API:", candidate);
-
+    console.info("[ItalianExperience] saveCandidate() – in-memory:", candidate);
     alert("Candidato salvato con successo (simulazione)");
   }
 
-  function saveJobOffer(formData) {
-    const now = new Date().toISOString();
-    const currentUser = getCurrentUserDisplayName();
+  async function saveJobOffer(formData) {
+    const title = (formData.get("titolo_posizione") || "").toString().trim();
+    const position = (formData.get("position") || "").toString().trim();
+    const client_name = (formData.get("client_name") || "").toString().trim();
+    const location = (formData.get("location") || "").toString().trim();
+    const description = (formData.get("descrizione") || "").toString();
+    const requirements = (formData.get("requirements") || "").toString();
+    const notes = (formData.get("notes") || "").toString();
+    const status = (formData.get("stato_offerta") || "open").toString();
 
-    const clientName = (formData.get("client_name") || "").toString().trim();
-    let clientId = null;
-    if (clientName) {
-      const existing = IE_STORE.clients.find(
-        (c) => c.nome.toLowerCase() === clientName.toLowerCase()
-      );
-      if (existing) {
-        clientId = existing.id;
+    if (window.IESupabase) {
+      const { data, error } = await window.IESupabase.insertJobOffer({
+        title: title,
+        position: position,
+        client_name: client_name || null,
+        location: location || null,
+        description: description || null,
+        requirements: requirements || null,
+        notes: notes || null,
+        status: status,
+      });
+      if (error) {
+        window.IESupabase.showError(error.message || "Errore nella creazione dell'offerta.", "saveJobOffer");
+        return;
       }
+      window.IESupabase.showSuccess("Offerta di lavoro creata con successo.");
+      navigateTo("offerte.html");
+      return;
     }
 
+    const now = new Date().toISOString();
+    const currentUser = getCurrentUserDisplayName();
+    let clientId = null;
+    if (client_name) {
+      const existing = IE_STORE.clients.find(
+        (c) => c.nome.toLowerCase() === client_name.toLowerCase()
+      );
+      if (existing) clientId = existing.id;
+    }
     const jobOffer = {
       id: "offer-" + Math.random().toString(36).slice(2, 10),
-      titolo_posizione: (formData.get("titolo_posizione") || "").toString().trim(),
+      titolo_posizione: title,
       client_id: clientId,
-      descrizione: (formData.get("descrizione") || "").toString(),
+      descrizione: description,
       paga: (formData.get("paga") || "").toString(),
       tipo_contratto: (formData.get("tipo_contratto") || "").toString(),
       numero_posizioni: parseInt(formData.get("numero_posizioni") || "1", 10) || 1,
-      citta: (formData.get("citta") || "").toString().trim(),
+      citta: location,
       stato: (formData.get("stato") || "").toString().trim(),
       data_scadenza: (formData.get("data_scadenza") || "").toString(),
-      stato_offerta: (formData.get("stato_offerta") || "open").toString(),
+      stato_offerta: status,
       created_at: now,
       updated_at: now,
       created_by: currentUser,
       updated_by: currentUser,
       is_archived: false,
     };
-
     IE_STORE.jobOffers.push(jobOffer);
-
-    console.info("[ItalianExperience] saveJobOffer() – payload ready for API:", jobOffer);
-
+    console.info("[ItalianExperience] saveJobOffer() – in-memory:", jobOffer);
     alert("Offerta di lavoro creata con successo (simulazione)");
   }
 
@@ -1761,7 +1948,7 @@
     }
 
     function findClientNameForCandidate(candidate) {
-      // Attempt to infer client from associations
+      if (candidate.client_name) return candidate.client_name;
       const assoc = IE_STORE.candidateJobAssociations.find(
         (a) => a.candidate_id === candidate.id
       );
@@ -1901,17 +2088,17 @@
     });
 
     function renderOffers() {
-      fetchJobOffers(filters).then((rows) => {
+      fetchJobOffers(filters).then(async (rows) => {
         rows.sort((a, b) => Number(a.is_archived) - Number(b.is_archived));
         tbody.innerHTML = "";
-
+        if (rows.length && window.IESupabase) window.IE_ACTIVE_JOB_OFFER_ID = rows[0].id;
         rows.forEach((row) => {
           const tr = document.createElement("tr");
           tr.className = "table-row transition" + (row.is_archived ? " opacity-60" : "");
           tr.setAttribute("data-id", row.id);
 
           const client = IE_STORE.clients.find((c) => c.id === row.client_id);
-          const clientName = client ? client.nome : "—";
+          const clientName = row.client_name || (client ? client.nome : "—");
           const location = row.citta && row.stato ? `${row.citta}, ${row.stato}` : "—";
           const createdDate = row.created_at
             ? new Date(row.created_at).toLocaleDateString("it-IT")
@@ -1958,7 +2145,7 @@
         });
 
         // Keep associated candidates section in sync with first visible offer
-        renderAssociationsForActiveOffer();
+        await renderAssociationsForActiveOffer();
       });
     }
 
@@ -2117,60 +2304,58 @@
   // Associations table rendering (job offers page)
   // ---------------------------------------------------------------------------
 
-  function renderAssociationsForActiveOffer() {
+  async function renderAssociationsForActiveOffer() {
     const tbody = document.querySelector("[data-ie-associations-body]");
     if (!tbody) return;
 
     const firstOfferRow = document.querySelector("[data-ie-joboffers-body] tr");
     let activeOfferId = null;
-    if (firstOfferRow) {
-      activeOfferId = firstOfferRow.getAttribute("data-id");
-    }
-    if (!activeOfferId && IE_STORE.jobOffers.length) {
-      activeOfferId = IE_STORE.jobOffers[0].id;
-    }
-    if (!activeOfferId) return;
+    if (firstOfferRow) activeOfferId = firstOfferRow.getAttribute("data-id");
+    if (!activeOfferId && IE_STORE.jobOffers.length) activeOfferId = IE_STORE.jobOffers[0].id;
 
+    if (window.IESupabase && activeOfferId) {
+      const { data: assocs } = await window.IESupabase.fetchAssociations({ job_offer_id: activeOfferId });
+      const { data: candidates } = await window.IESupabase.fetchMyCandidates();
+      const candidateMap = (candidates || []).reduce(function (acc, c) {
+        acc[c.id] = c;
+        return acc;
+      }, {});
+      tbody.innerHTML = "";
+      (assocs || []).forEach(function (assoc) {
+        const c = candidateMap[assoc.candidate_id];
+        const nome = c ? (c.first_name || "") + " " + (c.last_name || "") : "—";
+        const posizione = c ? (c.position || "—") : "—";
+        const tr = document.createElement("tr");
+        tr.className = "table-row transition";
+        tr.innerHTML =
+          "<td class=\"px-6 py-4 font-semibold text-gray-800\">" + nome + "</td>" +
+          "<td class=\"px-6 py-4 text-gray-600\">" + posizione + "</td>" +
+          "<td class=\"px-6 py-4\"><span class=\"badge " + getCandidateStatusBadgeClass(assoc.status) + "\">" + formatCandidateStatusLabel(assoc.status) + "</span></td>" +
+          "<td class=\"px-6 py-4 text-gray-500 italic text-xs\">" + (assoc.notes || "—") + "</td>" +
+          "<td class=\"px-6 py-4 text-center\"><button type=\"button\" class=\"text-red-500 hover:text-red-600 text-xs font-semibold uppercase tracking-widest\" data-action=\"remove-association\" data-id=\"" + (assoc.id || "") + "\">Remove</button></td>";
+        tbody.appendChild(tr);
+      });
+      return;
+    }
+
+    if (!activeOfferId) return;
     const rows = IE_STORE.candidateJobAssociations.filter(
       (assoc) => assoc.job_offer_id === activeOfferId
     );
-
     tbody.innerHTML = "";
-
     rows.forEach((assoc) => {
       const candidate = IE_STORE.candidates.find((c) => c.id === assoc.candidate_id);
       if (!candidate) return;
-
       const tr = document.createElement("tr");
       tr.className = "table-row transition";
       const metaTitle = formatLastUpdatedMeta(assoc);
       if (metaTitle) tr.title = metaTitle;
-
-      tr.innerHTML = `
-        <td class="px-6 py-4 font-semibold text-gray-800">${candidate.nome} ${
-        candidate.cognome
-      }</td>
-        <td class="px-6 py-4 text-gray-600">${candidate.posizione || "—"}</td>
-        <td class="px-6 py-4">
-          <span class="badge ${getCandidateStatusBadgeClass(assoc.status)}">${formatCandidateStatusLabel(
-        assoc.status
-      )}</span>
-        </td>
-        <td class="px-6 py-4 text-gray-500 italic text-xs">
-          ${assoc.notes || "—"}
-        </td>
-        <td class="px-6 py-4 text-center">
-          <button
-            type="button"
-            class="text-red-500 hover:text-red-600 text-xs font-semibold uppercase tracking-widest"
-            data-action="remove-association"
-            data-id="${assoc.id}"
-          >
-            Remove
-          </button>
-        </td>
-      `;
-
+      tr.innerHTML =
+        "<td class=\"px-6 py-4 font-semibold text-gray-800\">" + candidate.nome + " " + candidate.cognome + "</td>" +
+        "<td class=\"px-6 py-4 text-gray-600\">" + (candidate.posizione || "—") + "</td>" +
+        "<td class=\"px-6 py-4\"><span class=\"badge " + getCandidateStatusBadgeClass(assoc.status) + "\">" + formatCandidateStatusLabel(assoc.status) + "</span></td>" +
+        "<td class=\"px-6 py-4 text-gray-500 italic text-xs\">" + (assoc.notes || "—") + "</td>" +
+        "<td class=\"px-6 py-4 text-center\"><button type=\"button\" class=\"text-red-500 hover:text-red-600 text-xs font-semibold uppercase tracking-widest\" data-action=\"remove-association\" data-id=\"" + assoc.id + "\">Remove</button></td>";
       tbody.appendChild(tr);
     });
 
@@ -2179,9 +2364,7 @@
       if (!btn) return;
       const id = btn.getAttribute("data-id");
       if (!id) return;
-      const confirmed = window.confirm(
-        "Vuoi rimuovere questa associazione candidato-offerta? (simulazione)"
-      );
+      const confirmed = window.confirm("Vuoi rimuovere questa associazione candidato-offerta? (simulazione)");
       if (!confirmed) return;
       const idx = IE_STORE.candidateJobAssociations.findIndex((a) => a.id === id);
       if (idx >= 0) {

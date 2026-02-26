@@ -106,8 +106,8 @@
                                 <th class="px-6 py-5 text-center">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100 text-sm">
-                            <!-- Row 1 -->
+                        <tbody class="divide-y divide-gray-100 text-sm" data-ie-joboffers-body>
+                            <!-- Rows filled by app.js from Supabase -->
                             <tr class="table-row transition">
                                 <td class="px-6 py-4 font-semibold text-gray-800">Head Sommelier</td>
                                 <td class="px-6 py-4 text-gray-600 font-medium">Sommellerie</td>
@@ -238,7 +238,8 @@
                                 <th class="px-6 py-5 font-bold text-center">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100 text-sm">
+                        <tbody class="divide-y divide-gray-100 text-sm" data-ie-associations-body>
+                            <!-- Rows filled by app.js from Supabase -->
                             <tr class="table-row transition">
                                 <td class="px-6 py-4 font-semibold text-gray-800">Alessandro Rossi</td>
                                 <td class="px-6 py-4 text-gray-600">Head Sommelier</td>
@@ -308,6 +309,9 @@
         </div>
     </main>
 
+    <!-- Supabase (auth + data) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
