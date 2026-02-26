@@ -397,6 +397,167 @@
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Dashboard stats (real-time from candidates + job_offers)
+  // ---------------------------------------------------------------------------
+  // Candidates table: id, first_name, last_name, position, status, source, created_at, is_archived (and created_by)
+  // Job offers table: id, status (stato_offerta), is_archived, ...
+
+  /**
+   * Total count of candidates (non-archived only).
+   * @returns {Promise<{ data: number, error: object | null }>}
+   */
+  async function getTotalCandidates() {
+    try {
+      let q = supabase.from("candidates").select("*", { count: "exact", head: true });
+      try {
+        q = q.eq("is_archived", false);
+      } catch (_) {}
+      const { count, error } = await q;
+      if (error) {
+        console.error("[Supabase] getTotalCandidates error:", error.message, error);
+        return { data: 0, error };
+      }
+      return { data: count ?? 0, error: null };
+    } catch (err) {
+      console.error("[Supabase] getTotalCandidates exception:", err);
+      return { data: 0, error: err };
+    }
+  }
+
+  /**
+   * Count of active job offers (non-archived).
+   * @returns {Promise<{ data: number, error: object | null }>}
+   */
+  async function getActiveJobOffers() {
+    try {
+      let q = supabase.from("job_offers").select("*", { count: "exact", head: true });
+      try {
+        q = q.eq("is_archived", false);
+      } catch (_) {}
+      const { count, error } = await q;
+      if (error) {
+        console.error("[Supabase] getActiveJobOffers error:", error.message, error);
+        return { data: 0, error };
+      }
+      return { data: count ?? 0, error: null };
+    } catch (err) {
+      console.error("[Supabase] getActiveJobOffers exception:", err);
+      return { data: 0, error: err };
+    }
+  }
+
+  /**
+   * Count of candidates created today (server date).
+   * @returns {Promise<{ data: number, error: object | null }>}
+   */
+  async function getNewCandidatesToday() {
+    try {
+      const now = new Date();
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+      const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString();
+      const { data, error } = await supabase
+        .from("candidates")
+        .select("id")
+        .gte("created_at", startOfDay)
+        .lt("created_at", endOfDay);
+      if (error) {
+        console.error("[Supabase] getNewCandidatesToday error:", error.message, error);
+        return { data: 0, error };
+      }
+      return { data: (data || []).length, error: null };
+    } catch (err) {
+      console.error("[Supabase] getNewCandidatesToday exception:", err);
+      return { data: 0, error: err };
+    }
+  }
+
+  /**
+   * Count of candidates with status 'hired' (or similar) created/updated this month.
+   * @returns {Promise<{ data: number, error: object | null }>}
+   */
+  async function getHiredThisMonth() {
+    try {
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
+      const { data, error } = await supabase
+        .from("candidates")
+        .select("id")
+        .eq("status", "hired")
+        .gte("created_at", startOfMonth)
+        .lt("created_at", endOfMonth);
+      if (error) {
+        console.error("[Supabase] getHiredThisMonth error:", error.message, error);
+        return { data: 0, error };
+      }
+      return { data: (data || []).length, error: null };
+    } catch (err) {
+      console.error("[Supabase] getHiredThisMonth exception:", err);
+      return { data: 0, error: err };
+    }
+  }
+
+  /**
+   * Recent candidates (non-archived, latest first), limit 10.
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function getRecentCandidates() {
+    try {
+      let q = supabase
+        .from("candidates")
+        .select("id, first_name, last_name, position, status, source, created_at")
+        .order("created_at", { ascending: false })
+        .limit(10);
+      try {
+        q = q.eq("is_archived", false);
+      } catch (_) {}
+      const { data, error } = await q;
+      if (error) {
+        console.error("[Supabase] getRecentCandidates error:", error.message, error);
+        return { data: [], error };
+      }
+      return { data: data || [], error: null };
+    } catch (err) {
+      console.error("[Supabase] getRecentCandidates exception:", err);
+      return { data: [], error: err };
+    }
+  }
+
+  /**
+   * Candidates grouped by source (fonte). Returns array of { source: string, count: number }.
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function getCandidatesBySource() {
+    try {
+      const { data, error } = await supabase
+        .from("candidates")
+        .select("source")
+        .eq("is_archived", false);
+      if (error) {
+        console.error("[Supabase] getCandidatesBySource error:", error.message, error);
+        return { data: [], error };
+      }
+      const list = data || [];
+      const bySource = {};
+      list.forEach((row) => {
+        const s = (row.source || "other").toString().trim() || "other";
+        bySource[s] = (bySource[s] || 0) + 1;
+      });
+      const total = list.length;
+      const result = Object.entries(bySource).map(([source, count]) => ({
+        source,
+        count,
+        percentage: total > 0 ? Math.round((count / total) * 100) : 0,
+      }));
+      result.sort((a, b) => b.count - a.count);
+      return { data: result, error: null };
+    } catch (err) {
+      console.error("[Supabase] getCandidatesBySource exception:", err);
+      return { data: [], error: err };
+    }
+  }
+
   /**
    * Fetch job history for a candidate (associations with job_offers joined).
    * Returns list of { association, job_offer } if job_offers has title/client_name etc.
@@ -474,6 +635,13 @@
     linkCandidateToJob,
     fetchAssociations,
     fetchJobHistoryForCandidate,
+    // Dashboard
+    getTotalCandidates,
+    getActiveJobOffers,
+    getNewCandidatesToday,
+    getHiredThisMonth,
+    getRecentCandidates,
+    getCandidatesBySource,
     // Helpers
     showError,
     showSuccess,

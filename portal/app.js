@@ -1771,12 +1771,219 @@
 
   function initDataViews() {
     const pageKey = getCurrentPageKey();
-    if (pageKey === "candidati") {
+    if (pageKey === "dashboard") {
+      initDashboardPage();
+    } else if (pageKey === "candidati") {
       initCandidatesPage();
     } else if (pageKey === "offerte") {
       initJobOffersPage();
     } else if (pageKey === "clients") {
       initClientsPage();
+    }
+  }
+
+  /**
+   * Dashboard: load real data from Supabase and update cards, recent candidates table, and sources.
+   */
+  async function initDashboardPage() {
+    const api = window.IESupabase;
+    if (!api) {
+      setDashboardCardValues({ totalCandidates: 0, activeJobOffers: 0, newCandidatesToday: 0, hiredThisMonth: 0 });
+      renderDashboardRecentCandidates([]);
+      renderDashboardSources([]);
+      return;
+    }
+
+    setDashboardLoading(true);
+
+    try {
+      const [
+        totalRes,
+        activeOffersRes,
+        newTodayRes,
+        hiredRes,
+        recentRes,
+        bySourceRes,
+      ] = await Promise.all([
+        api.getTotalCandidates(),
+        api.getActiveJobOffers(),
+        api.getNewCandidatesToday(),
+        api.getHiredThisMonth(),
+        api.getRecentCandidates(),
+        api.getCandidatesBySource(),
+      ]);
+
+      setDashboardCardValues({
+        totalCandidates: totalRes.error ? 0 : totalRes.data,
+        activeJobOffers: activeOffersRes.error ? 0 : activeOffersRes.data,
+        newCandidatesToday: newTodayRes.error ? 0 : newTodayRes.data,
+        hiredThisMonth: hiredRes.error ? 0 : hiredRes.data,
+      });
+
+      const recentList = recentRes.error ? [] : (recentRes.data || []);
+      const mappedRecent = recentList.map(function (r) {
+        return {
+          id: r.id,
+          nome: r.first_name || "",
+          cognome: r.last_name || "",
+          posizione: r.position || "",
+          status: r.status || "new",
+          created_at: r.created_at,
+        };
+      });
+      renderDashboardRecentCandidates(mappedRecent);
+
+      const sourceList = bySourceRes.error ? [] : (bySourceRes.data || []);
+      renderDashboardSources(sourceList);
+    } catch (err) {
+      console.error("[ItalianExperience] Dashboard load error:", err);
+      setDashboardCardValues({ totalCandidates: 0, activeJobOffers: 0, newCandidatesToday: 0, hiredThisMonth: 0 });
+      renderDashboardRecentCandidates([]);
+      renderDashboardSources([]);
+    } finally {
+      setDashboardLoading(false);
+    }
+  }
+
+  function setDashboardLoading(loading) {
+    document.querySelectorAll("[data-dashboard-value]").forEach(function (el) {
+      var val = el.querySelector(".dashboard-value");
+      if (val) val.textContent = loading ? "…" : (val.textContent || "—");
+    });
+    var tbody = document.querySelector("[data-dashboard='recentCandidates']");
+    if (tbody) {
+      var placeholder = tbody.querySelector("[data-dashboard-placeholder]");
+      if (placeholder) placeholder.style.display = loading ? "" : "none";
+    }
+    var sourceContainer = document.querySelector("[data-dashboard='candidatesBySource']");
+    if (sourceContainer) {
+      var ph = sourceContainer.querySelector("[data-dashboard-placeholder]");
+      if (ph) ph.style.display = loading ? "" : "none";
+    }
+  }
+
+  function setDashboardCardValues(values) {
+    var totalEl = document.querySelector("[data-dashboard-value='totalCandidates']");
+    if (totalEl) {
+      var v = totalEl.querySelector(".dashboard-value");
+      if (v) v.textContent = formatInteger(values.totalCandidates);
+    }
+    var activeEl = document.querySelector("[data-dashboard-value='activeJobOffers']");
+    if (activeEl) {
+      var v = activeEl.querySelector(".dashboard-value");
+      if (v) v.textContent = formatInteger(values.activeJobOffers);
+    }
+    var newEl = document.querySelector("[data-dashboard-value='newCandidatesToday']");
+    if (newEl) {
+      var v = newEl.querySelector(".dashboard-value");
+      if (v) v.textContent = formatInteger(values.newCandidatesToday);
+    }
+    var hiredEl = document.querySelector("[data-dashboard-value='hiredThisMonth']");
+    if (hiredEl) {
+      var v = hiredEl.querySelector(".dashboard-value");
+      if (v) v.textContent = formatInteger(values.hiredThisMonth);
+    }
+  }
+
+  function formatInteger(n) {
+    if (n === undefined || n === null) return "0";
+    return Number(n).toLocaleString("it-IT");
+  }
+
+  function renderDashboardRecentCandidates(rows) {
+    var tbody = document.querySelector("[data-dashboard='recentCandidates']");
+    if (!tbody) return;
+    var placeholder = tbody.querySelector("[data-dashboard-placeholder]");
+    if (placeholder) placeholder.remove();
+    tbody.innerHTML = "";
+    if (!rows.length) {
+      var tr = document.createElement("tr");
+      tr.innerHTML = "<td colspan=\"4\" class=\"px-6 py-8 text-center text-gray-400\">Nessun candidato recente.</td>";
+      tbody.appendChild(tr);
+      return;
+    }
+    rows.forEach(function (row) {
+      var tr = document.createElement("tr");
+      tr.className = "table-row transition";
+      var createdDate = row.created_at
+        ? new Date(row.created_at).toLocaleDateString("it-IT")
+        : "";
+      var statusClass = getDashboardCandidateStatusBadgeClass(row.status);
+      var statusLabel = formatDashboardCandidateStatusLabel(row.status);
+      tr.innerHTML =
+        "<td class=\"px-6 py-4 font-semibold text-gray-800\">" + escapeHtml((row.nome || "") + " " + (row.cognome || "").trim()) + "</td>" +
+        "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(row.posizione || "—") + "</td>" +
+        "<td class=\"px-6 py-4 text-gray-500 text-sm\">" + escapeHtml(createdDate) + "</td>" +
+        "<td class=\"px-6 py-4\"><span class=\"badge " + statusClass + "\">" + escapeHtml(statusLabel) + "</span></td>";
+      tbody.appendChild(tr);
+    });
+  }
+
+  function renderDashboardSources(items) {
+    var container = document.querySelector("[data-dashboard='candidatesBySource']");
+    if (!container) return;
+    var placeholder = container.querySelector("[data-dashboard-placeholder]");
+    if (placeholder) placeholder.remove();
+    container.innerHTML = "";
+    var sourceLabels = {
+      linkedin: "LinkedIn",
+      email: "Email Diretta",
+      website: "Sito Web",
+      facebook: "Facebook / IG",
+      instagram: "Facebook / IG",
+      other: "Altro",
+    };
+    var sourceColors = ["bg-blue-600", "bg-[#c5a059]", "bg-green-600", "bg-indigo-500", "bg-gray-400"];
+    if (!items.length) {
+      var p = document.createElement("p");
+      p.className = "text-gray-400 text-sm py-2";
+      p.textContent = "Nessun dato per sorgente.";
+      container.appendChild(p);
+      return;
+    }
+    items.forEach(function (item, idx) {
+      var key = (item.source || "other").toLowerCase();
+      var label = sourceLabels[key] || key;
+      var color = sourceColors[idx % sourceColors.length];
+      var div = document.createElement("div");
+      div.className = "space-y-2";
+      div.innerHTML =
+        "<div class=\"flex justify-between text-xs font-bold uppercase tracking-tighter\">" +
+        "<span class=\"text-gray-500\">" + escapeHtml(label) + "</span>" +
+        "<span class=\"text-[#1b4332]\">" + (item.percentage || 0) + "%</span>" +
+        "</div>" +
+        "<div class=\"w-full h-2 bg-gray-100 rounded-full overflow-hidden\">" +
+        "<div class=\"h-full " + color + " rounded-full\" style=\"width:" + (item.percentage || 0) + "%\"></div>" +
+        "</div>";
+      container.appendChild(div);
+    });
+  }
+
+  function escapeHtml(str) {
+    if (str == null) return "";
+    var s = String(str);
+    var div = document.createElement("div");
+    div.textContent = s;
+    return div.innerHTML;
+  }
+
+  function getDashboardCandidateStatusBadgeClass(status) {
+    switch (status) {
+      case "new": return "badge-new";
+      case "interview": return "badge-interview";
+      case "hired": return "badge-hired";
+      case "rejected": return "badge-rejected";
+      default: return "badge-new";
+    }
+  }
+
+  function formatDashboardCandidateStatusLabel(status) {
+    switch (status) {
+      case "new": return "New";
+      case "interview": return "Interview";
+      case "hired": return "Hired";
+      case "rejected": return "Rejected";
+      default: return status ? String(status) : "New";
     }
   }
 
