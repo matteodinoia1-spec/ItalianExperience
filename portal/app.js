@@ -13,16 +13,75 @@
   "use strict";
 
   document.addEventListener("DOMContentLoaded", function () {
-    initLayout();
-    initNavigation();
-    initButtons();
-    initForms();
-    initDataViews();
+    ensureSidebarLoaded()
+      .then(function () {
+        initLayout();
+        initNavigation();
+        initButtons();
+        initForms();
+        initDataViews();
+      })
+      .catch(function (error) {
+        console.error("[ItalianExperience] Sidebar loading failed", error);
+        // Fallback: inizializza comunque il resto dell'app
+        initButtons();
+        initForms();
+        initDataViews();
+      });
   });
 
   // ---------------------------------------------------------------------------
   // Layout & Sidebar
   // ---------------------------------------------------------------------------
+
+  function ensureSidebarLoaded() {
+    const container = document.getElementById("sidebar");
+    if (!container) {
+      return Promise.resolve();
+    }
+
+    // Se la sidebar è già presente (ad es. markup statico), non fare nulla
+    if (container.children.length && container.querySelector(".sidebar")) {
+      return Promise.resolve();
+    }
+
+    const base = derivePortalBasePath();
+    const url = base + "sidebar.html";
+
+    return fetch(url, { credentials: "same-origin" })
+      .then(function (res) {
+        if (!res.ok) {
+          throw new Error("Failed to load sidebar.html (" + res.status + ")");
+        }
+        return res.text();
+      })
+      .then(function (html) {
+        const tpl = document.createElement("template");
+        tpl.innerHTML = html.trim();
+
+        const fetchedAside =
+          tpl.content.querySelector("#sidebar") || tpl.content.firstElementChild;
+
+        if (fetchedAside) {
+          // Copia classi e attributi (tranne id) dal file sorgente
+          if (fetchedAside.className) {
+            container.className = fetchedAside.className;
+          }
+          Array.from(fetchedAside.attributes).forEach(function (attr) {
+            if (attr.name === "id" || attr.name === "class") return;
+            container.setAttribute(attr.name, attr.value);
+          });
+
+          container.innerHTML = fetchedAside.innerHTML;
+        } else {
+          // Fallback: inietta l'HTML così com'è
+          container.innerHTML = html;
+        }
+      })
+      .catch(function (error) {
+        console.error("[ItalianExperience] Unable to load sidebar fragment", error);
+      });
+  }
 
   function initLayout() {
     const sidebar = document.getElementById("sidebar");
