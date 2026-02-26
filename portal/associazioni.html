@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Associazioni | Italian Experience Recruitment</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #1b4332;
+            --gold-accent: #c5a059;
+            --cream-bg: #fdfcf8;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--cream-bg);
+            color: var(--primary-green);
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-green);
+            transition: all 0.3s ease;
+        }
+
+        .nav-link {
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid var(--gold-accent);
+            color: var(--gold-accent);
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold-accent);
+            border-radius: 10px;
+        }
+
+        /* Status Badges */
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .badge-new { background-color: #dbeafe; color: #1e40af; } /* Blue */
+        .badge-interview { background-color: #fef3c7; color: #92400e; } /* Orange */
+        .badge-hired { background-color: #d1fae5; color: #065f46; } /* Green */
+        .badge-rejected { background-color: #fee2e2; color: #991b1b; } /* Red */
+
+        /* Table custom style */
+        .table-row:hover {
+            background-color: rgba(197, 160, 89, 0.03);
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+                height: 100vh;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar h-screen flex flex-col text-white fixed lg:static left-0 top-0 shadow-2xl">
+        <div class="p-8">
+            <div class="flex items-center space-x-3 mb-10">
+                <div class="w-10 h-10 bg-[#c5a059] rounded-full flex items-center justify-center text-white font-bold text-xl serif italic">
+                    IE
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold serif leading-tight">Italian</h2>
+                    <p class="text-[10px] uppercase tracking-widest opacity-60">Experience Portal</p>
+                </div>
+            </div>
+
+            <nav class="space-y-2">
+                <a href="dashboard.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                    <span class="text-sm font-medium">Dashboard</span>
+                </a>
+                <a href="candidati.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <span class="text-sm font-medium">Candidati</span>
+                </a>
+                <a href="offerte.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span class="text-sm font-medium">Offerte di Lavoro</span>
+                </a>
+                <a href="#" class="nav-link active flex items-center space-x-4 py-3 px-4 rounded-r-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    <span class="text-sm font-medium">Associazioni</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="mt-auto p-8 border-t border-white/10">
+            <a href="#" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span class="text-sm font-medium">Impostazioni</span>
+            </a>
+            <a href="login.html" class="flex items-center space-x-4 py-3 px-4 text-red-400 hover:text-red-300 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span class="text-sm font-medium">Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col min-w-0">
+        <!-- Header -->
+        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-8 sticky top-0 z-40">
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-md hover:bg-gray-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+                <h1 class="text-2xl font-bold serif text-[#1b4332]">Associations</h1>
+            </div>
+            
+            <div class="flex items-center space-x-6">
+                <div class="text-right hidden md:block">
+                    <p class="text-sm font-semibold text-gray-800">Matteo Di Noia</p>
+                    <p class="text-[10px] uppercase tracking-tighter text-[#c5a059] font-bold">Admin</p>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-gray-200 border-2 border-[#c5a059] overflow-hidden">
+                    <img src="https://ui-avatars.com/api/?name=Matteo+Di+Noia&background=1b4332&color=fff" alt="User">
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="p-8 space-y-8 max-w-[1600px] mx-auto w-full">
+            
+            <!-- Page Title & CTA -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-3xl font-bold serif text-[#1b4332]">Candidate – Job Associations</h2>
+                    <p class="text-gray-500 text-sm italic">Gestisci il matching tra i migliori talenti e le offerte di lusso.</p>
+                </div>
+                <button class="bg-[#c5a059] hover:bg-[#b08d4a] text-white px-6 py-3 rounded-lg font-semibold text-sm flex items-center space-x-2 shadow-lg transition-all transform hover:-translate-y-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span>Create New Association</span>
+                </button>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="glass-card p-6 rounded-2xl">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Search Candidate -->
+                    <div class="relative">
+                        <label class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2 block">Cerca Candidato</label>
+                        <input type="text" placeholder="Nome candidato..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 bottom-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <!-- Job Offer Filter -->
+                    <div>
+                        <label class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2 block">Filtra per Offerta</label>
+                        <select class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none appearance-none cursor-pointer">
+                            <option value="">Tutte le offerte</option>
+                            <option value="1">Head Sommelier - Grand Hotel</option>
+                            <option value="2">Executive Chef - Cracco</option>
+                            <option value="3">Property Manager - Luxury Villas</option>
+                        </select>
+                    </div>
+                    <!-- Status Filter -->
+                    <div>
+                        <label class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2 block">Stato Associazione</label>
+                        <select class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none appearance-none cursor-pointer">
+                            <option value="">Tutti gli stati</option>
+                            <option value="new">New</option>
+                            <option value="interview">Interview</option>
+                            <option value="hired">Hired</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Associations Table Section -->
+            <div class="glass-card rounded-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50/80 text-gray-500 text-[10px] uppercase tracking-widest">
+                            <tr>
+                                <th class="px-6 py-5 font-bold">Candidate Name</th>
+                                <th class="px-6 py-5 font-bold">Job Offer</th>
+                                <th class="px-6 py-5 font-bold">Position</th>
+                                <th class="px-6 py-5 font-bold">Client / Company</th>
+                                <th class="px-6 py-5 font-bold">Status</th>
+                                <th class="px-6 py-5 font-bold">Notes</th>
+                                <th class="px-6 py-5 font-bold text-center">Date Added</th>
+                                <th class="px-6 py-5 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 text-sm">
+                            <!-- Row 1 -->
+                            <tr class="table-row transition">
+                                <td class="px-6 py-4 font-semibold text-gray-800">Alessandro Rossi</td>
+                                <td class="px-6 py-4 text-gray-600">IE-OFF-001</td>
+                                <td class="px-6 py-4 text-gray-600 font-medium">Head Sommelier</td>
+                                <td class="px-6 py-4 text-gray-500">Grand Hotel Milano</td>
+                                <td class="px-6 py-4"><span class="badge badge-interview">Interview</span></td>
+                                <td class="px-6 py-4 text-gray-500 italic text-xs">Waiting for interview</td>
+                                <td class="px-6 py-4 text-center text-gray-400">24/05/2024</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+                                        <button class="p-2 text-gray-400 hover:text-blue-500 transition" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
+                                        <button class="p-2 text-gray-400 hover:text-red-500 transition" title="Remove"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 2 -->
+                            <tr class="table-row transition">
+                                <td class="px-6 py-4 font-semibold text-gray-800">Giulia Bianchi</td>
+                                <td class="px-6 py-4 text-gray-600">IE-OFF-002</td>
+                                <td class="px-6 py-4 text-gray-600 font-medium">Chef de Rang</td>
+                                <td class="px-6 py-4 text-gray-500">Ristorante Cracco</td>
+                                <td class="px-6 py-4"><span class="badge badge-hired">Hired</span></td>
+                                <td class="px-6 py-4 text-gray-500 italic text-xs">Selected for next step</td>
+                                <td class="px-6 py-4 text-center text-gray-400">23/05/2024</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+                                        <button class="p-2 text-gray-400 hover:text-blue-500 transition" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
+                                        <button class="p-2 text-gray-400 hover:text-red-500 transition" title="Remove"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 3 -->
+                            <tr class="table-row transition">
+                                <td class="px-6 py-4 font-semibold text-gray-800">Luca Moretti</td>
+                                <td class="px-6 py-4 text-gray-600">IE-OFF-004</td>
+                                <td class="px-6 py-4 text-gray-600 font-medium">Maître d'Hôtel</td>
+                                <td class="px-6 py-4 text-gray-500">Hotel Cipriani</td>
+                                <td class="px-6 py-4"><span class="badge badge-new">New</span></td>
+                                <td class="px-6 py-4 text-gray-500 italic text-xs">Reviewing profile</td>
+                                <td class="px-6 py-4 text-center text-gray-400">22/05/2024</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+                                        <button class="p-2 text-gray-400 hover:text-blue-500 transition" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
+                                        <button class="p-2 text-gray-400 hover:text-red-500 transition" title="Remove"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 4 -->
+                            <tr class="table-row transition">
+                                <td class="px-6 py-4 font-semibold text-gray-800">Elena Martini</td>
+                                <td class="px-6 py-4 text-gray-600">IE-OFF-005</td>
+                                <td class="px-6 py-4 text-gray-600 font-medium">Pastry Chef</td>
+                                <td class="px-6 py-4 text-gray-500">Pasticceria Marchesi</td>
+                                <td class="px-6 py-4"><span class="badge badge-rejected">Rejected</span></td>
+                                <td class="px-6 py-4 text-gray-500 italic text-xs">Rejected due to experience</td>
+                                <td class="px-6 py-4 text-center text-gray-400">20/05/2024</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+                                        <button class="p-2 text-gray-400 hover:text-blue-500 transition" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
+                                        <button class="p-2 text-gray-400 hover:text-red-500 transition" title="Remove"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 5 -->
+                            <tr class="table-row transition">
+                                <td class="px-6 py-4 font-semibold text-gray-800">Marco Villa</td>
+                                <td class="px-6 py-4 text-gray-600">IE-OFF-003</td>
+                                <td class="px-6 py-4 text-gray-600 font-medium">Property Manager</td>
+                                <td class="px-6 py-4 text-gray-500">Luxury Villas</td>
+                                <td class="px-6 py-4"><span class="badge badge-new">New</span></td>
+                                <td class="px-6 py-4 text-gray-500 italic text-xs">Contacting candidate</td>
+                                <td class="px-6 py-4 text-center text-gray-400">18/05/2024</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+                                        <button class="p-2 text-gray-400 hover:text-blue-500 transition" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
+                                        <button class="p-2 text-gray-400 hover:text-red-500 transition" title="Remove"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="p-6 bg-white/50 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-gray-100">
+                    <p class="text-xs text-gray-500 font-medium">Mostrando 5 di 128 associazioni attive</p>
+                    <div class="flex items-center space-x-2">
+                        <button class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition disabled:opacity-50" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+                        <span class="text-xs font-bold text-gray-700 px-3 uppercase tracking-tighter">Pagina 1 di 26</span>
+                        <button class="p-2 rounded-lg bg-[#1b4332] text-white hover:bg-[#1b4332]/90 transition shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Toggle Sidebar on Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Chiusura sidebar cliccando fuori (su mobile)
+        window.onclick = function(event) {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth < 1024 && event.target.closest('main') && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+            }
+        }
+    </script>
+</body>
+</html>
