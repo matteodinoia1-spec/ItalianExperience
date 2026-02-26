@@ -17,7 +17,10 @@
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: var(--cream-bg);
+            background: url('https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             color: var(--primary-green);
         }
 
@@ -25,8 +28,17 @@
             font-family: 'Playfair Display', serif;
         }
 
+        /* Effetto Glass Ice principale */
+        .glass-container {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+
         .bg-italian-overlay {
-            background: linear-gradient(rgba(27, 67, 50, 0.7), rgba(27, 67, 50, 0.4)), 
+            background: linear-gradient(rgba(27, 67, 50, 0.6), rgba(27, 67, 50, 0.3)), 
                         url('https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
             background-size: cover;
             background-position: center;
@@ -40,22 +52,21 @@
         }
 
         .btn-gold:hover {
-            background-color: transparent;
+            background-color: rgba(197, 160, 89, 0.1);
             color: var(--gold-accent);
+            backdrop-filter: blur(5px);
         }
 
         .input-field {
-            border-bottom: 1px solid #d1d5db;
-            transition: border-color 0.3s;
+            background: rgba(255, 255, 255, 0.4);
+            border-bottom: 1px solid rgba(27, 67, 50, 0.2);
+            transition: all 0.3s;
         }
 
         .input-field:focus {
             outline: none;
+            background: rgba(255, 255, 255, 0.6);
             border-bottom: 2px solid var(--gold-accent);
-        }
-
-        .card-shadow {
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
         }
 
         /* Animazione per il caricamento */
@@ -71,13 +82,14 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
-    <div class="max-w-5xl w-full bg-white rounded-2xl overflow-hidden flex flex-col md:flex-row card-shadow fade-in">
+    <!-- Wrapper per l'effetto glass globale -->
+    <div class="max-w-5xl w-full rounded-2xl overflow-hidden flex flex-col md:flex-row glass-container fade-in">
         
         <!-- Colonna Sinistra: Immagine e Benvenuto -->
         <div class="md:w-1/2 bg-italian-overlay p-12 text-white flex flex-col justify-between min-h-[300px] md:min-h-[600px]">
-            <div>
+            <div class="backdrop-brightness-90 p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
                 <h2 class="text-3xl lg:text-4xl font-bold italic mb-4 serif">Benvenuto</h2>
-                <p class="text-lg font-light opacity-90 leading-relaxed">
+                <p class="text-lg font-light opacity-95 leading-relaxed">
                     Accedi per continuare il tuo viaggio attraverso le meraviglie, i sapori e l'arte dell'Italia.
                 </p>
             </div>
@@ -87,28 +99,28 @@
         </div>
 
         <!-- Colonna Destra: Modulo Login -->
-        <div class="md:w-1/2 p-8 lg:p-16 flex flex-col justify-center bg-white">
+        <div class="md:w-1/2 p-8 lg:p-16 flex flex-col justify-center">
             <div class="mb-10 text-center md:text-left">
                 <h1 class="text-4xl font-bold mb-2 serif">Accesso</h1>
-                <p class="text-gray-500 text-sm italic">Area riservata ai membri della community.</p>
+                <p class="text-gray-600 text-sm italic">Area riservata ai membri della community.</p>
             </div>
 
             <form id="loginForm" class="space-y-6">
                 <!-- Email/Username -->
                 <div class="relative">
-                    <label for="email" class="block text-xs uppercase tracking-wider font-semibold text-gray-400 mb-1">Email o Nome Utente</label>
+                    <label for="email" class="block text-xs uppercase tracking-wider font-semibold text-gray-500 mb-1">Email o Nome Utente</label>
                     <input type="text" id="email" name="email" required
-                        class="w-full py-3 bg-transparent input-field text-gray-800 placeholder-gray-300"
+                        class="w-full py-3 px-4 rounded-t-lg input-field text-gray-800 placeholder-gray-400"
                         placeholder="esempio@esperienza.it">
                 </div>
 
                 <!-- Password -->
                 <div class="relative">
-                    <label for="password" class="block text-xs uppercase tracking-wider font-semibold text-gray-400 mb-1">Password</label>
+                    <label for="password" class="block text-xs uppercase tracking-wider font-semibold text-gray-500 mb-1">Password</label>
                     <input type="password" id="password" name="password" required
-                        class="w-full py-3 bg-transparent input-field text-gray-800 placeholder-gray-300"
+                        class="w-full py-3 px-4 rounded-t-lg input-field text-gray-800 placeholder-gray-400"
                         placeholder="••••••••">
-                    <button type="button" onclick="togglePassword()" class="absolute right-0 bottom-3 text-gray-400 hover:text-gold-accent">
+                    <button type="button" onclick="togglePassword()" class="absolute right-4 bottom-3 text-gray-400 hover:text-gold-accent">
                         <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -119,10 +131,10 @@
                 <!-- Opzioni Extra -->
                 <div class="flex items-center justify-between text-sm">
                     <label class="flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" class="rounded border-gray-300 text-[#c5a059] focus:ring-[#c5a059]">
+                        <input type="checkbox" class="rounded border-gray-300 text-[#c5a059] focus:ring-[#c5a059] bg-white/50">
                         <span class="text-gray-600">Ricordami</span>
                     </label>
-                    <a href="#" class="text-[#c5a059] hover:underline transition">Password dimenticata?</a>
+                    <a href="#" class="text-[#c5a059] hover:underline transition font-medium">Password dimenticata?</a>
                 </div>
 
                 <!-- Bottone Submit -->
@@ -133,27 +145,27 @@
 
             <!-- Footer del form -->
             <div class="mt-12 text-center">
-                <p class="text-gray-400 text-xs uppercase tracking-widest">
+                <p class="text-gray-500 text-xs uppercase tracking-widest font-medium">
                     L'accesso è consentito solo su invito.
                 </p>
                 
                 <div class="flex items-center justify-center space-x-4 mt-8 opacity-40">
-                    <div class="h-px w-8 bg-gray-300"></div>
+                    <div class="h-px w-8 bg-gray-400"></div>
                     <span class="text-xs uppercase tracking-tighter">Esplora l'Italia</span>
-                    <div class="h-px w-8 bg-gray-300"></div>
+                    <div class="h-px w-8 bg-gray-400"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Messaggio Box (Custom) -->
-    <div id="messageBox" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-white border border-gray-200 px-6 py-4 rounded-xl shadow-2xl hidden flex items-center space-x-3">
-        <div id="messageIcon" class="p-2 bg-green-100 rounded-full text-green-600">
+    <div id="messageBox" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-md border border-white/40 px-6 py-4 rounded-xl shadow-2xl hidden flex items-center space-x-3">
+        <div id="messageIcon" class="p-2 bg-green-100/50 rounded-full text-green-700">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
         </div>
-        <p id="messageText" class="text-sm font-medium text-gray-700"></p>
+        <p id="messageText" class="text-sm font-semibold text-gray-800"></p>
     </div>
 
     <script>
