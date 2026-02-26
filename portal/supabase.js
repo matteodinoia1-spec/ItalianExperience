@@ -157,12 +157,19 @@
       }
       if (existing) return { data: existing, error: null };
 
+      const fullName = user.user_metadata?.full_name || user.email?.split("@")[0] || "User";
+      const parts = String(fullName).trim().split(/\s+/);
+      const first_name = parts[0] || "";
+      const last_name = parts.slice(1).join(" ") || null;
+
       const { data: inserted, error: insertError } = await supabase
         .from("profiles")
         .insert({
           id: user.id,
           email: user.email || null,
-          full_name: user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
+          first_name,
+          last_name,
+          role: null,
         })
         .select()
         .single();
@@ -199,6 +206,43 @@
       return { data, error: null };
     } catch (err) {
       console.error("[Supabase] getProfile exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Update profile for current user (first_name, last_name).
+   * @param {object} payload - { first_name?: string, last_name?: string }
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function updateProfile(payload) {
+    const { data: sessionData } = await getSession();
+    const userId = sessionData?.user?.id;
+    if (!userId) {
+      const err = new Error("Not authenticated");
+      console.error("[Supabase] updateProfile:", err);
+      return { data: null, error: err };
+    }
+    try {
+      const updates = {
+        updated_at: new Date().toISOString(),
+      };
+      if (payload.first_name !== undefined) updates.first_name = payload.first_name;
+      if (payload.last_name !== undefined) updates.last_name = payload.last_name;
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .update(updates)
+        .eq("id", userId)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] updateProfile error:", error.message, error);
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] updateProfile exception:", err);
       return { data: null, error: err };
     }
   }
@@ -625,6 +669,7 @@
     // Profile
     ensureProfile,
     getProfile,
+    updateProfile,
     // Candidates
     insertCandidate,
     fetchMyCandidates,

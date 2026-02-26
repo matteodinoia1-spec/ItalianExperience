@@ -95,7 +95,7 @@
     const pageKey = getCurrentPageKey();
 
     // Protected pages: require Supabase auth (redirect to login if not authenticated)
-    const protectedPages = ["dashboard", "candidati", "offerte", "add-candidato", "add-offerta"];
+    const protectedPages = ["dashboard", "candidati", "offerte", "add-candidato", "add-offerta", "profile"];
     if (protectedPages.indexOf(pageKey) !== -1 && window.IESupabase) {
       try {
         await window.IESupabase.requireAuth();
@@ -335,6 +335,9 @@
         return "add-candidato";
       case "add-offerta.html":
         return "add-offerta";
+      case "profile.html":
+      case "profile.htm":
+        return "profile";
       case "index.html":
       case "":
         return "login";
@@ -343,6 +346,7 @@
         if (lastSegment.includes("dashboard")) return "dashboard";
         if (lastSegment.includes("candidati")) return "candidati";
         if (lastSegment.includes("offerte")) return "offerte";
+        if (lastSegment.includes("profile")) return "profile";
         return "unknown";
     }
   }
@@ -358,6 +362,7 @@
       candidati: ["candidati", "candidate", "candidates"],
       offerte: ["offerte di lavoro", "job offers", "job offer"],
       clients: ["clienti", "clients"],
+      profile: ["impostazioni", "profilo", "settings"],
     };
 
     const targetSection = (function () {
@@ -389,6 +394,9 @@
       candidati: "candidati.html",
       "offerte di lavoro": "offerte.html",
       clienti: "clients.html",
+      impostazioni: "profile.htm",
+      profilo: "profile.htm",
+      settings: "profile.htm",
     };
 
     const links = document.querySelectorAll(".sidebar .nav-link");
@@ -400,6 +408,7 @@
       else if (label.includes("candidati") || label.includes("candidate")) key = "candidati";
       else if (label.includes("offerte")) key = "offerte di lavoro";
       else if (label.includes("clienti") || label.includes("clients")) key = "clienti";
+      else if (label.includes("impostazioni") || label.includes("profilo") || label.includes("settings")) key = "impostazioni";
 
       if (!key) return;
 
@@ -1365,8 +1374,13 @@
   }
 
   function getCurrentUserDisplayName() {
-    if (IE_CURRENT_PROFILE?.full_name) return IE_CURRENT_PROFILE.full_name;
-    if (IE_CURRENT_PROFILE?.email) return IE_CURRENT_PROFILE.email;
+    if (IE_CURRENT_PROFILE) {
+      const first = (IE_CURRENT_PROFILE.first_name || "").trim();
+      const last = (IE_CURRENT_PROFILE.last_name || "").trim();
+      if (first || last) return (first + " " + last).trim();
+      if (IE_CURRENT_PROFILE.full_name) return IE_CURRENT_PROFILE.full_name;
+      if (IE_CURRENT_PROFILE.email) return IE_CURRENT_PROFILE.email;
+    }
     if (window.IESupabase) {
       try {
         const session = window.IESupabase.supabase?.auth?.getSession?.();

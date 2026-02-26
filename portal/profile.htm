@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <style>
         :root {
             --primary-green: #1b4332;
@@ -127,70 +128,15 @@
 </head>
 <body class="flex min-h-screen">
 
-    <!-- SIDEBAR -->
-    <aside id="sidebar" class="sidebar h-screen flex flex-col text-white fixed lg:static left-0 top-0 shadow-2xl">
-        <div class="p-8">
-            <div class="flex items-center space-x-3 mb-10">
-                <div class="w-10 h-10 bg-[#c5a059] rounded-full flex items-center justify-center text-white font-bold text-xl serif italic">
-                    IE
-                </div>
-                <div>
-                    <h2 class="text-lg font-bold serif leading-tight">Italian</h2>
-                    <p class="text-[10px] uppercase tracking-widest opacity-60">Experience Portal</p>
-                </div>
-            </div>
-
-            <nav class="space-y-2">
-                <a href="dashboard.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                    </svg>
-                    <span class="text-sm font-medium">Dashboard</span>
-                </a>
-                <a href="candidati.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                    <span class="text-sm font-medium">Candidati</span>
-                </a>
-                <a href="offerte.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    <span class="text-sm font-medium">Offerte di Lavoro</span>
-                </a>
-                <a href="associazioni.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    <span class="text-sm font-medium">Associazioni</span>
-                </a>
-            </nav>
-        </div>
-
-        <div class="mt-auto p-8 border-t border-white/10">
-            <a href="#" class="nav-link active flex items-center space-x-4 py-3 px-4 rounded-r-lg mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span class="text-sm font-medium">Impostazioni</span>
-            </a>
-            <a href="login.html" class="flex items-center space-x-4 py-3 px-4 text-red-400 hover:text-red-300 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                <span class="text-sm font-medium">Logout</span>
-            </a>
-        </div>
-    </aside>
+    <!-- SIDEBAR (loaded dynamically from sidebar.html) -->
+    <aside id="sidebar"></aside>
 
     <!-- MAIN CONTENT -->
     <main class="flex-1 flex flex-col min-w-0">
         <!-- Header -->
         <header class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-8 sticky top-0 z-40">
             <div class="flex items-center space-x-4">
-                <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-md hover:bg-gray-100">
+                <button data-toggle="sidebar" class="lg:hidden p-2 rounded-md hover:bg-gray-100">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
@@ -200,11 +146,11 @@
             
             <div class="flex items-center space-x-6">
                 <div class="text-right hidden md:block">
-                    <p class="text-sm font-semibold text-gray-800">Matteo Di Noia</p>
-                    <p class="text-[10px] uppercase tracking-tighter text-[#c5a059] font-bold">Admin</p>
+                    <p class="text-sm font-semibold text-gray-800">—</p>
+                    <p class="text-[10px] uppercase tracking-tighter text-[#c5a059] font-bold">—</p>
                 </div>
                 <div class="w-10 h-10 rounded-full bg-gray-200 border-2 border-[#c5a059] overflow-hidden">
-                    <img src="https://ui-avatars.com/api/?name=Matteo+Di+Noia&background=1b4332&color=fff" alt="User">
+                    <img src="https://ui-avatars.com/api/?name=User&background=1b4332&color=fff" alt="User">
                 </div>
             </div>
         </header>
@@ -212,10 +158,15 @@
         <!-- Page Content -->
         <div class="p-8 space-y-8 max-w-[1000px] mx-auto w-full">
             
+            <!-- Error message banner (hidden by default) -->
+            <div class="profile-error-banner hidden glass-card p-4 rounded-2xl border border-red-100 bg-red-50/80">
+                <p id="profileErrorMessage" class="text-sm text-red-700 font-medium"></p>
+            </div>
+
             <!-- Profile Header Card -->
             <div class="glass-card p-8 rounded-3xl flex flex-col md:flex-row items-center gap-8">
                 <div class="profile-avatar-container">
-                    <img id="profilePreview" src="https://ui-avatars.com/api/?name=Matteo+Di+Noia&size=120&background=1b4332&color=fff" class="w-full h-full rounded-full border-4 border-[#c5a059] shadow-lg object-cover" alt="Avatar">
+                    <img id="profilePreview" src="https://ui-avatars.com/api/?name=User&size=120&background=1b4332&color=fff" class="w-full h-full rounded-full border-4 border-[#c5a059] shadow-lg object-cover" alt="Avatar">
                     <label for="avatarUpload" class="avatar-edit-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -225,9 +176,9 @@
                     </label>
                 </div>
                 <div class="text-center md:text-left">
-                    <h2 class="text-3xl font-bold serif text-[#1b4332]">Matteo Di Noia</h2>
-                    <p class="text-[#c5a059] font-semibold uppercase tracking-widest text-sm mb-2">Administrator & Founder</p>
-                    <p class="text-gray-500 text-sm italic max-w-md">Gestore principale del portale Italian Experience. Responsabile della selezione dei talenti e delle associazioni strategiche.</p>
+                    <h2 id="profileTitle" class="text-3xl font-bold serif text-[#1b4332]">—</h2>
+                    <p id="profileSubtitle" class="text-[#c5a059] font-semibold uppercase tracking-widest text-sm mb-2">—</p>
+                    <p class="text-gray-500 text-sm italic max-w-md">Gestisci le tue informazioni personali e il ruolo nel portale.</p>
                 </div>
             </div>
 
@@ -238,67 +189,30 @@
                     <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Informazioni Personali</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="form-label">Nome</label>
-                            <input type="text" value="Matteo" class="form-input">
+                            <label class="form-label" for="profileFirstName">Nome</label>
+                            <input id="profileFirstName" type="text" name="first_name" class="form-input" placeholder="Nome">
                         </div>
                         <div>
-                            <label class="form-label">Cognome</label>
-                            <input type="text" value="Di Noia" class="form-input">
+                            <label class="form-label" for="profileLastName">Cognome</label>
+                            <input id="profileLastName" type="text" name="last_name" class="form-input" placeholder="Cognome">
                         </div>
                         <div>
-                            <label class="form-label">Ruolo Professionale</label>
-                            <input type="text" value="Administrator & Founder" class="form-input">
-                        </div>
-                        <div>
-                            <label class="form-label">Data di Nascita</label>
-                            <input type="date" value="1990-01-01" class="form-input">
+                            <label class="form-label" for="profileRole">Ruolo</label>
+                            <input id="profileRole" type="text" class="form-input bg-gray-50" readonly placeholder="—">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="form-label">Bio / Descrizione</label>
-                            <textarea rows="3" class="form-input resize-none">Esperto nel settore del luxury hospitality e nel recruitment di profili di alto livello per l'Experience Italiana.</textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section: Contact & Security -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Contact -->
-                    <div class="glass-card p-8 rounded-3xl">
-                        <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Contatti</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="form-label">Email Istituzionale</label>
-                                <input type="email" value="matteo@italianexperience.it" class="form-input">
-                            </div>
-                            <div>
-                                <label class="form-label">Telefono</label>
-                                <input type="tel" value="+39 02 1234567" class="form-input">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Security -->
-                    <div class="glass-card p-8 rounded-3xl">
-                        <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Sicurezza</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="form-label">Nuova Password</label>
-                                <input type="password" placeholder="••••••••" class="form-input">
-                            </div>
-                            <div>
-                                <label class="form-label">Conferma Password</label>
-                                <input type="password" placeholder="••••••••" class="form-input">
-                            </div>
+                            <label class="form-label" for="profileEmail">Email</label>
+                            <input id="profileEmail" type="email" class="form-input bg-gray-50" readonly placeholder="—">
                         </div>
                     </div>
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="flex items-center justify-end space-x-4 pt-4 pb-12">
-                    <button type="button" class="px-8 py-3 rounded-xl border border-gray-200 text-gray-500 font-semibold text-sm hover:bg-gray-50 transition-all">
+                    <button type="button" id="profileCancelBtn" class="px-8 py-3 rounded-xl border border-gray-200 text-gray-500 font-semibold text-sm hover:bg-gray-50 transition-all">
                         Annulla
                     </button>
-                    <button type="submit" class="px-10 py-3 rounded-xl bg-[#1b4332] text-white font-semibold text-sm shadow-xl hover:bg-[#1b4332]/90 transition-all transform hover:-translate-y-1">
+                    <button type="submit" id="profileSubmitBtn" class="px-10 py-3 rounded-xl bg-[#1b4332] text-white font-semibold text-sm shadow-xl hover:bg-[#1b4332]/90 transition-all transform hover:-translate-y-1">
                         Salva Modifiche
                     </button>
                 </div>
@@ -308,8 +222,8 @@
         </div>
     </main>
 
-    <!-- Success Message Box -->
-    <div id="successToast" class="fixed bottom-10 right-10 bg-white/90 backdrop-blur-md border border-green-100 p-4 rounded-2xl shadow-2xl hidden flex items-center space-x-4 animate-bounce">
+    <!-- Success Toast -->
+    <div id="successToast" class="fixed bottom-10 right-10 bg-white/90 backdrop-blur-md border border-green-100 p-4 rounded-2xl shadow-2xl hidden flex items-center space-x-4 z-50">
         <div class="p-2 bg-green-100 text-green-700 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -321,14 +235,26 @@
         </div>
     </div>
 
-    <script>
-        // Toggle Sidebar on Mobile
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('open');
-        }
+    <!-- Error Toast -->
+    <div id="errorToast" class="fixed bottom-10 right-10 bg-white/90 backdrop-blur-md border border-red-100 p-4 rounded-2xl shadow-2xl hidden flex items-center space-x-4 z-50">
+        <div class="p-2 bg-red-100 text-red-700 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <div>
+            <p class="text-sm font-bold text-gray-800">Errore</p>
+            <p class="profile-error-text text-xs text-gray-600"></p>
+        </div>
+    </div>
 
-        // Preview Immagine Profilo
+    <!-- Supabase (auth + data) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="app.js"></script>
+    <script src="profile/profile.js"></script>
+    <script>
+        // Avatar preview (local only, no upload to backend)
         document.getElementById('avatarUpload').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -339,24 +265,6 @@
                 reader.readAsDataURL(file);
             }
         });
-
-        // Form Submission Placeholder
-        document.getElementById('profileForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const toast = document.getElementById('successToast');
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
-        });
-
-        // Chiusura sidebar cliccando fuori (su mobile)
-        window.onclick = function(event) {
-            const sidebar = document.getElementById('sidebar');
-            if (window.innerWidth < 1024 && event.target.closest('main') && sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open');
-            }
-        }
     </script>
 </body>
 </html>
