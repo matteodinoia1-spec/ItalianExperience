@@ -138,5 +138,20 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script src="supabase.js"></script>
     <script src="app.js"></script>
+    <script>
+        (async function () {
+            try {
+                if (window.__IE_AUTH_GUARD__ && typeof window.__IE_AUTH_GUARD__.then === "function") {
+                    var allowed = await window.__IE_AUTH_GUARD__;
+                    if (!allowed) return;
+                } else if (window.IESupabase && typeof window.IESupabase.requireAuth === "function") {
+                    var user = await window.IESupabase.requireAuth();
+                    if (!user) return;
+                }
+            } catch (e) {
+                return;
+            }
+        })();
+    </script>
 </body>
 </html>
