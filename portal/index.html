@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Login | Italian Experience</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,6 +23,23 @@
             background-position: center;
             background-attachment: fixed;
             color: var(--primary-green);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Mobile: evita taglio in alto e permette scroll */
+        @media (max-width: 767px) {
+            body {
+                background-attachment: scroll;
+                min-height: 100vh;
+                min-height: 100dvh;
+                align-items: flex-start;
+                justify-content: flex-start;
+                padding-top: max(1rem, env(safe-area-inset-top));
+                padding-bottom: max(1rem, env(safe-area-inset-bottom));
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
         }
 
         h1, h2, h3, .serif {
@@ -81,13 +98,13 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen min-h-[100dvh] flex flex-col md:flex-row items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]">
 
-    <!-- Wrapper per l'effetto glass globale -->
-    <div class="max-w-5xl w-full rounded-2xl overflow-hidden flex flex-col md:flex-row glass-container fade-in">
+    <!-- Wrapper per l'effetto glass globale (su mobile scrollabile) -->
+    <div class="login-card max-w-5xl w-full rounded-2xl overflow-hidden flex flex-col md:flex-row glass-container fade-in flex-shrink-0 md:my-0 my-6">
         
         <!-- Colonna Sinistra: Immagine e Benvenuto -->
-        <div class="md:w-1/2 bg-italian-overlay p-12 text-white flex flex-col justify-between min-h-[300px] md:min-h-[600px]">
+        <div class="md:w-1/2 bg-italian-overlay p-8 md:p-12 text-white flex flex-col justify-between min-h-[220px] md:min-h-[600px]">
             <div class="backdrop-brightness-90 p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
                 <h2 class="text-3xl lg:text-4xl font-bold italic mb-4 serif">Benvenuto</h2>
                 <p class="text-lg font-light opacity-95 leading-relaxed">

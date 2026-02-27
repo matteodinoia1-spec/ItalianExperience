@@ -62,6 +62,24 @@
     "        </svg>",
     '        <span class="text-sm font-medium">Offerte di Lavoro</span>',
     "      </a>",
+    "",
+    '      <a href="clienti.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">',
+    '        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"',
+    '          stroke="currentColor" aria-hidden="true">',
+    '          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"',
+    '            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />',
+    "        </svg>",
+    '        <span class="text-sm font-medium">Clienti</span>',
+    "      </a>",
+    "",
+    '      <a href="archiviati.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">',
+    '        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"',
+    '          stroke="currentColor" aria-hidden="true">',
+    '          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"',
+    '            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />',
+    "        </svg>",
+    '        <span class="text-sm font-medium">Archiviati</span>',
+    "      </a>",
     "    </nav>",
     "  </div>",
     "",
@@ -95,7 +113,7 @@
     const pageKey = getCurrentPageKey();
 
     // Protected pages: require Supabase auth (redirect to login if not authenticated)
-    const protectedPages = ["dashboard", "candidati", "offerte", "add-candidato", "add-offerta", "profile"];
+    const protectedPages = ["dashboard", "candidati", "offerte", "clients", "archiviati", "add-candidato", "add-offerta", "profile"];
     if (protectedPages.indexOf(pageKey) !== -1 && window.IESupabase) {
       try {
         await window.IESupabase.requireAuth();
@@ -333,6 +351,8 @@
       case "clients.html":
       case "clienti.html":
         return "clients";
+      case "archiviati.html":
+        return "archiviati";
       case "add-candidato.html":
         return "add-candidato";
       case "add-offerta.html":
@@ -348,6 +368,7 @@
         if (lastSegment.includes("dashboard")) return "dashboard";
         if (lastSegment.includes("candidati")) return "candidati";
         if (lastSegment.includes("offerte")) return "offerte";
+        if (lastSegment.includes("archiviati")) return "archiviati";
         if (lastSegment.includes("profile")) return "profile";
         return "unknown";
     }
@@ -364,6 +385,7 @@
       candidati: ["candidati", "candidate", "candidates"],
       offerte: ["offerte di lavoro", "job offers", "job offer"],
       clients: ["clienti", "clients"],
+      archiviati: ["archiviati"],
       profile: ["impostazioni", "profilo", "settings"],
     };
 
@@ -395,7 +417,8 @@
       dashboard: "dashboard.html",
       candidati: "candidati.html",
       "offerte di lavoro": "offerte.html",
-      clienti: "clients.html",
+      clienti: "clienti.html",
+      archiviati: "archiviati.html",
       impostazioni: "profile.html",
       profilo: "profile.html",
       settings: "profile.html",
@@ -410,6 +433,7 @@
       else if (label.includes("candidati") || label.includes("candidate")) key = "candidati";
       else if (label.includes("offerte")) key = "offerte di lavoro";
       else if (label.includes("clienti") || label.includes("clients")) key = "clienti";
+      else if (label.includes("archiviati")) key = "archiviati";
       else if (label.includes("impostazioni") || label.includes("profilo") || label.includes("settings")) key = "impostazioni";
 
       if (!key) return;
@@ -2033,6 +2057,7 @@
 
   const CANDIDATES_PAGE_SIZE = 10;
   const JOB_OFFERS_PAGE_SIZE = 10;
+  const CLIENTS_PAGE_SIZE = 10;
 
   function updatePaginationUI(container, totalCount, currentPage, limit, currentRowCount) {
     if (!container) return;
@@ -2604,6 +2629,9 @@
       archived: "active",
     };
 
+    let currentPage = 1;
+    const limit = CLIENTS_PAGE_SIZE;
+
     const nameInput = document.querySelector('[data-filter="client-name"]');
     const cityInput = document.querySelector('[data-filter="client-city"]');
     const stateInput = document.querySelector('[data-filter="client-state"]');
@@ -2613,30 +2641,35 @@
     if (nameInput) {
       nameInput.addEventListener("input", function () {
         filters.name = this.value || "";
+        currentPage = 1;
         renderClients();
       });
     }
     if (cityInput) {
       cityInput.addEventListener("input", function () {
         filters.city = this.value || "";
+        currentPage = 1;
         renderClients();
       });
     }
     if (stateInput) {
       stateInput.addEventListener("input", function () {
         filters.state = this.value || "";
+        currentPage = 1;
         renderClients();
       });
     }
     if (countryInput) {
       countryInput.addEventListener("input", function () {
         filters.country = this.value || "";
+        currentPage = 1;
         renderClients();
       });
     }
     if (archivedSelect) {
       archivedSelect.addEventListener("change", function () {
         filters.archived = this.value || "active";
+        currentPage = 1;
         renderClients();
       });
     }
@@ -2650,35 +2683,161 @@
           "Sei sicuro di voler archiviare questo cliente? Potrai vederlo nella vista 'Archived'."
         );
         if (!confirmed) return;
-        archiveRecordById(IE_STORE.clients, id);
-        renderClients();
+        if (typeof archiveRecordById === "function" && IE_STORE && IE_STORE.clients) {
+          archiveRecordById(IE_STORE.clients, id);
+          renderClients();
+        }
       }
     });
 
+    const paginationEl = document
+      .querySelector("[data-ie-clients-body]")
+      ?.closest(".glass-card")
+      ?.querySelector("[data-ie-pagination]");
+
+    function goToPage(page) {
+      currentPage = Math.max(1, page);
+      renderClients();
+    }
+
+    if (paginationEl) {
+      const prevBtn = paginationEl.querySelector("[data-ie-pagination-prev]");
+      const nextBtn = paginationEl.querySelector("[data-ie-pagination-next]");
+      if (prevBtn) {
+        prevBtn.addEventListener("click", function () {
+          if (!this.disabled) goToPage(currentPage - 1);
+        });
+      }
+      if (nextBtn) {
+        nextBtn.addEventListener("click", function () {
+          if (!this.disabled) goToPage(currentPage + 1);
+        });
+      }
+    }
+
     function renderClients() {
+      const paginationContainer = paginationEl;
+
+      if (window.IESupabase && window.IESupabase.fetchClientsPaginated) {
+        // Loading state
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="px-6 py-8 text-center text-gray-500 text-sm">
+              Caricamento clienti...
+            </td>
+          </tr>
+        `;
+        window.IESupabase
+          .fetchClientsPaginated({
+            filters,
+            page: currentPage,
+            limit,
+          })
+          .then(function (result) {
+            const rows = result.data || [];
+            const totalCount = result.totalCount ?? 0;
+            const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+            if (currentPage > totalPages && totalPages > 0) {
+              currentPage = totalPages;
+              renderClients();
+              return;
+            }
+
+            tbody.innerHTML = "";
+
+            if (!rows.length) {
+              tbody.innerHTML =
+                '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500 text-sm">Nessun cliente trovato.</td></tr>';
+              updatePaginationUI(paginationContainer, totalCount, currentPage, limit, 0);
+              return;
+            }
+
+            rows.forEach(function (row) {
+              const tr = document.createElement("tr");
+              tr.className = "table-row transition" + (row.is_archived ? " opacity-60" : "");
+              tr.setAttribute("data-id", row.id);
+
+              const metaTitle = formatLastUpdatedMeta(row);
+              if (metaTitle) tr.title = metaTitle;
+
+              tr.innerHTML = `
+                <td class="px-6 py-4 font-semibold text-gray-800">${row.nome || "—"}</td>
+                <td class="px-6 py-4 text-gray-600">${row.citta || "—"}</td>
+                <td class="px-6 py-4 text-gray-600">${row.stato || "—"}</td>
+                <td class="px-6 py-4 text-gray-600">${row.email || "—"}</td>
+                <td class="px-6 py-4 text-gray-600">${row.telefono || "—"}</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-center space-x-2">
+                    <button type="button" class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
+                    </button>
+                    <button type="button" class="p-2 text-gray-400 hover:text-blue-500 transition" title="Edit">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                    </button>
+                    <button type="button" data-action="archive-client" data-id="${
+                      row.id
+                    }" class="p-2 text-gray-400 hover:text-red-500 transition" title="${
+                row.is_archived ? "Archived" : "Archive"
+              }">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              `;
+
+              tbody.appendChild(tr);
+            });
+
+            updatePaginationUI(paginationContainer, totalCount, currentPage, limit, rows.length);
+          })
+          .catch(function (err) {
+            console.error("[ItalianExperience] fetchClientsPaginated error:", err);
+            tbody.innerHTML =
+              '<tr><td colspan="6" class="px-6 py-8 text-center text-red-500 text-sm">Errore nel caricamento. Riprova più tardi.</td></tr>';
+            updatePaginationUI(paginationContainer, 0, 1, limit, 0);
+          });
+
+        return;
+      }
+
+      // Fallback: local in-memory store with simple filtering (no server-side pagination)
       fetchClients(filters).then((rows) => {
         rows.sort((a, b) => Number(a.is_archived) - Number(b.is_archived));
         tbody.innerHTML = "";
 
-        rows.forEach((row) => {
+        if (!rows.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500 text-sm">Nessun cliente trovato.</td></tr>';
+          if (paginationContainer) {
+            updatePaginationUI(paginationContainer, 0, 1, limit, 0);
+          }
+          return;
+        }
+
+        const totalCount = rows.length;
+        const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+        if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+        const start = (currentPage - 1) * limit;
+        const pageRows = rows.slice(start, start + limit);
+
+        pageRows.forEach((row) => {
           const tr = document.createElement("tr");
           tr.className = "table-row transition" + (row.is_archived ? " opacity-60" : "");
           tr.setAttribute("data-id", row.id);
 
-          const location =
-            row.citta && row.stato
-              ? `${row.citta}, ${row.stato}`
-              : row.citta || row.stato || "—";
-          const metaTitle = formatLastUpdatedMeta(row);
-          if (metaTitle) tr.title = metaTitle;
-
           tr.innerHTML = `
             <td class="px-6 py-4 font-semibold text-gray-800">${row.nome}</td>
-            <td class="px-6 py-4 text-gray-600">${location}</td>
-            <td class="px-6 py-4 text-gray-600">${row.nazione || "—"}</td>
+            <td class="px-6 py-4 text-gray-600">${row.citta || "—"}</td>
+            <td class="px-6 py-4 text-gray-600">${row.stato || "—"}</td>
             <td class="px-6 py-4 text-gray-600">${row.email || "—"}</td>
             <td class="px-6 py-4 text-gray-600">${row.telefono || "—"}</td>
-            <td class="px-6 py-4 text-gray-500 text-xs italic">${row.note || "—"}</td>
             <td class="px-6 py-4">
               <div class="flex items-center justify-center space-x-2">
                 <button type="button" class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View">
@@ -2707,6 +2866,10 @@
 
           tbody.appendChild(tr);
         });
+
+        if (paginationContainer) {
+          updatePaginationUI(paginationContainer, totalCount, currentPage, limit, pageRows.length);
+        }
       });
     }
 

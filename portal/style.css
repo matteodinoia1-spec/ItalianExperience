@@ -354,6 +354,19 @@ a:hover {
   padding: 1.5rem;
 }
 
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(197, 160, 89, 0.2);
+  border-top-color: var(--ie-color-accent);
+  border-radius: 50%;
+  animation: ie-spin 0.8s linear infinite;
+}
+
+@keyframes ie-spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Statistic chips */
 .stat-chip {
   display: inline-flex;

@@ -75,6 +75,27 @@
   }
 
   /**
+   * Start of previous month in ISO string.
+   */
+  function getPreviousMonthStart() {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 1);
+    d.setDate(1);
+    d.setHours(0, 0, 0, 0);
+    return d.toISOString();
+  }
+
+  /**
+   * End of previous month (start of current month) in ISO string.
+   */
+  function getPreviousMonthEnd() {
+    const d = new Date();
+    d.setDate(1);
+    d.setHours(0, 0, 0, 0);
+    return d.toISOString();
+  }
+
+  /**
    * A. Total candidates (is_archived = false).
    * @returns {Promise<{ data: number, error: object | null }>}
    */
@@ -153,6 +174,172 @@
     return { data: (data || []).length, error: null };
   }
 
+  // ---------------------------------------------------------------------------
+  // Month-over-month counts (for percentage indicators)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Count candidates with created_at in [start, end).
+   * @param {string} start - ISO date string (inclusive)
+   * @param {string} end - ISO date string (exclusive)
+   * @returns {Promise<{ data: number, error: object | null }>}
+   */
+  async function countCandidatesCreatedInRange(start, end) {
+    const supabase = getSupabase();
+    if (!supabase) return { data: 0, error: new Error("Supabase not available") };
+    const { data, error } = await supabase
+      .from("candidates")
+      .select("id")
+      .gte("created_at", start)
+      .lt("created_at", end);
+    if (error) return { data: 0, error };
+    return { data: (data || []).length, error: null };
+  }
+
+  /**
+   * Count job offers with created_at in [start, end).
+   * @param {string} start - ISO date string (inclusive)
+   * @param {string} end - ISO date string (exclusive)
+   * @returns {Promise<{ data: number, error: object | null }>}
+   */
+  async function countJobOffersCreatedInRange(start, end) {
+    const supabase = getSupabase();
+    if (!supabase) return { data: 0, error: new Error("Supabase not available") };
+    const { data, error } = await supabase
+      .from("job_offers")
+      .select("id")
+      .gte("created_at", start)
+      .lt("created_at", end);
+    if (error) return { data: 0, error };
+    return { data: (data || []).length, error: null };
+  }
+
+  /**
+   * Count hired candidates (status 'hired' or 'assunto') with created_at in [start, end).
+   * @param {string} start - ISO date string (inclusive)
+   * @param {string} end - ISO date string (exclusive)
+   * @returns {Promise<{ data: number, error: object | null }>}
+   */
+  async function countHiredCreatedInRange(start, end) {
+    const supabase = getSupabase();
+    if (!supabase) return { data: 0, error: new Error("Supabase not available") };
+    const { data, error } = await supabase
+      .from("candidates")
+      .select("id")
+      .or("status.eq.hired,status.eq.assunto")
+      .gte("created_at", start)
+      .lt("created_at", end);
+    if (error) return { data: 0, error };
+    return { data: (data || []).length, error: null };
+  }
+
+  /**
+   * Compute percentage change: ((current - previous) / previous) * 100 with edge cases.
+   * - previous = 0 and current > 0 → +100
+   * - both 0 → 0
+   * - previous > 0 and current = 0 → -100
+   * @param {number} current
+   * @param {number} previous
+   * @returns {{ value: number, isPositive: boolean, isNegative: boolean }}
+   */
+  function computePercentageChange(current, previous) {
+    const curr = Number(current) || 0;
+    const prev = Number(previous) || 0;
+    if (prev === 0 && curr > 0) return { value: 100, isPositive: true, isNegative: false };
+    if (prev === 0 && curr === 0) return { value: 0, isPositive: false, isNegative: false };
+    if (prev > 0 && curr === 0) return { value: -100, isPositive: false, isNegative: true };
+    const value = Math.round(((curr - prev) / prev) * 100);
+    return {
+      value,
+      isPositive: value > 0,
+      isNegative: value < 0,
+    };
+  }
+
+  /**
+   * Format percentage for display: "+12%", "-5%", "0%".
+   * @param {{ value: number }} result - from computePercentageChange
+   * @returns {string}
+   */
+  function formatPercentageDisplay(result) {
+    const v = result.value;
+    if (v > 0) return "+" + v + "%";
+    if (v < 0) return v + "%";
+    return "0%";
+  }
+
+  /**
+   * Fetch all month-over-month percentage changes (current vs previous month).
+   * @returns {Promise<{ totalCandidates: { value, isPositive, isNegative }, activeJobOffers, newCandidatesToday, hiredThisMonth }>}
+   */
+  async function fetchMonthOverMonthPercentages() {
+    const currStart = getMonthStart();
+    const currEnd = getMonthEnd();
+    const prevStart = getPreviousMonthStart();
+    const prevEnd = getPreviousMonthEnd();
+
+    const [
+      candidatesCurr,
+      candidatesPrev,
+      offersCurr,
+      offersPrev,
+      hiredCurr,
+      hiredPrev,
+    ] = await Promise.all([
+      countCandidatesCreatedInRange(currStart, currEnd),
+      countCandidatesCreatedInRange(prevStart, prevEnd),
+      countJobOffersCreatedInRange(currStart, currEnd),
+      countJobOffersCreatedInRange(prevStart, prevEnd),
+      countHiredCreatedInRange(currStart, currEnd),
+      countHiredCreatedInRange(prevStart, prevEnd),
+    ]);
+
+    const totalCandidates = computePercentageChange(
+      candidatesCurr.error ? 0 : candidatesCurr.data,
+      candidatesPrev.error ? 0 : candidatesPrev.data
+    );
+    const activeJobOffers = computePercentageChange(
+      offersCurr.error ? 0 : offersCurr.data,
+      offersPrev.error ? 0 : offersPrev.data
+    );
+    const hiredThisMonth = computePercentageChange(
+      hiredCurr.error ? 0 : hiredCurr.data,
+      hiredPrev.error ? 0 : hiredPrev.data
+    );
+
+    return {
+      totalCandidates,
+      activeJobOffers,
+      newCandidatesToday: totalCandidates,
+      hiredThisMonth,
+    };
+  }
+
+  /**
+   * Update percentage indicator spans: text and color (green/red).
+   * @param {object} percentages - result from fetchMonthOverMonthPercentages
+   */
+  function setPercentageIndicators(percentages) {
+    if (!percentages) return;
+    const keys = [
+      CARD_KEYS.totalCandidates,
+      CARD_KEYS.activeJobOffers,
+      CARD_KEYS.newCandidatesToday,
+      CARD_KEYS.hiredThisMonth,
+    ];
+    keys.forEach((key) => {
+      const result = percentages[key];
+      if (!result) return;
+      const el = document.querySelector("[data-dashboard-percentage=\"" + key + "\"]");
+      if (!el) return;
+      el.textContent = formatPercentageDisplay(result);
+      el.classList.remove("text-green-600", "text-red-600");
+      if (result.isPositive) el.classList.add("text-green-600");
+      else if (result.isNegative) el.classList.add("text-red-600");
+      else el.classList.add("text-gray-500");
+    });
+  }
+
   /**
    * E. Recent 5 candidates (nome, cognome, posizione, status, created_at).
    * Supports both schemas: nome/cognome/posizione/fonte or first_name/last_name/position/source.
@@ -220,6 +407,9 @@
     document.querySelectorAll(SELECTORS.cardValue).forEach((el) => {
       const val = el.querySelector(".dashboard-value");
       if (val) val.textContent = loading ? "…" : "—";
+    });
+    document.querySelectorAll("[data-dashboard-percentage]").forEach((el) => {
+      el.textContent = loading ? "…" : "—";
     });
 
     const tbody = document.querySelector(SELECTORS.recentCandidates);
@@ -425,6 +615,8 @@
     let recentList = [];
     let sourceList = [];
 
+    let monthOverMonthPercentages = null;
+
     try {
       const [
         totalRes,
@@ -433,6 +625,7 @@
         hiredRes,
         recentRes,
         bySourceRes,
+        momRes,
       ] = await Promise.all([
         fetchTotalCandidates(),
         fetchActiveJobOffers(),
@@ -440,6 +633,7 @@
         fetchHiredThisMonth(),
         fetchRecentCandidates(),
         fetchCandidatesBySource(),
+        fetchMonthOverMonthPercentages(),
       ]);
 
       if (totalRes.error) {
@@ -482,6 +676,10 @@
         sourceList = bySourceRes.data || [];
       }
 
+      if (momRes && typeof momRes === "object") {
+        monthOverMonthPercentages = momRes;
+      }
+
       setCardValues(
         {
           totalCandidates,
@@ -493,6 +691,7 @@
       );
       renderRecentCandidates(recentList, !!recentRes.error);
       renderCandidatesBySource(sourceList, !!bySourceRes.error);
+      if (monthOverMonthPercentages) setPercentageIndicators(monthOverMonthPercentages);
     } catch (err) {
       console.error("[Dashboard] loadDashboard error:", err);
       setCardValues(

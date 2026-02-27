@@ -500,7 +500,7 @@
   async function fetchJobOffersPaginated(opts) {
     const filters = opts.filters || {};
     const page = Math.max(1, parseInt(opts.page, 10) || 1);
-    const limit = Math.max(1, Math.min(100, parseInt(opts.limit, 10) || 10);
+    const limit = Math.max(1, Math.min(100, parseInt(opts.limit, 10) || 10));
     const offset = (page - 1) * limit;
 
     try {
@@ -545,6 +545,184 @@
     } catch (err) {
       console.error("[Supabase] fetchJobOffersPaginated exception:", err);
       return { data: [], totalCount: 0, error: err };
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Clients
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Build clients query with filters (same logic for count and data).
+   * Filters: name, city, state, country, archived.
+   * Columns: nome, citta, stato, nazione, email, telefono, is_archived.
+   */
+  function buildClientsQuery(supabaseQuery, filters) {
+    let q = supabaseQuery;
+
+    if (filters.archived === "active") q = q.eq("is_archived", false);
+    if (filters.archived === "archived") q = q.eq("is_archived", true);
+
+    const nameTerm = (filters.name || "").trim();
+    if (nameTerm) {
+      const escaped = nameTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
+      q = q.ilike("nome", "%" + escaped + "%");
+    }
+
+    const cityTerm = (filters.city || "").trim();
+    if (cityTerm) {
+      const escaped = cityTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
+      q = q.ilike("citta", "%" + escaped + "%");
+    }
+
+    const stateTerm = (filters.state || "").trim();
+    if (stateTerm) {
+      const escaped = stateTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
+      q = q.ilike("stato", "%" + escaped + "%");
+    }
+
+    const countryTerm = (filters.country || "").trim();
+    if (countryTerm) {
+      const escaped = countryTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
+      q = q.ilike("nazione", "%" + escaped + "%");
+    }
+
+    return q;
+  }
+
+  /**
+   * Fetch clients with filters and pagination. Returns total count (with same filters) and page of data.
+   * @param {object} opts - { filters: object, page: number, limit: number }
+   * @returns {Promise<{ data: array, totalCount: number, error: object | null }>}
+   */
+  async function fetchClientsPaginated(opts) {
+    const filters = opts.filters || {};
+    const page = Math.max(1, parseInt(opts.page, 10) || 1);
+    const limit = Math.max(1, Math.min(100, parseInt(opts.limit, 10) || 10));
+    const offset = (page - 1) * limit;
+
+    try {
+      const countQuery = buildClientsQuery(
+        supabase.from("clients").select("*", { count: "exact", head: true }),
+        filters
+      );
+      const { count, error: countError } = await countQuery;
+      if (countError) {
+        console.error("[Supabase] fetchClientsPaginated count error:", countError.message);
+        return { data: [], totalCount: 0, error: countError };
+      }
+      const totalCount = count ?? 0;
+
+      const dataQuery = buildClientsQuery(
+        supabase.from("clients").select("*"),
+        filters
+      );
+      const { data: rows, error: dataError } = await dataQuery
+        .order("created_at", { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (dataError) {
+        console.error("[Supabase] fetchClientsPaginated data error:", dataError.message);
+        return { data: [], totalCount, error: dataError };
+      }
+
+      const data = (rows || []).map(function (r) {
+        return {
+          id: r.id,
+          nome: r.nome,
+          citta: r.citta,
+          stato: r.stato,
+          nazione: r.nazione,
+          email: r.email,
+          telefono: r.telefono,
+          note: r.note,
+          is_archived: !!r.is_archived,
+        };
+      });
+
+      return { data, totalCount, error: null };
+    } catch (err) {
+      console.error("[Supabase] fetchClientsPaginated exception:", err);
+      return { data: [], totalCount: 0, error: err };
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Restore (unarchive) – set is_archived = false for Archiviati page
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Restore a candidate from archive (set is_archived = false).
+   * @param {string} id - candidate id
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function unarchiveCandidate(id) {
+    if (!id) return { data: null, error: new Error("Missing id") };
+    try {
+      const { data, error } = await supabase
+        .from("candidates")
+        .update({ is_archived: false })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] unarchiveCandidate error:", error.message, error);
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] unarchiveCandidate exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Restore a job offer from archive (set is_archived = false).
+   * @param {string} id - job_offers id
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function unarchiveJobOffer(id) {
+    if (!id) return { data: null, error: new Error("Missing id") };
+    try {
+      const { data, error } = await supabase
+        .from("job_offers")
+        .update({ is_archived: false })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] unarchiveJobOffer error:", error.message, error);
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] unarchiveJobOffer exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Restore a client from archive (set is_archived = false).
+   * @param {string} id - clients id
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function unarchiveClient(id) {
+    if (!id) return { data: null, error: new Error("Missing id") };
+    try {
+      const { data, error } = await supabase
+        .from("clients")
+        .update({ is_archived: false })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] unarchiveClient error:", error.message, error);
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] unarchiveClient exception:", err);
+      return { data: null, error: err };
     }
   }
 
@@ -849,6 +1027,12 @@
     insertJobOffer,
     fetchJobOffers,
     fetchJobOffersPaginated,
+    // Clients
+    fetchClientsPaginated,
+    // Restore (unarchive) for Archiviati page
+    unarchiveCandidate,
+    unarchiveJobOffer,
+    unarchiveClient,
     // Associations
     linkCandidateToJob,
     fetchAssociations,

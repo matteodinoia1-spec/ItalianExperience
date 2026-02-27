@@ -10,86 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        :root {
-            --primary-green: #1b4332;
-            --gold-accent: #c5a059;
-            --cream-bg: #fdfcf8;
-            --sidebar-width: 280px;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--cream-bg);
-            color: var(--primary-green);
-            overflow-x: hidden;
-        }
-
-        h1, h2, h3, .serif {
-            font-family: 'Playfair Display', serif;
-        }
-
-        /* Sidebar Styling */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: var(--primary-green);
-            transition: all 0.3s ease;
-        }
-
-        .nav-link {
-            transition: all 0.2s ease;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-left: 3px solid var(--gold-accent);
-            color: var(--gold-accent);
-        }
-
-        /* Glass Styling */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-        }
-
-        /* Form Styling */
-        .form-input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background-color: rgba(255, 255, 255, 0.5);
-            border: 1px solid rgba(27, 67, 50, 0.1);
-            border-radius: 0.75rem;
-            outline: none;
-            transition: all 0.3s ease;
-            font-size: 0.875rem;
-        }
-
-        .form-input:focus {
-            border-color: var(--gold-accent);
-            background-color: #fff;
-            box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1);
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: #6b7280;
-            margin-bottom: 0.5rem;
-            padding-left: 0.25rem;
-        }
-
-        .section-title {
-            position: relative;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid rgba(27, 67, 50, 0.05);
-        }
-
+        /* Profile-specific only; layout/sidebar/form use style.css */
         .profile-avatar-container {
             position: relative;
             width: 120px;
@@ -100,7 +21,7 @@
             position: absolute;
             bottom: 0;
             right: 0;
-            background: var(--gold-accent);
+            background: var(--ie-color-accent);
             color: white;
             padding: 8px;
             border-radius: 50%;
@@ -111,18 +32,6 @@
 
         .avatar-edit-btn:hover {
             transform: scale(1.1);
-        }
-
-        @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-100%);
-                position: fixed;
-                z-index: 50;
-                height: 100vh;
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
         }
     </style>
 </head>

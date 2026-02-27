@@ -8,152 +8,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-green: #1b4332;
-            --gold-accent: #c5a059;
-            --cream-bg: #fdfcf8;
-            --sidebar-width: 280px;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--cream-bg);
-            color: var(--primary-green);
-            overflow-x: hidden;
-        }
-
-        h1, h2, h3, .serif {
-            font-family: 'Playfair Display', serif;
-        }
-
-        /* Sidebar Styling */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: var(--primary-green);
-            transition: all 0.3s ease;
-        }
-
-        .nav-link {
-            transition: all 0.2s ease;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-left: 3px solid var(--gold-accent);
-            color: var(--gold-accent);
-        }
-
-        /* Glass Cards */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-        }
-
-        /* Status Badges */
-        .badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .badge-active { background-color: #d1fae5; color: #065f46; } /* Green */
-        .badge-inactive { background-color: #f3f4f6; color: #4b5563; } /* Gray */
-
-        .table-row:hover {
-            background-color: rgba(197, 160, 89, 0.03);
-        }
-
-        @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-100%);
-                position: fixed;
-                z-index: 50;
-                height: 100vh;
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="flex min-h-screen">
 
-    <!-- SIDEBAR -->
-    <aside id="sidebar" class="sidebar h-screen flex flex-col text-white fixed lg:static left-0 top-0 shadow-2xl">
-        <div class="p-8">
-            <div class="flex items-center space-x-3 mb-10">
-                <div class="w-10 h-10 bg-[#c5a059] rounded-full flex items-center justify-center text-white font-bold text-xl serif italic">
-                    IE
-                </div>
-                <div>
-                    <h2 class="text-lg font-bold serif leading-tight">Italian</h2>
-                    <p class="text-[10px] uppercase tracking-widest opacity-60">Experience Portal</p>
-                </div>
-            </div>
-
-            <nav class="space-y-2">
-                <a href="dashboard.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                    </svg>
-                    <span class="text-sm font-medium">Dashboard</span>
-                </a>
-                <a href="candidati.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                    <span class="text-sm font-medium">Candidati</span>
-                </a>
-                <a href="offerte.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    <span class="text-sm font-medium">Offerte di Lavoro</span>
-                </a>
-                <a href="associazioni.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    <span class="text-sm font-medium">Associazioni</span>
-                </a>
-                <a href="#" class="nav-link active flex items-center space-x-4 py-3 px-4 rounded-r-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    <span class="text-sm font-medium">Clienti</span>
-                </a>
-            </nav>
-        </div>
-
-        <div class="mt-auto p-8 border-t border-white/10">
-            <a href="profilo.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span class="text-sm font-medium">Impostazioni</span>
-            </a>
-            <a href="login.html" class="flex items-center space-x-4 py-3 px-4 text-red-400 hover:text-red-300 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                <span class="text-sm font-medium">Logout</span>
-            </a>
-        </div>
-    </aside>
+    <!-- SIDEBAR (loaded dynamically from sidebar.html) -->
+    <aside id="sidebar"></aside>
 
     <!-- MAIN CONTENT -->
     <main class="flex-1 flex flex-col min-w-0">
         <!-- Header -->
         <header class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-8 sticky top-0 z-40">
             <div class="flex items-center space-x-4">
-                <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-md hover:bg-gray-100">
+                <button data-toggle="sidebar" class="lg:hidden p-2 rounded-md hover:bg-gray-100">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
@@ -191,23 +58,39 @@
 
             <!-- Filters Section -->
             <div class="glass-card p-6 rounded-2xl">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Search -->
                     <div class="relative">
-                        <label class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2 block">Cerca Azienda o Contatto</label>
-                        <input type="text" placeholder="Nome hotel, ristorante, referente..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none">
+                        <label class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2 block">Cerca Azienda</label>
+                        <input
+                            type="text"
+                            placeholder="Nome azienda..."
+                            data-filter="client-name"
+                            class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none"
+                        >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 bottom-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
-                    <!-- Status Filter -->
+                    <!-- City Filter -->
                     <div>
-                        <label class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2 block">Stato Cliente</label>
-                        <select class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none appearance-none cursor-pointer">
-                            <option value="">Tutti gli stati</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
+                        <label class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2 block">Città</label>
+                        <input
+                            type="text"
+                            placeholder="Es. Milano, Roma..."
+                            data-filter="client-city"
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none"
+                        >
+                    </div>
+                    <!-- State Filter -->
+                    <div>
+                        <label class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2 block">Stato / Regione</label>
+                        <input
+                            type="text"
+                            placeholder="Es. Lombardia..."
+                            data-filter="client-state"
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none"
+                        >
                     </div>
                 </div>
             </div>
@@ -218,161 +101,42 @@
                     <table class="w-full text-left">
                         <thead class="bg-gray-50/80 text-gray-500 text-[10px] uppercase tracking-widest">
                             <tr>
-                                <th class="px-6 py-5 font-bold">Company Name</th>
-                                <th class="px-6 py-5 font-bold">Contact Person</th>
-                                <th class="px-6 py-5 font-bold">Industry</th>
+                                <th class="px-6 py-5 font-bold">Nome</th>
+                                <th class="px-6 py-5 font-bold">Città</th>
+                                <th class="px-6 py-5 font-bold">Stato</th>
                                 <th class="px-6 py-5 font-bold">Email</th>
-                                <th class="px-6 py-5 font-bold">Phone</th>
-                                <th class="px-6 py-5 text-center font-bold">Active Offers</th>
-                                <th class="px-6 py-5 font-bold">Status</th>
-                                <th class="px-6 py-5 text-center font-bold">Actions</th>
+                                <th class="px-6 py-5 font-bold">Telefono</th>
+                                <th class="px-6 py-5 text-center font-bold">Azioni</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100 text-sm">
-                            <!-- Row 1 -->
-                            <tr class="table-row transition">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-[#1b4332] font-bold serif border border-[#1b4332]/10">
-                                            GH
-                                        </div>
-                                        <span class="font-semibold text-gray-800">Grand Hotel Milano</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-gray-600">Dott.ssa Sofia Conti</td>
-                                <td class="px-6 py-4">
-                                    <span class="px-2 py-1 bg-gray-100 rounded text-[10px] font-bold text-gray-500 uppercase">Hospitality</span>
-                                </td>
-                                <td class="px-6 py-4 text-gray-500">hr@grandhotelmilano.it</td>
-                                <td class="px-6 py-4 text-gray-500">+39 02 445566</td>
-                                <td class="px-6 py-4 text-center font-bold text-[#c5a059]">12</td>
-                                <td class="px-6 py-4"><span class="badge badge-active">Active</span></td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center justify-center space-x-2">
-                                        <button class="p-2 text-gray-400 hover:text-[#1b4332] transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
-                                        <button class="p-2 text-gray-400 hover:text-blue-500 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                                        <button class="p-2 text-gray-400 hover:text-red-500 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <!-- Row 2 -->
-                            <tr class="table-row transition">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-800 font-bold serif border border-orange-200">
-                                            RC
-                                        </div>
-                                        <span class="font-semibold text-gray-800">Ristorante Cracco</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-gray-600">Sig. Marco Galli</td>
-                                <td class="px-6 py-4">
-                                    <span class="px-2 py-1 bg-gray-100 rounded text-[10px] font-bold text-gray-500 uppercase">F&B / Catering</span>
-                                </td>
-                                <td class="px-6 py-4 text-gray-500">management@cracco.it</td>
-                                <td class="px-6 py-4 text-gray-500">+39 02 889977</td>
-                                <td class="px-6 py-4 text-center font-bold text-[#c5a059]">4</td>
-                                <td class="px-6 py-4"><span class="badge badge-active">Active</span></td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center justify-center space-x-2">
-                                        <button class="p-2 text-gray-400 hover:text-[#1b4332] transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
-                                        <button class="p-2 text-gray-400 hover:text-blue-500 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                                        <button class="p-2 text-gray-400 hover:text-red-500 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <!-- Row 3 -->
-                            <tr class="table-row transition">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-800 font-bold serif border border-blue-200">
-                                            HC
-                                        </div>
-                                        <span class="font-semibold text-gray-800">Hotel Cipriani</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-gray-600">Dott. Pietro Lazzari</td>
-                                <td class="px-6 py-4">
-                                    <span class="px-2 py-1 bg-gray-100 rounded text-[10px] font-bold text-gray-500 uppercase">Hospitality</span>
-                                </td>
-                                <td class="px-6 py-4 text-gray-500">p.lazzari@belmond.com</td>
-                                <td class="px-6 py-4 text-gray-500">+39 041 223344</td>
-                                <td class="px-6 py-4 text-center font-bold text-[#c5a059]">8</td>
-                                <td class="px-6 py-4"><span class="badge badge-active">Active</span></td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center justify-center space-x-2">
-                                        <button class="p-2 text-gray-400 hover:text-[#1b4332] transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
-                                        <button class="p-2 text-gray-400 hover:text-blue-500 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                                        <button class="p-2 text-gray-400 hover:text-red-500 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <!-- Row 4 -->
-                            <tr class="table-row transition opacity-60">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 font-bold serif border border-gray-200">
-                                            LV
-                                        </div>
-                                        <span class="font-semibold text-gray-800">Luxury Villas Italy</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-gray-600">Sig.ra Clara Muti</td>
-                                <td class="px-6 py-4">
-                                    <span class="px-2 py-1 bg-gray-100 rounded text-[10px] font-bold text-gray-500 uppercase">Real Estate</span>
-                                </td>
-                                <td class="px-6 py-4 text-gray-500">clara@luxvillas.it</td>
-                                <td class="px-6 py-4 text-gray-500">+39 055 778899</td>
-                                <td class="px-6 py-4 text-center font-bold text-gray-400">0</td>
-                                <td class="px-6 py-4"><span class="badge badge-inactive">Inactive</span></td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center justify-center space-x-2">
-                                        <button class="p-2 text-gray-400 hover:text-[#1b4332] transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
-                                        <button class="p-2 text-gray-400 hover:text-blue-500 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                                        <button class="p-2 text-gray-400 hover:text-red-500 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <!-- Row 5 -->
-                            <tr class="table-row transition">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 rounded-lg bg-pink-50 flex items-center justify-center text-pink-800 font-bold serif border border-pink-200">
-                                            PM
-                                        </div>
-                                        <span class="font-semibold text-gray-800">Pasticceria Marchesi</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-gray-600">Sig. Edoardo Marchesi</td>
-                                <td class="px-6 py-4">
-                                    <span class="px-2 py-1 bg-gray-100 rounded text-[10px] font-bold text-gray-500 uppercase">Food & Pastry</span>
-                                </td>
-                                <td class="px-6 py-4 text-gray-500">edoardo@marchesi.it</td>
-                                <td class="px-6 py-4 text-gray-500">+39 02 112233</td>
-                                <td class="px-6 py-4 text-center font-bold text-[#c5a059]">2</td>
-                                <td class="px-6 py-4"><span class="badge badge-active">Active</span></td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center justify-center space-x-2">
-                                        <button class="p-2 text-gray-400 hover:text-[#1b4332] transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
-                                        <button class="p-2 text-gray-400 hover:text-blue-500 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                                        <button class="p-2 text-gray-400 hover:text-red-500 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                                    </div>
-                                </td>
-                            </tr>
+                        <tbody class="divide-y divide-gray-100 text-sm" data-ie-clients-body>
                         </tbody>
                     </table>
                 </div>
                 
                 <!-- Pagination -->
-                <div class="p-6 bg-white/50 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-gray-100">
-                    <p class="text-xs text-gray-500 font-medium">Mostrando 5 di 84 clienti nel network</p>
+                <div class="p-6 bg-white/50 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-gray-100" data-ie-pagination>
+                    <p class="text-xs text-gray-500 font-medium" data-ie-pagination-summary>Mostrando 0 di 0 risultati</p>
                     <div class="flex items-center space-x-2">
-                        <button class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition disabled:opacity-50" disabled>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        <button
+                            type="button"
+                            data-ie-pagination-prev
+                            class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
                         </button>
-                        <span class="text-xs font-bold text-gray-700 px-3 uppercase tracking-tighter">Pagina 1 di 17</span>
-                        <button class="p-2 rounded-lg bg-[#1b4332] text-white hover:bg-[#1b4332]/90 transition shadow-md">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        <span class="text-xs font-bold text-gray-700 px-3 uppercase tracking-tighter" data-ie-pagination-pages>Pagina 1 di 1</span>
+                        <button
+                            type="button"
+                            data-ie-pagination-next
+                            class="p-2 rounded-lg bg-[#1b4332] text-white hover:bg-[#1b4332]/90 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
                         </button>
                     </div>
                 </div>
@@ -381,20 +145,10 @@
         </div>
     </main>
 
-    <script>
-        // Toggle Sidebar on Mobile
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('open');
-        }
-
-        // Chiusura sidebar cliccando fuori (su mobile)
-        window.onclick = function(event) {
-            const sidebar = document.getElementById('sidebar');
-            if (window.innerWidth < 1024 && event.target.closest('main') && sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open');
-            }
-        }
-    </script>
+    <!-- Supabase (auth + data) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
+

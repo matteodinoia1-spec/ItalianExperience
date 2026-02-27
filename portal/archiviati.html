@@ -3,242 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Archivio | Italian Experience Recruitment</title>
-    <!-- Tailwind CSS -->
+    <title>Archiviati | Italian Experience Recruitment</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS Library -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-green: #1b4332;
-            --gold-accent: #c5a059;
-            --cream-bg: #fdfcf8;
-            --sidebar-width: 280px;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--cream-bg);
-            color: var(--primary-green);
-            overflow-x: hidden;
-        }
-
-        h1, h2, h3, .serif {
-            font-family: 'Playfair Display', serif;
-        }
-
-        /* Sidebar Styling */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: var(--primary-green);
-            transition: all 0.3s ease;
-        }
-
-        .nav-link {
-            transition: all 0.2s ease;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-left: 3px solid var(--gold-accent);
-            color: var(--gold-accent);
-        }
-
-        /* Glass Cards */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-        }
-
-        .table-row:hover {
-            background-color: rgba(197, 160, 89, 0.03);
-        }
-
-        .loading-spinner {
-            border: 3px solid rgba(197, 160, 89, 0.1);
-            border-top: 3px solid var(--gold-accent);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-100%);
-                position: fixed;
-                z-index: 50;
-                height: 100vh;
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="flex min-h-screen">
 
-    <!-- SIDEBAR -->
-    <aside id="sidebar" class="sidebar h-screen flex flex-col text-white fixed lg:static left-0 top-0 shadow-2xl">
-        <div class="p-8">
-            <div class="flex items-center space-x-3 mb-10">
-                <div class="w-10 h-10 bg-[#c5a059] rounded-full flex items-center justify-center text-white font-bold text-xl serif italic">
-                    IE
-                </div>
-                <div>
-                    <h2 class="text-lg font-bold serif leading-tight">Italian</h2>
-                    <p class="text-[10px] uppercase tracking-widest opacity-60">Experience Portal</p>
-                </div>
-            </div>
-
-            <nav class="space-y-2">
-                <a href="dashboard.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" />
-                    </svg>
-                    <span class="text-sm font-medium">Dashboard</span>
-                </a>
-                <a href="candidati.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1z" />
-                    </svg>
-                    <span class="text-sm font-medium">Candidati</span>
-                </a>
-                <a href="offerte.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745" />
-                    </svg>
-                    <span class="text-sm font-medium">Offerte di Lavoro</span>
-                </a>
-                <a href="associazioni.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2" />
-                    </svg>
-                    <span class="text-sm font-medium">Associazioni</span>
-                </a>
-                <a href="clienti.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2" />
-                    </svg>
-                    <span class="text-sm font-medium">Clienti</span>
-                </a>
-                <a href="#" class="nav-link active flex items-center space-x-4 py-3 px-4 rounded-r-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    <span class="text-sm font-medium">Archiviati</span>
-                </a>
-            </nav>
-        </div>
-
-        <div class="mt-auto p-8 border-t border-white/10">
-            <a href="profilo.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066" />
-                </svg>
-                <span class="text-sm font-medium">Impostazioni</span>
-            </a>
-            <a href="login.html" class="flex items-center space-x-4 py-3 px-4 text-red-400 hover:text-red-300 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M17 16l4-4m0 0l-4-4m4 4H7" />
-                </svg>
-                <span class="text-sm font-medium">Logout</span>
-            </a>
-        </div>
-    </aside>
+    <!-- SIDEBAR (loaded dynamically from sidebar.html) -->
+    <aside id="sidebar"></aside>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        <!-- Header -->
+    <main class="flex-1 flex flex-col min-w-0">
         <header class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-8 sticky top-0 z-40">
             <div class="flex items-center space-x-4">
-                <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-md hover:bg-gray-100">
+                <button data-toggle="sidebar" class="lg:hidden p-2 rounded-md hover:bg-gray-100">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
                 <h1 class="text-2xl font-bold serif text-[#1b4332]">Archiviati</h1>
             </div>
-            
             <div class="flex items-center space-x-6">
-                <div class="text-right hidden md:block">
-                    <p class="text-sm font-semibold text-gray-800">Matteo Di Noia</p>
-                    <p class="text-[10px] uppercase tracking-tighter text-[#c5a059] font-bold">Admin</p>
-                </div>
-                <div class="w-10 h-10 rounded-full bg-gray-200 border-2 border-[#c5a059] overflow-hidden">
-                    <img src="https://ui-avatars.com/api/?name=Matteo+Di+Noia&background=1b4332&color=fff" alt="User">
+                <div class="flex items-center space-x-3 border-l pl-6 border-gray-100">
+                    <div class="text-right hidden md:block">
+                        <p class="text-sm font-semibold text-gray-800">—</p>
+                        <p class="text-[10px] uppercase tracking-tighter text-[#c5a059] font-bold">Admin</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gray-200 border-2 border-[#c5a059] overflow-hidden">
+                        <img src="https://ui-avatars.com/api/?name=User&background=1b4332&color=fff" alt="User">
+                    </div>
                 </div>
             </div>
         </header>
 
         <div class="p-8 space-y-12 max-w-[1600px] mx-auto w-full">
 
-            <!-- ARCHIVED CANDIDATES -->
+            <!-- Archived Candidates -->
             <section id="section-candidates" class="space-y-6">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <h2 class="text-xl font-bold serif text-[#1b4332]">Candidati Archiviati</h2>
-                    <div class="relative w-64">
+                    <div class="relative w-full sm:w-64">
                         <input type="text" id="search-candidates" placeholder="Cerca candidati..." class="w-full pl-10 pr-4 py-2 bg-white border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 top-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
                 </div>
-                <div class="glass-card rounded-2xl overflow-hidden min-h-[200px] relative" id="table-candidates-container">
-                    <!-- Dynamic Table Content -->
+                <div class="glass-card rounded-2xl overflow-hidden min-h-[120px] relative" id="table-candidates-container">
+                    <div data-archived-loading="candidates" class="hidden absolute inset-0 flex items-center justify-center bg-white/80 z-10">
+                        <div class="loading-spinner"></div>
+                    </div>
+                    <div data-archived-error="candidates" class="hidden p-6 text-red-600 text-sm"></div>
+                    <div data-archived-empty="candidates" class="hidden p-8 text-center text-gray-500 text-sm">Nessun candidato archiviato.</div>
+                    <div data-archived-table="candidates" class="hidden overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50/80 text-gray-500 text-[10px] uppercase tracking-widest">
+                                <tr>
+                                    <th class="px-6 py-5 font-bold">Nome</th>
+                                    <th class="px-6 py-5 font-bold">Posizione</th>
+                                    <th class="px-6 py-5 font-bold">Stato</th>
+                                    <th class="px-6 py-5 font-bold text-right">Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 text-sm" data-archived-tbody="candidates"></tbody>
+                        </table>
+                    </div>
+                    <div data-archived-pagination="candidates" class="hidden p-6 bg-white/50 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-gray-100">
+                        <p class="text-xs text-gray-500 font-medium" data-archived-summary="candidates"></p>
+                        <div class="flex items-center space-x-2">
+                            <button type="button" data-archived-prev="candidates" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                            </button>
+                            <span class="text-xs font-bold text-gray-700 px-3 uppercase tracking-tighter" data-archived-pages="candidates">Pagina 1 di 1</span>
+                            <button type="button" data-archived-next="candidates" class="p-2 rounded-lg bg-[#1b4332] text-white hover:bg-[#1b4332]/90 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <!-- ARCHIVED JOB OFFERS -->
+            <!-- Archived Job Offers -->
             <section id="section-jobs" class="space-y-6">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <h2 class="text-xl font-bold serif text-[#1b4332]">Offerte Archiviate</h2>
-                    <div class="relative w-64">
+                    <div class="relative w-full sm:w-64">
                         <input type="text" id="search-jobs" placeholder="Cerca offerte..." class="w-full pl-10 pr-4 py-2 bg-white border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 top-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
                 </div>
-                <div class="glass-card rounded-2xl overflow-hidden min-h-[200px] relative" id="table-jobs-container">
-                    <!-- Dynamic Table Content -->
+                <div class="glass-card rounded-2xl overflow-hidden min-h-[120px] relative" id="table-jobs-container">
+                    <div data-archived-loading="jobs" class="hidden absolute inset-0 flex items-center justify-center bg-white/80 z-10">
+                        <div class="loading-spinner"></div>
+                    </div>
+                    <div data-archived-error="jobs" class="hidden p-6 text-red-600 text-sm"></div>
+                    <div data-archived-empty="jobs" class="hidden p-8 text-center text-gray-500 text-sm">Nessuna offerta archiviata.</div>
+                    <div data-archived-table="jobs" class="hidden overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50/80 text-gray-500 text-[10px] uppercase tracking-widest">
+                                <tr>
+                                    <th class="px-6 py-5 font-bold">Titolo</th>
+                                    <th class="px-6 py-5 font-bold">Cliente</th>
+                                    <th class="px-6 py-5 font-bold">Luogo</th>
+                                    <th class="px-6 py-5 font-bold text-right">Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 text-sm" data-archived-tbody="jobs"></tbody>
+                        </table>
+                    </div>
+                    <div data-archived-pagination="jobs" class="hidden p-6 bg-white/50 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-gray-100">
+                        <p class="text-xs text-gray-500 font-medium" data-archived-summary="jobs"></p>
+                        <div class="flex items-center space-x-2">
+                            <button type="button" data-archived-prev="jobs" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                            </button>
+                            <span class="text-xs font-bold text-gray-700 px-3 uppercase tracking-tighter" data-archived-pages="jobs">Pagina 1 di 1</span>
+                            <button type="button" data-archived-next="jobs" class="p-2 rounded-lg bg-[#1b4332] text-white hover:bg-[#1b4332]/90 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <!-- ARCHIVED CLIENTS -->
+            <!-- Archived Clients -->
             <section id="section-clients" class="space-y-6">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <h2 class="text-xl font-bold serif text-[#1b4332]">Clienti Archiviati</h2>
-                    <div class="relative w-64">
+                    <div class="relative w-full sm:w-64">
                         <input type="text" id="search-clients" placeholder="Cerca clienti..." class="w-full pl-10 pr-4 py-2 bg-white border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 top-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
                 </div>
-                <div class="glass-card rounded-2xl overflow-hidden min-h-[200px] relative" id="table-clients-container">
-                    <!-- Dynamic Table Content -->
+                <div class="glass-card rounded-2xl overflow-hidden min-h-[120px] relative" id="table-clients-container">
+                    <div data-archived-loading="clients" class="hidden absolute inset-0 flex items-center justify-center bg-white/80 z-10">
+                        <div class="loading-spinner"></div>
+                    </div>
+                    <div data-archived-error="clients" class="hidden p-6 text-red-600 text-sm"></div>
+                    <div data-archived-empty="clients" class="hidden p-8 text-center text-gray-500 text-sm">Nessun cliente archiviato.</div>
+                    <div data-archived-table="clients" class="hidden overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50/80 text-gray-500 text-[10px] uppercase tracking-widest">
+                                <tr>
+                                    <th class="px-6 py-5 font-bold">Nome</th>
+                                    <th class="px-6 py-5 font-bold">Città</th>
+                                    <th class="px-6 py-5 font-bold">Stato</th>
+                                    <th class="px-6 py-5 font-bold">Email</th>
+                                    <th class="px-6 py-5 font-bold text-right">Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 text-sm" data-archived-tbody="clients"></tbody>
+                        </table>
+                    </div>
+                    <div data-archived-pagination="clients" class="hidden p-6 bg-white/50 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-gray-100">
+                        <p class="text-xs text-gray-500 font-medium" data-archived-summary="clients"></p>
+                        <div class="flex items-center space-x-2">
+                            <button type="button" data-archived-prev="clients" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                            </button>
+                            <span class="text-xs font-bold text-gray-700 px-3 uppercase tracking-tighter" data-archived-pages="clients">Pagina 1 di 1</span>
+                            <button type="button" data-archived-next="clients" class="p-2 rounded-lg bg-[#1b4332] text-white hover:bg-[#1b4332]/90 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </section>
 
         </div>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="app.js"></script>
     <script src="archiviati.js"></script>
-    <script>
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-        }
-    </script>
 </body>
 </html>
