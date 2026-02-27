@@ -808,7 +808,7 @@
       );
       const { count, error: countError } = await countQuery;
       if (countError) {
-        console.error("[Supabase] fetchClientsPaginated count error:", countError.message);
+        console.error("[Supabase] fetchClientsPaginated count error:", countError.message, countError);
         return { data: [], totalCount: 0, error: countError };
       }
       const totalCount = count ?? 0;
@@ -822,7 +822,7 @@
         .range(offset, offset + limit - 1);
 
       if (dataError) {
-        console.error("[Supabase] fetchClientsPaginated data error:", dataError.message);
+        console.error("[Supabase] fetchClientsPaginated data error:", dataError.message, dataError);
         return { data: [], totalCount, error: dataError };
       }
 
@@ -847,8 +847,167 @@
     }
   }
 
+  /**
+   * Lightweight client search by name, for autocomplete widgets.
+   * @param {{ term: string, limit?: number }} opts
+   * @returns {Promise<{ data: Array<{ id: string, name: string }>, error: object | null }>}
+   */
+  async function searchClientsByName(opts) {
+    const term = (opts && opts.term) || "";
+    const rawLimit = (opts && opts.limit) || 5;
+    const limit = Math.max(1, Math.min(20, parseInt(rawLimit, 10) || 5));
+
+    if (!term.trim()) {
+      return { data: [], error: null };
+    }
+
+    try {
+      const escaped = term.trim().replace(/%/g, "\\%").replace(/_/g, "\\_");
+      const pattern = "%" + escaped + "%";
+
+      const { data, error } = await supabase
+        .from("clients")
+        .select("id, name")
+        .ilike("name", pattern)
+        .order("name", { ascending: true })
+        .limit(limit);
+
+      if (error) {
+        console.error("[Supabase] searchClientsByName error:", error.message, error);
+        return { data: [], error };
+      }
+
+      const rows = (data || []).map(function (r) {
+        return { id: r.id, name: r.name || "" };
+      });
+
+      return { data: rows, error: null };
+    } catch (err) {
+      console.error("[Supabase] searchClientsByName exception:", err);
+      return { data: [], error: err };
+    }
+  }
+
   // ---------------------------------------------------------------------------
-  // Archive (soft delete) – set is_archived = true
+  // DELETE / ARCHIVE HELPERS
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Generic soft archive helper: set is_archived = true on a single row.
+   * @param {{ table: string, id: string }} params
+   * @returns {Promise<{ data: any, error: any }>}
+   */
+  async function archiveRecord(params) {
+    const table = params && params.table;
+    const id = params && params.id;
+
+    if (!table || !id) {
+      const error = new Error("Missing table or id");
+      console.error("[Supabase] archiveRecord:", error, { table, id });
+      return { data: null, error };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from(table)
+        .update({ is_archived: true })
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("[Supabase] archiveRecord error:", error.message, error, { table, id });
+        return { data: null, error };
+      }
+
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] archiveRecord exception:", err, { table, id });
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Generic unarchive helper: set is_archived = false on a single row.
+   * @param {{ table: string, id: string }} params
+   * @returns {Promise<{ data: any, error: any }>}
+   */
+  async function unarchiveRecord(params) {
+    const table = params && params.table;
+    const id = params && params.id;
+
+    if (!table || !id) {
+      const error = new Error("Missing table or id");
+      console.error("[Supabase] unarchiveRecord:", error, { table, id });
+      return { data: null, error };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from(table)
+        .update({ is_archived: false })
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("[Supabase] unarchiveRecord error:", error.message, error, { table, id });
+        return { data: null, error };
+      }
+
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] unarchiveRecord exception:", err, { table, id });
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Generic permanent delete helper.
+   * - Performs a hard delete on the given table by primary key.
+   * - Never reports success when 0 rows were deleted.
+   *
+   * @param {{ table: string, id: string }} params
+   * @returns {Promise<{ data: any, error: any }>}
+   */
+  async function deletePermanent(params) {
+    const table = params && params.table;
+    const id = params && params.id;
+
+    if (!table || !id) {
+      const error = new Error("Missing table or id");
+      console.error("[Supabase] deletePermanent:", error, { table, id });
+      return { data: null, error };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from(table)
+        .delete()
+        .eq("id", id)
+        .select();
+
+      if (error) {
+        console.error("[Supabase] deletePermanent error:", error.message, error, { table, id });
+        return { data: null, error };
+      }
+
+      const rowCount = Array.isArray(data) ? data.length : data ? 1 : 0;
+      if (rowCount === 0) {
+        const zeroError = new Error("Delete succeeded but 0 rows affected");
+        console.error("[Supabase] deletePermanent zero rows:", { table, id });
+        return { data: null, error: zeroError };
+      }
+
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] deletePermanent exception:", err, { table, id });
+      return { data: null, error: err };
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Archive (soft delete) – entity-specific wrappers
   // ---------------------------------------------------------------------------
 
   /**
@@ -858,22 +1017,7 @@
    */
   async function archiveCandidate(id) {
     if (!id) return { data: null, error: new Error("Missing id") };
-    try {
-      const { data, error } = await supabase
-        .from("candidates")
-        .update({ is_archived: true })
-        .eq("id", id)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] archiveCandidate error:", error.message, error);
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] archiveCandidate exception:", err);
-      return { data: null, error: err };
-    }
+    return archiveRecord({ table: "candidates", id });
   }
 
   /**
@@ -883,22 +1027,7 @@
    */
   async function archiveJobOffer(id) {
     if (!id) return { data: null, error: new Error("Missing id") };
-    try {
-      const { data, error } = await supabase
-        .from("job_offers")
-        .update({ is_archived: true })
-        .eq("id", id)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] archiveJobOffer error:", error.message, error);
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] archiveJobOffer exception:", err);
-      return { data: null, error: err };
-    }
+    return archiveRecord({ table: "job_offers", id });
   }
 
   /**
@@ -908,22 +1037,7 @@
    */
   async function archiveClient(id) {
     if (!id) return { data: null, error: new Error("Missing id") };
-    try {
-      const { data, error } = await supabase
-        .from("clients")
-        .update({ is_archived: true })
-        .eq("id", id)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] archiveClient error:", error.message, error);
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] archiveClient exception:", err);
-      return { data: null, error: err };
-    }
+    return archiveRecord({ table: "clients", id });
   }
 
   // ---------------------------------------------------------------------------
@@ -937,22 +1051,7 @@
    */
   async function unarchiveCandidate(id) {
     if (!id) return { data: null, error: new Error("Missing id") };
-    try {
-      const { data, error } = await supabase
-        .from("candidates")
-        .update({ is_archived: false })
-        .eq("id", id)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] unarchiveCandidate error:", error.message, error);
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] unarchiveCandidate exception:", err);
-      return { data: null, error: err };
-    }
+    return unarchiveRecord({ table: "candidates", id });
   }
 
   /**
@@ -962,22 +1061,7 @@
    */
   async function unarchiveJobOffer(id) {
     if (!id) return { data: null, error: new Error("Missing id") };
-    try {
-      const { data, error } = await supabase
-        .from("job_offers")
-        .update({ is_archived: false })
-        .eq("id", id)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] unarchiveJobOffer error:", error.message, error);
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] unarchiveJobOffer exception:", err);
-      return { data: null, error: err };
-    }
+    return unarchiveRecord({ table: "job_offers", id });
   }
 
   /**
@@ -987,22 +1071,7 @@
    */
   async function unarchiveClient(id) {
     if (!id) return { data: null, error: new Error("Missing id") };
-    try {
-      const { data, error } = await supabase
-        .from("clients")
-        .update({ is_archived: false })
-        .eq("id", id)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] unarchiveClient error:", error.message, error);
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] unarchiveClient exception:", err);
-      return { data: null, error: err };
-    }
+    return unarchiveRecord({ table: "clients", id });
   }
 
   // ---------------------------------------------------------------------------
@@ -1274,11 +1343,10 @@
 
   function showError(message, context) {
     console.error("[Supabase]", context || "", message);
-    if (typeof alert === "function") alert(message);
   }
 
   function showSuccess(message) {
-    if (typeof alert === "function") alert(message);
+    console.log("[Supabase] Success:", message);
   }
 
   // ---------------------------------------------------------------------------
@@ -1316,6 +1384,7 @@
     insertClient,
     archiveClient,
     fetchClientsPaginated,
+    searchClientsByName,
     // Restore (unarchive) for Archiviati page
     unarchiveCandidate,
     unarchiveJobOffer,
@@ -1331,6 +1400,8 @@
     getHiredThisMonth,
     getRecentCandidates,
     getCandidatesBySource,
+    // Deletes / archive helpers
+    deletePermanentRecord: deletePermanent,
     // Helpers
     showError,
     showSuccess,

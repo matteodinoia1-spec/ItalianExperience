@@ -870,12 +870,11 @@
         return;
       }
 
-      if (window.IESupabase && window.IESupabase.supabase) {
-        const { data, error } = await window.IESupabase.supabase
-          .from("clients")
-          .select("id, name")
-          .ilike("name", "%" + term + "%")
-          .limit(5);
+      if (window.IESupabase && window.IESupabase.searchClientsByName) {
+        const { data, error } = await window.IESupabase.searchClientsByName({
+          term,
+          limit: 5,
+        });
 
         if (queryToken !== latestQueryToken) return;
         if (error) {
@@ -2236,7 +2235,8 @@
   function initDataViews() {
     const pageKey = getCurrentPageKey();
     if (pageKey === "dashboard") {
-      // Dashboard data is loaded by portal/dashboard/dashboard.js
+      // Dashboard data is loaded via Supabase helpers in this file.
+      initDashboardPage();
       return;
     }
     if (pageKey === "candidati") {

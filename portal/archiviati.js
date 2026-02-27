@@ -16,6 +16,22 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
     clients: { page: 1, totalCount: 0, search: "" },
   };
 
+  function showErrorMessage(message) {
+    if (typeof alert === "function") {
+      alert(message);
+    } else {
+      console.error("[Archiviati] Error:", message);
+    }
+  }
+
+  function showSuccessMessage(message) {
+    if (typeof alert === "function") {
+      alert(message);
+    } else {
+      console.log("[Archiviati] Success:", message);
+    }
+  }
+
   function getIE() {
     return window.IESupabase;
   }
@@ -256,14 +272,14 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
     try {
       const { error } = await IE.unarchiveCandidate(id);
       if (error) {
-        IE.showError && IE.showError(error.message || "Ripristino non riuscito.");
+        showErrorMessage(error.message || "Ripristino non riuscito.");
         return;
       }
-      IE.showSuccess && IE.showSuccess("Candidato ripristinato.");
+      showSuccessMessage("Candidato ripristinato.");
       await loadCandidates();
     } catch (err) {
       console.error("[Archiviati] restoreCandidate", err);
-      IE.showError && IE.showError(err && err.message ? err.message : "Errore di rete.");
+      showErrorMessage(err && err.message ? err.message : "Errore di rete.");
     }
   }
 
@@ -273,14 +289,14 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
     try {
       const { error } = await IE.unarchiveJobOffer(id);
       if (error) {
-        IE.showError && IE.showError(error.message || "Ripristino non riuscito.");
+        showErrorMessage(error.message || "Ripristino non riuscito.");
         return;
       }
-      IE.showSuccess && IE.showSuccess("Offerta ripristinata.");
+      showSuccessMessage("Offerta ripristinata.");
       await loadJobs();
     } catch (err) {
       console.error("[Archiviati] restoreJob", err);
-      IE.showError && IE.showError(err && err.message ? err.message : "Errore di rete.");
+      showErrorMessage(err && err.message ? err.message : "Errore di rete.");
     }
   }
 
@@ -290,63 +306,54 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
     try {
       const { error } = await IE.unarchiveClient(id);
       if (error) {
-        IE.showError && IE.showError(error.message || "Ripristino non riuscito.");
+        showErrorMessage(error.message || "Ripristino non riuscito.");
         return;
       }
-      IE.showSuccess && IE.showSuccess("Cliente ripristinato.");
+      showSuccessMessage("Cliente ripristinato.");
       await loadClients();
     } catch (err) {
       console.error("[Archiviati] restoreClient", err);
-      IE.showError && IE.showError(err && err.message ? err.message : "Errore di rete.");
+      showErrorMessage(err && err.message ? err.message : "Errore di rete.");
     }
   }
 
   async function deletePermanently(id, tableName, section) {
     const IE = getIE();
-  
-    if (!IE || !IE.supabase) {
+    if (!IE) {
       console.error("[Archiviati] Supabase non disponibile.");
-      IE?.showError?.("Supabase non disponibile. Impossibile eliminare definitivamente.");
       return;
     }
-  
+
+    if (!IE.deletePermanentRecord) {
+      console.error("[Archiviati] deletePermanentRecord API non disponibile su IESupabase.");
+      showErrorMessage("Funzione di eliminazione non disponibile. Aggiorna la pagina o contatta il supporto.");
+      return;
+    }
+
     try {
-      // 🔎 Debug sessione reale
-      const { data: userData } = await IE.supabase.auth.getUser();
-      console.log("DELETE USER →", userData);
-      const { data: sessionData } = await IE.supabase.auth.getSession();
-      console.log("DELETE SESSION →", sessionData);
-  
-      // 🔥 Delete con select per vedere cosa viene realmente eliminato
-      const { data, error } = await IE.supabase
-  .from(tableName)
-  .delete()
-  .eq("id", id)
-  .eq("is_archived", true)   // forziamo la stessa condizione della policy
-  .select(); // fondamentale per debug RLS
-  
-      console.log("DELETE RESULT →", {
+      const { data, error } = await IE.deletePermanentRecord({
         table: tableName,
         id,
-        deletedRows: data,
-        error
       });
-  
+
       if (error) {
         console.error("[Archiviati] Permanent delete error:", error);
-        IE?.showError?.(error.message || "Errore durante eliminazione definitiva.");
+        const msg =
+          error.message ||
+          "Nessuna riga eliminata. Verifica che il record sia archiviato e i permessi RLS.";
+        showErrorMessage(msg);
         return;
       }
-  
-      if (!data || data.length === 0) {
-        console.warn("⚠️ Nessuna riga eliminata. Probabile blocco RLS.");
-        IE?.showError?.("Nessuna riga eliminata. Verifica permessi RLS.");
+
+      const rowCount = Array.isArray(data) ? data.length : data ? 1 : 0;
+      if (!data || rowCount === 0) {
+        console.warn("Nessuna riga eliminata. Probabile blocco RLS o record non archiviato.");
+        showErrorMessage("Nessuna riga eliminata. Verifica che il record sia archiviato e i permessi RLS.");
         return;
       }
-  
-      IE?.showSuccess?.("Record eliminato definitivamente.");
-  
-      // 🔄 Reload sezione
+
+      showSuccessMessage("Record eliminato definitivamente.");
+
       if (section === SECTIONS.candidates) {
         await loadCandidates();
       } else if (section === SECTIONS.jobs) {
@@ -354,7 +361,6 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
       } else if (section === SECTIONS.clients) {
         await loadClients();
       }
-  
     } catch (err) {
       console.error("[Archiviati] deletePermanently exception:", err);
       IE?.showError?.(err?.message || "Errore durante eliminazione definitiva.");
