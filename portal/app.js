@@ -2031,6 +2031,34 @@
     }
   }
 
+  const CANDIDATES_PAGE_SIZE = 10;
+  const JOB_OFFERS_PAGE_SIZE = 10;
+
+  function updatePaginationUI(container, totalCount, currentPage, limit, currentRowCount) {
+    if (!container) return;
+    const summaryEl = container.querySelector("[data-ie-pagination-summary]");
+    const pagesEl = container.querySelector("[data-ie-pagination-pages]");
+    const prevBtn = container.querySelector("[data-ie-pagination-prev]");
+    const nextBtn = container.querySelector("[data-ie-pagination-next]");
+    const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+    const page = Math.max(1, Math.min(currentPage, totalPages));
+
+    if (summaryEl) {
+      summaryEl.textContent = totalCount === 0
+        ? "Mostrando 0 di 0 risultati"
+        : "Mostrando " + currentRowCount + " di " + Number(totalCount).toLocaleString("it-IT") + " risultati";
+    }
+    if (pagesEl) {
+      pagesEl.textContent = "Pagina " + page + " di " + totalPages;
+    }
+    if (prevBtn) {
+      prevBtn.disabled = page <= 1;
+    }
+    if (nextBtn) {
+      nextBtn.disabled = page >= totalPages || totalCount === 0;
+    }
+  }
+
   // Candidates list
   function initCandidatesPage() {
     const tbody = document.querySelector("[data-ie-candidates-body]");
@@ -2044,6 +2072,8 @@
       source: "",
       archived: "active",
     };
+    let currentPage = 1;
+    const limit = CANDIDATES_PAGE_SIZE;
 
     const nameInput = document.querySelector('[data-filter="candidate-name"]');
     const positionInput = document.querySelector('[data-filter="candidate-position"]');
@@ -2052,41 +2082,60 @@
     const sourceSelect = document.querySelector('[data-filter="candidate-source"]');
     const archivedSelect = document.querySelector('[data-filter="candidate-archived"]');
 
+    function goToPage(page) {
+      currentPage = Math.max(1, page);
+      renderCandidates();
+    }
+
     if (nameInput) {
       nameInput.addEventListener("input", function () {
         filters.name = this.value || "";
+        currentPage = 1;
         renderCandidates();
       });
     }
     if (positionInput) {
       positionInput.addEventListener("input", function () {
         filters.position = this.value || "";
+        currentPage = 1;
         renderCandidates();
       });
     }
     if (addressInput) {
       addressInput.addEventListener("input", function () {
         filters.address = this.value || "";
+        currentPage = 1;
         renderCandidates();
       });
     }
     if (statusSelect) {
       statusSelect.addEventListener("change", function () {
         filters.status = this.value || "";
+        currentPage = 1;
         renderCandidates();
       });
     }
     if (sourceSelect) {
       sourceSelect.addEventListener("change", function () {
         filters.source = this.value || "";
+        currentPage = 1;
         renderCandidates();
       });
     }
     if (archivedSelect) {
       archivedSelect.addEventListener("change", function () {
         filters.archived = this.value || "active";
+        currentPage = 1;
         renderCandidates();
       });
+    }
+
+    const paginationEl = document.querySelector("[data-ie-candidates-body]")?.closest(".glass-card")?.querySelector("[data-ie-pagination]");
+    if (paginationEl) {
+      const prevBtn = paginationEl.querySelector("[data-ie-pagination-prev]");
+      const nextBtn = paginationEl.querySelector("[data-ie-pagination-next]");
+      if (prevBtn) prevBtn.addEventListener("click", function () { if (!this.disabled) goToPage(currentPage - 1); });
+      if (nextBtn) nextBtn.addEventListener("click", function () { if (!this.disabled) goToPage(currentPage + 1); });
     }
 
     tbody.addEventListener("click", function (event) {
@@ -2125,28 +2174,83 @@
       }
     });
 
+    function mapCandidateRow(r) {
+      const nome = r.first_name ?? r.nome ?? "";
+      const cognome = r.last_name ?? r.cognome ?? "";
+      return {
+        id: r.id,
+        nome,
+        cognome,
+        posizione: r.position ?? r.posizione ?? "",
+        indirizzo: r.address ?? r.indirizzo ?? "",
+        status: r.status ?? "new",
+        fonte: r.source ?? r.fonte ?? "",
+        client_name: r.client_name || null,
+        foto_url: r.photo_url || r.foto_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent((nome || "") + "+" + (cognome || "")) + "&background=dbeafe&color=1e40af",
+        created_at: r.created_at,
+        is_archived: r.is_archived || false,
+      };
+    }
+
     function renderCandidates() {
-      fetchCandidates(filters).then((rows) => {
-        // Active first, then archived
-        rows.sort((a, b) => Number(a.is_archived) - Number(b.is_archived));
+      const paginationContainer = document.querySelector("[data-ie-candidates-body]")?.closest(".glass-card")?.querySelector("[data-ie-pagination]");
 
-        tbody.innerHTML = "";
-        rows.forEach((row) => {
-          const tr = document.createElement("tr");
-          tr.className = "table-row transition" + (row.is_archived ? " opacity-60" : "");
-          tr.setAttribute("data-id", row.id);
-          const clientName = findClientNameForCandidate(row);
-          const statusBadgeClass = getCandidateStatusBadgeClass(row.status);
-          const sourceLabel = (row.fonte || "").toUpperCase();
-          const createdDate = row.created_at
-            ? new Date(row.created_at).toLocaleDateString("it-IT")
-            : "";
-          const metaTitle = formatLastUpdatedMeta(row);
-          if (metaTitle) {
-            tr.title = metaTitle;
+      if (window.IESupabase && window.IESupabase.fetchCandidatesPaginated) {
+        window.IESupabase.fetchCandidatesPaginated({
+          filters,
+          page: currentPage,
+          limit,
+        }).then(function (result) {
+          const rows = (result.data || []).map(mapCandidateRow);
+          const totalCount = result.totalCount ?? 0;
+          const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+          if (currentPage > totalPages && totalPages > 0) {
+            currentPage = totalPages;
+            renderCandidates();
+            return;
           }
+          renderCandidateRows(rows);
+          updatePaginationUI(paginationContainer, totalCount, currentPage, limit, rows.length);
+        }).catch(function (err) {
+          console.error("[ItalianExperience] fetchCandidatesPaginated error:", err);
+          tbody.innerHTML = "<tr><td colspan=\"10\" class=\"px-6 py-8 text-center text-red-500\">Errore nel caricamento. Riprova più tardi.</td></tr>";
+          updatePaginationUI(paginationContainer, 0, 1, limit, 0);
+        });
+        return;
+      }
 
-          tr.innerHTML = `
+      fetchCandidates(filters).then((rows) => {
+        rows.sort((a, b) => Number(a.is_archived) - Number(b.is_archived));
+        const totalCount = rows.length;
+        const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+        if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+        const start = (currentPage - 1) * limit;
+        const pageRows = rows.slice(start, start + limit);
+        renderCandidateRows(pageRows);
+        updatePaginationUI(paginationContainer, totalCount, currentPage, limit, pageRows.length);
+      });
+    }
+
+    function renderCandidateRows(rows) {
+      tbody.innerHTML = "";
+      if (!rows.length) {
+        tbody.innerHTML = "<tr><td colspan=\"10\" class=\"px-6 py-8 text-center text-gray-400\">Nessun candidato trovato.</td></tr>";
+        return;
+      }
+      rows.forEach((row) => {
+        const tr = document.createElement("tr");
+        tr.className = "table-row transition" + (row.is_archived ? " opacity-60" : "");
+        tr.setAttribute("data-id", row.id);
+        const clientName = findClientNameForCandidate(row);
+        const statusBadgeClass = getCandidateStatusBadgeClass(row.status);
+        const sourceLabel = (row.fonte || "").toUpperCase();
+        const createdDate = row.created_at
+          ? new Date(row.created_at).toLocaleDateString("it-IT")
+          : "";
+        const metaTitle = formatLastUpdatedMeta(row);
+        if (metaTitle) tr.title = metaTitle;
+
+        tr.innerHTML = `
             <td class="px-6 py-4">
               <img src="${row.foto_url || ""}" class="w-10 h-10 rounded-full border-2 border-white shadow-sm" alt="${row.nome} ${row.cognome}">
             </td>
@@ -2154,15 +2258,11 @@
             <td class="px-6 py-4 text-gray-600">${row.posizione || "—"}</td>
             <td class="px-6 py-4 text-gray-600">${clientName}</td>
             <td class="px-6 py-4 text-gray-500 italic">${row.indirizzo || "—"}</td>
-            <td class="px-6 py-4"><span class="badge ${statusBadgeClass}">${formatCandidateStatusLabel(
-            row.status
-          )}</span></td>
+            <td class="px-6 py-4"><span class="badge ${statusBadgeClass}">${formatCandidateStatusLabel(row.status)}</span></td>
             <td class="px-6 py-4 text-xs font-medium text-blue-600">${sourceLabel || "—"}</td>
             <td class="px-6 py-4 text-gray-400">${createdDate}</td>
             <td class="px-6 py-4 text-center">
-              <button type="button" data-action="view-cv" data-id="${
-                row.id
-              }" class="text-[#c5a059] hover:bg-[#c5a059]/10 px-3 py-1.5 rounded-md border border-[#c5a059]/20 transition text-xs font-bold">
+              <button type="button" data-action="view-cv" data-id="${row.id}" class="text-[#c5a059] hover:bg-[#c5a059]/10 px-3 py-1.5 rounded-md border border-[#c5a059]/20 transition text-xs font-bold">
                 View CV
               </button>
             </td>
@@ -2179,11 +2279,7 @@
                     <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                   </svg>
                 </button>
-                <button type="button" data-action="archive-candidate" data-id="${
-                  row.id
-                }" class="p-2 text-gray-400 hover:text-red-500 transition" title="${
-            row.is_archived ? "Archived" : "Archive"
-          }">
+                <button type="button" data-action="archive-candidate" data-id="${row.id}" class="p-2 text-gray-400 hover:text-red-500 transition" title="${row.is_archived ? "Archived" : "Archive"}">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                   </svg>
@@ -2191,9 +2287,7 @@
               </div>
             </td>
           `;
-
-          tbody.appendChild(tr);
-        });
+        tbody.appendChild(tr);
       });
     }
 
@@ -2256,6 +2350,8 @@
       offerStatus: "",
       archived: "active",
     };
+    let currentPage = 1;
+    const limit = JOB_OFFERS_PAGE_SIZE;
 
     const titleInput = document.querySelector('[data-filter="offer-title"]');
     const clientSelect = document.querySelector('[data-filter="offer-client"]');
@@ -2264,6 +2360,11 @@
     const stateInput = document.querySelector('[data-filter="offer-state"]');
     const contractSelect = document.querySelector('[data-filter="offer-contract"]');
     const archivedSelect = document.querySelector('[data-filter="offer-archived"]');
+
+    function goToPage(page) {
+      currentPage = Math.max(1, page);
+      renderOffers();
+    }
 
     // Populate client filter options from store (if the element exists)
     if (clientSelect && !clientSelect.dataset.iePopulated) {
@@ -2283,44 +2384,59 @@
     if (titleInput) {
       titleInput.addEventListener("input", function () {
         filters.title = this.value || "";
+        currentPage = 1;
         renderOffers();
       });
     }
     if (clientSelect) {
       clientSelect.addEventListener("change", function () {
         filters.clientId = this.value || "";
+        currentPage = 1;
         renderOffers();
       });
     }
     if (statusSelect) {
       statusSelect.addEventListener("change", function () {
         filters.offerStatus = this.value || "";
+        currentPage = 1;
         renderOffers();
       });
     }
     if (cityInput) {
       cityInput.addEventListener("input", function () {
         filters.city = this.value || "";
+        currentPage = 1;
         renderOffers();
       });
     }
     if (stateInput) {
       stateInput.addEventListener("input", function () {
         filters.state = this.value || "";
+        currentPage = 1;
         renderOffers();
       });
     }
     if (contractSelect) {
       contractSelect.addEventListener("change", function () {
         filters.contractType = this.value || "";
+        currentPage = 1;
         renderOffers();
       });
     }
     if (archivedSelect) {
       archivedSelect.addEventListener("change", function () {
         filters.archived = this.value || "active";
+        currentPage = 1;
         renderOffers();
       });
+    }
+
+    const paginationEl = document.querySelector("[data-ie-joboffers-body]")?.closest(".glass-card")?.querySelector("[data-ie-pagination]");
+    if (paginationEl) {
+      const prevBtn = paginationEl.querySelector("[data-ie-pagination-prev]");
+      const nextBtn = paginationEl.querySelector("[data-ie-pagination-next]");
+      if (prevBtn) prevBtn.addEventListener("click", function () { if (!this.disabled) goToPage(currentPage - 1); });
+      if (nextBtn) nextBtn.addEventListener("click", function () { if (!this.disabled) goToPage(currentPage + 1); });
     }
 
     tbody.addEventListener("click", function (event) {
@@ -2337,28 +2453,43 @@
       }
     });
 
-    function renderOffers() {
-      fetchJobOffers(filters).then(async (rows) => {
-        rows.sort((a, b) => Number(a.is_archived) - Number(b.is_archived));
-        tbody.innerHTML = "";
-        if (rows.length && window.IESupabase) window.IE_ACTIVE_JOB_OFFER_ID = rows[0].id;
-        rows.forEach((row) => {
-          const tr = document.createElement("tr");
-          tr.className = "table-row transition" + (row.is_archived ? " opacity-60" : "");
-          tr.setAttribute("data-id", row.id);
+    function mapJobOfferRow(r) {
+      return {
+        id: r.id,
+        titolo_posizione: r.title ?? r.titolo_posizione ?? "",
+        descrizione: r.description ?? r.descrizione ?? "",
+        client_id: r.client_id ?? null,
+        client_name: r.client_name ?? null,
+        citta: r.location ?? r.citta ?? "",
+        stato: r.state ?? r.stato ?? "",
+        stato_offerta: r.status ?? r.stato_offerta ?? "open",
+        created_at: r.created_at,
+        is_archived: r.is_archived || false,
+      };
+    }
 
-          const client = IE_STORE.clients.find((c) => c.id === row.client_id);
-          const clientName = row.client_name || (client ? client.nome : "—");
-          const location = row.citta && row.stato ? `${row.citta}, ${row.stato}` : "—";
-          const createdDate = row.created_at
-            ? new Date(row.created_at).toLocaleDateString("it-IT")
-            : "";
-          const badgeClass = getOfferStatusBadgeClass(row.stato_offerta);
-          const statusLabel = formatOfferStatusLabel(row.stato_offerta);
-          const metaTitle = formatLastUpdatedMeta(row);
-          if (metaTitle) tr.title = metaTitle;
+    function renderOfferRows(rows) {
+      tbody.innerHTML = "";
+      if (!rows.length) {
+        tbody.innerHTML = "<tr><td colspan=\"7\" class=\"px-6 py-8 text-center text-gray-400\">Nessuna offerta trovata.</td></tr>";
+        return;
+      }
+      if (window.IESupabase) window.IE_ACTIVE_JOB_OFFER_ID = rows[0].id;
+      rows.forEach((row) => {
+        const tr = document.createElement("tr");
+        tr.className = "table-row transition" + (row.is_archived ? " opacity-60" : "");
+        tr.setAttribute("data-id", row.id);
 
-          tr.innerHTML = `
+        const client = IE_STORE.clients.find((c) => c.id === row.client_id);
+        const clientName = row.client_name || (client ? client.nome : "—");
+        const location = row.citta && row.stato ? `${row.citta}, ${row.stato}` : (row.citta || row.stato || "—");
+        const createdDate = row.created_at ? new Date(row.created_at).toLocaleDateString("it-IT") : "";
+        const badgeClass = getOfferStatusBadgeClass(row.stato_offerta);
+        const statusLabel = formatOfferStatusLabel(row.stato_offerta);
+        const metaTitle = formatLastUpdatedMeta(row);
+        if (metaTitle) tr.title = metaTitle;
+
+        tr.innerHTML = `
             <td class="px-6 py-4 font-semibold text-gray-800">${row.titolo_posizione}</td>
             <td class="px-6 py-4 text-gray-600 font-medium">${row.descrizione ? "Role" : "—"}</td>
             <td class="px-6 py-4 text-gray-600">${clientName}</td>
@@ -2378,11 +2509,7 @@
                     <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                   </svg>
                 </button>
-                <button type="button" data-action="archive-offer" data-id="${
-                  row.id
-                }" class="p-2 text-gray-400 hover:text-red-500 transition" title="${
-            row.is_archived ? "Archived" : "Archive"
-          }">
+                <button type="button" data-action="archive-offer" data-id="${row.id}" class="p-2 text-gray-400 hover:text-red-500 transition" title="${row.is_archived ? "Archived" : "Archive"}">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                   </svg>
@@ -2390,11 +2517,47 @@
               </div>
             </td>
           `;
+        tbody.appendChild(tr);
+      });
+    }
 
-          tbody.appendChild(tr);
+    function renderOffers() {
+      const paginationContainer = document.querySelector("[data-ie-joboffers-body]")?.closest(".glass-card")?.querySelector("[data-ie-pagination]");
+
+      if (window.IESupabase && window.IESupabase.fetchJobOffersPaginated) {
+        window.IESupabase.fetchJobOffersPaginated({
+          filters,
+          page: currentPage,
+          limit,
+        }).then(function (result) {
+          const rows = (result.data || []).map(mapJobOfferRow);
+          const totalCount = result.totalCount ?? 0;
+          const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+          if (currentPage > totalPages && totalPages > 0) {
+            currentPage = totalPages;
+            renderOffers();
+            return;
+          }
+          renderOfferRows(rows);
+          updatePaginationUI(paginationContainer, totalCount, currentPage, limit, rows.length);
+          renderAssociationsForActiveOffer();
+        }).catch(function (err) {
+          console.error("[ItalianExperience] fetchJobOffersPaginated error:", err);
+          tbody.innerHTML = "<tr><td colspan=\"7\" class=\"px-6 py-8 text-center text-red-500\">Errore nel caricamento. Riprova più tardi.</td></tr>";
+          updatePaginationUI(paginationContainer, 0, 1, limit, 0);
         });
+        return;
+      }
 
-        // Keep associated candidates section in sync with first visible offer
+      fetchJobOffers(filters).then(async (rows) => {
+        rows.sort((a, b) => Number(a.is_archived) - Number(b.is_archived));
+        const totalCount = rows.length;
+        const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+        if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+        const start = (currentPage - 1) * limit;
+        const pageRows = rows.slice(start, start + limit);
+        renderOfferRows(pageRows);
+        updatePaginationUI(paginationContainer, totalCount, currentPage, limit, pageRows.length);
         await renderAssociationsForActiveOffer();
       });
     }

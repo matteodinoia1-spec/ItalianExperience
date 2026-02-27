@@ -377,6 +377,177 @@
     }
   }
 
+  /**
+   * Build candidates query with filters (same logic for count and data).
+   * Filters: name, position, address, status, source, archived.
+   * Columns: first_name, last_name, position, address, status, source, is_archived, created_by.
+   */
+  function buildCandidatesQuery(supabaseQuery, filters, userId) {
+    let q = supabaseQuery.eq("created_by", userId);
+    if (filters.archived === "active") q = q.eq("is_archived", false);
+    if (filters.archived === "archived") q = q.eq("is_archived", true);
+    if (filters.status) q = q.eq("status", filters.status);
+    if (filters.source) q = q.eq("source", filters.source);
+    const nameTerm = (filters.name || "").trim().replace(/,/g, " ");
+    if (nameTerm) {
+      const escaped = nameTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
+      const pattern = "%" + escaped + "%";
+      q = q.or("first_name.ilike." + pattern + ",last_name.ilike." + pattern);
+    }
+    const posTerm = (filters.position || "").trim();
+    if (posTerm) {
+      const escaped = posTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
+      q = q.ilike("position", "%" + escaped + "%");
+    }
+    const addrTerm = (filters.address || "").trim();
+    if (addrTerm) {
+      const escaped = addrTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
+      q = q.ilike("address", "%" + escaped + "%");
+    }
+    return q;
+  }
+
+  /**
+   * Fetch candidates with filters and pagination. Returns total count (with same filters) and page of data.
+   * @param {object} opts - { filters: object, page: number, limit: number }
+   * @returns {Promise<{ data: array, totalCount: number, error: object | null }>}
+   */
+  async function fetchCandidatesPaginated(opts) {
+    const { data: sessionData } = await getSession();
+    const userId = sessionData?.user?.id;
+    if (!userId) return { data: [], totalCount: 0, error: null };
+
+    const filters = opts.filters || {};
+    const page = Math.max(1, parseInt(opts.page, 10) || 1);
+    const limit = Math.max(1, Math.min(100, parseInt(opts.limit, 10) || 10));
+    const offset = (page - 1) * limit;
+
+    try {
+      const countQuery = buildCandidatesQuery(
+        supabase.from("candidates").select("*", { count: "exact", head: true }),
+        filters,
+        userId
+      );
+      const { count, error: countError } = await countQuery;
+      if (countError) {
+        console.error("[Supabase] fetchCandidatesPaginated count error:", countError.message);
+        return { data: [], totalCount: 0, error: countError };
+      }
+      const totalCount = count ?? 0;
+
+      const dataQuery = buildCandidatesQuery(
+        supabase.from("candidates").select("*"),
+        filters,
+        userId
+      );
+      const { data: rows, error: dataError } = await dataQuery
+        .order("created_at", { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (dataError) {
+        console.error("[Supabase] fetchCandidatesPaginated data error:", dataError.message);
+        return { data: [], totalCount, error: dataError };
+      }
+      const data = (rows || []).map(function (r) {
+        return {
+          id: r.id,
+          first_name: r.first_name,
+          last_name: r.last_name,
+          position: r.position,
+          address: r.address,
+          status: r.status,
+          source: r.source,
+          notes: r.notes,
+          created_at: r.created_at,
+          is_archived: r.is_archived,
+          photo_url: r.photo_url,
+        };
+      });
+      return { data, totalCount, error: null };
+    } catch (err) {
+      console.error("[Supabase] fetchCandidatesPaginated exception:", err);
+      return { data: [], totalCount: 0, error: err };
+    }
+  }
+
+  /**
+   * Build job offers query with filters (same logic for count and data).
+   * Filters: title, offerStatus, archived, city. Columns: title, location, status, is_archived.
+   */
+  function buildJobOffersQuery(supabaseQuery, filters) {
+    let q = supabaseQuery;
+    if (filters.archived === "active") q = q.eq("is_archived", false);
+    if (filters.archived === "archived") q = q.eq("is_archived", true);
+    if (filters.offerStatus) q = q.eq("status", filters.offerStatus);
+    const titleTerm = (filters.title || "").trim();
+    if (titleTerm) {
+      const escaped = titleTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
+      q = q.ilike("title", "%" + escaped + "%");
+    }
+    const cityTerm = (filters.city || "").trim();
+    if (cityTerm) {
+      const escaped = cityTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
+      q = q.ilike("location", "%" + escaped + "%");
+    }
+    return q;
+  }
+
+  /**
+   * Fetch job offers with filters and pagination. Returns total count (with same filters) and page of data.
+   * @param {object} opts - { filters: object, page: number, limit: number }
+   * @returns {Promise<{ data: array, totalCount: number, error: object | null }>}
+   */
+  async function fetchJobOffersPaginated(opts) {
+    const filters = opts.filters || {};
+    const page = Math.max(1, parseInt(opts.page, 10) || 1);
+    const limit = Math.max(1, Math.min(100, parseInt(opts.limit, 10) || 10);
+    const offset = (page - 1) * limit;
+
+    try {
+      const countQuery = buildJobOffersQuery(
+        supabase.from("job_offers").select("*", { count: "exact", head: true }),
+        filters
+      );
+      const { count, error: countError } = await countQuery;
+      if (countError) {
+        console.error("[Supabase] fetchJobOffersPaginated count error:", countError.message);
+        return { data: [], totalCount: 0, error: countError };
+      }
+      const totalCount = count ?? 0;
+
+      const dataQuery = buildJobOffersQuery(
+        supabase.from("job_offers").select("*"),
+        filters
+      );
+      const { data: rows, error: dataError } = await dataQuery
+        .order("created_at", { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (dataError) {
+        console.error("[Supabase] fetchJobOffersPaginated data error:", dataError.message);
+        return { data: [], totalCount, error: dataError };
+      }
+      const data = (rows || []).map(function (r) {
+        return {
+          id: r.id,
+          title: r.title,
+          position: r.position,
+          client_name: r.client_name,
+          client_id: r.client_id,
+          location: r.location,
+          description: r.description,
+          status: r.status,
+          created_at: r.created_at,
+          is_archived: r.is_archived,
+        };
+      });
+      return { data, totalCount, error: null };
+    } catch (err) {
+      console.error("[Supabase] fetchJobOffersPaginated exception:", err);
+      return { data: [], totalCount: 0, error: err };
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Candidate–Job associations
   // ---------------------------------------------------------------------------
@@ -673,9 +844,11 @@
     // Candidates
     insertCandidate,
     fetchMyCandidates,
+    fetchCandidatesPaginated,
     // Job offers
     insertJobOffer,
     fetchJobOffers,
+    fetchJobOffersPaginated,
     // Associations
     linkCandidateToJob,
     fetchAssociations,
