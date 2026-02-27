@@ -61,11 +61,11 @@
                             <label class="form-label">Position</label>
                             <input type="text" name="position" placeholder="Es. Cucina / Management" class="form-input">
                         </div>
-                        <div>
+                        <div class="relative">
                             <label class="form-label">Client / Company Name</label>
-                            <select name="client_id" class="form-input appearance-none" required>
-                                <option value="">Seleziona cliente</option>
-                            </select>
+                            <input type="text" id="clientInput" name="client_name" autocomplete="off" placeholder="Digita nome cliente" class="form-input" required>
+                            <input type="hidden" id="clientIdHidden" name="client_id">
+                            <div id="clientSuggestions" class="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-20 hidden"></div>
                         </div>
                         <div>
                             <label class="form-label">Location</label>

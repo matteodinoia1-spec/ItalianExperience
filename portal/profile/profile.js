@@ -31,7 +31,21 @@
 
   let currentProfile = null;
 
+  async function waitForAuthGuard() {
+    if (!window.__IE_AUTH_GUARD__ || typeof window.__IE_AUTH_GUARD__.then !== "function") {
+      return true;
+    }
+    try {
+      return !!(await window.__IE_AUTH_GUARD__);
+    } catch (error) {
+      return false;
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", async function () {
+    const authAllowed = await waitForAuthGuard();
+    if (!authAllowed) return;
+
     const api = window.IESupabase;
     if (!api) {
       showError("Configurazione non disponibile.");

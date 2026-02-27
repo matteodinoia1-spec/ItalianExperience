@@ -164,16 +164,31 @@
     <script src="profile/profile.js"></script>
     <script>
         // Avatar preview (local only, no upload to backend)
-        document.getElementById('avatarUpload').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    document.getElementById('profilePreview').src = event.target.result;
+        (async function () {
+            if (window.__IE_AUTH_GUARD__ && typeof window.__IE_AUTH_GUARD__.then === 'function') {
+                try {
+                    const authAllowed = await window.__IE_AUTH_GUARD__;
+                    if (!authAllowed) return;
+                } catch (error) {
+                    return;
                 }
-                reader.readAsDataURL(file);
             }
-        });
+
+            const avatarUpload = document.getElementById('avatarUpload');
+            if (!avatarUpload) return;
+
+            avatarUpload.addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const preview = document.getElementById('profilePreview');
+                    if (preview) preview.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        })();
     </script>
 </body>
 </html>

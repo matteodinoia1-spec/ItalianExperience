@@ -12,6 +12,26 @@
 (function () {
   "use strict";
 
+  var PROTECTED_PAGES = [
+    "dashboard",
+    "candidati",
+    "offerte",
+    "clients",
+    "clienti",
+    "archiviati",
+    "profile",
+    "add-candidato",
+    "add-offerta",
+    "add-cliente",
+    "edit-candidato",
+    "settings",
+    "sidebar",
+  ];
+
+  var pageKey = getCurrentPageKey();
+  var isProtectedPage = PROTECTED_PAGES.indexOf(pageKey) !== -1;
+  window.__IE_AUTH_GUARD__ = runEarlyAuthGuard(pageKey, isProtectedPage);
+
   // ---------------------------------------------------------------------------
   // Static fallback markup for the sidebar (used when fetch() is unavailable,
   // e.g. Safari / local file://, or when sidebar.html cannot be loaded).
@@ -110,25 +130,14 @@
   ].join("\n");
 
   document.addEventListener("DOMContentLoaded", async function () {
-    const pageKey = getCurrentPageKey();
+    var isAuthenticated = await window.__IE_AUTH_GUARD__;
+    if (!isAuthenticated) {
+      return;
+    }
 
-    // Protected pages: require Supabase auth (redirect to login if not authenticated)
-    const protectedPages = ["dashboard", "candidati", "offerte", "clients", "clienti", "archiviati", "add-candidato", "add-offerta", "add-cliente", "edit-candidato", "profile", "settings", "sidebar"];
-    const isProtected = protectedPages.indexOf(pageKey) !== -1;
-    if (isProtected) {
-      if (!window.IESupabase) {
-        window.location.href = (derivePortalBasePath()) + "index.html";
-        return;
-      }
-      try {
-        const user = await window.IESupabase.requireAuth();
-        if (!user) return;
-        await loadCurrentUserProfile();
-        initInactivityTimer();
-      } catch (e) {
-        window.location.href = (derivePortalBasePath()) + "index.html";
-        return;
-      }
+    if (isProtectedPage) {
+      await loadCurrentUserProfile();
+      initInactivityTimer();
     }
 
     ensureSidebarLoaded()
@@ -152,6 +161,35 @@
         updateHeaderUserBlock();
       });
   });
+
+  async function runEarlyAuthGuard(currentPageKey, isProtected) {
+    if (!isProtected) return true;
+
+    if (!window.IESupabase || typeof window.IESupabase.requireAuth !== "function") {
+      hardRedirectToLogin();
+      return false;
+    }
+
+    try {
+      var user = await window.IESupabase.requireAuth();
+      if (!user) {
+        hardRedirectToLogin();
+        return false;
+      }
+      window.__IE_AUTH_USER__ = user;
+      return true;
+    } catch (error) {
+      console.error("[ItalianExperience] Auth guard failed on page:", currentPageKey, error);
+      hardRedirectToLogin();
+      return false;
+    }
+  }
+
+  function hardRedirectToLogin() {
+    var target = derivePortalBasePath() + "index.html";
+    if (window.location.href === target) return;
+    window.location.replace(target);
+  }
 
   // ---------------------------------------------------------------------------
   // Layout & Sidebar
@@ -372,6 +410,9 @@
       case "profile.html":
       case "profile.htm":
         return "profile";
+      case "settings.html":
+      case "settings.htm":
+        return "settings";
       case "index.html":
       case "":
         return "login";
@@ -382,6 +423,7 @@
         if (lastSegment.includes("offerte")) return "offerte";
         if (lastSegment.includes("archiviati")) return "archiviati";
         if (lastSegment.includes("profile")) return "profile";
+        if (lastSegment.includes("settings")) return "settings";
         return "unknown";
     }
   }
@@ -753,7 +795,7 @@
     const jobOfferForm = scope.querySelector("#jobOfferForm");
     if (jobOfferForm && !jobOfferForm.dataset.ieBound) {
       jobOfferForm.dataset.ieBound = "true";
-      hydrateJobOfferClientSelect(jobOfferForm);
+      hydrateJobOfferClientAutocomplete(jobOfferForm);
       jobOfferForm.addEventListener("submit", function (event) {
         event.preventDefault();
         const formData = new FormData(jobOfferForm);
@@ -772,36 +814,116 @@
     }
   }
 
-  function hydrateJobOfferClientSelect(form) {
+  function hydrateJobOfferClientAutocomplete(form) {
     if (!form) return;
-    const clientSelect = form.querySelector('[name="client_id"]');
-    if (!clientSelect || clientSelect.dataset.iePopulated === "true") return;
-    clientSelect.dataset.iePopulated = "true";
+    const clientInput = form.querySelector("#clientInput");
+    const clientIdHidden = form.querySelector("#clientIdHidden");
+    const clientSuggestions = form.querySelector("#clientSuggestions");
+    if (!clientInput || !clientIdHidden || !clientSuggestions) return;
+    if (clientInput.dataset.ieAutocompleteBound === "true") return;
+    clientInput.dataset.ieAutocompleteBound = "true";
 
-    function appendClientOptions(list) {
-      list.forEach(function (client) {
+    let debounceTimer = null;
+    let latestQueryToken = 0;
+
+    function clearSuggestions() {
+      clientSuggestions.innerHTML = "";
+      clientSuggestions.classList.add("hidden");
+    }
+
+    function openSuggestions() {
+      if (!clientSuggestions.children.length) return;
+      clientSuggestions.classList.remove("hidden");
+    }
+
+    function renderSuggestions(clients, typedValue) {
+      clientSuggestions.innerHTML = "";
+
+      (clients || []).forEach(function (client) {
         if (!client || !client.id) return;
-        const opt = document.createElement("option");
-        opt.value = client.id;
-        opt.textContent = client.name || "—";
-        clientSelect.appendChild(opt);
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#f6f2e7] transition-colors";
+        item.textContent = client.name || "—";
+        item.addEventListener("mousedown", function (event) {
+          event.preventDefault();
+          clientInput.value = client.name || "";
+          clientIdHidden.value = client.id;
+          clearSuggestions();
+        });
+        clientSuggestions.appendChild(item);
       });
+
+      const normalizedTypedValue = (typedValue || "").trim().toLowerCase();
+      const hasExactMatch = (clients || []).some(function (client) {
+        return ((client && client.name) || "").trim().toLowerCase() === normalizedTypedValue;
+      });
+
+      if (!hasExactMatch) {
+        clientIdHidden.value = "";
+      }
+
+      openSuggestions();
     }
 
-    if (window.IESupabase && window.IESupabase.fetchClientsPaginated) {
-      window.IESupabase.fetchClientsPaginated({
-        filters: { archived: "active" },
-        page: 1,
-        limit: 500,
-      }).then(function (res) {
-        appendClientOptions((res.data || []).filter(function (c) { return !c.is_archived; }));
-      }).catch(function () {
-        appendClientOptions(IE_STORE.clients.filter(function (c) { return !c.is_archived; }));
-      });
-      return;
+    async function searchClients(term, queryToken) {
+      if (!term) {
+        clearSuggestions();
+        clientIdHidden.value = "";
+        return;
+      }
+
+      if (window.IESupabase && window.IESupabase.supabase) {
+        const { data, error } = await window.IESupabase.supabase
+          .from("clients")
+          .select("id, name")
+          .ilike("name", "%" + term + "%")
+          .limit(5);
+
+        if (queryToken !== latestQueryToken) return;
+        if (error) {
+          clearSuggestions();
+          return;
+        }
+        renderSuggestions(data || [], term);
+        return;
+      }
+
+      const normalizedTerm = term.toLowerCase();
+      const localMatches = IE_STORE.clients
+        .filter(function (client) {
+          if (!client || client.is_archived) return false;
+          return (client.name || "").toLowerCase().indexOf(normalizedTerm) !== -1;
+        })
+        .slice(0, 5)
+        .map(function (client) {
+          return { id: client.id, name: client.name };
+        });
+      if (queryToken !== latestQueryToken) return;
+      renderSuggestions(localMatches, term);
     }
 
-    appendClientOptions(IE_STORE.clients.filter(function (c) { return !c.is_archived; }));
+    clientInput.addEventListener("input", function () {
+      const value = clientInput.value.trim();
+      clientIdHidden.value = "";
+      clearTimeout(debounceTimer);
+      debounceTimer = window.setTimeout(function () {
+        latestQueryToken += 1;
+        searchClients(value, latestQueryToken).catch(function () {
+          clearSuggestions();
+        });
+      }, 300);
+    });
+
+    clientInput.addEventListener("focus", function () {
+      openSuggestions();
+    });
+
+    clientInput.addEventListener("blur", function () {
+      window.setTimeout(function () {
+        clearSuggestions();
+      }, 120);
+    });
   }
 
   // ---------------------------------------------------------------------------
@@ -1789,7 +1911,8 @@
   async function saveJobOffer(formData) {
     const title = (formData.get("title") || "").toString().trim();
     const position = (formData.get("position") || "").toString().trim();
-    const client_id = (formData.get("client_id") || "").toString().trim();
+    const clientName = (formData.get("client_name") || "").toString().trim();
+    let client_id = (formData.get("client_id") || "").toString().trim();
     const description = (formData.get("description") || "").toString();
     const requirements = (formData.get("requirements") || "").toString();
     const notes = (formData.get("notes") || "").toString();
@@ -1801,6 +1924,39 @@
     const deadline = (formData.get("deadline") || "").toString().trim();
     const status = (formData.get("status") || "open").toString();
     const positions = positionsRaw === "" ? null : Number(positionsRaw);
+
+    if (!client_id && clientName) {
+      if (window.IESupabase && window.IESupabase.insertClient) {
+        const { data: createdClient, error: clientError } = await window.IESupabase.insertClient({
+          name: clientName,
+        });
+        if (clientError) {
+          window.IESupabase.showError(clientError.message || "Errore nella creazione del cliente.", "saveJobOffer");
+          return;
+        }
+        client_id = (createdClient && createdClient.id) || "";
+      } else {
+        const nowForClient = new Date().toISOString();
+        const currentUserForClient = getCurrentUserDisplayName();
+        const localClient = {
+          id: "client-" + Math.random().toString(36).slice(2, 10),
+          name: clientName,
+          city: null,
+          state: null,
+          country: null,
+          email: null,
+          phone: null,
+          notes: null,
+          created_at: nowForClient,
+          updated_at: nowForClient,
+          created_by: currentUserForClient,
+          updated_by: currentUserForClient,
+          is_archived: false,
+        };
+        IE_STORE.clients.push(localClient);
+        client_id = localClient.id;
+      }
+    }
 
     if (window.IESupabase) {
       const { data, error } = await window.IESupabase.insertJobOffer({
