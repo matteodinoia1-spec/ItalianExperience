@@ -312,6 +312,8 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
   
     try {
       // 🔎 Debug sessione reale
+      const { data: userData } = await IE.supabase.auth.getUser();
+      console.log("DELETE USER →", userData);
       const { data: sessionData } = await IE.supabase.auth.getSession();
       console.log("DELETE SESSION →", sessionData);
   
