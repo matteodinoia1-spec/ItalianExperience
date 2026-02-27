@@ -305,43 +305,45 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
     const IE = getIE();
   
     if (!IE || !IE.supabase) {
-      console.error("[Archiviati] deletePermanently: Supabase non disponibile.");
-      if (IE && IE.showError) {
-        IE.showError("Supabase non disponibile. Impossibile eliminare definitivamente.");
-      } else if (typeof alert === "function") {
-        alert("Errore durante eliminazione definitiva.");
-      }
+      console.error("[Archiviati] Supabase non disponibile.");
+      IE?.showError?.("Supabase non disponibile. Impossibile eliminare definitivamente.");
       return;
     }
   
     try {
-      const { data, error, status } = await IE.supabase
+      // 🔎 Debug sessione reale
+      const { data: sessionData } = await IE.supabase.auth.getSession();
+      console.log("DELETE SESSION →", sessionData);
+  
+      // 🔥 Delete con select per vedere cosa viene realmente eliminato
+      const { data, error } = await IE.supabase
         .from(tableName)
         .delete()
-        .eq("id", id);
+        .eq("id", id)
+        .select(); // fondamentale per debug RLS
   
-      console.log("DELETE DEBUG →", {
-        tableName,
+      console.log("DELETE RESULT →", {
+        table: tableName,
         id,
-        data,
-        error,
-        status
+        deletedRows: data,
+        error
       });
   
       if (error) {
-        console.error("[Archiviati] Permanent delete failed:", error);
-        if (IE.showError) {
-          IE.showError(error.message || "Errore durante eliminazione definitiva.");
-        } else if (typeof alert === "function") {
-          alert("Errore durante eliminazione definitiva.");
-        }
+        console.error("[Archiviati] Permanent delete error:", error);
+        IE?.showError?.(error.message || "Errore durante eliminazione definitiva.");
         return;
       }
   
-      if (IE.showSuccess) {
-        IE.showSuccess("Record eliminato definitivamente.");
+      if (!data || data.length === 0) {
+        console.warn("⚠️ Nessuna riga eliminata. Probabile blocco RLS.");
+        IE?.showError?.("Nessuna riga eliminata. Verifica permessi RLS.");
+        return;
       }
   
+      IE?.showSuccess?.("Record eliminato definitivamente.");
+  
+      // 🔄 Reload sezione
       if (section === SECTIONS.candidates) {
         await loadCandidates();
       } else if (section === SECTIONS.jobs) {
@@ -352,13 +354,7 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
   
     } catch (err) {
       console.error("[Archiviati] deletePermanently exception:", err);
-      if (IE && IE.showError) {
-        IE.showError(
-          (err && err.message) || "Errore durante eliminazione definitiva."
-        );
-      } else if (typeof alert === "function") {
-        alert("Errore durante eliminazione definitiva.");
-      }
+      IE?.showError?.(err?.message || "Errore durante eliminazione definitiva.");
     }
   }
 
