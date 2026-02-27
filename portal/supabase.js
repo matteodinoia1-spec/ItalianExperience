@@ -180,10 +180,14 @@
 
       const fullName = user.user_metadata?.full_name || user.email?.split("@")[0] || "User";
       const parts = String(fullName).trim().split(/\s+/);
-      const first_name = parts[0] || "";
-      const last_name = parts.slice(1).join(" ") || null;
+      const derivedFirst = parts[0] || "";
+      const derivedLast = parts.slice(1).join(" ") || null;
+      const first_name = (user.user_metadata?.first_name || "").trim() || derivedFirst;
+      const last_name = (user.user_metadata?.last_name || "").trim() || derivedLast;
 
-      const { data: inserted, error: insertError } = await supabase
+      console.log("[Profile] Creating profile for user:", user.id);
+
+      const { error: insertError } = await supabase
         .from("profiles")
         .insert({
           id: user.id,
@@ -191,15 +195,25 @@
           first_name,
           last_name,
           role: null,
-        })
-        .select()
-        .single();
+        });
 
       if (insertError) {
         console.error("[Supabase] ensureProfile insert error:", insertError.message, insertError);
         return { data: null, error: insertError };
       }
-      return { data: inserted, error: null };
+      // Re-fetch to return the full row shape (defensive; should now exist and be unique).
+      const { data: createdProfile, error: fetchCreatedError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (fetchCreatedError) {
+        console.error("[Supabase] ensureProfile post-insert fetch error:", fetchCreatedError.message, fetchCreatedError);
+        return { data: null, error: fetchCreatedError };
+      }
+
+      return { data: createdProfile || null, error: null };
     } catch (err) {
       console.error("[Supabase] ensureProfile exception:", err);
       return { data: null, error: err };
@@ -212,7 +226,8 @@
    */
   async function getProfile() {
     const { data: sessionData } = await getSession();
-    const userId = sessionData?.user?.id;
+    const user = sessionData?.user || null;
+    const userId = user?.id;
     if (!userId) return { data: null, error: null };
     try {
       const { data, error } = await supabase
@@ -224,6 +239,17 @@
         console.error("[Supabase] getProfile error:", error.message, error);
         return { data: null, error };
       }
+      if (!data) {
+        console.log("[Profile] No profile found for user, ensuring profile exists:", userId);
+        const { data: ensured, error: ensureError } = await ensureProfile(user);
+        if (ensureError) {
+          console.error("[Supabase] getProfile ensureProfile error:", ensureError.message || ensureError, ensureError);
+          return { data: null, error: ensureError };
+        }
+        console.log("[Profile] Loaded profile:", ensured);
+        return { data: ensured || null, error: null };
+      }
+      console.log("[Profile] Loaded profile:", data);
       return { data, error: null };
     } catch (err) {
       console.error("[Supabase] getProfile exception:", err);
@@ -245,23 +271,28 @@
       return { data: null, error: err };
     }
     try {
+      console.log("[Profile] Updating profile for user:", userId, "payload:", payload);
       const updates = {
         updated_at: new Date().toISOString(),
       };
       if (payload.first_name !== undefined) updates.first_name = payload.first_name;
       if (payload.last_name !== undefined) updates.last_name = payload.last_name;
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("profiles")
         .update(updates)
-        .eq("id", userId)
-        .select()
-        .single();
+        .eq("id", userId);
       if (error) {
         console.error("[Supabase] updateProfile error:", error.message, error);
         return { data: null, error };
       }
-      return { data, error: null };
+      // Re-fetch the latest profile so callers always receive fresh data.
+      const { data: refreshedProfile, error: fetchError } = await getProfile();
+      if (fetchError) {
+        console.error("[Supabase] updateProfile getProfile error:", fetchError.message || fetchError, fetchError);
+        return { data: null, error: fetchError };
+      }
+      return { data: refreshedProfile || null, error: null };
     } catch (err) {
       console.error("[Supabase] updateProfile exception:", err);
       return { data: null, error: err };

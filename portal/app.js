@@ -733,7 +733,7 @@
   function updateHeaderUserBlock() {
     if (!window.IESupabase) return;
     const displayName = getCurrentUserDisplayName();
-    const roleLabel = (IE_CURRENT_PROFILE && IE_CURRENT_PROFILE.role) ? String(IE_CURRENT_PROFILE.role) : "User";
+    const roleLabel = getCurrentUserRole();
     const nameEl = document.querySelector("header .text-right p.text-sm");
     const roleEl = document.querySelector("header .text-right p:nth-of-type(2)");
     const avatarEl = document.querySelector("header .w-10.h-10.rounded-full img");
@@ -1701,11 +1701,27 @@
   }
 
   let IE_CURRENT_PROFILE = null;
+  let IE_CURRENT_USER_EMAIL = null;
 
   async function loadCurrentUserProfile() {
     if (!window.IESupabase) return;
-    const { data } = await window.IESupabase.getProfile();
-    IE_CURRENT_PROFILE = data || null;
+    try {
+      const { data: sessionResult } = await window.IESupabase.getSession();
+      const user = sessionResult?.user || null;
+      IE_CURRENT_USER_EMAIL = user?.email || null;
+
+      const { data, error } = await window.IESupabase.getProfile();
+      if (error) {
+        console.error("[Profile] Failed to load profile in header:", error);
+        IE_CURRENT_PROFILE = null;
+        return;
+      }
+      IE_CURRENT_PROFILE = data || null;
+      console.log("[Profile] Loaded profile:", IE_CURRENT_PROFILE);
+    } catch (e) {
+      console.error("[Profile] loadCurrentUserProfile exception:", e);
+      IE_CURRENT_PROFILE = null;
+    }
   }
 
   function getCurrentUserDisplayName() {
@@ -1716,17 +1732,12 @@
       if (IE_CURRENT_PROFILE.full_name) return IE_CURRENT_PROFILE.full_name;
       if (IE_CURRENT_PROFILE.email) return IE_CURRENT_PROFILE.email;
     }
-    if (window.IESupabase) {
-      try {
-        const session = window.IESupabase.supabase?.auth?.getSession?.();
-        if (session?.data?.session?.user?.email) return session.data.session.user.email;
-      } catch (e) {}
-    }
+    if (IE_CURRENT_USER_EMAIL) return IE_CURRENT_USER_EMAIL;
     return "User";
   }
 
   function getCurrentUserRole() {
-    return (IE_CURRENT_PROFILE && IE_CURRENT_PROFILE.role) ? String(IE_CURRENT_PROFILE.role) : "User";
+    return (IE_CURRENT_PROFILE && IE_CURRENT_PROFILE.role) ? String(IE_CURRENT_PROFILE.role) : "—";
   }
 
   function markUpdated(record) {
