@@ -2793,7 +2793,7 @@
                     <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                   </svg>
                 </button>
-                <button type="button" data-action="archive-candidate" data-id="${row.id}" class="p-2 text-gray-400 hover:text-red-500 transition" title="${row.is_archived ? "Archived" : "Archive"}">
+                <button type="button" data-action="archive-candidate" data-id="${row.id}" class="p-2 text-gray-400 hover:text-red-500 transition" title="${row.is_archived ? "Archiviato" : "Archivia"}">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                   </svg>
@@ -2979,8 +2979,36 @@
           "Sei sicuro di voler archiviare questa offerta? Potrai vederla nella vista 'Archived'."
         );
         if (!confirmed) return;
-        archiveRecordById(IE_STORE.jobOffers, id);
-        renderOffers();
+
+        if (window.IESupabase && window.IESupabase.archiveJobOffer) {
+          window.IESupabase
+            .archiveJobOffer(id)
+            .then(function (result) {
+              if (result && result.error) {
+                if (window.IESupabase.showError) {
+                  window.IESupabase.showError(
+                    result.error.message || "Errore durante l'archiviazione."
+                  );
+                }
+                return;
+              }
+              if (window.IESupabase.showSuccess) {
+                window.IESupabase.showSuccess("Offerta archiviata.");
+              }
+              renderOffers();
+            })
+            .catch(function (err) {
+              console.error("[ItalianExperience] archiveJobOffer error:", err);
+              if (window.IESupabase && window.IESupabase.showError) {
+                window.IESupabase.showError(
+                  (err && err.message) || "Errore durante l'archiviazione."
+                );
+              }
+            });
+        } else {
+          archiveRecordById(IE_STORE.jobOffers, id);
+          renderOffers();
+        }
       }
     });
 
@@ -3041,7 +3069,7 @@
                     <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                   </svg>
                 </button>
-                <button type="button" data-action="archive-offer" data-id="${row.id}" class="p-2 text-gray-400 hover:text-red-500 transition" title="${row.is_archived ? "Archived" : "Archive"}">
+                <button type="button" data-action="archive-offer" data-id="${row.id}" class="p-2 text-gray-400 hover:text-red-500 transition" title="${row.is_archived ? "Archiviata" : "Archivia"}">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                   </svg>
@@ -3191,7 +3219,33 @@
           "Sei sicuro di voler archiviare questo cliente? Potrai vederlo nella vista 'Archived'."
         );
         if (!confirmed) return;
-        if (typeof archiveRecordById === "function" && IE_STORE && IE_STORE.clients) {
+
+        if (window.IESupabase && window.IESupabase.archiveClient) {
+          window.IESupabase
+            .archiveClient(id)
+            .then(function (result) {
+              if (result && result.error) {
+                if (window.IESupabase.showError) {
+                  window.IESupabase.showError(
+                    result.error.message || "Errore durante l'archiviazione."
+                  );
+                }
+                return;
+              }
+              if (window.IESupabase.showSuccess) {
+                window.IESupabase.showSuccess("Cliente archiviato.");
+              }
+              renderClients();
+            })
+            .catch(function (err) {
+              console.error("[ItalianExperience] archiveClient error:", err);
+              if (window.IESupabase && window.IESupabase.showError) {
+                window.IESupabase.showError(
+                  (err && err.message) || "Errore durante l'archiviazione."
+                );
+              }
+            });
+        } else if (typeof archiveRecordById === "function" && IE_STORE && IE_STORE.clients) {
           archiveRecordById(IE_STORE.clients, id);
           renderClients();
         }
@@ -3362,7 +3416,7 @@
                 <button type="button" data-action="archive-client" data-id="${
                   row.id
                 }" class="p-2 text-gray-400 hover:text-red-500 transition" title="${
-            row.is_archived ? "Archived" : "Archive"
+            row.is_archived ? "Archiviato" : "Archivia"
           }">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>

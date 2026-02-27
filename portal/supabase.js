@@ -876,6 +876,56 @@
     }
   }
 
+  /**
+   * Archive a job offer (set is_archived = true). Does not remove the record.
+   * @param {string} id - job_offers id
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function archiveJobOffer(id) {
+    if (!id) return { data: null, error: new Error("Missing id") };
+    try {
+      const { data, error } = await supabase
+        .from("job_offers")
+        .update({ is_archived: true })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] archiveJobOffer error:", error.message, error);
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] archiveJobOffer exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Archive a client (set is_archived = true). Does not remove the record.
+   * @param {string} id - clients id
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function archiveClient(id) {
+    if (!id) return { data: null, error: new Error("Missing id") };
+    try {
+      const { data, error } = await supabase
+        .from("clients")
+        .update({ is_archived: true })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] archiveClient error:", error.message, error);
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] archiveClient exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Restore (unarchive) – set is_archived = false for Archiviati page
   // ---------------------------------------------------------------------------
@@ -1259,10 +1309,12 @@
     fetchCandidatesPaginated,
     // Job offers
     insertJobOffer,
+    archiveJobOffer,
     fetchJobOffers,
     fetchJobOffersPaginated,
     // Clients
     insertClient,
+    archiveClient,
     fetchClientsPaginated,
     // Restore (unarchive) for Archiviati page
     unarchiveCandidate,

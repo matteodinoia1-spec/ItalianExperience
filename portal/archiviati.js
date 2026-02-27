@@ -93,8 +93,10 @@
           "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(position) + "</td>" +
           "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(status) + "</td>" +
           '<td class="px-6 py-4 text-right">' +
+          '<div class="flex items-center justify-end space-x-2">' +
           '<button type="button" data-action="restore-candidate" data-id="' + escapeHtml(row.id) + '" class="px-3 py-1.5 rounded-lg bg-[#1b4332] text-white text-xs font-medium hover:bg-[#1b4332]/90 transition">Ripristina</button>' +
-          "</td></tr>"
+          '<button type="button" data-action="delete-candidate-permanent" data-id="' + escapeHtml(row.id) + '" class="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 transition">Elimina definitivamente</button>' +
+          "</div></td></tr>"
         );
       })
       .join("");
@@ -151,8 +153,10 @@
           "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(client) + "</td>" +
           "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(location) + "</td>" +
           '<td class="px-6 py-4 text-right">' +
+          '<div class="flex items-center justify-end space-x-2">' +
           '<button type="button" data-action="restore-job" data-id="' + escapeHtml(row.id) + '" class="px-3 py-1.5 rounded-lg bg-[#1b4332] text-white text-xs font-medium hover:bg-[#1b4332]/90 transition">Ripristina</button>' +
-          "</td></tr>"
+          '<button type="button" data-action="delete-job-permanent" data-id="' + escapeHtml(row.id) + '" class="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 transition">Elimina definitivamente</button>' +
+          "</div></td></tr>"
         );
       })
       .join("");
@@ -211,8 +215,10 @@
           "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(state) + "</td>" +
           "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(email) + "</td>" +
           '<td class="px-6 py-4 text-right">' +
+          '<div class="flex items-center justify-end space-x-2">' +
           '<button type="button" data-action="restore-client" data-id="' + escapeHtml(row.id) + '" class="px-3 py-1.5 rounded-lg bg-[#1b4332] text-white text-xs font-medium hover:bg-[#1b4332]/90 transition">Ripristina</button>' +
-          "</td></tr>"
+          '<button type="button" data-action="delete-client-permanent" data-id="' + escapeHtml(row.id) + '" class="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 transition">Elimina definitivamente</button>' +
+          "</div></td></tr>"
         );
       })
       .join("");
@@ -291,6 +297,57 @@
     } catch (err) {
       console.error("[Archiviati] restoreClient", err);
       IE.showError && IE.showError(err && err.message ? err.message : "Errore di rete.");
+    }
+  }
+
+  async function deletePermanently(id, tableName, section) {
+    const IE = getIE();
+    if (!IE || !IE.supabase) {
+      console.error("[Archiviati] deletePermanently: Supabase non disponibile.");
+      if (IE && IE.showError) {
+        IE.showError("Supabase non disponibile. Impossibile eliminare definitivamente.");
+      } else if (typeof alert === "function") {
+        alert("Errore durante eliminazione definitiva.");
+      }
+      return;
+    }
+
+    try {
+      const { error } = await IE.supabase
+        .from(tableName)
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        console.error("[Archiviati] Permanent delete failed:", error);
+        if (IE.showError) {
+          IE.showError(error.message || "Errore durante eliminazione definitiva.");
+        } else if (typeof alert === "function") {
+          alert("Errore durante eliminazione definitiva.");
+        }
+        return;
+      }
+
+      if (IE.showSuccess) {
+        IE.showSuccess("Record eliminato definitivamente.");
+      }
+
+      if (section === SECTIONS.candidates) {
+        await loadCandidates();
+      } else if (section === SECTIONS.jobs) {
+        await loadJobs();
+      } else if (section === SECTIONS.clients) {
+        await loadClients();
+      }
+    } catch (err) {
+      console.error("[Archiviati] deletePermanently exception:", err);
+      if (IE && IE.showError) {
+        IE.showError(
+          (err && err.message) || "Errore durante eliminazione definitiva."
+        );
+      } else if (typeof alert === "function") {
+        alert("Errore durante eliminazione definitiva.");
+      }
     }
   }
 
@@ -396,6 +453,33 @@
       if (btn) {
         var id = btn.getAttribute("data-id");
         if (id) restoreClient(id);
+        return;
+      }
+
+      btn = e.target.closest("[data-action='delete-candidate-permanent']");
+      if (btn) {
+        var id = btn.getAttribute("data-id");
+        if (id && window.confirm("Sei sicuro? Questa azione è irreversibile.")) {
+          deletePermanently(id, "candidates", SECTIONS.candidates);
+        }
+        return;
+      }
+
+      btn = e.target.closest("[data-action='delete-job-permanent']");
+      if (btn) {
+        var id = btn.getAttribute("data-id");
+        if (id && window.confirm("Sei sicuro? Questa azione è irreversibile.")) {
+          deletePermanently(id, "job_offers", SECTIONS.jobs);
+        }
+        return;
+      }
+
+      btn = e.target.closest("[data-action='delete-client-permanent']");
+      if (btn) {
+        var id = btn.getAttribute("data-id");
+        if (id && window.confirm("Sei sicuro? Questa azione è irreversibile.")) {
+          deletePermanently(id, "clients", SECTIONS.clients);
+        }
       }
     });
   }
