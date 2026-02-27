@@ -1814,8 +1814,10 @@
   function initDataViews() {
     const pageKey = getCurrentPageKey();
     if (pageKey === "dashboard") {
-      initDashboardPage();
-    } else if (pageKey === "candidati") {
+      // Dashboard data is loaded by portal/dashboard/dashboard.js
+      return;
+    }
+    if (pageKey === "candidati") {
       initCandidatesPage();
     } else if (pageKey === "offerte") {
       initJobOffersPage();
