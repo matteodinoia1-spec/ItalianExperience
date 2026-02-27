@@ -27,7 +27,7 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Mobile: evita taglio in alto e permette scroll */
+        /* Mobile: layout compatto e riquadro adattato allo schermo */
         @media (max-width: 767px) {
             body {
                 background-attachment: scroll;
@@ -35,10 +35,55 @@
                 min-height: 100dvh;
                 align-items: flex-start;
                 justify-content: flex-start;
-                padding-top: max(1rem, env(safe-area-inset-top));
-                padding-bottom: max(1rem, env(safe-area-inset-bottom));
-                padding-left: 1rem;
-                padding-right: 1rem;
+                padding: max(0.5rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right)) max(0.5rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
+            }
+            .login-card {
+                max-height: calc(100dvh - 1rem);
+                max-height: calc(100vh - 1rem);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0;
+                border-radius: 1rem;
+            }
+            .login-card .login-left {
+                min-height: 140px;
+                padding: 1rem 1.25rem;
+            }
+            .login-card .login-left h2 {
+                font-size: 1.35rem;
+                margin-bottom: 0.5rem;
+            }
+            .login-card .login-left p.text-lg {
+                font-size: 0.875rem;
+                line-height: 1.4;
+            }
+            .login-card .login-right {
+                padding: 1rem 1.25rem 1.5rem;
+            }
+            .login-card .login-right .login-header {
+                margin-bottom: 1rem;
+            }
+            .login-card .login-right .login-header h1 {
+                font-size: 1.5rem;
+                margin-bottom: 0.25rem;
+            }
+            .login-card .login-right .login-header p {
+                font-size: 0.75rem;
+            }
+            .login-card .login-form .input-field {
+                padding: 0.625rem 0.75rem;
+                font-size: 16px; /* evita zoom su iOS */
+            }
+            .login-card .login-form .btn-submit {
+                padding: 0.75rem 1rem;
+                font-size: 0.75rem;
+                margin-top: 0.5rem;
+            }
+            .login-card .login-footer {
+                margin-top: 1rem;
+            }
+            .login-card .login-footer .divider {
+                margin-top: 1rem;
             }
         }
 
@@ -101,10 +146,10 @@
 <body class="min-h-screen min-h-[100dvh] flex flex-col md:flex-row items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]">
 
     <!-- Wrapper per l'effetto glass globale (su mobile scrollabile) -->
-    <div class="login-card max-w-5xl w-full rounded-2xl overflow-hidden flex flex-col md:flex-row glass-container fade-in flex-shrink-0 md:my-0 my-6">
+    <div class="login-card max-w-5xl w-full rounded-2xl overflow-hidden flex flex-col md:flex-row glass-container fade-in flex-shrink-0 md:my-0 my-2 sm:my-6">
         
         <!-- Colonna Sinistra: Immagine e Benvenuto -->
-        <div class="md:w-1/2 bg-italian-overlay p-8 md:p-12 text-white flex flex-col justify-between min-h-[220px] md:min-h-[600px]">
+        <div class="login-left md:w-1/2 bg-italian-overlay p-8 md:p-12 text-white flex flex-col justify-between min-h-[220px] md:min-h-[600px]">
             <div class="backdrop-brightness-90 p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
                 <h2 class="text-3xl lg:text-4xl font-bold italic mb-4 serif">Benvenuto</h2>
                 <p class="text-lg font-light opacity-95 leading-relaxed">
@@ -117,13 +162,13 @@
         </div>
 
         <!-- Colonna Destra: Modulo Login -->
-        <div class="md:w-1/2 p-8 lg:p-16 flex flex-col justify-center">
-            <div class="mb-10 text-center md:text-left">
+        <div class="login-right md:w-1/2 p-8 lg:p-16 flex flex-col justify-center">
+            <div class="login-header mb-10 text-center md:text-left">
                 <h1 class="text-4xl font-bold mb-2 serif">Accesso</h1>
                 <p class="text-gray-600 text-sm italic">Area riservata ai membri della community.</p>
             </div>
 
-            <form id="loginForm" class="space-y-6">
+            <form id="loginForm" class="login-form space-y-4 md:space-y-6">
                 <!-- Email/Username -->
                 <div class="relative">
                     <label for="email" class="block text-xs uppercase tracking-wider font-semibold text-gray-500 mb-1">Email o Nome Utente</label>
@@ -156,18 +201,18 @@
                 </div>
 
                 <!-- Bottone Submit -->
-                <button type="submit" class="w-full py-4 rounded-md btn-gold font-semibold uppercase tracking-widest text-sm shadow-lg mt-4">
+                <button type="submit" class="btn-submit w-full py-4 rounded-md btn-gold font-semibold uppercase tracking-widest text-sm shadow-lg mt-4">
                     Accedi ora
                 </button>
             </form>
 
             <!-- Footer del form -->
-            <div class="mt-12 text-center">
+            <div class="login-footer mt-12 text-center">
                 <p class="text-gray-500 text-xs uppercase tracking-widest font-medium">
                     L'accesso è consentito solo su invito.
                 </p>
                 
-                <div class="flex items-center justify-center space-x-4 mt-8 opacity-40">
+                <div class="divider flex items-center justify-center space-x-4 mt-8 opacity-40">
                     <div class="h-px w-8 bg-gray-400"></div>
                     <span class="text-xs uppercase tracking-tighter">Esplora l'Italia</span>
                     <div class="h-px w-8 bg-gray-400"></div>
