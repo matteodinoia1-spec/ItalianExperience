@@ -1,3 +1,4 @@
+console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
 /**
  * Archiviati page – Supabase integration
  * Loads archived candidates, job offers, and clients with pagination, search, and restore.
