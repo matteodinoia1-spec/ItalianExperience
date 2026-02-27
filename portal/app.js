@@ -2702,6 +2702,7 @@
         foto_url: r.photo_url || r.foto_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent((first_name || "") + "+" + (last_name || "")) + "&background=dbeafe&color=1e40af",
         created_at: r.created_at,
         is_archived: r.is_archived || false,
+        latest_association: r.latest_association || null,
       };
     }
 
@@ -2756,6 +2757,7 @@
         tr.className = "table-row transition" + (row.is_archived ? " opacity-60" : "");
         tr.setAttribute("data-id", row.id);
         const clientName = findClientNameForCandidate(row);
+        const latestAssoc = row.latest_association || null;
         const statusBadgeClass = getCandidateStatusBadgeClass(row.status);
         const sourceLabel = (row.source || "").toUpperCase();
         const createdDate = row.created_at
@@ -2764,13 +2766,29 @@
         const metaTitle = formatLastUpdatedMeta(row);
         if (metaTitle) tr.title = metaTitle;
 
+        let assignmentHtml;
+        if (latestAssoc) {
+          const jobTitle = latestAssoc.job_title || "—";
+          const jobLocation = latestAssoc.job_location || "—";
+          const assocStatus = latestAssoc.status || "new";
+          const assocStatusLabel = formatCandidateStatusLabel(assocStatus);
+          const assocStatusClass = getCandidateStatusBadgeClass(assocStatus);
+          assignmentHtml =
+            '<div class="text-gray-800 font-medium">' + (clientName || "—") + "</div>" +
+            '<div class="text-xs text-gray-500">' + jobTitle + (jobLocation ? " · " + jobLocation : "") + "</div>" +
+            '<div class="mt-1"><span class="badge ' + assocStatusClass + '">' + assocStatusLabel + "</span></div>";
+        } else {
+          assignmentHtml =
+            '<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold">Non assegnato</span>';
+        }
+
         tr.innerHTML = `
             <td class="px-6 py-4">
               <img src="${row.foto_url || ""}" class="w-10 h-10 rounded-full border-2 border-white shadow-sm" alt="${row.first_name} ${row.last_name}">
             </td>
             <td class="px-6 py-4 font-semibold text-gray-800">${row.first_name} ${row.last_name}</td>
             <td class="px-6 py-4 text-gray-600">${row.position || "—"}</td>
-            <td class="px-6 py-4 text-gray-600">${clientName}</td>
+            <td class="px-6 py-4 text-gray-600">${assignmentHtml}</td>
             <td class="px-6 py-4 text-gray-500 italic">${row.address || "—"}</td>
             <td class="px-6 py-4"><span class="badge ${statusBadgeClass}">${formatCandidateStatusLabel(row.status)}</span></td>
             <td class="px-6 py-4 text-xs font-medium text-blue-600">${sourceLabel || "—"}</td>
@@ -2806,6 +2824,9 @@
     }
 
     function findClientNameForCandidate(candidate) {
+      if (candidate.latest_association && candidate.latest_association.client_name) {
+        return candidate.latest_association.client_name;
+      }
       if (candidate.client_name) return candidate.client_name;
       const assoc = IE_STORE.candidateJobAssociations.find(
         (a) => a.candidate_id === candidate.id

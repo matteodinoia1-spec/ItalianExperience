@@ -650,6 +650,9 @@
             `
             *,
             candidate_job_associations (
+              id,
+              status,
+              created_at,
               job_offer_id,
               job_offers (
                 id,
@@ -671,6 +674,7 @@
         userId
       );
       const { data: rows, error: dataError } = await dataQuery
+        .order("created_at", { foreignTable: "candidate_job_associations", ascending: false })
         .order("created_at", { ascending: false })
         .range(offset, offset + limit - 1);
 
@@ -679,15 +683,29 @@
         return { data: [], totalCount, error: dataError };
       }
       const data = (rows || []).map(function (r) {
-        let clientName = r.client_name || null;
-        if (!clientName && Array.isArray(r.candidate_job_associations) && r.candidate_job_associations.length > 0) {
-          const assoc = r.candidate_job_associations[0];
-          const job = assoc && assoc.job_offers;
-          const client = job && job.clients;
-          if (client && client.name) {
-            clientName = client.name;
-          }
+        let latestAssociation = null;
+        if (Array.isArray(r.candidate_job_associations) && r.candidate_job_associations.length > 0) {
+          latestAssociation = r.candidate_job_associations[0];
         }
+
+        let latestJob = latestAssociation && latestAssociation.job_offers ? latestAssociation.job_offers : null;
+        let latestClient = latestJob && latestJob.clients ? latestJob.clients : null;
+
+        const latestClientName =
+          r.client_name ||
+          (latestClient && latestClient.name) ||
+          null;
+
+        const latestJobLocation = latestJob
+          ? [latestJob.city, latestJob.state]
+              .filter(function (x) {
+                return x;
+              })
+              .join(", ")
+          : null;
+
+        const latestAssociationStatus = latestAssociation && latestAssociation.status ? latestAssociation.status : null;
+
         return {
           id: r.id,
           first_name: r.first_name,
@@ -699,8 +717,19 @@
           notes: r.notes,
           created_at: r.created_at,
           is_archived: r.is_archived,
-          client_name: clientName,
+          client_name: latestClientName,
           photo_url: r.photo_url,
+          latest_association: latestAssociation
+            ? {
+                id: latestAssociation.id,
+                status: latestAssociationStatus,
+                created_at: latestAssociation.created_at,
+                job_offer_id: latestAssociation.job_offer_id,
+                job_title: latestJob ? latestJob.title : null,
+                job_location: latestJobLocation,
+                client_name: latestClientName,
+              }
+            : null,
         };
       });
       return { data, totalCount, error: null };
