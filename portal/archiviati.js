@@ -317,10 +317,11 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
   
       // 🔥 Delete con select per vedere cosa viene realmente eliminato
       const { data, error } = await IE.supabase
-        .from(tableName)
-        .delete()
-        .eq("id", id)
-        .select(); // fondamentale per debug RLS
+  .from(tableName)
+  .delete()
+  .eq("id", id)
+  .eq("is_archived", true)   // forziamo la stessa condizione della policy
+  .select(); // fondamentale per debug RLS
   
       console.log("DELETE RESULT →", {
         table: tableName,
