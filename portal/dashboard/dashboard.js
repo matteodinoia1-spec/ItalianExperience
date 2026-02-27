@@ -104,7 +104,7 @@
     if (!supabase) return { data: 0, error: new Error("Supabase not available") };
 
     const { count, error } = await supabase
-      .from("candidates")
+      .from("candidates_with_client")
       .select("*", { count: "exact", head: true })
       .eq("is_archived", false);
 
@@ -121,7 +121,7 @@
     if (!supabase) return { data: 0, error: new Error("Supabase not available") };
 
     const { count, error } = await supabase
-      .from("job_offers")
+      .from("job_offers_with_client")
       .select("*", { count: "exact", head: true })
       .eq("is_archived", false)
       .in("status", ["open", "attiva"]);
@@ -142,7 +142,7 @@
     const end = getTodayEnd();
 
     const { data, error } = await supabase
-      .from("candidates")
+      .from("candidates_with_client")
       .select("id")
       .eq("is_archived", false)
       .gte("created_at", start)
@@ -164,7 +164,7 @@
     const end = getMonthEnd();
 
     const { data, error } = await supabase
-      .from("candidates")
+      .from("candidates_with_client")
       .select("id")
       .eq("status", "assunto")
       .gte("created_at", start)
@@ -188,7 +188,7 @@
     const supabase = getSupabase();
     if (!supabase) return { data: 0, error: new Error("Supabase not available") };
     const { data, error } = await supabase
-      .from("candidates")
+      .from("candidates_with_client")
       .select("id")
       .gte("created_at", start)
       .lt("created_at", end);
@@ -206,7 +206,7 @@
     const supabase = getSupabase();
     if (!supabase) return { data: 0, error: new Error("Supabase not available") };
     const { data, error } = await supabase
-      .from("job_offers")
+      .from("job_offers_with_client")
       .select("id")
       .gte("created_at", start)
       .lt("created_at", end);
@@ -224,7 +224,7 @@
     const supabase = getSupabase();
     if (!supabase) return { data: 0, error: new Error("Supabase not available") };
     const { data, error } = await supabase
-      .from("candidates")
+      .from("candidates_with_client")
       .select("id")
       .or("status.eq.hired,status.eq.assunto")
       .gte("created_at", start)
@@ -349,7 +349,7 @@
     if (!supabase) return { data: [], error: new Error("Supabase not available") };
 
     const { data, error } = await supabase
-      .from("candidates")
+      .from("candidates_with_client")
       .select("first_name, last_name, position, status, created_at")
       .eq("is_archived", false)
       .order("created_at", { ascending: false })
@@ -376,7 +376,7 @@
     if (!supabase) return { data: [], error: new Error("Supabase not available") };
 
     const { data, error } = await supabase
-      .from("candidates")
+      .from("candidates_with_client")
       .select("source")
       .eq("is_archived", false);
 

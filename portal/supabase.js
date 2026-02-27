@@ -306,7 +306,7 @@
     if (!id) return { data: null, error: new Error("Missing id") };
     try {
       const { data, error } = await supabase
-        .from("candidates")
+        .from("candidates_with_client")
         .select("*")
         .eq("id", id)
         .maybeSingle();
@@ -366,7 +366,7 @@
     if (!userId) return { data: [], error: null };
     try {
       const { data, error } = await supabase
-        .from("candidates")
+        .from("candidates_with_client")
         .select("*")
         .eq("created_by", userId)
         .order("created_at", { ascending: false });
@@ -435,7 +435,7 @@
   async function fetchJobOffers() {
     try {
       const { data, error } = await supabase
-        .from("job_offers")
+        .from("job_offers_with_client")
         .select("*")
         .order("created_at", { ascending: false });
       if (error) {
@@ -496,7 +496,7 @@
 
     try {
       const countQuery = buildCandidatesQuery(
-        supabase.from("candidates").select("*", { count: "exact", head: true }),
+        supabase.from("candidates_with_client").select("*", { count: "exact", head: true }),
         filters,
         userId
       );
@@ -508,7 +508,7 @@
       const totalCount = count ?? 0;
 
       const dataQuery = buildCandidatesQuery(
-        supabase.from("candidates").select("*"),
+        supabase.from("candidates_with_client").select("*"),
         filters,
         userId
       );
@@ -532,6 +532,7 @@
           notes: r.notes,
           created_at: r.created_at,
           is_archived: r.is_archived,
+          client_name: r.client_name,
           photo_url: r.photo_url,
         };
       });
@@ -584,7 +585,7 @@
 
     try {
       const countQuery = buildJobOffersQuery(
-        supabase.from("job_offers").select("*", { count: "exact", head: true }),
+        supabase.from("job_offers_with_client").select("*", { count: "exact", head: true }),
         filters
       );
       const { count, error: countError } = await countQuery;
@@ -595,7 +596,7 @@
       const totalCount = count ?? 0;
 
       const dataQuery = buildJobOffersQuery(
-        supabase.from("job_offers").select("*"),
+        supabase.from("job_offers_with_client").select("*"),
         filters
       );
       const { data: rows, error: dataError } = await dataQuery
@@ -612,6 +613,7 @@
           title: r.title,
           position: r.position,
           client_id: r.client_id,
+          client_name: r.client_name,
           description: r.description,
           requirements: r.requirements,
           notes: r.notes,
@@ -620,6 +622,7 @@
           positions: r.positions,
           city: r.city,
           state: r.state,
+          location: r.location,
           deadline: r.deadline,
           status: r.status,
           created_at: r.created_at,
@@ -953,7 +956,7 @@
    */
   async function getTotalCandidates() {
     try {
-      let q = supabase.from("candidates").select("*", { count: "exact", head: true });
+      let q = supabase.from("candidates_with_client").select("*", { count: "exact", head: true });
       try {
         q = q.eq("is_archived", false);
       } catch (_) {}
@@ -975,7 +978,7 @@
    */
   async function getActiveJobOffers() {
     try {
-      let q = supabase.from("job_offers").select("*", { count: "exact", head: true });
+      let q = supabase.from("job_offers_with_client").select("*", { count: "exact", head: true });
       try {
         q = q.eq("is_archived", false);
       } catch (_) {}
@@ -1001,7 +1004,7 @@
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
       const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString();
       const { data, error } = await supabase
-        .from("candidates")
+        .from("candidates_with_client")
         .select("id")
         .gte("created_at", startOfDay)
         .lt("created_at", endOfDay);
@@ -1026,7 +1029,7 @@
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
       const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
       const { data, error } = await supabase
-        .from("candidates")
+        .from("candidates_with_client")
         .select("id")
         .eq("status", "hired")
         .gte("created_at", startOfMonth)
@@ -1049,7 +1052,7 @@
   async function getRecentCandidates() {
     try {
       let q = supabase
-        .from("candidates")
+        .from("candidates_with_client")
         .select("id, first_name, last_name, position, status, source, created_at")
         .order("created_at", { ascending: false })
         .limit(10);
@@ -1075,7 +1078,7 @@
   async function getCandidatesBySource() {
     try {
       const { data, error } = await supabase
-        .from("candidates")
+        .from("candidates_with_client")
         .select("source")
         .eq("is_archived", false);
       if (error) {
@@ -1123,8 +1126,8 @@
       if (!assocs?.length) return { data: [], error: null };
       const offerIds = [...new Set(assocs.map((a) => a.job_offer_id))];
       const { data: offers, error: offersError } = await supabase
-        .from("job_offers")
-        .select("id, title, position, city, state, salary, deadline, status")
+        .from("job_offers_with_client")
+        .select("id, title, position, city, state, salary, deadline, status, client_name, location")
         .in("id", offerIds);
       if (offersError) {
         console.error("[Supabase] fetchJobHistoryForCandidate job_offers error:", offersError.message);
