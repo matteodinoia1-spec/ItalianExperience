@@ -49,6 +49,12 @@
         console.error("[Supabase Auth] Login error:", error.message, error);
         return { data: null, error };
       }
+      // Auth success: log user id so we can verify auth.uid() will be non-null on queries.
+      if (data?.user?.id) {
+        console.log("[Supabase Auth] Login success. User id:", data.user.id);
+      } else {
+        console.log("[Supabase Auth] Login success but user object missing.");
+      }
       return { data, error: null };
     } catch (err) {
       console.error("[Supabase Auth] Login exception:", err);
@@ -84,6 +90,12 @@
       if (error) {
         console.error("[Supabase Auth] getSession error:", error.message, error);
         return { data: { session: null, user: null }, error };
+      }
+      if (session?.user?.id) {
+        // Session restored on page load (or still valid): useful to confirm persistence across navigation.
+        console.log("[Supabase Auth] Session restored for user id:", session.user.id);
+      } else {
+        console.log("[Supabase Auth] No active session found.");
       }
       return { data: { session, user: session?.user ?? null }, error: null };
     } catch (err) {
@@ -123,9 +135,11 @@
   async function requireAuth() {
     const { data } = await getSession();
     if (!data?.user) {
+      console.warn("[Supabase Auth] requireAuth: no user found, redirecting to login.");
       redirectToLogin();
       return undefined;
     }
+    console.log("[Supabase Auth] requireAuth: user is authenticated with id:", data.user.id);
     return data.user;
   }
 
@@ -274,6 +288,7 @@
       return { data: null, error: err };
     }
     try {
+      console.log("[Supabase] insertCandidate as user id:", userId);
       const row = {
         created_by: userId,
         first_name: payload.first_name || "",
@@ -365,6 +380,7 @@
     const userId = sessionData?.user?.id;
     if (!userId) return { data: [], error: null };
     try {
+      console.log("[Supabase] fetchMyCandidates for user id:", userId);
       const { data, error } = await supabase
         .from("candidates_with_client")
         .select("*")
@@ -400,6 +416,7 @@
       return { data: null, error: err };
     }
     try {
+      console.log("[Supabase] insertJobOffer as user id:", userId);
       const row = {
         created_by: userId,
         client_id: payload.client_id || null,
@@ -495,6 +512,7 @@
     const offset = (page - 1) * limit;
 
     try {
+      console.log("[Supabase] fetchCandidatesPaginated for user id:", userId, "page:", page, "limit:", limit);
       const countQuery = buildCandidatesQuery(
         supabase.from("candidates_with_client").select("*", { count: "exact", head: true }),
         filters,
@@ -692,6 +710,7 @@
       return { data: null, error: err };
     }
     try {
+      console.log("[Supabase] insertClient as user id:", userId);
       const row = {
         created_by: userId,
         name: payload.name || "",
@@ -899,6 +918,7 @@
       return { data: null, error: err };
     }
     try {
+      console.log("[Supabase] linkCandidateToJob as user id:", userId, "candidate:", payload.candidate_id, "job_offer:", payload.job_offer_id);
       const row = {
         candidate_id: payload.candidate_id,
         job_offer_id: payload.job_offer_id,

@@ -253,22 +253,39 @@
                 return;
             }
             showMessage('Accesso in corso...', 'success');
-            if (window.IESupabase) {
-                const { data, error } = await window.IESupabase.login(email, password);
-                if (error) {
-                    console.error('[Login]', error);
-                    showMessage(error.message || 'Accesso fallito. Controlla email e password.', 'error');
-                    return;
-                }
-                if (data?.user) {
-                    await window.IESupabase.ensureProfile(data.user);
-                    showMessage('Ben tornato! Reindirizzamento...', 'success');
-                    window.IESupabase.redirectToDashboard();
-                    return;
-                }
+            if (!window.IESupabase) {
+                console.error('[Login] IESupabase non è disponibile. Il client Supabase non è stato caricato.');
+                showMessage('Errore interno. Riprova più tardi.', 'error');
+                return;
             }
-            showMessage('Ben tornato, ' + email + '! Accesso in corso...', 'success');
-            setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
+
+            console.log('[Login] Tentativo di login per:', email);
+            const { data, error } = await window.IESupabase.login(email, password);
+            if (error) {
+                console.error('[Login] Errore di autenticazione:', error);
+                showMessage(error.message || 'Accesso fallito. Controlla email e password.', 'error');
+                return;
+            }
+
+            if (!data || !data.user) {
+                console.error('[Login] Risposta di login senza utente valido:', data);
+                showMessage('Accesso non riuscito. Riprova.', 'error');
+                return;
+            }
+
+            console.log('[Login] Utente autenticato, id:', data.user.id);
+
+            // Dopo il login, creiamo/aggiorniamo il profilo e poi
+            // reindirizziamo SEMPRE alla dashboard (nessun fallback anonimo).
+            try {
+                await window.IESupabase.ensureProfile(data.user);
+                console.log('[Login] Profilo verificato/creato per user id:', data.user.id);
+            } catch (profileError) {
+                console.error('[Login] Errore durante ensureProfile:', profileError);
+            }
+
+            showMessage('Ben tornato! Reindirizzamento...', 'success');
+            window.IESupabase.redirectToDashboard();
         });
 
         function showMessage(text, type) {
@@ -284,7 +301,10 @@
     <script src="supabase.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            if (window.IESupabase) window.IESupabase.redirectToDashboardIfAuthenticated();
+            if (window.IESupabase) {
+                console.log('[Auth] Login page loaded, verifico eventuale sessione esistente...');
+                window.IESupabase.redirectToDashboardIfAuthenticated();
+            }
         });
     </script>
     <script src="app.js"></script>
