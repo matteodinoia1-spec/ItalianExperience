@@ -302,6 +302,7 @@
 
   async function deletePermanently(id, tableName, section) {
     const IE = getIE();
+  
     if (!IE || !IE.supabase) {
       console.error("[Archiviati] deletePermanently: Supabase non disponibile.");
       if (IE && IE.showError) {
@@ -311,13 +312,21 @@
       }
       return;
     }
-
+  
     try {
-      const { error } = await IE.supabase
+      const { data, error, status } = await IE.supabase
         .from(tableName)
         .delete()
         .eq("id", id);
-
+  
+      console.log("DELETE DEBUG →", {
+        tableName,
+        id,
+        data,
+        error,
+        status
+      });
+  
       if (error) {
         console.error("[Archiviati] Permanent delete failed:", error);
         if (IE.showError) {
@@ -327,11 +336,11 @@
         }
         return;
       }
-
+  
       if (IE.showSuccess) {
         IE.showSuccess("Record eliminato definitivamente.");
       }
-
+  
       if (section === SECTIONS.candidates) {
         await loadCandidates();
       } else if (section === SECTIONS.jobs) {
@@ -339,6 +348,7 @@
       } else if (section === SECTIONS.clients) {
         await loadClients();
       }
+  
     } catch (err) {
       console.error("[Archiviati] deletePermanently exception:", err);
       if (IE && IE.showError) {
