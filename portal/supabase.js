@@ -8,14 +8,14 @@
 // Expected table/column names (adjust if your DB differs):
 //   profiles: id (uuid, = auth.users.id), email, first_name, last_name, role
 //   candidates: id, created_by (uuid), first_name, last_name, position,
-//               address, status, source, notes, created_at
+//               address, status, source, notes, created_at, is_archived
 //               (no client_name; relationship is via candidate_job_associations -> job_offers -> clients)
 //   job_offers: id, created_by, title, position, client_name, location,
 //               description, requirements, notes, status, created_at
 //   candidate_job_associations: id, candidate_id, job_offer_id, status, notes,
 //                               created_by, created_at
-//   clients: id, created_by (optional for RLS), nome, citta, stato, nazione,
-//            email, telefono, note, is_archived, created_at
+//   clients: id, created_by (optional for RLS), name, city, state, country,
+//            email, phone, notes, is_archived, created_at
 // ============================================================================
 
 (function () {
@@ -282,6 +282,7 @@
         status: payload.status || "new",
         source: payload.source || null,
         notes: payload.notes || null,
+        is_archived: false,
       };
       const { data, error } = await supabase.from("candidates").insert(row).select().single();
       if (error) {
@@ -291,6 +292,65 @@
       return { data, error: null };
     } catch (err) {
       console.error("[Supabase] insertCandidate exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Fetch a single candidate by id (for edit page).
+   * @param {string} id - candidate id
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function getCandidateById(id) {
+    if (!id) return { data: null, error: new Error("Missing id") };
+    try {
+      const { data, error } = await supabase
+        .from("candidates")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
+      if (error) {
+        console.error("[Supabase] getCandidateById error:", error.message, error);
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] getCandidateById exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Update an existing candidate by id.
+   * @param {string} id - candidate id
+   * @param {object} payload - { first_name, last_name, position, address, status, source, notes }
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function updateCandidate(id, payload) {
+    if (!id) return { data: null, error: new Error("Missing id") };
+    try {
+      const updates = {
+        first_name: payload.first_name ?? "",
+        last_name: payload.last_name ?? "",
+        position: payload.position ?? null,
+        address: payload.address ?? null,
+        status: payload.status ?? "new",
+        source: payload.source ?? null,
+        notes: payload.notes ?? null,
+      };
+      const { data, error } = await supabase
+        .from("candidates")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] updateCandidate error:", error.message, error);
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] updateCandidate exception:", err);
       return { data: null, error: err };
     }
   }
@@ -561,7 +621,7 @@
   /**
    * Build clients query with filters (same logic for count and data).
    * Filters: name, city, state, country, archived.
-   * Columns: nome, citta, stato, nazione, email, telefono, is_archived.
+   * Columns: name, city, state, country, email, phone, is_archived.
    */
   function buildClientsQuery(supabaseQuery, filters) {
     let q = supabaseQuery;
@@ -572,33 +632,33 @@
     const nameTerm = (filters.name || "").trim();
     if (nameTerm) {
       const escaped = nameTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
-      q = q.ilike("nome", "%" + escaped + "%");
+      q = q.ilike("name", "%" + escaped + "%");
     }
 
     const cityTerm = (filters.city || "").trim();
     if (cityTerm) {
       const escaped = cityTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
-      q = q.ilike("citta", "%" + escaped + "%");
+      q = q.ilike("city", "%" + escaped + "%");
     }
 
     const stateTerm = (filters.state || "").trim();
     if (stateTerm) {
       const escaped = stateTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
-      q = q.ilike("stato", "%" + escaped + "%");
+      q = q.ilike("state", "%" + escaped + "%");
     }
 
     const countryTerm = (filters.country || "").trim();
     if (countryTerm) {
       const escaped = countryTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
-      q = q.ilike("nazione", "%" + escaped + "%");
+      q = q.ilike("country", "%" + escaped + "%");
     }
 
     return q;
   }
 
   /**
-   * Insert a new client. Expects table: clients (id, created_by, nome, citta, stato, nazione, email, telefono, note, is_archived, created_at).
-   * @param {object} payload - { nome, citta?, stato?, nazione?, email?, telefono?, note? }
+   * Insert a new client. Expects table: clients (id, created_by, name, city, state, country, email, phone, notes, is_archived, created_at).
+   * @param {object} payload - { name, city?, state?, country?, email?, phone?, notes? }
    * @returns {Promise<{ data: object | null, error: object | null }>}
    */
   async function insertClient(payload) {
@@ -612,13 +672,13 @@
     try {
       const row = {
         created_by: userId,
-        nome: payload.nome || "",
-        citta: payload.citta || null,
-        stato: payload.stato || null,
-        nazione: payload.nazione || null,
+        name: payload.name || "",
+        city: payload.city || null,
+        state: payload.state || null,
+        country: payload.country || null,
         email: payload.email || null,
-        telefono: payload.telefono || null,
-        note: payload.note || null,
+        phone: payload.phone || null,
+        notes: payload.notes || null,
         is_archived: false,
       };
       const { data, error } = await supabase.from("clients").insert(row).select().single();
@@ -672,13 +732,13 @@
       const data = (rows || []).map(function (r) {
         return {
           id: r.id,
-          nome: r.nome,
-          citta: r.citta,
-          stato: r.stato,
-          nazione: r.nazione,
+          name: r.name,
+          city: r.city,
+          state: r.state,
+          country: r.country,
           email: r.email,
-          telefono: r.telefono,
-          note: r.note,
+          phone: r.phone,
+          notes: r.notes,
           is_archived: !!r.is_archived,
         };
       });
@@ -687,6 +747,35 @@
     } catch (err) {
       console.error("[Supabase] fetchClientsPaginated exception:", err);
       return { data: [], totalCount: 0, error: err };
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Archive (soft delete) – set is_archived = true
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Archive a candidate (set is_archived = true). Does not remove the record.
+   * @param {string} id - candidate id
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function archiveCandidate(id) {
+    if (!id) return { data: null, error: new Error("Missing id") };
+    try {
+      const { data, error } = await supabase
+        .from("candidates")
+        .update({ is_archived: true })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] archiveCandidate error:", error.message, error);
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] archiveCandidate exception:", err);
+      return { data: null, error: err };
     }
   }
 
@@ -837,7 +926,7 @@
   // Dashboard stats (real-time from candidates + job_offers)
   // ---------------------------------------------------------------------------
   // Candidates table: id, first_name, last_name, position, status, source, created_at, is_archived (and created_by)
-  // Job offers table: id, status (stato_offerta), is_archived, ...
+  // Job offers table: id, status, is_archived, ...
 
   /**
    * Total count of candidates (non-archived only).
@@ -961,7 +1050,7 @@
   }
 
   /**
-   * Candidates grouped by source (fonte). Returns array of { source: string, count: number }.
+   * Candidates grouped by source. Returns array of { source: string, count: number }.
    * @returns {Promise<{ data: array, error: object | null }>}
    */
   async function getCandidatesBySource() {
@@ -1064,6 +1153,9 @@
     updateProfile,
     // Candidates
     insertCandidate,
+    getCandidateById,
+    updateCandidate,
+    archiveCandidate,
     fetchMyCandidates,
     fetchCandidatesPaginated,
     // Job offers

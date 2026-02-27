@@ -2,8 +2,8 @@
 // Italian Experience – Dashboard data from Supabase
 // ----------------------------------------------------------------------------
 // Fetches real data for dashboard overview. Uses schema:
-//   candidates: id, nome, cognome, posizione, status, fonte, created_at, is_archived
-//   job_offers: id, stato_offerta, is_archived
+//   candidates: id, first_name, last_name, position, status, source, created_at, is_archived
+//   job_offers: id, status, is_archived
 // Load after: Supabase CDN, supabase.js, app.js
 // ============================================================================
 
@@ -113,7 +113,7 @@
   }
 
   /**
-   * B. Active job offers (is_archived = false, stato_offerta = 'attiva').
+   * B. Active job offers (is_archived = false, status = 'open' or 'attiva').
    * @returns {Promise<{ data: number, error: object | null }>}
    */
   async function fetchActiveJobOffers() {
@@ -124,7 +124,7 @@
       .from("job_offers")
       .select("*", { count: "exact", head: true })
       .eq("is_archived", false)
-      .eq("stato_offerta", "attiva");
+      .in("status", ["open", "attiva"]);
 
     if (error) return { data: 0, error };
     return { data: count ?? 0, error: null };
@@ -341,9 +341,8 @@
   }
 
   /**
-   * E. Recent 5 candidates (nome, cognome, posizione, status, created_at).
-   * Supports both schemas: nome/cognome/posizione/fonte or first_name/last_name/position/source.
-   * @returns {Promise<{ data: Array<{ nome: string, cognome: string, posizione: string, status: string, created_at: string }>, error: object | null }>}
+   * E. Recent 5 candidates (first_name, last_name, position, status, created_at).
+   * @returns {Promise<{ data: Array<{ first_name: string, last_name: string, position: string, status: string, created_at: string }>, error: object | null }>}
    */
   async function fetchRecentCandidates() {
     const supabase = getSupabase();
@@ -351,7 +350,7 @@
 
     const { data, error } = await supabase
       .from("candidates")
-      .select("nome, cognome, posizione, status, created_at, first_name, last_name, position")
+      .select("first_name, last_name, position, status, created_at")
       .eq("is_archived", false)
       .order("created_at", { ascending: false })
       .limit(5);
@@ -359,9 +358,9 @@
     if (error) return { data: [], error };
 
     const rows = (data || []).map((r) => ({
-      nome: r.nome ?? r.first_name ?? "",
-      cognome: r.cognome ?? r.last_name ?? "",
-      posizione: r.posizione ?? r.position ?? "",
+      first_name: r.first_name ?? "",
+      last_name: r.last_name ?? "",
+      position: r.position ?? "",
       status: r.status ?? "new",
       created_at: r.created_at ?? "",
     }));
@@ -369,7 +368,7 @@
   }
 
   /**
-   * F. Candidates grouped by source (fonte). Uses fonte or source.
+   * F. Candidates grouped by source.
    * @returns {Promise<{ data: Array<{ source: string, count: number, percentage: number }>, error: object | null }>}
    */
   async function fetchCandidatesBySource() {
@@ -378,7 +377,7 @@
 
     const { data, error } = await supabase
       .from("candidates")
-      .select("fonte, source")
+      .select("source")
       .eq("is_archived", false);
 
     if (error) return { data: [], error };
@@ -386,7 +385,7 @@
     const list = data || [];
     const bySource = {};
     list.forEach((row) => {
-      const s = String(row.fonte ?? row.source ?? "other").trim() || "other";
+      const s = String(row.source ?? "other").trim() || "other";
       bySource[s] = (bySource[s] || 0) + 1;
     });
     const total = list.length;
@@ -456,7 +455,7 @@
 
   /**
    * Render recent candidates table body.
-   * @param {Array<{ nome: string, cognome: string, posizione: string, status: string, created_at: string }>} rows
+   * @param {Array<{ first_name: string, last_name: string, position: string, status: string, created_at: string }>} rows
    * @param {boolean} isError
    */
   function renderRecentCandidates(rows, isError) {
@@ -511,10 +510,10 @@
       const createdDate = row.created_at
         ? new Date(row.created_at).toLocaleDateString("it-IT")
         : "—";
-      const fullName = [row.nome, row.cognome].filter(Boolean).join(" ").trim() || "—";
+      const fullName = [row.first_name, row.last_name].filter(Boolean).join(" ").trim() || "—";
       tr.innerHTML =
         "<td class=\"px-6 py-4 font-semibold text-gray-800\">" + escapeHtml(fullName) + "</td>" +
-        "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(row.posizione || "—") + "</td>" +
+        "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(row.position || "—") + "</td>" +
         "<td class=\"px-6 py-4 text-gray-500 text-sm\">" + escapeHtml(createdDate) + "</td>" +
         "<td class=\"px-6 py-4\"><span class=\"badge " + statusClass(row.status) + "\">" +
         escapeHtml(statusLabel(row.status)) + "</span></td>";

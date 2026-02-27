@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aggiungi Candidato | Italian Experience Recruitment</title>
+    <title>Modifica Candidato | Italian Experience Recruitment</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -25,7 +25,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
-                <h1 class="text-2xl font-bold serif text-[#1b4332]">Add New Candidate</h1>
+                <h1 class="text-2xl font-bold serif text-[#1b4332]">Modifica Candidato</h1>
             </div>
             
             <div class="flex items-center space-x-6">
@@ -44,7 +44,7 @@
             
             <div class="mb-6">
                 <h2 class="text-3xl font-bold serif text-[#1b4332]">Candidate Profile</h2>
-                <p class="text-gray-500 text-sm italic">Compila i campi sottostanti per inserire un nuovo talento nel database.</p>
+                <p class="text-gray-500 text-sm italic">Modifica i campi sottostanti e salva le modifiche.</p>
             </div>
 
             <form id="candidateForm" class="space-y-8">
@@ -140,11 +140,11 @@
 
                 <!-- Action Buttons -->
                 <div class="flex items-center justify-end space-x-4 pt-4 pb-12">
-                    <button type="button" class="px-8 py-3 rounded-xl border border-gray-200 text-gray-500 font-semibold text-sm hover:bg-gray-50 transition-all">
+                    <button type="button" data-edit-cancel class="px-8 py-3 rounded-xl border border-gray-200 text-gray-500 font-semibold text-sm hover:bg-gray-50 transition-all">
                         Cancel
                     </button>
                     <button type="submit" class="px-10 py-3 rounded-xl bg-[#1b4332] text-white font-semibold text-sm shadow-xl hover:bg-[#1b4332]/90 transition-all transform hover:-translate-y-1">
-                        Save Candidate
+                        Save Changes
                     </button>
                 </div>
 

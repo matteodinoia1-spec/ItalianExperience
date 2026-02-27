@@ -200,15 +200,15 @@
     if (!tbody) return;
     tbody.innerHTML = rows
       .map(function (row) {
-        const nome = row.nome || "—";
-        const citta = row.citta || "—";
-        const stato = row.stato || "—";
+        const name = row.name || "—";
+        const city = row.city || "—";
+        const state = row.state || "—";
         const email = row.email || "—";
         return (
           '<tr class="table-row transition hover:bg-[#c5a059]/5">' +
-          "<td class=\"px-6 py-4\">" + escapeHtml(nome) + "</td>" +
-          "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(citta) + "</td>" +
-          "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(stato) + "</td>" +
+          "<td class=\"px-6 py-4\">" + escapeHtml(name) + "</td>" +
+          "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(city) + "</td>" +
+          "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(state) + "</td>" +
           "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(email) + "</td>" +
           '<td class="px-6 py-4 text-right">' +
           '<button type="button" data-action="restore-client" data-id="' + escapeHtml(row.id) + '" class="px-3 py-1.5 rounded-lg bg-[#1b4332] text-white text-xs font-medium hover:bg-[#1b4332]/90 transition">Ripristina</button>' +

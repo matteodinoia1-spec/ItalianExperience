@@ -113,7 +113,7 @@
     const pageKey = getCurrentPageKey();
 
     // Protected pages: require Supabase auth (redirect to login if not authenticated)
-    const protectedPages = ["dashboard", "candidati", "offerte", "clients", "clienti", "archiviati", "add-candidato", "add-offerta", "add-cliente", "profile"];
+    const protectedPages = ["dashboard", "candidati", "offerte", "clients", "clienti", "archiviati", "add-candidato", "edit-candidato", "add-offerta", "add-cliente", "profile"];
     const isProtected = protectedPages.indexOf(pageKey) !== -1;
     if (isProtected) {
       if (!window.IESupabase) {
@@ -363,6 +363,8 @@
         return "archiviati";
       case "add-candidato.html":
         return "add-candidato";
+      case "edit-candidato.html":
+        return "edit-candidato";
       case "add-offerta.html":
         return "add-offerta";
       case "add-cliente.html":
@@ -400,7 +402,7 @@
     };
 
     const targetSection = (function () {
-      if (currentKey === "add-candidato") return "candidati";
+      if (currentKey === "add-candidato" || currentKey === "edit-candidato") return "candidati";
       if (currentKey === "add-offerta") return "offerte";
       if (currentKey === "add-cliente") return "clients";
       return currentKey in sectionGroups ? currentKey : null;
@@ -731,8 +733,21 @@
       candidateForm.addEventListener("submit", function (event) {
         event.preventDefault();
         const formData = new FormData(candidateForm);
+        if (getCurrentPageKey() === "edit-candidato") {
+          const id = new URLSearchParams(window.location.search).get("id");
+          if (id && window.IESupabase && window.IESupabase.updateCandidate) {
+            updateCandidateFromForm(id, formData);
+            return;
+          }
+        }
         saveCandidate(formData);
       });
+      const cancelBtn = candidateForm.querySelector("[data-edit-cancel]");
+      if (cancelBtn) {
+        cancelBtn.addEventListener("click", function () {
+          navigateTo("candidati.html");
+        });
+      }
     }
 
     const jobOfferForm = scope.querySelector("#jobOfferForm");
@@ -913,7 +928,7 @@
                 .join("")
             : candidateOptions
                 .map(function (c) {
-                  return "<option value=\"" + (c.slug || c.id) + "\">" + (c.nome || "") + " " + (c.cognome || "") + " – " + (c.posizione || "") + "</option>";
+                  return "<option value=\"" + (c.slug || c.id) + "\">" + (c.first_name || "") + " " + (c.last_name || "") + " – " + (c.position || "") + "</option>";
                 })
                 .join("");
         mount.innerHTML = `
@@ -1192,34 +1207,12 @@
   // ---------------------------------------------------------------------------
 
   /**
-   * Shape aligned with future Supabase tables.
+   * Shape aligned with Supabase tables (English column names).
    *
-   * Candidate (candidati):
-   * - id (local-only helper)
-   * - nome, cognome, posizione, indirizzo
-   * - status, note, fonte
-   * - cv_url, foto_url
-   * - created_at, updated_at, created_by, updated_by
-   * - is_archived
-   *
-   * Job Offer (offerte):
-   * - id (local-only helper)
-   * - titolo_posizione, client_id, descrizione, paga, tipo_contratto,
-   *   numero_posizioni, citta, stato, data_scadenza, stato_offerta
-   * - created_at, updated_at, created_by, updated_by
-   * - is_archived
-   *
-   * Client (clienti):
-   * - id (local-only helper)
-   * - nome, indirizzo, citta, stato, nazione, email, telefono, note
-   * - created_at, updated_at, created_by, updated_by
-   * - is_archived
-   *
-   * Candidate ⇄ Job Offer association (candidate_job_associations):
-   * - id (local-only helper)
-   * - candidate_id, job_offer_id
-   * - status, notes
-   * - created_at, updated_at, created_by, updated_by
+   * Candidate: id, first_name, last_name, position, address, status, source, notes, cv_url, foto_url, created_at, is_archived, ...
+   * Job Offer: id, title, client_id, description, location, status, created_at, is_archived, ...
+   * Client: id, name, city, state, country, email, phone, notes, created_at, is_archived, ...
+   * Candidate ⇄ Job Offer association: candidate_id, job_offer_id, status, notes, ...
    */
 
   const IE_STORE = createInitialInMemoryStore();
@@ -1231,14 +1224,14 @@
     const clients = [
       {
         id: "client-grand-hotel-milano",
-        nome: "Grand Hotel Milano",
-        indirizzo: "Via Montenapoleone 1",
-        citta: "Milano",
-        stato: "MI",
-        nazione: "IT",
+        name: "Grand Hotel Milano",
+        address: "Via Montenapoleone 1",
+        city: "Milano",
+        state: "MI",
+        country: "IT",
         email: "hr@grandhotelmilano.it",
-        telefono: "+39 02 1234 5678",
-        note: "Hotel 5* lusso nel centro di Milano.",
+        phone: "+39 02 1234 5678",
+        notes: "Hotel 5* lusso nel centro di Milano.",
         created_at: now,
         updated_at: now,
         created_by: admin,
@@ -1247,14 +1240,14 @@
       },
       {
         id: "client-ristorante-cracco",
-        nome: "Ristorante Cracco",
-        indirizzo: "Galleria Vittorio Emanuele II",
-        citta: "Milano",
-        stato: "MI",
-        nazione: "IT",
+        name: "Ristorante Cracco",
+        address: "Galleria Vittorio Emanuele II",
+        city: "Milano",
+        state: "MI",
+        country: "IT",
         email: "hr@cracco.it",
-        telefono: "+39 02 8765 4321",
-        note: "Fine dining iconico a Milano.",
+        phone: "+39 02 8765 4321",
+        notes: "Fine dining iconico a Milano.",
         created_at: now,
         updated_at: now,
         created_by: admin,
@@ -1263,14 +1256,14 @@
       },
       {
         id: "client-hotel-cipriani",
-        nome: "Hotel Cipriani",
-        indirizzo: "Giudecca 10",
-        citta: "Venezia",
-        stato: "VE",
-        nazione: "IT",
+        name: "Hotel Cipriani",
+        address: "Giudecca 10",
+        city: "Venezia",
+        state: "VE",
+        country: "IT",
         email: "talent@hotelcipriani.it",
-        telefono: "+39 041 234 5678",
-        note: "Hotel di riferimento nella laguna.",
+        phone: "+39 041 234 5678",
+        notes: "Hotel di riferimento nella laguna.",
         created_at: now,
         updated_at: now,
         created_by: admin,
@@ -1279,14 +1272,14 @@
       },
       {
         id: "client-pasticceria-marchesi",
-        nome: "Pasticceria Marchesi",
-        indirizzo: "Via Santa Maria alla Porta 11/a",
-        citta: "Roma",
-        stato: "RM",
-        nazione: "IT",
+        name: "Pasticceria Marchesi",
+        address: "Via Santa Maria alla Porta 11/a",
+        city: "Roma",
+        state: "RM",
+        country: "IT",
         email: "hr@marchesi.it",
-        telefono: "+39 06 9876 5432",
-        note: "Pasticceria storica.",
+        phone: "+39 06 9876 5432",
+        notes: "Pasticceria storica.",
         created_at: now,
         updated_at: now,
         created_by: admin,
@@ -1295,14 +1288,14 @@
       },
       {
         id: "client-italian-luxury-villas",
-        nome: "Italian Luxury Villas",
-        indirizzo: "Via dei Colli 15",
-        citta: "Firenze",
-        stato: "FI",
-        nazione: "IT",
+        name: "Italian Luxury Villas",
+        address: "Via dei Colli 15",
+        city: "Firenze",
+        state: "FI",
+        country: "IT",
         email: "careers@italianluxuryvillas.it",
-        telefono: "+39 055 555 1234",
-        note: "Gestione ville di lusso.",
+        phone: "+39 055 555 1234",
+        notes: "Gestione ville di lusso.",
         created_at: now,
         updated_at: now,
         created_by: admin,
@@ -1315,13 +1308,13 @@
       {
         id: "cand-alessandro-rossi",
         slug: "alessandro-rossi",
-        nome: "Alessandro",
-        cognome: "Rossi",
-        posizione: "Sommelier Senior",
-        indirizzo: "Milano, IT",
+        first_name: "Alessandro",
+        last_name: "Rossi",
+        position: "Sommelier Senior",
+        address: "Milano, IT",
         status: "new",
-        note: "",
-        fonte: "linkedin",
+        notes: "",
+        source: "linkedin",
         cv_url: "https://example.com/cv/alessandro-rossi.pdf",
         foto_url:
           "https://ui-avatars.com/api/?name=Alessandro+Rossi&background=dbeafe&color=1e40af",
@@ -1334,13 +1327,13 @@
       {
         id: "cand-giulia-bianchi",
         slug: "giulia-bianchi",
-        nome: "Giulia",
-        cognome: "Bianchi",
-        posizione: "Chef de Rang",
-        indirizzo: "Torino, IT",
+        first_name: "Giulia",
+        last_name: "Bianchi",
+        position: "Chef de Rang",
+        address: "Torino, IT",
         status: "hired",
-        note: "",
-        fonte: "website",
+        notes: "",
+        source: "website",
         cv_url: "https://example.com/cv/giulia-bianchi.pdf",
         foto_url:
           "https://ui-avatars.com/api/?name=Giulia+Bianchi&background=d1fae5&color=065f46",
@@ -1353,13 +1346,13 @@
       {
         id: "cand-luca-moretti",
         slug: "luca-moretti",
-        nome: "Luca",
-        cognome: "Moretti",
-        posizione: "Maître d'Hôtel",
-        indirizzo: "Venezia, IT",
+        first_name: "Luca",
+        last_name: "Moretti",
+        position: "Maître d'Hôtel",
+        address: "Venezia, IT",
         status: "interview",
-        note: "",
-        fonte: "email",
+        notes: "",
+        source: "email",
         cv_url: "https://example.com/cv/luca-moretti.pdf",
         foto_url:
           "https://ui-avatars.com/api/?name=Luca+Moretti&background=fef3c7&color=92400e",
@@ -1372,13 +1365,13 @@
       {
         id: "cand-elena-martini",
         slug: "elena-martini",
-        nome: "Elena",
-        cognome: "Martini",
-        posizione: "Pastry Chef",
-        indirizzo: "Roma, IT",
+        first_name: "Elena",
+        last_name: "Martini",
+        position: "Pastry Chef",
+        address: "Roma, IT",
         status: "rejected",
-        note: "",
-        fonte: "facebook",
+        notes: "",
+        source: "facebook",
         cv_url: "https://example.com/cv/elena-martini.pdf",
         foto_url:
           "https://ui-avatars.com/api/?name=Elena+Martini&background=fee2e2&color=991b1b",
@@ -1391,13 +1384,13 @@
       {
         id: "cand-marco-villa",
         slug: "marco-villa",
-        nome: "Marco",
-        cognome: "Villa",
-        posizione: "Property Manager",
-        indirizzo: "Firenze, IT",
+        first_name: "Marco",
+        last_name: "Villa",
+        position: "Property Manager",
+        address: "Firenze, IT",
         status: "new",
-        note: "",
-        fonte: "other",
+        notes: "",
+        source: "other",
         cv_url: "https://example.com/cv/marco-villa.pdf",
         foto_url:
           "https://ui-avatars.com/api/?name=Marco+Villa&background=dbeafe&color=1e40af",
@@ -1412,16 +1405,15 @@
     const jobOffers = [
       {
         id: "offer-head-sommelier",
-        titolo_posizione: "Head Sommelier",
+        title: "Head Sommelier",
         client_id: "client-grand-hotel-milano",
-        descrizione: "Responsabile della carta vini e del team di sommellerie.",
-        paga: "€55.000 - €65.000",
-        tipo_contratto: "Full-time",
-        numero_posizioni: 1,
-        citta: "Milano",
-        stato: "MI",
-        data_scadenza: "2024-06-30",
-        stato_offerta: "open",
+        description: "Responsabile della carta vini e del team di sommellerie.",
+        salary: "€55.000 - €65.000",
+        contract_type: "Full-time",
+        positions: 1,
+        location: "Milano",
+        state: "MI",
+        status: "open",
         created_at: now,
         updated_at: now,
         created_by: admin,
@@ -1430,16 +1422,15 @@
       },
       {
         id: "offer-executive-chef",
-        titolo_posizione: "Executive Chef",
+        title: "Executive Chef",
         client_id: "client-ristorante-cracco",
-        descrizione: "Guida creativa della cucina e del team.",
-        paga: "€70.000 - €85.000",
-        tipo_contratto: "Full-time",
-        numero_posizioni: 1,
-        citta: "Milano",
-        stato: "MI",
-        data_scadenza: "2024-06-15",
-        stato_offerta: "inprogress",
+        description: "Guida creativa della cucina e del team.",
+        salary: "€70.000 - €85.000",
+        contract_type: "Full-time",
+        positions: 1,
+        location: "Milano",
+        state: "MI",
+        status: "inprogress",
         created_at: now,
         updated_at: now,
         created_by: admin,
@@ -1448,16 +1439,15 @@
       },
       {
         id: "offer-property-manager",
-        titolo_posizione: "Property Manager",
+        title: "Property Manager",
         client_id: "client-italian-luxury-villas",
-        descrizione: "Gestione portafoglio ville di pregio.",
-        paga: "€45.000 - €55.000",
-        tipo_contratto: "Full-time",
-        numero_posizioni: 1,
-        citta: "Firenze",
-        stato: "FI",
-        data_scadenza: "2024-07-10",
-        stato_offerta: "open",
+        description: "Gestione portafoglio ville di pregio.",
+        salary: "€45.000 - €55.000",
+        contract_type: "Full-time",
+        positions: 1,
+        location: "Firenze",
+        state: "FI",
+        status: "open",
         created_at: now,
         updated_at: now,
         created_by: admin,
@@ -1466,16 +1456,15 @@
       },
       {
         id: "offer-maitre",
-        titolo_posizione: "Maître d'Hôtel",
+        title: "Maître d'Hôtel",
         client_id: "client-hotel-cipriani",
-        descrizione: "Coordinamento sala e accoglienza ospiti.",
-        paga: "€50.000 - €60.000",
-        tipo_contratto: "Full-time",
-        numero_posizioni: 1,
-        citta: "Venezia",
-        stato: "VE",
-        data_scadenza: "2024-05-01",
-        stato_offerta: "closed",
+        description: "Coordinamento sala e accoglienza ospiti.",
+        salary: "€50.000 - €60.000",
+        contract_type: "Full-time",
+        positions: 1,
+        location: "Venezia",
+        state: "VE",
+        status: "closed",
         created_at: now,
         updated_at: now,
         created_by: admin,
@@ -1484,16 +1473,15 @@
       },
       {
         id: "offer-pastry-chef",
-        titolo_posizione: "Pastry Chef",
+        title: "Pastry Chef",
         client_id: "client-pasticceria-marchesi",
-        descrizione: "Responsabile laboratorio pasticceria.",
-        paga: "€40.000 - €50.000",
-        tipo_contratto: "Full-time",
-        numero_posizioni: 1,
-        citta: "Roma",
-        stato: "RM",
-        data_scadenza: "2024-06-20",
-        stato_offerta: "inprogress",
+        description: "Responsabile laboratorio pasticceria.",
+        salary: "€40.000 - €50.000",
+        contract_type: "Full-time",
+        positions: 1,
+        location: "Roma",
+        state: "RM",
+        status: "inprogress",
         created_at: now,
         updated_at: now,
         created_by: admin,
@@ -1627,13 +1615,13 @@
       const mapped = (rows || []).map(function (r) {
         return {
           id: r.id,
-          nome: r.first_name || "",
-          cognome: r.last_name || "",
-          posizione: r.position || "",
-          indirizzo: r.address || "",
+          first_name: r.first_name || "",
+          last_name: r.last_name || "",
+          position: r.position || "",
+          address: r.address || "",
           status: r.status || "new",
-          note: r.notes || "",
-          fonte: r.source || "",
+          notes: r.notes || "",
+          source: r.source || "",
           client_name: r.client_name || null,
           foto_url: r.photo_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent((r.first_name || "") + "+" + (r.last_name || "")) + "&background=dbeafe&color=1e40af",
           created_at: r.created_at,
@@ -1656,13 +1644,12 @@
       const mapped = (rows || []).map(function (r) {
         return {
           id: r.id,
-          titolo_posizione: r.title || "",
-          client_id: null,
+          title: r.title || "",
+          client_id: r.client_id || null,
           client_name: r.client_name || null,
-          descrizione: r.description || "",
-          citta: r.location || "",
-          stato: "",
-          stato_offerta: r.status || "open",
+          description: r.description || "",
+          location: r.location || "",
+          status: r.status || "open",
           created_at: r.created_at,
           is_archived: r.is_archived || false,
         };
@@ -1680,24 +1667,24 @@
   }
 
   async function saveCandidate(formData) {
-    const nome = (formData.get("nome") || "").toString().trim();
-    const cognome = (formData.get("cognome") || "").toString().trim();
-    const posizione = (formData.get("posizione") || "").toString().trim();
-    const indirizzo = (formData.get("indirizzo") || "").toString().trim();
+    const first_name = (formData.get("first_name") || "").toString().trim();
+    const last_name = (formData.get("last_name") || "").toString().trim();
+    const position = (formData.get("position") || "").toString().trim();
+    const address = (formData.get("address") || "").toString().trim();
     const status = (formData.get("status") || "new").toString();
-    const note = (formData.get("note") || "").toString();
-    const fonte = (formData.get("fonte") || "").toString();
+    const notes = (formData.get("notes") || "").toString();
+    const source = (formData.get("source") || "").toString();
     // client_name: kept in form for display only; candidates table has no client_name (relationship via job_offers -> clients)
 
     if (window.IESupabase) {
       const { data, error } = await window.IESupabase.insertCandidate({
-        first_name: nome,
-        last_name: cognome,
-        position: posizione,
-        address: indirizzo,
+        first_name: first_name,
+        last_name: last_name,
+        position: position,
+        address: address,
         status: status,
-        notes: note,
-        source: fonte,
+        notes: notes,
+        source: source,
       });
       if (error) {
         window.IESupabase.showError(error.message || "Errore nel salvataggio del candidato.", "saveCandidate");
@@ -1713,13 +1700,13 @@
     const candidate = {
       id: "cand-" + Math.random().toString(36).slice(2, 10),
       slug: null,
-      nome: nome,
-      cognome: cognome,
-      posizione: posizione,
-      indirizzo: indirizzo,
+      first_name: first_name,
+      last_name: last_name,
+      position: position,
+      address: address,
       status: status,
-      note: note,
-      fonte: fonte,
+      notes: notes,
+      source: source,
       cv_url: null,
       foto_url: null,
       created_at: now,
@@ -1738,7 +1725,7 @@
       candidate.foto_url = "/uploads/foto/" + encodeURIComponent(photoFile.name);
     }
     candidate.slug =
-      (candidate.nome + "-" + candidate.cognome)
+      (candidate.first_name + "-" + candidate.last_name)
         .toLowerCase()
         .replace(/\s+/g, "-")
         .replace(/[^a-z0-9-]/g, "") || candidate.id;
@@ -1749,14 +1736,14 @@
   }
 
   async function saveJobOffer(formData) {
-    const title = (formData.get("titolo_posizione") || "").toString().trim();
+    const title = (formData.get("title") || "").toString().trim();
     const position = (formData.get("position") || "").toString().trim();
     const client_name = (formData.get("client_name") || "").toString().trim();
     const location = (formData.get("location") || "").toString().trim();
-    const description = (formData.get("descrizione") || "").toString();
+    const description = (formData.get("description") || "").toString();
     const requirements = (formData.get("requirements") || "").toString();
     const notes = (formData.get("notes") || "").toString();
-    const status = (formData.get("stato_offerta") || "open").toString();
+    const status = (formData.get("status") || "open").toString();
 
     if (window.IESupabase) {
       const { data, error } = await window.IESupabase.insertJobOffer({
@@ -1783,22 +1770,17 @@
     let clientId = null;
     if (client_name) {
       const existing = IE_STORE.clients.find(
-        (c) => c.nome.toLowerCase() === client_name.toLowerCase()
+        (c) => (c.name || "").toLowerCase() === client_name.toLowerCase()
       );
       if (existing) clientId = existing.id;
     }
     const jobOffer = {
       id: "offer-" + Math.random().toString(36).slice(2, 10),
-      titolo_posizione: title,
+      title: title,
       client_id: clientId,
-      descrizione: description,
-      paga: (formData.get("paga") || "").toString(),
-      tipo_contratto: (formData.get("tipo_contratto") || "").toString(),
-      numero_posizioni: parseInt(formData.get("numero_posizioni") || "1", 10) || 1,
-      citta: location,
-      stato: (formData.get("stato") || "").toString().trim(),
-      data_scadenza: (formData.get("data_scadenza") || "").toString(),
-      stato_offerta: status,
+      description: description,
+      location: location,
+      status: status,
       created_at: now,
       updated_at: now,
       created_by: currentUser,
@@ -1811,15 +1793,15 @@
   }
 
   async function saveClient(formData) {
-    const nome = (formData.get("nome") || "").toString().trim();
-    const citta = (formData.get("citta") || "").toString().trim();
-    const stato = (formData.get("stato") || "").toString().trim();
-    const nazione = (formData.get("nazione") || "").toString().trim();
+    const name = (formData.get("name") || "").toString().trim();
+    const city = (formData.get("city") || "").toString().trim();
+    const state = (formData.get("state") || "").toString().trim();
+    const country = (formData.get("country") || "").toString().trim();
     const email = (formData.get("email") || "").toString().trim();
-    const telefono = (formData.get("telefono") || "").toString().trim();
-    const note = (formData.get("note") || "").toString();
+    const phone = (formData.get("phone") || "").toString().trim();
+    const notes = (formData.get("notes") || "").toString();
 
-    if (!nome) {
+    if (!name) {
       if (window.IESupabase) window.IESupabase.showError("Il nome del cliente è obbligatorio.", "saveClient");
       else alert("Il nome del cliente è obbligatorio.");
       return;
@@ -1827,13 +1809,13 @@
 
     if (window.IESupabase && window.IESupabase.insertClient) {
       const { data, error } = await window.IESupabase.insertClient({
-        nome: nome,
-        citta: citta || null,
-        stato: stato || null,
-        nazione: nazione || null,
+        name: name,
+        city: city || null,
+        state: state || null,
+        country: country || null,
         email: email || null,
-        telefono: telefono || null,
-        note: note || null,
+        phone: phone || null,
+        notes: notes || null,
       });
       if (error) {
         window.IESupabase.showError(error.message || "Errore nel salvataggio del cliente.", "saveClient");
@@ -1848,13 +1830,13 @@
     const currentUser = getCurrentUserDisplayName();
     const client = {
       id: "client-" + Math.random().toString(36).slice(2, 10),
-      nome,
-      citta: citta || null,
-      stato: stato || null,
-      nazione: nazione || null,
+      name,
+      city: city || null,
+      state: state || null,
+      country: country || null,
       email: email || null,
-      telefono: telefono || null,
-      note: note || null,
+      phone: phone || null,
+      notes: notes || null,
       created_at: now,
       updated_at: now,
       created_by: currentUser,
@@ -1925,18 +1907,18 @@
       })
       .filter((item) => {
         if (!filters.name) return true;
-        const haystack = (item.nome + " " + item.cognome).toLowerCase();
+        const haystack = ((item.first_name || "") + " " + (item.last_name || "")).toLowerCase();
         return haystack.includes(filters.name.toLowerCase());
       })
       .filter((item) => {
         if (!filters.position) return true;
-        return (item.posizione || "")
+        return (item.position || "")
           .toLowerCase()
           .includes(filters.position.toLowerCase());
       })
       .filter((item) => {
         if (!filters.address) return true;
-        return (item.indirizzo || "")
+        return (item.address || "")
           .toLowerCase()
           .includes(filters.address.toLowerCase());
       })
@@ -1946,7 +1928,7 @@
       })
       .filter((item) => {
         if (!filters.source) return true;
-        return item.fonte === filters.source;
+        return (item.source || "") === filters.source;
       });
   }
 
@@ -1959,7 +1941,7 @@
       })
       .filter((item) => {
         if (!filters.title) return true;
-        return (item.titolo_posizione || "")
+        return (item.title || "")
           .toLowerCase()
           .includes(filters.title.toLowerCase());
       })
@@ -1969,19 +1951,19 @@
       })
       .filter((item) => {
         if (!filters.city) return true;
-        return (item.citta || "").toLowerCase().includes(filters.city.toLowerCase());
+        return (item.location || "").toLowerCase().includes(filters.city.toLowerCase());
       })
       .filter((item) => {
         if (!filters.state) return true;
-        return (item.stato || "").toLowerCase().includes(filters.state.toLowerCase());
+        return (item.state || "").toLowerCase().includes(filters.state.toLowerCase());
       })
       .filter((item) => {
         if (!filters.contractType) return true;
-        return (item.tipo_contratto || "") === filters.contractType;
+        return (item.contract_type || "") === filters.contractType;
       })
       .filter((item) => {
         if (!filters.offerStatus) return true;
-        return (item.stato_offerta || "") === filters.offerStatus;
+        return (item.status || "") === filters.offerStatus;
       });
   }
 
@@ -1994,19 +1976,19 @@
       })
       .filter((item) => {
         if (!filters.name) return true;
-        return (item.nome || "").toLowerCase().includes(filters.name.toLowerCase());
+        return (item.name || "").toLowerCase().includes(filters.name.toLowerCase());
       })
       .filter((item) => {
         if (!filters.city) return true;
-        return (item.citta || "").toLowerCase().includes(filters.city.toLowerCase());
+        return (item.city || "").toLowerCase().includes(filters.city.toLowerCase());
       })
       .filter((item) => {
         if (!filters.state) return true;
-        return (item.stato || "").toLowerCase().includes(filters.state.toLowerCase());
+        return (item.state || "").toLowerCase().includes(filters.state.toLowerCase());
       })
       .filter((item) => {
         if (!filters.country) return true;
-        return (item.nazione || "")
+        return (item.country || "")
           .toLowerCase()
           .includes(filters.country.toLowerCase());
       });
@@ -2032,11 +2014,79 @@
     }
     if (pageKey === "candidati") {
       initCandidatesPage();
+    } else if (pageKey === "edit-candidato") {
+      initEditCandidatePage();
     } else if (pageKey === "offerte") {
       initJobOffersPage();
     } else if (pageKey === "clients") {
       initClientsPage();
     }
+  }
+
+  /**
+   * Edit candidate page: load candidate by id from URL, fill form. No table rendering.
+   */
+  function initEditCandidatePage() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    if (!id) {
+      navigateTo("candidati.html");
+      return;
+    }
+    const form = document.querySelector("#candidateForm");
+    if (!form) return;
+    if (!window.IESupabase || !window.IESupabase.getCandidateById) {
+      if (window.IESupabase && window.IESupabase.showError) window.IESupabase.showError("Supabase non disponibile.");
+      return;
+    }
+    window.IESupabase.getCandidateById(id).then(function (result) {
+      if (result.error) {
+        if (window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Candidato non trovato.");
+        return;
+      }
+      const c = result.data;
+      if (!c) {
+        if (window.IESupabase.showError) window.IESupabase.showError("Candidato non trovato.");
+        return;
+      }
+      const firstNameEl = form.querySelector('[name="first_name"]');
+      const lastNameEl = form.querySelector('[name="last_name"]');
+      const addressEl = form.querySelector('[name="address"]');
+      const positionEl = form.querySelector('[name="position"]');
+      const statusEl = form.querySelector('[name="status"]');
+      const sourceEl = form.querySelector('[name="source"]');
+      const notesEl = form.querySelector('[name="notes"]');
+      if (firstNameEl) firstNameEl.value = c.first_name || "";
+      if (lastNameEl) lastNameEl.value = c.last_name || "";
+      if (addressEl) addressEl.value = c.address || "";
+      if (positionEl) positionEl.value = c.position || "";
+      if (statusEl) statusEl.value = c.status || "new";
+      if (sourceEl) sourceEl.value = c.source || "";
+      if (notesEl) notesEl.value = c.notes || "";
+    });
+  }
+
+  /**
+   * Update candidate from edit form (Supabase only).
+   */
+  function updateCandidateFromForm(id, formData) {
+    const payload = {
+      first_name: (formData.get("first_name") || "").toString().trim(),
+      last_name: (formData.get("last_name") || "").toString().trim(),
+      address: (formData.get("address") || "").toString().trim(),
+      position: (formData.get("position") || "").toString().trim(),
+      status: (formData.get("status") || "new").toString(),
+      source: (formData.get("source") || "").toString(),
+      notes: (formData.get("notes") || "").toString(),
+    };
+    window.IESupabase.updateCandidate(id, payload).then(function (result) {
+      if (result.error) {
+        if (window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Errore durante il salvataggio.");
+        return;
+      }
+      if (window.IESupabase.showSuccess) window.IESupabase.showSuccess("Candidato aggiornato.");
+      navigateTo("candidati.html");
+    });
   }
 
   /**
@@ -2081,9 +2131,9 @@
       const mappedRecent = recentList.map(function (r) {
         return {
           id: r.id,
-          nome: r.first_name || "",
-          cognome: r.last_name || "",
-          posizione: r.position || "",
+          first_name: r.first_name || "",
+          last_name: r.last_name || "",
+          position: r.position || "",
           status: r.status || "new",
           created_at: r.created_at,
         };
@@ -2162,14 +2212,15 @@
     rows.forEach(function (row) {
       var tr = document.createElement("tr");
       tr.className = "table-row transition";
+      var fullName = [row.first_name, row.last_name].filter(Boolean).join(" ").trim() || "—";
       var createdDate = row.created_at
         ? new Date(row.created_at).toLocaleDateString("it-IT")
         : "";
       var statusClass = getDashboardCandidateStatusBadgeClass(row.status);
       var statusLabel = formatDashboardCandidateStatusLabel(row.status);
       tr.innerHTML =
-        "<td class=\"px-6 py-4 font-semibold text-gray-800\">" + escapeHtml((row.nome || "") + " " + (row.cognome || "").trim()) + "</td>" +
-        "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(row.posizione || "—") + "</td>" +
+        "<td class=\"px-6 py-4 font-semibold text-gray-800\">" + escapeHtml(fullName) + "</td>" +
+        "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(row.position || "—") + "</td>" +
         "<td class=\"px-6 py-4 text-gray-500 text-sm\">" + escapeHtml(createdDate) + "</td>" +
         "<td class=\"px-6 py-4\"><span class=\"badge " + statusClass + "\">" + escapeHtml(statusLabel) + "</span></td>";
       tbody.appendChild(tr);
@@ -2362,6 +2413,16 @@
         return;
       }
 
+      const editBtn = event.target.closest("[data-action='edit-candidate']");
+      if (editBtn) {
+        const id = editBtn.getAttribute("data-id");
+        if (id) {
+          const base = typeof window.IESupabase !== "undefined" && window.IESupabase.getBasePath ? window.IESupabase.getBasePath() : derivePortalBasePath();
+          window.location.href = base + "edit-candidato.html?id=" + encodeURIComponent(id);
+        }
+        return;
+      }
+
       const archiveBtn = event.target.closest("[data-action='archive-candidate']");
       if (archiveBtn) {
         const id = archiveBtn.getAttribute("data-id");
@@ -2370,8 +2431,19 @@
           "Sei sicuro di voler archiviare questo candidato? Potrai vederlo nella vista 'Archived'."
         );
         if (!confirmed) return;
-        archiveRecordById(IE_STORE.candidates, id);
-        renderCandidates();
+        if (window.IESupabase && window.IESupabase.archiveCandidate) {
+          window.IESupabase.archiveCandidate(id).then(function (result) {
+            if (result.error) {
+              if (window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Errore durante l'archiviazione.");
+              return;
+            }
+            if (window.IESupabase.showSuccess) window.IESupabase.showSuccess("Candidato archiviato.");
+            renderCandidates();
+          });
+        } else {
+          archiveRecordById(IE_STORE.candidates, id);
+          renderCandidates();
+        }
         return;
       }
 
@@ -2389,18 +2461,18 @@
     });
 
     function mapCandidateRow(r) {
-      const nome = r.first_name ?? r.nome ?? "";
-      const cognome = r.last_name ?? r.cognome ?? "";
+      const first_name = r.first_name ?? "";
+      const last_name = r.last_name ?? "";
       return {
         id: r.id,
-        nome,
-        cognome,
-        posizione: r.position ?? r.posizione ?? "",
-        indirizzo: r.address ?? r.indirizzo ?? "",
+        first_name,
+        last_name,
+        position: r.position ?? "",
+        address: r.address ?? "",
         status: r.status ?? "new",
-        fonte: r.source ?? r.fonte ?? "",
+        source: r.source ?? "",
         client_name: r.client_name || null,
-        foto_url: r.photo_url || r.foto_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent((nome || "") + "+" + (cognome || "")) + "&background=dbeafe&color=1e40af",
+        foto_url: r.photo_url || r.foto_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent((first_name || "") + "+" + (last_name || "")) + "&background=dbeafe&color=1e40af",
         created_at: r.created_at,
         is_archived: r.is_archived || false,
       };
@@ -2458,7 +2530,7 @@
         tr.setAttribute("data-id", row.id);
         const clientName = findClientNameForCandidate(row);
         const statusBadgeClass = getCandidateStatusBadgeClass(row.status);
-        const sourceLabel = (row.fonte || "").toUpperCase();
+        const sourceLabel = (row.source || "").toUpperCase();
         const createdDate = row.created_at
           ? new Date(row.created_at).toLocaleDateString("it-IT")
           : "";
@@ -2467,12 +2539,12 @@
 
         tr.innerHTML = `
             <td class="px-6 py-4">
-              <img src="${row.foto_url || ""}" class="w-10 h-10 rounded-full border-2 border-white shadow-sm" alt="${row.nome} ${row.cognome}">
+              <img src="${row.foto_url || ""}" class="w-10 h-10 rounded-full border-2 border-white shadow-sm" alt="${row.first_name} ${row.last_name}">
             </td>
-            <td class="px-6 py-4 font-semibold text-gray-800">${row.nome} ${row.cognome}</td>
-            <td class="px-6 py-4 text-gray-600">${row.posizione || "—"}</td>
+            <td class="px-6 py-4 font-semibold text-gray-800">${row.first_name} ${row.last_name}</td>
+            <td class="px-6 py-4 text-gray-600">${row.position || "—"}</td>
             <td class="px-6 py-4 text-gray-600">${clientName}</td>
-            <td class="px-6 py-4 text-gray-500 italic">${row.indirizzo || "—"}</td>
+            <td class="px-6 py-4 text-gray-500 italic">${row.address || "—"}</td>
             <td class="px-6 py-4"><span class="badge ${statusBadgeClass}">${formatCandidateStatusLabel(row.status)}</span></td>
             <td class="px-6 py-4 text-xs font-medium text-blue-600">${sourceLabel || "—"}</td>
             <td class="px-6 py-4 text-gray-400">${createdDate}</td>
@@ -2489,7 +2561,7 @@
                     <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                   </svg>
                 </button>
-                <button type="button" class="p-2 text-gray-400 hover:text-blue-500 transition" title="Edit">
+                <button type="button" data-action="edit-candidate" data-id="${row.id}" class="p-2 text-gray-400 hover:text-blue-500 transition" title="Edit">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                   </svg>
@@ -2515,7 +2587,7 @@
       const offer = IE_STORE.jobOffers.find((o) => o.id === assoc.job_offer_id);
       if (!offer) return "—";
       const client = IE_STORE.clients.find((c) => c.id === offer.client_id);
-      return client ? client.nome : "—";
+      return client ? client.name : "—";
     }
 
     function getCandidateStatusBadgeClass(status) {
@@ -2597,7 +2669,7 @@
               if (client.is_archived) return;
               const opt = document.createElement("option");
               opt.value = client.id || "";
-              opt.textContent = client.nome || "—";
+              opt.textContent = client.name || "—";
               clientSelect.appendChild(opt);
             });
           })
@@ -2607,7 +2679,7 @@
           if (client.is_archived) return;
           const opt = document.createElement("option");
           opt.value = client.id;
-          opt.textContent = client.nome;
+          opt.textContent = client.name;
           clientSelect.appendChild(opt);
         });
       }
@@ -2688,13 +2760,13 @@
     function mapJobOfferRow(r) {
       return {
         id: r.id,
-        titolo_posizione: r.title ?? r.titolo_posizione ?? "",
-        descrizione: r.description ?? r.descrizione ?? "",
+        title: r.title ?? "",
+        description: r.description ?? "",
         client_id: r.client_id ?? null,
         client_name: r.client_name ?? null,
-        citta: r.location ?? r.citta ?? "",
-        stato: r.state ?? r.stato ?? "",
-        stato_offerta: r.status ?? r.stato_offerta ?? "open",
+        location: r.location ?? "",
+        state: r.state ?? "",
+        status: r.status ?? "open",
         created_at: r.created_at,
         is_archived: r.is_archived || false,
       };
@@ -2713,17 +2785,17 @@
         tr.setAttribute("data-id", row.id);
 
         const client = IE_STORE.clients.find((c) => c.id === row.client_id);
-        const clientName = row.client_name || (client ? client.nome : "—");
-        const location = row.citta && row.stato ? `${row.citta}, ${row.stato}` : (row.citta || row.stato || "—");
+        const clientName = row.client_name || (client ? client.name : "—");
+        const location = row.location && row.state ? `${row.location}, ${row.state}` : (row.location || row.state || "—");
         const createdDate = row.created_at ? new Date(row.created_at).toLocaleDateString("it-IT") : "";
-        const badgeClass = getOfferStatusBadgeClass(row.stato_offerta);
-        const statusLabel = formatOfferStatusLabel(row.stato_offerta);
+        const badgeClass = getOfferStatusBadgeClass(row.status);
+        const statusLabel = formatOfferStatusLabel(row.status);
         const metaTitle = formatLastUpdatedMeta(row);
         if (metaTitle) tr.title = metaTitle;
 
         tr.innerHTML = `
-            <td class="px-6 py-4 font-semibold text-gray-800">${row.titolo_posizione}</td>
-            <td class="px-6 py-4 text-gray-600 font-medium">${row.descrizione ? "Role" : "—"}</td>
+            <td class="px-6 py-4 font-semibold text-gray-800">${row.title}</td>
+            <td class="px-6 py-4 text-gray-600 font-medium">${row.description ? "Role" : "—"}</td>
             <td class="px-6 py-4 text-gray-600">${clientName}</td>
             <td class="px-6 py-4 text-gray-500 italic">${location}</td>
             <td class="px-6 py-4"><span class="badge ${badgeClass}">${statusLabel}</span></td>
@@ -2969,11 +3041,11 @@
               if (metaTitle) tr.title = metaTitle;
 
               tr.innerHTML = `
-                <td class="px-6 py-4 font-semibold text-gray-800">${row.nome || "—"}</td>
-                <td class="px-6 py-4 text-gray-600">${row.citta || "—"}</td>
-                <td class="px-6 py-4 text-gray-600">${row.stato || "—"}</td>
+                <td class="px-6 py-4 font-semibold text-gray-800">${row.name || "—"}</td>
+                <td class="px-6 py-4 text-gray-600">${row.city || "—"}</td>
+                <td class="px-6 py-4 text-gray-600">${row.state || "—"}</td>
                 <td class="px-6 py-4 text-gray-600">${row.email || "—"}</td>
-                <td class="px-6 py-4 text-gray-600">${row.telefono || "—"}</td>
+                <td class="px-6 py-4 text-gray-600">${row.phone || "—"}</td>
                 <td class="px-6 py-4">
                   <div class="flex items-center justify-center space-x-2">
                     <button type="button" class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View">
@@ -3041,11 +3113,11 @@
           tr.setAttribute("data-id", row.id);
 
           tr.innerHTML = `
-            <td class="px-6 py-4 font-semibold text-gray-800">${row.nome}</td>
-            <td class="px-6 py-4 text-gray-600">${row.citta || "—"}</td>
-            <td class="px-6 py-4 text-gray-600">${row.stato || "—"}</td>
+            <td class="px-6 py-4 font-semibold text-gray-800">${row.name}</td>
+            <td class="px-6 py-4 text-gray-600">${row.city || "—"}</td>
+            <td class="px-6 py-4 text-gray-600">${row.state || "—"}</td>
             <td class="px-6 py-4 text-gray-600">${row.email || "—"}</td>
-            <td class="px-6 py-4 text-gray-600">${row.telefono || "—"}</td>
+            <td class="px-6 py-4 text-gray-600">${row.phone || "—"}</td>
             <td class="px-6 py-4">
               <div class="flex items-center justify-center space-x-2">
                 <button type="button" class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View">
@@ -3107,13 +3179,13 @@
       tbody.innerHTML = "";
       (assocs || []).forEach(function (assoc) {
         const c = candidateMap[assoc.candidate_id];
-        const nome = c ? (c.first_name || "") + " " + (c.last_name || "") : "—";
-        const posizione = c ? (c.position || "—") : "—";
+        const fullName = c ? (c.first_name || "") + " " + (c.last_name || "") : "—";
+        const positionLabel = c ? (c.position || "—") : "—";
         const tr = document.createElement("tr");
         tr.className = "table-row transition";
         tr.innerHTML =
-          "<td class=\"px-6 py-4 font-semibold text-gray-800\">" + nome + "</td>" +
-          "<td class=\"px-6 py-4 text-gray-600\">" + posizione + "</td>" +
+          "<td class=\"px-6 py-4 font-semibold text-gray-800\">" + fullName + "</td>" +
+          "<td class=\"px-6 py-4 text-gray-600\">" + positionLabel + "</td>" +
           "<td class=\"px-6 py-4\"><span class=\"badge " + getCandidateStatusBadgeClass(assoc.status) + "\">" + formatCandidateStatusLabel(assoc.status) + "</span></td>" +
           "<td class=\"px-6 py-4 text-gray-500 italic text-xs\">" + (assoc.notes || "—") + "</td>" +
           "<td class=\"px-6 py-4 text-center\"><button type=\"button\" class=\"text-red-500 hover:text-red-600 text-xs font-semibold uppercase tracking-widest\" data-action=\"remove-association\" data-id=\"" + (assoc.id || "") + "\">Remove</button></td>";
@@ -3135,7 +3207,7 @@
       const metaTitle = formatLastUpdatedMeta(assoc);
       if (metaTitle) tr.title = metaTitle;
       tr.innerHTML =
-        "<td class=\"px-6 py-4 font-semibold text-gray-800\">" + candidate.nome + " " + candidate.cognome + "</td>" +
+        "<td class=\"px-6 py-4 font-semibold text-gray-800\">" + (candidate.first_name || "") + " " + (candidate.last_name || "") + "</td>" +
         "<td class=\"px-6 py-4 text-gray-600\">" + (candidate.posizione || "—") + "</td>" +
         "<td class=\"px-6 py-4\"><span class=\"badge " + getCandidateStatusBadgeClass(assoc.status) + "\">" + formatCandidateStatusLabel(assoc.status) + "</span></td>" +
         "<td class=\"px-6 py-4 text-gray-500 italic text-xs\">" + (assoc.notes || "—") + "</td>" +
