@@ -10,8 +10,9 @@
 //   candidates: id, created_by (uuid), first_name, last_name, position,
 //               address, status, source, notes, created_at, is_archived
 //               (no client_name; relationship is via candidate_job_associations -> job_offers -> clients)
-//   job_offers: id, created_by, title, position, client_name, location,
-//               description, requirements, notes, status, created_at
+//   job_offers: id, created_by, title, position, client_id, description,
+//               requirements, notes, salary, contract_type, positions, city,
+//               state, deadline, status, created_at
 //   candidate_job_associations: id, candidate_id, job_offer_id, status, notes,
 //                               created_by, created_at
 //   clients: id, created_by (optional for RLS), name, city, state, country,
@@ -386,8 +387,8 @@
 
   /**
    * Insert a new job offer.
-   * Expects table: job_offers (id, created_by, title, position, client_name, location, description, status, created_at, ...)
-   * @param {object} payload - { title, position, client_name, location, description, requirements, notes, status }
+   * Expects table: job_offers (id, created_by, title, position, client_id, description, requirements, notes, salary, contract_type, positions, city, state, deadline, status, created_at, ...)
+   * @param {object} payload - { client_id, title, position, description, requirements, notes, salary, contract_type, positions, city, state, deadline, status }
    * @returns {Promise<{ data: object | null, error: object | null }>}
    */
   async function insertJobOffer(payload) {
@@ -401,13 +402,18 @@
     try {
       const row = {
         created_by: userId,
+        client_id: payload.client_id || null,
         title: payload.title || "",
         position: payload.position || null,
-        client_name: payload.client_name || null,
-        location: payload.location || null,
         description: payload.description || null,
         requirements: payload.requirements || null,
         notes: payload.notes || null,
+        salary: payload.salary || null,
+        contract_type: payload.contract_type || null,
+        positions: payload.positions ?? null,
+        city: payload.city || null,
+        state: payload.state || null,
+        deadline: payload.deadline || null,
         status: payload.status || "open",
       };
       const { data, error } = await supabase.from("job_offers").insert(row).select().single();
@@ -538,12 +544,14 @@
 
   /**
    * Build job offers query with filters (same logic for count and data).
-   * Filters: title, offerStatus, archived, city. Columns: title, location, status, is_archived.
+   * Filters: title, offerStatus, archived, city, state. Columns: title, city, state, status, is_archived.
    */
   function buildJobOffersQuery(supabaseQuery, filters) {
     let q = supabaseQuery;
     if (filters.archived === "active") q = q.eq("is_archived", false);
     if (filters.archived === "archived") q = q.eq("is_archived", true);
+    if (filters.clientId) q = q.eq("client_id", filters.clientId);
+    if (filters.contractType) q = q.eq("contract_type", filters.contractType);
     if (filters.offerStatus) q = q.eq("status", filters.offerStatus);
     const titleTerm = (filters.title || "").trim();
     if (titleTerm) {
@@ -553,7 +561,12 @@
     const cityTerm = (filters.city || "").trim();
     if (cityTerm) {
       const escaped = cityTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
-      q = q.ilike("location", "%" + escaped + "%");
+      q = q.ilike("city", "%" + escaped + "%");
+    }
+    const stateTerm = (filters.state || "").trim();
+    if (stateTerm) {
+      const escaped = stateTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
+      q = q.ilike("state", "%" + escaped + "%");
     }
     return q;
   }
@@ -598,10 +611,16 @@
           id: r.id,
           title: r.title,
           position: r.position,
-          client_name: r.client_name,
           client_id: r.client_id,
-          location: r.location,
           description: r.description,
+          requirements: r.requirements,
+          notes: r.notes,
+          salary: r.salary,
+          contract_type: r.contract_type,
+          positions: r.positions,
+          city: r.city,
+          state: r.state,
+          deadline: r.deadline,
           status: r.status,
           created_at: r.created_at,
           is_archived: r.is_archived,
@@ -1085,7 +1104,7 @@
 
   /**
    * Fetch job history for a candidate (associations with job_offers joined).
-   * Returns list of { association, job_offer } if job_offers has title/client_name etc.
+   * Returns list of { association, job_offer }.
    * @param {string} candidateId
    * @returns {Promise<{ data: array, error: object | null }>}
    */
@@ -1105,7 +1124,7 @@
       const offerIds = [...new Set(assocs.map((a) => a.job_offer_id))];
       const { data: offers, error: offersError } = await supabase
         .from("job_offers")
-        .select("id, title, client_name, location, status")
+        .select("id, title, position, city, state, salary, deadline, status")
         .in("id", offerIds);
       if (offersError) {
         console.error("[Supabase] fetchJobHistoryForCandidate job_offers error:", offersError.message);

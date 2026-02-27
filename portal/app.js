@@ -753,6 +753,7 @@
     const jobOfferForm = scope.querySelector("#jobOfferForm");
     if (jobOfferForm && !jobOfferForm.dataset.ieBound) {
       jobOfferForm.dataset.ieBound = "true";
+      hydrateJobOfferClientSelect(jobOfferForm);
       jobOfferForm.addEventListener("submit", function (event) {
         event.preventDefault();
         const formData = new FormData(jobOfferForm);
@@ -769,6 +770,38 @@
         saveClient(formData);
       });
     }
+  }
+
+  function hydrateJobOfferClientSelect(form) {
+    if (!form) return;
+    const clientSelect = form.querySelector('[name="client_id"]');
+    if (!clientSelect || clientSelect.dataset.iePopulated === "true") return;
+    clientSelect.dataset.iePopulated = "true";
+
+    function appendClientOptions(list) {
+      list.forEach(function (client) {
+        if (!client || !client.id) return;
+        const opt = document.createElement("option");
+        opt.value = client.id;
+        opt.textContent = client.name || "—";
+        clientSelect.appendChild(opt);
+      });
+    }
+
+    if (window.IESupabase && window.IESupabase.fetchClientsPaginated) {
+      window.IESupabase.fetchClientsPaginated({
+        filters: { archived: "active" },
+        page: 1,
+        limit: 500,
+      }).then(function (res) {
+        appendClientOptions((res.data || []).filter(function (c) { return !c.is_archived; }));
+      }).catch(function () {
+        appendClientOptions(IE_STORE.clients.filter(function (c) { return !c.is_archived; }));
+      });
+      return;
+    }
+
+    appendClientOptions(IE_STORE.clients.filter(function (c) { return !c.is_archived; }));
   }
 
   // ---------------------------------------------------------------------------
@@ -1210,7 +1243,8 @@
    * Shape aligned with Supabase tables (English column names).
    *
    * Candidate: id, first_name, last_name, position, address, status, source, notes, cv_url, foto_url, created_at, is_archived, ...
-   * Job Offer: id, title, client_id, description, location, status, created_at, is_archived, ...
+   * Job Offer: id, title, position, client_id, description, requirements, notes, salary,
+   *            contract_type, positions, city, state, deadline, status, created_at, is_archived, ...
    * Client: id, name, city, state, country, email, phone, notes, created_at, is_archived, ...
    * Candidate ⇄ Job Offer association: candidate_id, job_offer_id, status, notes, ...
    */
@@ -1406,13 +1440,15 @@
       {
         id: "offer-head-sommelier",
         title: "Head Sommelier",
+        position: "Head Sommelier",
         client_id: "client-grand-hotel-milano",
         description: "Responsabile della carta vini e del team di sommellerie.",
         salary: "€55.000 - €65.000",
         contract_type: "Full-time",
         positions: 1,
-        location: "Milano",
+        city: "Milano",
         state: "MI",
+        deadline: now.slice(0, 10),
         status: "open",
         created_at: now,
         updated_at: now,
@@ -1423,13 +1459,15 @@
       {
         id: "offer-executive-chef",
         title: "Executive Chef",
+        position: "Executive Chef",
         client_id: "client-ristorante-cracco",
         description: "Guida creativa della cucina e del team.",
         salary: "€70.000 - €85.000",
         contract_type: "Full-time",
         positions: 1,
-        location: "Milano",
+        city: "Milano",
         state: "MI",
+        deadline: now.slice(0, 10),
         status: "inprogress",
         created_at: now,
         updated_at: now,
@@ -1440,13 +1478,15 @@
       {
         id: "offer-property-manager",
         title: "Property Manager",
+        position: "Property Manager",
         client_id: "client-italian-luxury-villas",
         description: "Gestione portafoglio ville di pregio.",
         salary: "€45.000 - €55.000",
         contract_type: "Full-time",
         positions: 1,
-        location: "Firenze",
+        city: "Firenze",
         state: "FI",
+        deadline: now.slice(0, 10),
         status: "open",
         created_at: now,
         updated_at: now,
@@ -1457,13 +1497,15 @@
       {
         id: "offer-maitre",
         title: "Maître d'Hôtel",
+        position: "Maître d'Hôtel",
         client_id: "client-hotel-cipriani",
         description: "Coordinamento sala e accoglienza ospiti.",
         salary: "€50.000 - €60.000",
         contract_type: "Full-time",
         positions: 1,
-        location: "Venezia",
+        city: "Venezia",
         state: "VE",
+        deadline: now.slice(0, 10),
         status: "closed",
         created_at: now,
         updated_at: now,
@@ -1474,13 +1516,15 @@
       {
         id: "offer-pastry-chef",
         title: "Pastry Chef",
+        position: "Pastry Chef",
         client_id: "client-pasticceria-marchesi",
         description: "Responsabile laboratorio pasticceria.",
         salary: "€40.000 - €50.000",
         contract_type: "Full-time",
         positions: 1,
-        location: "Roma",
+        city: "Roma",
         state: "RM",
+        deadline: now.slice(0, 10),
         status: "inprogress",
         created_at: now,
         updated_at: now,
@@ -1645,10 +1689,17 @@
         return {
           id: r.id,
           title: r.title || "",
+          position: r.position || "",
           client_id: r.client_id || null,
-          client_name: r.client_name || null,
           description: r.description || "",
-          location: r.location || "",
+          requirements: r.requirements || "",
+          notes: r.notes || "",
+          salary: r.salary || "",
+          contract_type: r.contract_type || "",
+          positions: r.positions ?? null,
+          city: r.city || "",
+          state: r.state || "",
+          deadline: r.deadline || null,
           status: r.status || "open",
           created_at: r.created_at,
           is_archived: r.is_archived || false,
@@ -1738,22 +1789,33 @@
   async function saveJobOffer(formData) {
     const title = (formData.get("title") || "").toString().trim();
     const position = (formData.get("position") || "").toString().trim();
-    const client_name = (formData.get("client_name") || "").toString().trim();
-    const location = (formData.get("location") || "").toString().trim();
+    const client_id = (formData.get("client_id") || "").toString().trim();
     const description = (formData.get("description") || "").toString();
     const requirements = (formData.get("requirements") || "").toString();
     const notes = (formData.get("notes") || "").toString();
+    const salary = (formData.get("salary") || "").toString().trim();
+    const contract_type = (formData.get("contract_type") || "").toString().trim();
+    const positionsRaw = (formData.get("positions") || "").toString().trim();
+    const city = (formData.get("city") || "").toString().trim();
+    const state = (formData.get("state") || "").toString().trim();
+    const deadline = (formData.get("deadline") || "").toString().trim();
     const status = (formData.get("status") || "open").toString();
+    const positions = positionsRaw === "" ? null : Number(positionsRaw);
 
     if (window.IESupabase) {
       const { data, error } = await window.IESupabase.insertJobOffer({
+        client_id: client_id || null,
         title: title,
         position: position,
-        client_name: client_name || null,
-        location: location || null,
         description: description || null,
         requirements: requirements || null,
         notes: notes || null,
+        salary: salary || null,
+        contract_type: contract_type || null,
+        positions: Number.isFinite(positions) ? positions : null,
+        city: city || null,
+        state: state || null,
+        deadline: deadline || null,
         status: status,
       });
       if (error) {
@@ -1767,19 +1829,20 @@
 
     const now = new Date().toISOString();
     const currentUser = getCurrentUserDisplayName();
-    let clientId = null;
-    if (client_name) {
-      const existing = IE_STORE.clients.find(
-        (c) => (c.name || "").toLowerCase() === client_name.toLowerCase()
-      );
-      if (existing) clientId = existing.id;
-    }
     const jobOffer = {
       id: "offer-" + Math.random().toString(36).slice(2, 10),
+      client_id: client_id || null,
       title: title,
-      client_id: clientId,
+      position: position,
       description: description,
-      location: location,
+      requirements: requirements || null,
+      notes: notes || null,
+      salary: salary || null,
+      contract_type: contract_type || null,
+      positions: Number.isFinite(positions) ? positions : null,
+      city: city || null,
+      state: state || null,
+      deadline: deadline || null,
       status: status,
       created_at: now,
       updated_at: now,
@@ -1951,7 +2014,7 @@
       })
       .filter((item) => {
         if (!filters.city) return true;
-        return (item.location || "").toLowerCase().includes(filters.city.toLowerCase());
+        return (item.city || "").toLowerCase().includes(filters.city.toLowerCase());
       })
       .filter((item) => {
         if (!filters.state) return true;
@@ -2761,11 +2824,13 @@
       return {
         id: r.id,
         title: r.title ?? "",
+        position: r.position ?? "",
         description: r.description ?? "",
         client_id: r.client_id ?? null,
-        client_name: r.client_name ?? null,
-        location: r.location ?? "",
+        salary: r.salary ?? "",
+        city: r.city ?? "",
         state: r.state ?? "",
+        deadline: r.deadline ?? null,
         status: r.status ?? "open",
         created_at: r.created_at,
         is_archived: r.is_archived || false,
@@ -2784,10 +2849,9 @@
         tr.className = "table-row transition" + (row.is_archived ? " opacity-60" : "");
         tr.setAttribute("data-id", row.id);
 
-        const client = IE_STORE.clients.find((c) => c.id === row.client_id);
-        const clientName = row.client_name || (client ? client.name : "—");
-        const location = row.location && row.state ? `${row.location}, ${row.state}` : (row.location || row.state || "—");
-        const createdDate = row.created_at ? new Date(row.created_at).toLocaleDateString("it-IT") : "";
+        const cityValue = row.city || "—";
+        const salaryValue = row.salary || "—";
+        const deadlineValue = row.deadline ? new Date(row.deadline).toLocaleDateString("it-IT") : "—";
         const badgeClass = getOfferStatusBadgeClass(row.status);
         const statusLabel = formatOfferStatusLabel(row.status);
         const metaTitle = formatLastUpdatedMeta(row);
@@ -2795,11 +2859,11 @@
 
         tr.innerHTML = `
             <td class="px-6 py-4 font-semibold text-gray-800">${row.title}</td>
-            <td class="px-6 py-4 text-gray-600 font-medium">${row.description ? "Role" : "—"}</td>
-            <td class="px-6 py-4 text-gray-600">${clientName}</td>
-            <td class="px-6 py-4 text-gray-500 italic">${location}</td>
+            <td class="px-6 py-4 text-gray-600 font-medium">${row.position || "—"}</td>
+            <td class="px-6 py-4 text-gray-600">${cityValue}</td>
+            <td class="px-6 py-4 text-gray-500 italic">${salaryValue}</td>
             <td class="px-6 py-4"><span class="badge ${badgeClass}">${statusLabel}</span></td>
-            <td class="px-6 py-4 text-gray-400">${createdDate}</td>
+            <td class="px-6 py-4 text-gray-400">${deadlineValue}</td>
             <td class="px-6 py-4">
               <div class="flex items-center justify-center space-x-2">
                 <button type="button" class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View">
@@ -3230,4 +3294,3 @@
     });
   }
 })();
-

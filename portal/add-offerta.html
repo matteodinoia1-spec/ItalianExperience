@@ -63,11 +63,32 @@
                         </div>
                         <div>
                             <label class="form-label">Client / Company Name</label>
-                            <input type="text" name="client_name" placeholder="Es. Hotel Cipriani" class="form-input">
+                            <select name="client_id" class="form-input appearance-none" required>
+                                <option value="">Seleziona cliente</option>
+                            </select>
                         </div>
                         <div>
                             <label class="form-label">Location</label>
-                            <input type="text" name="location" placeholder="Es. Venezia, IT" class="form-input">
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="text" name="city" placeholder="Es. Venezia" class="form-input">
+                                <input type="text" name="state" placeholder="Es. VE" class="form-input">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label">Contract Type</label>
+                            <input type="text" name="contract_type" placeholder="Es. Full-time" class="form-input">
+                        </div>
+                        <div>
+                            <label class="form-label">Open Positions</label>
+                            <input type="number" name="positions" min="1" step="1" placeholder="Es. 1" class="form-input">
+                        </div>
+                        <div>
+                            <label class="form-label">Salary</label>
+                            <input type="text" name="salary" placeholder="Es. €45.000 - €55.000" class="form-input">
+                        </div>
+                        <div>
+                            <label class="form-label">Deadline</label>
+                            <input type="date" name="deadline" class="form-input">
                         </div>
                     </div>
                 </div>
