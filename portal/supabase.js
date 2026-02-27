@@ -1151,7 +1151,36 @@
    */
   async function archiveClient(id) {
     if (!id) return { data: null, error: new Error("Missing id") };
-    return archiveRecord({ table: "clients", id });
+    try {
+      // Soft archive the client itself.
+      const { data: client, error: clientError } = await supabase
+        .from("clients")
+        .update({ is_archived: true })
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (clientError) {
+        console.error("[Supabase] archiveClient clients update error:", clientError.message, clientError, { id });
+        return { data: null, error: clientError };
+      }
+
+      // Soft cascade: archive ALL job offers belonging to this client.
+      const { error: offersError } = await supabase
+        .from("job_offers")
+        .update({ is_archived: true })
+        .eq("client_id", id);
+
+      if (offersError) {
+        console.error("[Supabase] archiveClient job_offers update error:", offersError.message, offersError, { id });
+        return { data: client || null, error: offersError };
+      }
+
+      return { data: client || null, error: null };
+    } catch (err) {
+      console.error("[Supabase] archiveClient exception:", err, { id });
+      return { data: null, error: err };
+    }
   }
 
   // ---------------------------------------------------------------------------
