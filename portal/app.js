@@ -113,7 +113,7 @@
     const pageKey = getCurrentPageKey();
 
     // Protected pages: require Supabase auth (redirect to login if not authenticated)
-    const protectedPages = ["dashboard", "candidati", "offerte", "clients", "clienti", "archiviati", "add-candidato", "edit-candidato", "add-offerta", "add-cliente", "profile"];
+    const protectedPages = ["dashboard", "candidati", "offerte", "clients", "clienti", "archiviati", "add-candidato", "add-offerta", "add-cliente", "edit-candidato", "profile", "settings", "sidebar"];
     const isProtected = protectedPages.indexOf(pageKey) !== -1;
     if (isProtected) {
       if (!window.IESupabase) {

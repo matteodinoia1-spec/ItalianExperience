@@ -592,6 +592,12 @@
    * Load all dashboard data and update the UI.
    */
   async function loadDashboard() {
+    const api = window.IESupabase;
+    if (api && api.requireAuth) {
+      const user = await api.requireAuth();
+      if (!user) return;
+    }
+
     const supabase = getSupabase();
     setLoading(true);
 
