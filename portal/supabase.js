@@ -377,8 +377,28 @@
     if (!id) return { data: null, error: new Error("Missing id") };
     try {
       const { data, error } = await supabase
-        .from("candidates_with_client")
-        .select("*")
+        .from("candidates")
+        .select(
+          `
+          *,
+          candidate_job_associations (
+            job_offer_id,
+            job_offers (
+              id,
+              title,
+              position,
+              city,
+              state,
+              clients (
+                id,
+                name,
+                city,
+                state
+              )
+            )
+          )
+        `
+        )
         .eq("id", id)
         .maybeSingle();
       if (error) {
@@ -438,15 +458,47 @@
     try {
       console.log("[Supabase] fetchMyCandidates for user id:", userId);
       const { data, error } = await supabase
-        .from("candidates_with_client")
-        .select("*")
+        .from("candidates")
+        .select(
+          `
+          *,
+          candidate_job_associations (
+            job_offer_id,
+            job_offers (
+              id,
+              title,
+              position,
+              city,
+              state,
+              clients (
+                id,
+                name,
+                city,
+                state
+              )
+            )
+          )
+        `
+        )
         .eq("created_by", userId)
         .order("created_at", { ascending: false });
       if (error) {
         console.error("[Supabase] fetchMyCandidates error:", error.message, error);
         return { data: [], error };
       }
-      return { data: data || [], error: null };
+      const rows = (data || []).map(function (r) {
+        let clientName = r.client_name || null;
+        if (!clientName && Array.isArray(r.candidate_job_associations) && r.candidate_job_associations.length > 0) {
+          const assoc = r.candidate_job_associations[0];
+          const job = assoc && assoc.job_offers;
+          const client = job && job.clients;
+          if (client && client.name) {
+            clientName = client.name;
+          }
+        }
+        return Object.assign({}, r, { client_name: clientName });
+      });
+      return { data: rows, error: null };
     } catch (err) {
       console.error("[Supabase] fetchMyCandidates exception:", err);
       return { data: [], error: err };
@@ -508,8 +560,18 @@
   async function fetchJobOffers() {
     try {
       const { data, error } = await supabase
-        .from("job_offers_with_client")
-        .select("*")
+        .from("job_offers")
+        .select(
+          `
+          *,
+          clients (
+            id,
+            name,
+            city,
+            state
+          )
+        `
+        )
         .order("created_at", { ascending: false });
       if (error) {
         console.error("[Supabase] fetchJobOffers error:", error.message, error);
@@ -570,7 +632,7 @@
     try {
       console.log("[Supabase] fetchCandidatesPaginated for user id:", userId, "page:", page, "limit:", limit);
       const countQuery = buildCandidatesQuery(
-        supabase.from("candidates_with_client").select("*", { count: "exact", head: true }),
+        supabase.from("candidates").select("*", { count: "exact", head: true }),
         filters,
         userId
       );
@@ -582,7 +644,29 @@
       const totalCount = count ?? 0;
 
       const dataQuery = buildCandidatesQuery(
-        supabase.from("candidates_with_client").select("*"),
+        supabase
+          .from("candidates")
+          .select(
+            `
+            *,
+            candidate_job_associations (
+              job_offer_id,
+              job_offers (
+                id,
+                title,
+                position,
+                city,
+                state,
+                clients (
+                  id,
+                  name,
+                  city,
+                  state
+                )
+              )
+            )
+          `
+          ),
         filters,
         userId
       );
@@ -595,6 +679,15 @@
         return { data: [], totalCount, error: dataError };
       }
       const data = (rows || []).map(function (r) {
+        let clientName = r.client_name || null;
+        if (!clientName && Array.isArray(r.candidate_job_associations) && r.candidate_job_associations.length > 0) {
+          const assoc = r.candidate_job_associations[0];
+          const job = assoc && assoc.job_offers;
+          const client = job && job.clients;
+          if (client && client.name) {
+            clientName = client.name;
+          }
+        }
         return {
           id: r.id,
           first_name: r.first_name,
@@ -606,7 +699,7 @@
           notes: r.notes,
           created_at: r.created_at,
           is_archived: r.is_archived,
-          client_name: r.client_name,
+          client_name: clientName,
           photo_url: r.photo_url,
         };
       });
@@ -659,7 +752,7 @@
 
     try {
       const countQuery = buildJobOffersQuery(
-        supabase.from("job_offers_with_client").select("*", { count: "exact", head: true }),
+        supabase.from("job_offers").select("*", { count: "exact", head: true }),
         filters
       );
       const { count, error: countError } = await countQuery;
@@ -670,7 +763,19 @@
       const totalCount = count ?? 0;
 
       const dataQuery = buildJobOffersQuery(
-        supabase.from("job_offers_with_client").select("*"),
+        supabase
+          .from("job_offers")
+          .select(
+            `
+            *,
+            clients (
+              id,
+              name,
+              city,
+              state
+            )
+          `
+          ),
         filters
       );
       const { data: rows, error: dataError } = await dataQuery
@@ -682,12 +787,21 @@
         return { data: [], totalCount, error: dataError };
       }
       const data = (rows || []).map(function (r) {
+        const client = r.clients || null;
+        const clientName = r.client_name || (client && client.name) || null;
+        const location =
+          r.location ||
+          [r.city, r.state]
+            .filter(function (x) {
+              return x;
+            })
+            .join(", ");
         return {
           id: r.id,
           title: r.title,
           position: r.position,
           client_id: r.client_id,
-          client_name: r.client_name,
+          client_name: clientName,
           description: r.description,
           requirements: r.requirements,
           notes: r.notes,
@@ -696,7 +810,7 @@
           positions: r.positions,
           city: r.city,
           state: r.state,
-          location: r.location,
+          location: location,
           deadline: r.deadline,
           status: r.status,
           created_at: r.created_at,
@@ -1151,7 +1265,7 @@
    */
   async function getTotalCandidates() {
     try {
-      let q = supabase.from("candidates_with_client").select("*", { count: "exact", head: true });
+      let q = supabase.from("candidates").select("*", { count: "exact", head: true });
       try {
         q = q.eq("is_archived", false);
       } catch (_) {}
@@ -1173,7 +1287,7 @@
    */
   async function getActiveJobOffers() {
     try {
-      let q = supabase.from("job_offers_with_client").select("*", { count: "exact", head: true });
+      let q = supabase.from("job_offers").select("*", { count: "exact", head: true });
       try {
         q = q.eq("is_archived", false);
       } catch (_) {}
@@ -1199,7 +1313,7 @@
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
       const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString();
       const { data, error } = await supabase
-        .from("candidates_with_client")
+        .from("candidates")
         .select("id")
         .gte("created_at", startOfDay)
         .lt("created_at", endOfDay);
@@ -1224,7 +1338,7 @@
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
       const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
       const { data, error } = await supabase
-        .from("candidates_with_client")
+        .from("candidates")
         .select("id")
         .eq("status", "hired")
         .gte("created_at", startOfMonth)
@@ -1247,7 +1361,7 @@
   async function getRecentCandidates() {
     try {
       let q = supabase
-        .from("candidates_with_client")
+        .from("candidates")
         .select("id, first_name, last_name, position, status, source, created_at")
         .order("created_at", { ascending: false })
         .limit(10);
@@ -1273,7 +1387,7 @@
   async function getCandidatesBySource() {
     try {
       const { data, error } = await supabase
-        .from("candidates_with_client")
+        .from("candidates")
         .select("source")
         .eq("is_archived", false);
       if (error) {
@@ -1321,14 +1435,55 @@
       if (!assocs?.length) return { data: [], error: null };
       const offerIds = [...new Set(assocs.map((a) => a.job_offer_id))];
       const { data: offers, error: offersError } = await supabase
-        .from("job_offers_with_client")
-        .select("id, title, position, city, state, salary, deadline, status, client_name, location")
+        .from("job_offers")
+        .select(
+          `
+          id,
+          title,
+          position,
+          city,
+          state,
+          salary,
+          deadline,
+          status,
+          clients (
+            id,
+            name,
+            city,
+            state
+          )
+        `
+        )
         .in("id", offerIds);
       if (offersError) {
         console.error("[Supabase] fetchJobHistoryForCandidate job_offers error:", offersError.message);
         return { data: assocs.map((a) => ({ association: a, job_offer: null })), error: null };
       }
-      const offerMap = (offers || []).reduce((acc, o) => { acc[o.id] = o; return acc; }, {});
+      const normalizedOffers = (offers || []).map(function (o) {
+        const client = o.clients || null;
+        const clientName = (client && client.name) || null;
+        const location = [o.city, o.state]
+          .filter(function (x) {
+            return x;
+          })
+          .join(", ");
+        return {
+          id: o.id,
+          title: o.title,
+          position: o.position,
+          city: o.city,
+          state: o.state,
+          salary: o.salary,
+          deadline: o.deadline,
+          status: o.status,
+          client_name: clientName,
+          location: location,
+        };
+      });
+      const offerMap = normalizedOffers.reduce(function (acc, o) {
+        acc[o.id] = o;
+        return acc;
+      }, {});
       const result = assocs.map((a) => ({ association: a, job_offer: offerMap[a.job_offer_id] || null }));
       return { data: result, error: null };
     } catch (err) {
