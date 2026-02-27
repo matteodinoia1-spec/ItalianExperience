@@ -113,10 +113,16 @@
     const pageKey = getCurrentPageKey();
 
     // Protected pages: require Supabase auth (redirect to login if not authenticated)
-    const protectedPages = ["dashboard", "candidati", "offerte", "clients", "archiviati", "add-candidato", "add-offerta", "profile"];
-    if (protectedPages.indexOf(pageKey) !== -1 && window.IESupabase) {
+    const protectedPages = ["dashboard", "candidati", "offerte", "clients", "clienti", "archiviati", "add-candidato", "add-offerta", "add-cliente", "profile"];
+    const isProtected = protectedPages.indexOf(pageKey) !== -1;
+    if (isProtected) {
+      if (!window.IESupabase) {
+        window.location.href = (derivePortalBasePath()) + "index.html";
+        return;
+      }
       try {
-        await window.IESupabase.requireAuth();
+        const user = await window.IESupabase.requireAuth();
+        if (!user) return;
         await loadCurrentUserProfile();
       } catch (e) {
         return;
@@ -357,6 +363,8 @@
         return "add-candidato";
       case "add-offerta.html":
         return "add-offerta";
+      case "add-cliente.html":
+        return "add-cliente";
       case "profile.html":
       case "profile.htm":
         return "profile";
@@ -392,6 +400,7 @@
     const targetSection = (function () {
       if (currentKey === "add-candidato") return "candidati";
       if (currentKey === "add-offerta") return "offerte";
+      if (currentKey === "add-cliente") return "clients";
       return currentKey in sectionGroups ? currentKey : null;
     })();
 
@@ -501,6 +510,14 @@
       });
     }
 
+    const addClientBtn = document.querySelector('[data-action="add-client"]');
+    if (addClientBtn) {
+      addClientBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        navigateTo("add-cliente.html");
+      });
+    }
+
     // "Vedi Tutti" button on dashboard -> candidates listing
     const viewAllCandidatesBtn =
       document.querySelector('[data-action="view-all-candidates"]') ||
@@ -573,9 +590,12 @@
   function updateHeaderUserBlock() {
     if (!window.IESupabase) return;
     const displayName = getCurrentUserDisplayName();
+    const roleLabel = (IE_CURRENT_PROFILE && IE_CURRENT_PROFILE.role) ? String(IE_CURRENT_PROFILE.role) : "User";
     const nameEl = document.querySelector("header .text-right p.text-sm");
+    const roleEl = document.querySelector("header .text-right p:nth-of-type(2)");
     const avatarEl = document.querySelector("header .w-10.h-10.rounded-full img");
-    if (nameEl) nameEl.textContent = displayName;
+    if (nameEl) nameEl.textContent = displayName || "—";
+    if (roleEl) roleEl.textContent = roleLabel;
     if (avatarEl && displayName) {
       avatarEl.setAttribute("src", "https://ui-avatars.com/api/?name=" + encodeURIComponent(displayName.replace(/\s+/g, "+")) + "&background=1b4332&color=fff");
       avatarEl.setAttribute("alt", displayName);
@@ -623,6 +643,16 @@
         event.preventDefault();
         const formData = new FormData(jobOfferForm);
         saveJobOffer(formData);
+      });
+    }
+
+    const clientForm = scope.querySelector("#clientForm");
+    if (clientForm && !clientForm.dataset.ieBound) {
+      clientForm.dataset.ieBound = "true";
+      clientForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const formData = new FormData(clientForm);
+        saveClient(formData);
       });
     }
   }
@@ -1442,6 +1472,10 @@
     return "User";
   }
 
+  function getCurrentUserRole() {
+    return (IE_CURRENT_PROFILE && IE_CURRENT_PROFILE.role) ? String(IE_CURRENT_PROFILE.role) : "User";
+  }
+
   function markUpdated(record) {
     record.updated_at = new Date().toISOString();
     record.updated_by = getCurrentUserDisplayName();
@@ -1675,6 +1709,62 @@
     IE_STORE.jobOffers.push(jobOffer);
     console.info("[ItalianExperience] saveJobOffer() – in-memory:", jobOffer);
     alert("Offerta di lavoro creata con successo (simulazione)");
+  }
+
+  async function saveClient(formData) {
+    const nome = (formData.get("nome") || "").toString().trim();
+    const citta = (formData.get("citta") || "").toString().trim();
+    const stato = (formData.get("stato") || "").toString().trim();
+    const nazione = (formData.get("nazione") || "").toString().trim();
+    const email = (formData.get("email") || "").toString().trim();
+    const telefono = (formData.get("telefono") || "").toString().trim();
+    const note = (formData.get("note") || "").toString();
+
+    if (!nome) {
+      if (window.IESupabase) window.IESupabase.showError("Il nome del cliente è obbligatorio.", "saveClient");
+      else alert("Il nome del cliente è obbligatorio.");
+      return;
+    }
+
+    if (window.IESupabase && window.IESupabase.insertClient) {
+      const { data, error } = await window.IESupabase.insertClient({
+        nome: nome,
+        citta: citta || null,
+        stato: stato || null,
+        nazione: nazione || null,
+        email: email || null,
+        telefono: telefono || null,
+        note: note || null,
+      });
+      if (error) {
+        window.IESupabase.showError(error.message || "Errore nel salvataggio del cliente.", "saveClient");
+        return;
+      }
+      window.IESupabase.showSuccess("Cliente creato con successo.");
+      navigateTo("clienti.html");
+      return;
+    }
+
+    const now = new Date().toISOString();
+    const currentUser = getCurrentUserDisplayName();
+    const client = {
+      id: "client-" + Math.random().toString(36).slice(2, 10),
+      nome,
+      citta: citta || null,
+      stato: stato || null,
+      nazione: nazione || null,
+      email: email || null,
+      telefono: telefono || null,
+      note: note || null,
+      created_at: now,
+      updated_at: now,
+      created_by: currentUser,
+      is_archived: false,
+    };
+    IE_STORE.clients.push(client);
+    console.info("[ItalianExperience] saveClient() – in-memory:", client);
+    alert("Cliente creato con successo (simulazione)");
+    navigateTo("clienti.html");
   }
 
   function saveCandidateAssociation(formData, jobOfferIdOverride) {
@@ -2221,6 +2311,7 @@
       const paginationContainer = document.querySelector("[data-ie-candidates-body]")?.closest(".glass-card")?.querySelector("[data-ie-pagination]");
 
       if (window.IESupabase && window.IESupabase.fetchCandidatesPaginated) {
+        tbody.innerHTML = "<tr><td colspan=\"10\" class=\"px-6 py-8 text-center text-gray-400\">Caricamento...</td></tr>";
         window.IESupabase.fetchCandidatesPaginated({
           filters,
           page: currentPage,
@@ -2391,19 +2482,36 @@
       renderOffers();
     }
 
-    // Populate client filter options from store (if the element exists)
+    // Populate client filter options from Supabase or store
     if (clientSelect && !clientSelect.dataset.iePopulated) {
       clientSelect.dataset.iePopulated = "true";
-      const defaultOption = clientSelect.querySelector("option[value='']");
+      const defaultOpt = document.createElement("option");
+      defaultOpt.value = "";
+      defaultOpt.textContent = "Tutti i clienti";
       clientSelect.innerHTML = "";
-      if (defaultOption) clientSelect.appendChild(defaultOption);
-      IE_STORE.clients.forEach((client) => {
-        if (client.is_archived) return;
-        const opt = document.createElement("option");
-        opt.value = client.id;
-        opt.textContent = client.nome;
-        clientSelect.appendChild(opt);
-      });
+      clientSelect.appendChild(defaultOpt);
+      if (window.IESupabase && window.IESupabase.fetchClientsPaginated) {
+        window.IESupabase.fetchClientsPaginated({ filters: { archived: "active" }, page: 1, limit: 500 })
+          .then(function (res) {
+            const list = res.data || [];
+            list.forEach(function (client) {
+              if (client.is_archived) return;
+              const opt = document.createElement("option");
+              opt.value = client.id || "";
+              opt.textContent = client.nome || "—";
+              clientSelect.appendChild(opt);
+            });
+          })
+          .catch(function () {});
+      } else {
+        IE_STORE.clients.forEach((client) => {
+          if (client.is_archived) return;
+          const opt = document.createElement("option");
+          opt.value = client.id;
+          opt.textContent = client.nome;
+          clientSelect.appendChild(opt);
+        });
+      }
     }
 
     if (titleInput) {
@@ -2550,6 +2658,7 @@
       const paginationContainer = document.querySelector("[data-ie-joboffers-body]")?.closest(".glass-card")?.querySelector("[data-ie-pagination]");
 
       if (window.IESupabase && window.IESupabase.fetchJobOffersPaginated) {
+        tbody.innerHTML = "<tr><td colspan=\"7\" class=\"px-6 py-8 text-center text-gray-400\">Caricamento...</td></tr>";
         window.IESupabase.fetchJobOffersPaginated({
           filters,
           page: currentPage,

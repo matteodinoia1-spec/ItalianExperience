@@ -6,7 +6,7 @@
 // Uses publishable (anon) key only. RLS must be configured in Supabase.
 //
 // Expected table/column names (adjust if your DB differs):
-//   profiles: id (uuid, = auth.users.id), email, full_name
+//   profiles: id (uuid, = auth.users.id), email, first_name, last_name, role
 //   candidates: id, created_by (uuid), first_name, last_name, position,
 //               address, status, source, notes, created_at
 //               (no client_name; relationship is via candidate_job_associations -> job_offers -> clients)
@@ -14,6 +14,8 @@
 //               description, requirements, notes, status, created_at
 //   candidate_job_associations: id, candidate_id, job_offer_id, status, notes,
 //                               created_by, created_at
+//   clients: id, created_by (optional for RLS), nome, citta, stato, nazione,
+//            email, telefono, note, is_archived, created_at
 // ============================================================================
 
 (function () {
@@ -115,10 +117,14 @@
 
   /**
    * If user is not authenticated, redirect to login. Call on protected pages.
+   * Returns the current user or undefined; after redirect, caller should not continue.
    */
   async function requireAuth() {
     const { data } = await getSession();
-    if (!data?.user) redirectToLogin();
+    if (!data?.user) {
+      redirectToLogin();
+      return undefined;
+    }
     return data.user;
   }
 
@@ -591,6 +597,43 @@
   }
 
   /**
+   * Insert a new client. Expects table: clients (id, created_by, nome, citta, stato, nazione, email, telefono, note, is_archived, created_at).
+   * @param {object} payload - { nome, citta?, stato?, nazione?, email?, telefono?, note? }
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function insertClient(payload) {
+    const { data: sessionData } = await getSession();
+    const userId = sessionData?.user?.id;
+    if (!userId) {
+      const err = new Error("Not authenticated");
+      console.error("[Supabase] insertClient:", err);
+      return { data: null, error: err };
+    }
+    try {
+      const row = {
+        created_by: userId,
+        nome: payload.nome || "",
+        citta: payload.citta || null,
+        stato: payload.stato || null,
+        nazione: payload.nazione || null,
+        email: payload.email || null,
+        telefono: payload.telefono || null,
+        note: payload.note || null,
+        is_archived: false,
+      };
+      const { data, error } = await supabase.from("clients").insert(row).select().single();
+      if (error) {
+        console.error("[Supabase] insertClient error:", error.message, error);
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] insertClient exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
+  /**
    * Fetch clients with filters and pagination. Returns total count (with same filters) and page of data.
    * @param {object} opts - { filters: object, page: number, limit: number }
    * @returns {Promise<{ data: array, totalCount: number, error: object | null }>}
@@ -1028,6 +1071,7 @@
     fetchJobOffers,
     fetchJobOffersPaginated,
     // Clients
+    insertClient,
     fetchClientsPaginated,
     // Restore (unarchive) for Archiviati page
     unarchiveCandidate,
