@@ -588,30 +588,10 @@
     return div.innerHTML;
   }
 
-  async function waitForAuthGuard() {
-    if (!window.__IE_AUTH_GUARD__ || typeof window.__IE_AUTH_GUARD__.then !== "function") {
-      return true;
-    }
-    try {
-      return !!(await window.__IE_AUTH_GUARD__);
-    } catch (error) {
-      return false;
-    }
-  }
-
   /**
    * Load all dashboard data and update the UI.
    */
   async function loadDashboard() {
-    const authAllowed = await waitForAuthGuard();
-    if (!authAllowed) return;
-
-    const api = window.IESupabase;
-    if (api && api.requireAuth) {
-      const user = await api.requireAuth();
-      if (!user) return;
-    }
-
     const supabase = getSupabase();
     setLoading(true);
 

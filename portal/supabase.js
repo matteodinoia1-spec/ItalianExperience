@@ -37,6 +37,36 @@
   // ---------------------------------------------------------------------------
 
   /**
+   * Centralized authentication guard.
+   * - If there is no active session, performs a hard redirect to the portal login page.
+   * - If authenticated, returns the current user object.
+   * @returns {Promise<object|null>} user or null if redirecting
+   */
+  async function enforceAuthGuard() {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session || !session.user) {
+        const base = "/ItalianExperience/portal/";
+        const target = base + "index.html";
+        if (window.location.pathname + (window.location.search || "") + (window.location.hash || "") !== target) {
+          window.location.replace(target);
+        }
+        return null;
+      }
+
+      return session.user;
+    } catch (_) {
+      const base = "/ItalianExperience/portal/";
+      const target = base + "index.html";
+      window.location.replace(target);
+      return null;
+    }
+  }
+
+  /**
    * Login with email and password.
    * @param {string} email
    * @param {string} password
@@ -133,14 +163,9 @@
    * Returns the current user or undefined; after redirect, caller should not continue.
    */
   async function requireAuth() {
-    const { data } = await getSession();
-    if (!data?.user) {
-      console.warn("[Supabase Auth] requireAuth: no user found, redirecting to login.");
-      redirectToLogin();
-      return undefined;
-    }
-    console.log("[Supabase Auth] requireAuth: user is authenticated with id:", data.user.id);
-    return data.user;
+    const user = await enforceAuthGuard();
+    if (!user) return undefined;
+    return user;
   }
 
   function getBasePath() {
@@ -1216,6 +1241,7 @@
     login,
     logout,
     getSession,
+    enforceAuthGuard,
     redirectToDashboard,
     redirectToLogin,
     redirectToDashboardIfAuthenticated,

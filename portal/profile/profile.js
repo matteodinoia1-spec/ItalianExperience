@@ -31,21 +31,7 @@
 
   let currentProfile = null;
 
-  async function waitForAuthGuard() {
-    if (!window.__IE_AUTH_GUARD__ || typeof window.__IE_AUTH_GUARD__.then !== "function") {
-      return true;
-    }
-    try {
-      return !!(await window.__IE_AUTH_GUARD__);
-    } catch (error) {
-      return false;
-    }
-  }
-
   document.addEventListener("DOMContentLoaded", async function () {
-    const authAllowed = await waitForAuthGuard();
-    if (!authAllowed) return;
-
     const api = window.IESupabase;
     if (!api) {
       showError("Configurazione non disponibile.");
@@ -64,13 +50,10 @@
   });
 
   /**
-   * Ensure user is authenticated; redirect to login if not. Then load profile.
+   * Load profile for the current user.
    */
   async function requireAuthAndLoadProfile() {
     const api = window.IESupabase;
-    const user = await api.requireAuth();
-    if (!user) return;
-
     setPageLoading(true);
     const { data, error } = await api.getProfile();
     setPageLoading(false);
@@ -81,7 +64,7 @@
     }
 
     currentProfile = data || {
-      email: user.email || "",
+      email: "",
       first_name: "",
       last_name: "",
       role: "",

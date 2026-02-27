@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="flex min-h-screen">
+<body class="flex min-h-screen" style="visibility: hidden;">
 
     <aside id="sidebar"></aside>
 
@@ -88,20 +88,5 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script src="supabase.js"></script>
     <script src="app.js"></script>
-    <script>
-        (async function () {
-            try {
-                if (window.__IE_AUTH_GUARD__ && typeof window.__IE_AUTH_GUARD__.then === "function") {
-                    var allowed = await window.__IE_AUTH_GUARD__;
-                    if (!allowed) return;
-                } else if (window.IESupabase && typeof window.IESupabase.requireAuth === "function") {
-                    var user = await window.IESupabase.requireAuth();
-                    if (!user) return;
-                }
-            } catch (e) {
-                return;
-            }
-        })();
-    </script>
 </body>
 </html>

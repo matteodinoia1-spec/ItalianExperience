@@ -400,30 +400,7 @@
     });
   }
 
-  async function waitForAuthGuard() {
-    if (!window.__IE_AUTH_GUARD__ || typeof window.__IE_AUTH_GUARD__.then !== "function") {
-      return true;
-    }
-    try {
-      return !!(await window.__IE_AUTH_GUARD__);
-    } catch (error) {
-      return false;
-    }
-  }
-
   async function init() {
-    var authAllowed = await waitForAuthGuard();
-    if (!authAllowed) return;
-
-    var IE = getIE();
-    if (IE && IE.requireAuth) {
-      try {
-        await IE.requireAuth();
-      } catch (e) {
-        return;
-      }
-    }
-
     setupPagination(SECTIONS.candidates);
     setupPagination(SECTIONS.jobs);
     setupPagination(SECTIONS.clients);

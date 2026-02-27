@@ -30,7 +30,30 @@
 
   var pageKey = getCurrentPageKey();
   var isProtectedPage = PROTECTED_PAGES.indexOf(pageKey) !== -1;
-  window.__IE_AUTH_GUARD__ = runEarlyAuthGuard(pageKey, isProtectedPage);
+  if (isProtectedPage) {
+    window.__IE_AUTH_GUARD__ = (async function () {
+      if (!window.IESupabase || typeof window.IESupabase.enforceAuthGuard !== "function") {
+        var base = "/ItalianExperience/portal/";
+        window.location.replace(base + "index.html");
+        return false;
+      }
+
+      var user = await window.IESupabase.enforceAuthGuard();
+      if (!user) {
+        return false;
+      }
+
+      window.__IE_AUTH_USER__ = user;
+
+      if (document && document.body) {
+        document.body.style.visibility = "visible";
+      }
+
+      return true;
+    })();
+  } else {
+    window.__IE_AUTH_GUARD__ = Promise.resolve(true);
+  }
 
   // ---------------------------------------------------------------------------
   // Static fallback markup for the sidebar (used when fetch() is unavailable,
@@ -130,9 +153,12 @@
   ].join("\n");
 
   document.addEventListener("DOMContentLoaded", async function () {
-    var isAuthenticated = await window.__IE_AUTH_GUARD__;
-    if (!isAuthenticated) {
-      return;
+    var guard = window.__IE_AUTH_GUARD__;
+    if (guard && typeof guard.then === "function") {
+      var allowed = await guard;
+      if (!allowed) {
+        return;
+      }
     }
 
     if (isProtectedPage) {
@@ -161,35 +187,6 @@
         updateHeaderUserBlock();
       });
   });
-
-  async function runEarlyAuthGuard(currentPageKey, isProtected) {
-    if (!isProtected) return true;
-
-    if (!window.IESupabase || typeof window.IESupabase.requireAuth !== "function") {
-      hardRedirectToLogin();
-      return false;
-    }
-
-    try {
-      var user = await window.IESupabase.requireAuth();
-      if (!user) {
-        hardRedirectToLogin();
-        return false;
-      }
-      window.__IE_AUTH_USER__ = user;
-      return true;
-    } catch (error) {
-      console.error("[ItalianExperience] Auth guard failed on page:", currentPageKey, error);
-      hardRedirectToLogin();
-      return false;
-    }
-  }
-
-  function hardRedirectToLogin() {
-    var target = derivePortalBasePath() + "index.html";
-    if (window.location.href === target) return;
-    window.location.replace(target);
-  }
 
   // ---------------------------------------------------------------------------
   // Layout & Sidebar
