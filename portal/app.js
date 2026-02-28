@@ -23,7 +23,6 @@
     "add-candidato",
     "add-offerta",
     "add-cliente",
-    "edit-candidato",
     "settings",
     "sidebar",
   ];
@@ -398,8 +397,6 @@
         return "archiviati";
       case "add-candidato.html":
         return "add-candidato";
-      case "edit-candidato.html":
-        return "edit-candidato";
       case "add-offerta.html":
         return "add-offerta";
       case "add-cliente.html":
@@ -436,12 +433,12 @@
       candidati: ["candidati", "candidate", "candidates"],
       offerte: ["offerte di lavoro", "job offers", "job offer"],
       clients: ["clienti", "clients"],
-      archiviati: ["archiviati"],
+      archiviati: ["archiviati", "candidati archiviati", "offerte archiviate"],
       profile: ["impostazioni", "profilo", "settings"],
     };
 
     const targetSection = (function () {
-      if (currentKey === "add-candidato" || currentKey === "edit-candidato") return "candidati";
+      if (currentKey === "add-candidato") return "candidati";
       if (currentKey === "add-offerta") return "offerte";
       if (currentKey === "add-cliente") return "clients";
       return currentKey in sectionGroups ? currentKey : null;
@@ -468,7 +465,9 @@
     const routeMapByLabel = {
       dashboard: "dashboard.html",
       candidati: "candidati.html",
+      "candidati archiviati": "archiviati.html",
       "offerte di lavoro": "offerte.html",
+      "offerte archiviate": "archiviati.html",
       clienti: "clienti.html",
       archiviati: "archiviati.html",
       impostazioni: "profile.html",
@@ -482,7 +481,9 @@
 
       let key = null;
       if (label.includes("dashboard")) key = "dashboard";
+      else if (label.includes("candidati archiviati")) key = "candidati archiviati";
       else if (label.includes("candidati") || label.includes("candidate")) key = "candidati";
+      else if (label.includes("offerte archiviate")) key = "offerte archiviate";
       else if (label.includes("offerte")) key = "offerte di lavoro";
       else if (label.includes("clienti") || label.includes("clients")) key = "clienti";
       else if (label.includes("archiviati")) key = "archiviati";
@@ -527,6 +528,31 @@
     window.location.href = base + relativePath;
   }
 
+  /**
+   * Normalize entity page state based on URL params.
+   * - No id => create
+   * - id + invalid mode => default to view
+   * - id + valid mode (view/edit) => use it
+   *
+   * @param {URLSearchParams} params
+   * @returns {{ id: string|null, mode: "create"|"view"|"edit" }}
+   */
+  function resolveEntityPageState(params) {
+    const rawId = params.get("id");
+    const id = rawId ? rawId.toString() : null;
+    const rawMode = (params.get("mode") || "").toString().toLowerCase();
+
+    if (!id) {
+      return { id: null, mode: "create" };
+    }
+
+    if (rawMode === "view" || rawMode === "edit") {
+      return { id, mode: rawMode };
+    }
+
+    return { id, mode: "view" };
+  }
+
   // ---------------------------------------------------------------------------
   // Buttons & Small Interactions
   // ---------------------------------------------------------------------------
@@ -549,7 +575,7 @@
     if (addOfferBtn) {
       addOfferBtn.addEventListener("click", function (event) {
         event.preventDefault();
-        navigateTo("add-offerta.html");
+        navigateTo("add-offerta.html?mode=create");
       });
     }
 
@@ -772,12 +798,11 @@
       candidateForm.addEventListener("submit", function (event) {
         event.preventDefault();
         const formData = new FormData(candidateForm);
-        if (getCurrentPageKey() === "edit-candidato") {
-          const id = new URLSearchParams(window.location.search).get("id");
-          if (id && window.IESupabase && window.IESupabase.updateCandidate) {
-            updateCandidateFromForm(id, formData);
-            return;
-          }
+        const candidateParams = new URLSearchParams(window.location.search);
+        const candidateId = candidateParams.get("id");
+        if (getCurrentPageKey() === "add-candidato" && candidateId && window.IESupabase && window.IESupabase.updateCandidate) {
+          updateCandidateFromForm(candidateId, formData);
+          return;
         }
         saveCandidate(formData);
       });
@@ -796,6 +821,16 @@
       jobOfferForm.addEventListener("submit", function (event) {
         event.preventDefault();
         const formData = new FormData(jobOfferForm);
+
+        const pageKey = getCurrentPageKey();
+        if (pageKey === "add-offerta") {
+          const params = getJobOfferPageParams();
+          if (params.mode === "edit" && params.id) {
+            updateJobOfferFromForm(params.id, formData);
+            return;
+          }
+        }
+
         saveJobOffer(formData);
       });
     }
@@ -806,8 +841,20 @@
       clientForm.addEventListener("submit", function (event) {
         event.preventDefault();
         const formData = new FormData(clientForm);
+        const clientParams = new URLSearchParams(window.location.search);
+        const clientId = clientParams.get("id");
+        if (getCurrentPageKey() === "add-cliente" && clientId && window.IESupabase && window.IESupabase.updateClient) {
+          updateClientFromForm(clientId, formData);
+          return;
+        }
         saveClient(formData);
       });
+      const cancelBtn = clientForm.querySelector("[data-edit-cancel]");
+      if (cancelBtn) {
+        cancelBtn.addEventListener("click", function () {
+          navigateTo("clienti.html");
+        });
+      }
     }
   }
 
@@ -1979,7 +2026,7 @@
         city: city || null,
         state: state || null,
         deadline: deadline || null,
-        status: status,
+        status: "active",
       });
       if (error) {
         window.IESupabase.showError(error.message || "Errore nella creazione dell'offerta.", "saveJobOffer");
@@ -2189,7 +2236,11 @@
       })
       .filter((item) => {
         if (!filters.offerStatus) return true;
-        return (item.status || "") === filters.offerStatus;
+        const status = item.status || "";
+        if (filters.offerStatus === "active") {
+          return status === "open" || status === "inprogress" || status === "in progress";
+        }
+        return status === filters.offerStatus;
       });
   }
 
@@ -2241,41 +2292,76 @@
     }
     if (pageKey === "candidati") {
       initCandidatesPage();
-    } else if (pageKey === "edit-candidato") {
-      initEditCandidatePage();
+    } else if (pageKey === "add-candidato") {
+      initAddCandidatePage();
     } else if (pageKey === "offerte") {
       initJobOffersPage();
     } else if (pageKey === "clients") {
       initClientsPage();
+    } else if (pageKey === "add-cliente") {
+      initAddClientePage();
+    }
+    if (pageKey === "add-offerta") {
+      const params = new URLSearchParams(window.location.search);
+      const state = resolveEntityPageState(params);
+      setPageMode(state.mode, state.id);
     }
   }
 
-  /**
-   * Edit candidate page: load candidate by id from URL, fill form. No table rendering.
-   */
-  function initEditCandidatePage() {
+  function getCandidatePageParams() {
     const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
-    if (!id) {
-      navigateTo("candidati.html");
-      return;
-    }
+    const state = resolveEntityPageState(params);
+    return { mode: state.mode, id: state.id };
+  }
+
+  function getClientPageParams() {
+    const params = new URLSearchParams(window.location.search);
+    const state = resolveEntityPageState(params);
+    return { mode: state.mode, id: state.id };
+  }
+
+  /**
+   * Add/Edit/View candidate page: create mode (no id), or load candidate by id and apply lifecycle (edit/view).
+   */
+  function initAddCandidatePage() {
+    const params = getCandidatePageParams();
+    const candidateId = params.id;
+    const requestedMode = params.mode;
     const form = document.querySelector("#candidateForm");
     if (!form) return;
+
+    if (!candidateId) {
+      const headerTitleEl = document.querySelector("header h1");
+      const docTitleEl = document.querySelector("title");
+      if (headerTitleEl) headerTitleEl.textContent = "Add New Candidate";
+      if (docTitleEl) docTitleEl.textContent = "Add New Candidate | Italian Experience Recruitment";
+      return;
+    }
+
     if (!window.IESupabase || !window.IESupabase.getCandidateById) {
       if (window.IESupabase && window.IESupabase.showError) window.IESupabase.showError("Supabase non disponibile.");
       return;
     }
-    window.IESupabase.getCandidateById(id).then(function (result) {
+
+    window.IESupabase.getCandidateById(candidateId).then(function (result) {
       if (result.error) {
         if (window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Candidato non trovato.");
         return;
       }
-      const c = result.data;
-      if (!c) {
+      const candidate = result.data;
+      if (!candidate) {
         if (window.IESupabase.showError) window.IESupabase.showError("Candidato non trovato.");
         return;
       }
+
+      const lifecycleStatus = candidate.is_archived ? "archived" : "active";
+      const effectiveMode = resolveEntityMode(lifecycleStatus, requestedMode);
+      console.log("DEBUG CANDIDATE PAGE");
+      console.log("requestedMode:", requestedMode);
+      console.log("candidate.is_archived:", candidate.is_archived);
+      console.log("lifecycleStatus:", lifecycleStatus);
+      console.log("effectiveMode:", effectiveMode);
+
       const firstNameEl = form.querySelector('[name="first_name"]');
       const lastNameEl = form.querySelector('[name="last_name"]');
       const addressEl = form.querySelector('[name="address"]');
@@ -2283,13 +2369,169 @@
       const statusEl = form.querySelector('[name="status"]');
       const sourceEl = form.querySelector('[name="source"]');
       const notesEl = form.querySelector('[name="notes"]');
-      if (firstNameEl) firstNameEl.value = c.first_name || "";
-      if (lastNameEl) lastNameEl.value = c.last_name || "";
-      if (addressEl) addressEl.value = c.address || "";
-      if (positionEl) positionEl.value = c.position || "";
-      if (statusEl) statusEl.value = c.status || "new";
-      if (sourceEl) sourceEl.value = c.source || "";
-      if (notesEl) notesEl.value = c.notes || "";
+      if (firstNameEl) firstNameEl.value = candidate.first_name || "";
+      if (lastNameEl) lastNameEl.value = candidate.last_name || "";
+      if (addressEl) addressEl.value = candidate.address || "";
+      if (positionEl) positionEl.value = candidate.position || "";
+      if (statusEl) statusEl.value = candidate.status || "new";
+      if (sourceEl) sourceEl.value = candidate.source || "";
+      if (notesEl) notesEl.value = candidate.notes || "";
+
+      function setFormReadonly(readonly) {
+        const fields = form.querySelectorAll("input, textarea, select");
+        fields.forEach(function (field) {
+          if (field.type === "hidden") return;
+          field.disabled = !!readonly;
+        });
+        const saveBtn = form.querySelector('button[type="submit"]');
+        const cancelBtn = form.querySelector("[data-edit-cancel]");
+        if (saveBtn) {
+          saveBtn.style.display = readonly ? "none" : "";
+        }
+        if (cancelBtn) {
+          cancelBtn.textContent = readonly ? "Back" : "Cancel";
+        }
+      }
+      setFormReadonly(effectiveMode === "view");
+
+      const headerTitleEl = document.querySelector("header h1");
+      const docTitleEl = document.querySelector("title");
+      if (headerTitleEl) headerTitleEl.textContent = effectiveMode === "view" ? "View Candidate" : "Edit Candidate";
+      if (docTitleEl) docTitleEl.textContent = (effectiveMode === "view" ? "View Candidate" : "Edit Candidate") + " | Italian Experience Recruitment";
+
+      function renderCandidateLifecycleActions(status) {
+        renderLifecycleActions({
+          entityType: "candidate",
+          entityId: candidateId,
+          status: status,
+          mode: effectiveMode,
+          containerId: "candidateActions",
+          onEdit: function () {
+            navigateTo("add-candidato.html?id=" + encodeURIComponent(candidateId) + "&mode=edit");
+          },
+          onArchive: async function () {
+            const res = await window.IESupabase.archiveCandidate(candidateId);
+            if (!res.error) navigateTo("candidati.html");
+          },
+          onReopen: async function () {
+            const res = await window.IESupabase.unarchiveCandidate(candidateId);
+            if (!res.error) {
+              candidate.is_archived = false;
+              renderCandidateLifecycleActions("active");
+            }
+          },
+        });
+      }
+      renderCandidateLifecycleActions(lifecycleStatus);
+    });
+  }
+
+  /**
+   * Add/Edit/View client page: create mode (no id), or load client by id and apply lifecycle (edit/view).
+   */
+  function initAddClientePage() {
+    const params = getClientPageParams();
+    const clientId = params.id;
+    const requestedMode = params.mode;
+    const form = document.querySelector("#clientForm");
+    if (!form) return;
+
+    if (!clientId) {
+      return;
+    }
+
+    if (!window.IESupabase || !window.IESupabase.getClientById) {
+      if (window.IESupabase && window.IESupabase.showError) window.IESupabase.showError("Supabase non disponibile.");
+      return;
+    }
+
+    window.IESupabase.getClientById(clientId).then(function (result) {
+      if (result.error) {
+        if (window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Cliente non trovato.");
+        return;
+      }
+      const client = result.data;
+      if (!client) {
+        if (window.IESupabase.showError) window.IESupabase.showError("Cliente non trovato.");
+        return;
+      }
+
+      const lifecycleStatus = client.is_archived ? "archived" : "active";
+      const effectiveMode = resolveEntityMode(lifecycleStatus, requestedMode);
+
+      const nameEl = form.querySelector('[name="name"]');
+      const cityEl = form.querySelector('[name="city"]');
+      const stateEl = form.querySelector('[name="state"]');
+      const countryEl = form.querySelector('[name="country"]');
+      const emailEl = form.querySelector('[name="email"]');
+      const phoneEl = form.querySelector('[name="phone"]');
+      const notesEl = form.querySelector('[name="notes"]');
+      if (nameEl) nameEl.value = client.name || "";
+      if (cityEl) cityEl.value = client.city || "";
+      if (stateEl) stateEl.value = client.state || "";
+      if (countryEl) countryEl.value = client.country || "";
+      if (emailEl) emailEl.value = client.email || "";
+      if (phoneEl) phoneEl.value = client.phone || "";
+      if (notesEl) notesEl.value = client.notes || "";
+
+      function setFormReadonly(readonly) {
+        const fields = form.querySelectorAll("input, textarea, select");
+        fields.forEach(function (field) {
+          if (field.type === "hidden") return;
+          field.disabled = !!readonly;
+        });
+        const saveBtn = form.querySelector('button[type="submit"]');
+        const cancelBtn = form.querySelector("[data-edit-cancel]");
+        if (saveBtn) {
+          saveBtn.style.display = readonly ? "none" : "";
+        }
+        if (cancelBtn) {
+          cancelBtn.textContent = readonly ? "Back" : "Annulla";
+        }
+      }
+      setFormReadonly(effectiveMode === "view");
+
+      const headerTitleEl = document.querySelector("header h1");
+      const docTitleEl = document.querySelector("title");
+      if (headerTitleEl) headerTitleEl.textContent = effectiveMode === "view" ? "Visualizza Cliente" : "Modifica Cliente";
+      if (docTitleEl) docTitleEl.textContent = (effectiveMode === "view" ? "Visualizza Cliente" : "Modifica Cliente") + " | Italian Experience Recruitment";
+
+      function onEdit() {
+        navigateTo("add-cliente.html?id=" + encodeURIComponent(clientId) + "&mode=edit");
+      }
+      function onArchive() {
+        return window.IESupabase.archiveClient(clientId).then(function (res) {
+          if (!res.error) navigateTo("clienti.html");
+        });
+      }
+      function onReopen() {
+        return window.IESupabase.unarchiveClient(clientId).then(function (res) {
+          if (!res.error) {
+            client.is_archived = false;
+            renderLifecycleActions({
+              entityType: "client",
+              entityId: clientId,
+              status: "active",
+              mode: "view",
+              containerId: "clientActions",
+              onEdit: onEdit,
+              onArchive: onArchive,
+              onReopen: onReopen,
+            });
+          }
+        });
+      }
+
+      renderLifecycleActions({
+        entityType: "client",
+        entityId: clientId,
+        status: lifecycleStatus,
+        mode: effectiveMode,
+        containerId: "clientActions",
+        onEdit: onEdit,
+        onArchive: onArchive,
+        onReopen: onReopen,
+      });
     });
   }
 
@@ -2314,6 +2556,800 @@
       if (window.IESupabase.showSuccess) window.IESupabase.showSuccess("Candidato aggiornato.");
       navigateTo("candidati.html");
     });
+  }
+
+  /**
+   * Update client from edit form (Supabase only).
+   */
+  function updateClientFromForm(id, formData) {
+    const payload = {
+      name: (formData.get("name") || "").toString().trim(),
+      city: (formData.get("city") || "").toString().trim(),
+      state: (formData.get("state") || "").toString().trim(),
+      country: (formData.get("country") || "").toString().trim(),
+      email: (formData.get("email") || "").toString().trim(),
+      phone: (formData.get("phone") || "").toString().trim(),
+      notes: (formData.get("notes") || "").toString().trim(),
+    };
+    window.IESupabase.updateClient(id, payload).then(function (result) {
+      if (result.error) {
+        if (window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Errore durante il salvataggio.");
+        return;
+      }
+      if (window.IESupabase.showSuccess) window.IESupabase.showSuccess("Cliente aggiornato.");
+      navigateTo("clienti.html");
+    });
+  }
+
+  function normalizeStatus(status) {
+    const s = (status || "active").toString().toLowerCase();
+    if (s === "open" || s === "inprogress" || s === "active") return "active";
+    if (s === "closed") return "closed";
+    if (s === "archived") return "archived";
+    return "active";
+  }
+
+  function resolveEntityMode(status, requestedMode) {
+    var normalizedStatus = normalizeStatus(status);
+    if (normalizedStatus !== "active") return "view";
+    return requestedMode;
+  }
+
+  function renderLifecycleActions(config) {
+    var container = config.containerId ? document.getElementById(config.containerId) : null;
+    if (!container) return;
+    container.innerHTML = "";
+
+    if (config.mode !== "view") {
+      return;
+    }
+    if (!config.entityId) return;
+
+    var normalizedStatus = normalizeStatus(config.status);
+
+    var editBtn, closeBtn, reopenBtn, archiveBtn;
+    var btnClass = "px-4 py-2 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-all";
+    var archiveBtnClass = "px-4 py-2 rounded-xl border border-red-200 text-red-700 text-sm font-semibold bg-red-50 hover:bg-red-100 transition-all";
+
+    if (normalizedStatus === "active") {
+      if (config.onEdit) {
+        editBtn = document.createElement("button");
+        editBtn.type = "button";
+        editBtn.textContent = "Edit";
+        editBtn.className = btnClass;
+        editBtn.addEventListener("click", function () {
+          config.onEdit();
+        });
+        container.appendChild(editBtn);
+      }
+      if (config.entityType === "job_offer" && config.onClose) {
+        closeBtn = document.createElement("button");
+        closeBtn.type = "button";
+        closeBtn.textContent = "Mark as Closed";
+        closeBtn.className = btnClass;
+        closeBtn.addEventListener("click", async function () {
+          await config.onClose();
+        });
+        container.appendChild(closeBtn);
+      }
+      if (config.onArchive) {
+        archiveBtn = document.createElement("button");
+        archiveBtn.type = "button";
+        archiveBtn.textContent = "Archive";
+        archiveBtn.className = archiveBtnClass;
+        archiveBtn.addEventListener("click", async function () {
+          await config.onArchive();
+        });
+        container.appendChild(archiveBtn);
+      }
+    } else if (normalizedStatus === "closed") {
+      if (config.onReopen) {
+        reopenBtn = document.createElement("button");
+        reopenBtn.type = "button";
+        reopenBtn.textContent = "Reopen";
+        reopenBtn.className = btnClass;
+        reopenBtn.addEventListener("click", async function () {
+          await config.onReopen();
+        });
+        container.appendChild(reopenBtn);
+      }
+      if (config.onArchive) {
+        archiveBtn = document.createElement("button");
+        archiveBtn.type = "button";
+        archiveBtn.textContent = "Archive";
+        archiveBtn.className = archiveBtnClass;
+        archiveBtn.addEventListener("click", async function () {
+          await config.onArchive();
+        });
+        container.appendChild(archiveBtn);
+      }
+    } else if (normalizedStatus === "archived") {
+      if (config.onReopen) {
+        reopenBtn = document.createElement("button");
+        reopenBtn.type = "button";
+        reopenBtn.textContent = "Reopen";
+        reopenBtn.className = btnClass;
+        reopenBtn.addEventListener("click", async function () {
+          await config.onReopen();
+        });
+        container.appendChild(reopenBtn);
+      }
+    }
+  }
+
+  function getJobOfferPageParams() {
+    const params = new URLSearchParams(window.location.search);
+    const state = resolveEntityPageState(params);
+    return { mode: state.mode, id: state.id };
+  }
+
+  function setPageMode(mode, id) {
+    const form = document.querySelector("#jobOfferForm");
+    if (!form) return;
+
+    const params = getJobOfferPageParams();
+    const effectiveMode = (mode || params.mode || "create").toString().toLowerCase();
+    const finalMode = effectiveMode === "edit" || effectiveMode === "view" ? effectiveMode : "create";
+
+    const headerTitleEl = document.querySelector("header h1");
+    const docTitleEl = document.querySelector("title");
+    const saveButton = form.querySelector('button[type="submit"]');
+    const cancelButton = form.querySelector("button[type='button']");
+    const actionsContainer = document.querySelector("#jobOfferActions");
+
+    function setTitles(text) {
+      if (headerTitleEl) headerTitleEl.textContent = text;
+      if (docTitleEl) docTitleEl.textContent = text + " | Italian Experience Recruitment";
+    }
+
+    function setFormDisabled(disabled) {
+      const fields = form.querySelectorAll("input, textarea, select");
+      fields.forEach(function (field) {
+        if (field.type === "hidden") return;
+        field.disabled = !!disabled;
+      });
+    }
+
+    function setSaveVisibility(visible) {
+      if (!saveButton) return;
+      if (visible) {
+        saveButton.classList.remove("hidden");
+        saveButton.disabled = false;
+      } else {
+        saveButton.classList.add("hidden");
+        saveButton.disabled = true;
+      }
+    }
+
+    function setReadonlyState() {
+      setFormDisabled(true);
+      setSaveVisibility(false);
+      if (cancelButton) {
+        cancelButton.classList.add("hidden");
+        cancelButton.disabled = true;
+      }
+    }
+
+    function setEditableState() {
+      setFormDisabled(false);
+      setSaveVisibility(true);
+      if (cancelButton) {
+        cancelButton.classList.remove("hidden");
+        cancelButton.disabled = false;
+      }
+    }
+
+    function handleMissingOfferAndRedirect() {
+      try {
+        window.alert("Offerta non trovata.");
+      } catch (e) {
+        // ignore
+      }
+      navigateTo("offerte.html");
+    }
+
+    function renderActionButtons(modeToRender, offerId, offer) {
+      if (!actionsContainer) return;
+      function reloadPage() {
+        window.location.reload();
+      }
+      renderLifecycleActions({
+        entityType: "job_offer",
+        entityId: offerId,
+        status: offer ? offer.status : "active",
+        mode: modeToRender,
+        containerId: "jobOfferActions",
+        onEdit: function () {
+          navigateTo("add-offerta.html?id=" + encodeURIComponent(offerId) + "&mode=edit");
+        },
+        onClose: async function () {
+          if (!window.IESupabase || !window.IESupabase.updateJobOfferStatus) return;
+          var result = await window.IESupabase.updateJobOfferStatus(offerId, "closed");
+          if (result && result.error && window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Errore.");
+          else reloadPage();
+        },
+        onArchive: async function () {
+          if (!window.IESupabase || !window.IESupabase.updateJobOfferStatus) return;
+          var result = await window.IESupabase.updateJobOfferStatus(offerId, "archived");
+          if (result && result.error && window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Errore.");
+          else navigateTo("offerte.html");
+        },
+        onReopen: async function () {
+          if (!window.IESupabase || !window.IESupabase.updateJobOfferStatus) return;
+          var result = await window.IESupabase.updateJobOfferStatus(offerId, "active");
+          if (result && result.error && window.IESupabase.showError) {
+            window.IESupabase.showError(result.error.message || "Errore.");
+          } else if (result && result.data && offer) {
+            offer.status = result.data.status;
+            renderActionButtons("view", offerId, offer);
+          } else {
+            reloadPage();
+          }
+        }
+      });
+    }
+
+    var STATUS_OPTIONS = ["applied", "screening", "interview", "offered", "hired", "rejected"];
+
+    async function renderAssociatedCandidates(jobOfferId) {
+      if (!window.IESupabase || !window.IESupabase.fetchCandidatesForJobOffer) return;
+      var container = document.getElementById("associated-candidates-container");
+      if (!container) {
+        container = document.createElement("div");
+        container.id = "associated-candidates-container";
+        container.className = "mt-8";
+        var formActions = document.getElementById("form-action-buttons");
+        if (formActions && formActions.nextSibling) {
+          formActions.parentNode.insertBefore(container, formActions.nextSibling);
+        } else if (formActions) {
+          formActions.parentNode.appendChild(container);
+        } else {
+          var form = document.getElementById("jobOfferForm");
+          if (form) form.appendChild(container);
+        }
+      }
+      container.innerHTML = "";
+      var result = await window.IESupabase.fetchCandidatesForJobOffer(jobOfferId);
+      if (result.error) {
+        console.error("[ItalianExperience] fetchCandidatesForJobOffer error:", result.error);
+        return;
+      }
+      var list = result.data || [];
+      var associatedCandidateIds = list.map(function (item) {
+        var c = item.candidates;
+        return c && c.id ? c.id : null;
+      }).filter(Boolean);
+
+      var sectionTitle = document.createElement("h3");
+      sectionTitle.className = "serif text-xl font-bold text-[#1b4332] section-title mb-4";
+      sectionTitle.textContent = "Associated Candidates";
+      container.appendChild(sectionTitle);
+      if (list.length === 0) {
+        var emptyMsg = document.createElement("p");
+        emptyMsg.className = "text-gray-500 text-sm";
+        emptyMsg.textContent = "No candidates associated yet.";
+        container.appendChild(emptyMsg);
+      } else {
+        var glassCard = document.createElement("div");
+        glassCard.className = "glass-card p-6 rounded-3xl overflow-x-auto";
+        var table = document.createElement("table");
+        table.className = "w-full text-left border-collapse";
+        var thead = document.createElement("thead");
+        var headerRow = document.createElement("tr");
+        ["Name", "Position", "Status", "Change", "Remove"].forEach(function (label) {
+          var th = document.createElement("th");
+          th.className = "pb-3 text-sm font-semibold text-gray-700 border-b border-gray-200";
+          th.textContent = label;
+          headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        var tbody = document.createElement("tbody");
+        list.forEach(function (item) {
+          var c = item.candidates || {};
+          var name = [c.first_name, c.last_name].filter(Boolean).join(" ") || "—";
+          var position = (c.position && c.position.toString()) || "—";
+          var status = (item.status && item.status.toString()) || "—";
+          var isHired = status === "hired";
+          var tr = document.createElement("tr");
+          tr.className = "border-b border-gray-100";
+          tr.setAttribute("data-row-association-id", item.id);
+          var tdName = document.createElement("td");
+          tdName.className = "py-3 text-sm text-gray-800";
+          tdName.textContent = name;
+          tr.appendChild(tdName);
+          var tdPosition = document.createElement("td");
+          tdPosition.className = "py-3 text-sm text-gray-600";
+          tdPosition.textContent = position;
+          tr.appendChild(tdPosition);
+          var tdStatus = document.createElement("td");
+          tdStatus.className = "py-3 text-sm text-gray-600 status-cell";
+          if (isHired) {
+            var hiredBadge = document.createElement("span");
+            hiredBadge.className = "badge badge-hired";
+            hiredBadge.textContent = "Hired";
+            tdStatus.appendChild(hiredBadge);
+          } else {
+            tdStatus.textContent = status;
+          }
+          tr.appendChild(tdStatus);
+          var tdChange = document.createElement("td");
+          tdChange.className = "py-3";
+          var select = document.createElement("select");
+          select.className = "form-input appearance-none text-sm py-2 pr-8";
+          select.setAttribute("data-association-id", item.id);
+          STATUS_OPTIONS.forEach(function (opt) {
+            var option = document.createElement("option");
+            option.value = opt;
+            option.textContent = opt;
+            if (opt === status) option.selected = true;
+            select.appendChild(option);
+          });
+          select.addEventListener("change", async function () {
+            var associationId = select.getAttribute("data-association-id");
+            var newStatus = select.value;
+            if (!window.IESupabase || !window.IESupabase.updateCandidateAssociationStatus) return;
+            var res = await window.IESupabase.updateCandidateAssociationStatus(associationId, newStatus);
+            if (res.error) {
+              if (window.IESupabase.showError) window.IESupabase.showError(res.error.message || "Errore aggiornamento stato.");
+              return;
+            }
+            var statusCell = tr.querySelector(".status-cell");
+            if (statusCell) {
+              if (newStatus === "hired") {
+                statusCell.innerHTML = "";
+                var hiredBadge = document.createElement("span");
+                hiredBadge.className = "badge badge-hired";
+                hiredBadge.textContent = "Hired";
+                statusCell.appendChild(hiredBadge);
+              } else {
+                statusCell.textContent = newStatus;
+              }
+            }
+          });
+          tdChange.appendChild(select);
+          tr.appendChild(tdChange);
+          var tdRemove = document.createElement("td");
+          tdRemove.className = "py-3";
+          var removeBtn = document.createElement("button");
+          removeBtn.type = "button";
+          removeBtn.className = "px-3 py-1.5 rounded-lg border border-red-200 text-red-700 text-sm font-semibold hover:bg-red-50 transition-all";
+          removeBtn.textContent = "Remove";
+          removeBtn.addEventListener("click", async function () {
+            if (!window.confirm("Remove this candidate from the job offer?")) return;
+            var associationId = tr.getAttribute("data-row-association-id");
+            if (!window.IESupabase || !window.IESupabase.removeCandidateFromJob) return;
+            var result = await window.IESupabase.removeCandidateFromJob(associationId);
+            if (!result.error) {
+              await renderAssociatedCandidates(jobOfferId);
+            } else {
+              if (window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Errore rimozione.");
+            }
+          });
+          tdRemove.appendChild(removeBtn);
+          tr.appendChild(tdRemove);
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        glassCard.appendChild(table);
+        container.appendChild(glassCard);
+      }
+
+      var addCandidateWrap = document.createElement("div");
+      addCandidateWrap.className = "mt-4";
+      var addCandidateBtn = document.createElement("button");
+      addCandidateBtn.type = "button";
+      addCandidateBtn.className = "px-4 py-2.5 rounded-xl border border-[#1b4332] text-[#1b4332] font-semibold text-sm hover:bg-[#1b4332]/5 transition-all flex items-center gap-2";
+      addCandidateBtn.innerHTML = "<span class=\"text-lg leading-none\">+</span> Add Candidate";
+      addCandidateBtn.addEventListener("click", function () {
+        var existingWrap = container.querySelector("[data-autocomplete-wrap]");
+        if (existingWrap) {
+          existingWrap.remove();
+          addCandidateBtn.setAttribute("aria-expanded", "false");
+          return;
+        }
+        showAddCandidateAutocomplete(container, addCandidateBtn, jobOfferId, associatedCandidateIds, function () {
+          renderAssociatedCandidates(jobOfferId);
+        });
+        addCandidateBtn.setAttribute("aria-expanded", "true");
+      });
+      addCandidateWrap.appendChild(addCandidateBtn);
+      container.appendChild(addCandidateWrap);
+    }
+
+    function showAddCandidateAutocomplete(container, triggerBtn, jobOfferId, associatedCandidateIds, onLinked) {
+      var wrap = document.createElement("div");
+      wrap.className = "mt-3 p-4 rounded-2xl border border-gray-200 bg-white shadow-sm relative";
+      wrap.setAttribute("data-autocomplete-wrap", "true");
+
+      var inputRow = document.createElement("div");
+      inputRow.className = "flex gap-2 items-center";
+      var input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "Search candidate by name...";
+      input.className = "form-input flex-1 text-sm";
+      input.setAttribute("autocomplete", "off");
+      var cancelBtn = document.createElement("button");
+      cancelBtn.type = "button";
+      cancelBtn.className = "px-3 py-2 rounded-lg border border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition-all";
+      cancelBtn.textContent = "Cancel";
+      cancelBtn.addEventListener("click", close);
+      inputRow.appendChild(input);
+      inputRow.appendChild(cancelBtn);
+      wrap.appendChild(inputRow);
+
+      var dropdown = document.createElement("div");
+      dropdown.className = "absolute left-4 right-4 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-20 max-h-60 overflow-y-auto hidden";
+      dropdown.setAttribute("data-autocomplete-dropdown", "true");
+      wrap.appendChild(dropdown);
+
+      var debounceTimer = null;
+
+      function close() {
+        if (triggerBtn) triggerBtn.setAttribute("aria-expanded", "false");
+        wrap.remove();
+        document.removeEventListener("click", handleOutsideClick);
+        document.removeEventListener("keydown", handleEscape);
+      }
+
+      function handleOutsideClick(e) {
+        if (!wrap.contains(e.target) && e.target !== triggerBtn) close();
+      }
+
+      function handleEscape(e) {
+        if (e.key === "Escape") close();
+      }
+
+      function renderResults(candidates) {
+        dropdown.innerHTML = "";
+        dropdown.classList.remove("hidden");
+        if (!candidates || candidates.length === 0) {
+          var empty = document.createElement("div");
+          empty.className = "px-4 py-3 text-sm text-gray-500";
+          empty.textContent = "No matching candidates";
+          dropdown.appendChild(empty);
+          return;
+        }
+        candidates.forEach(function (c) {
+          var row = document.createElement("button");
+          row.type = "button";
+          row.className = "w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors flex flex-col gap-0.5";
+          var name = [c.first_name, c.last_name].filter(Boolean).join(" ") || "—";
+          var position = (c.position && c.position.toString()) || "—";
+          row.innerHTML = "<span class=\"font-medium text-gray-800\">" + escapeHtml(name) + "</span><span class=\"text-xs text-gray-500\">" + escapeHtml(position) + "</span>";
+          row.addEventListener("click", function () {
+            selectCandidate(c);
+          });
+          dropdown.appendChild(row);
+        });
+      }
+
+      function escapeHtml(s) {
+        var div = document.createElement("div");
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      function selectCandidate(c) {
+        if (!window.IESupabase || !window.IESupabase.linkCandidateToJob) return;
+        if (associatedCandidateIds.indexOf(c.id) !== -1) {
+          if (window.IESupabase.showError) window.IESupabase.showError("This candidate is already associated with this job offer.");
+          return;
+        }
+        wrap.querySelector("input").disabled = true;
+        window.IESupabase.linkCandidateToJob({
+          candidate_id: c.id,
+          job_offer_id: jobOfferId,
+          status: "applied"
+        }).then(function (res) {
+          wrap.querySelector("input").disabled = false;
+          if (res.error) {
+            var msg = res.error.message || "";
+            var code = res.error.code || (msg.indexOf("23505") !== -1 ? "23505" : null);
+            if (code === "23505" || msg.indexOf("23505") !== -1) {
+              alert("Candidate already linked");
+              return;
+            }
+            if (msg.toLowerCase().indexOf("already hired") !== -1) {
+              alert(msg);
+              return;
+            }
+            if (window.IESupabase.showError) window.IESupabase.showError(msg || "Errore collegamento.");
+            return;
+          }
+          close();
+          if (typeof onLinked === "function") onLinked();
+        }).catch(function () {
+          wrap.querySelector("input").disabled = false;
+        });
+      }
+
+      input.addEventListener("input", function () {
+        var term = (input.value || "").trim();
+        if (debounceTimer) clearTimeout(debounceTimer);
+        if (term.length < 2) {
+          dropdown.classList.add("hidden");
+          dropdown.innerHTML = "";
+          return;
+        }
+        debounceTimer = setTimeout(function () {
+          debounceTimer = null;
+          if (!window.IESupabase || !window.IESupabase.searchCandidatesByName) return;
+          window.IESupabase.searchCandidatesByName({
+            term: term,
+            limit: 10
+          }).then(function (result) {
+            if (result.error) {
+              renderResults([]);
+              return;
+            }
+            var data = result.data || [];
+            var excluded = {};
+            associatedCandidateIds.forEach(function (id) { excluded[id] = true; });
+            var filtered = data.filter(function (c) { return !excluded[c.id]; });
+            renderResults(filtered);
+          });
+        }, 300);
+      });
+
+      input.addEventListener("focus", function () {
+        var term = (input.value || "").trim();
+        if (term.length >= 2 && dropdown.children.length > 0) dropdown.classList.remove("hidden");
+      });
+
+      document.addEventListener("click", handleOutsideClick);
+      document.addEventListener("keydown", handleEscape);
+      setTimeout(function () { input.focus(); }, 50);
+
+      triggerBtn.parentNode.insertBefore(wrap, triggerBtn.nextSibling);
+    }
+
+    function configureCancel(modeToConfigure, offerId) {
+      if (!cancelButton) return;
+      cancelButton.onclick = null;
+
+      if (modeToConfigure === "create") {
+        cancelButton.addEventListener("click", function () {
+          navigateTo("offerte.html");
+        });
+      } else if (modeToConfigure === "edit" && offerId) {
+        cancelButton.addEventListener("click", function () {
+          navigateTo("add-offerta.html?id=" + encodeURIComponent(offerId) + "&mode=view");
+        });
+      }
+    }
+
+    function clearForm() {
+      const fields = form.querySelectorAll("input, textarea, select");
+      fields.forEach(function (field) {
+        if (field.type === "hidden") {
+          field.value = "";
+          return;
+        }
+        if (field.tagName === "SELECT") {
+          if (field.name === "status") {
+            field.value = "open";
+          } else {
+            field.value = "";
+          }
+          return;
+        }
+        if (field.tagName === "TEXTAREA") {
+          field.value = "";
+          return;
+        }
+        if (field.type === "number") {
+          field.value = "";
+          return;
+        }
+        if (field.type === "date") {
+          field.value = "";
+          return;
+        }
+        if (field.type === "checkbox" || field.type === "radio") {
+          field.checked = false;
+          return;
+        }
+        field.value = "";
+      });
+    }
+
+    function populateFormFromOffer(offer) {
+      if (!offer) return;
+      const titleEl = form.querySelector('[name="title"]');
+      const positionEl = form.querySelector('[name="position"]');
+      const clientNameEl = form.querySelector("#clientInput");
+      const clientIdHiddenEl = form.querySelector("#clientIdHidden");
+      const cityEl = form.querySelector('[name="city"]');
+      const stateEl = form.querySelector('[name="state"]');
+      const contractTypeEl = form.querySelector('[name="contract_type"]');
+      const positionsEl = form.querySelector('[name="positions"]');
+      const salaryEl = form.querySelector('[name="salary"]');
+      const deadlineEl = form.querySelector('[name="deadline"]');
+      const descriptionEl = form.querySelector('[name="description"]');
+      const requirementsEl = form.querySelector('[name="requirements"]');
+      const notesEl = form.querySelector('[name="notes"]');
+      const statusEl = form.querySelector('[name="status"]');
+
+      if (titleEl) titleEl.value = offer.title || "";
+      if (positionEl) positionEl.value = offer.position || "";
+      if (clientIdHiddenEl) clientIdHiddenEl.value = offer.client_id || "";
+      if (clientNameEl) clientNameEl.value = offer.client_name || "";
+      if (cityEl) cityEl.value = offer.city || "";
+      if (stateEl) stateEl.value = offer.state || "";
+      if (contractTypeEl) contractTypeEl.value = offer.contract_type || "";
+      if (positionsEl) positionsEl.value = offer.positions != null ? String(offer.positions) : "";
+      if (salaryEl) salaryEl.value = offer.salary || "";
+      if (deadlineEl) deadlineEl.value = offer.deadline ? offer.deadline.split("T")[0] : "";
+      if (descriptionEl) descriptionEl.value = offer.description || "";
+      if (requirementsEl) requirementsEl.value = offer.requirements || "";
+      if (notesEl) notesEl.value = offer.notes || "";
+      if (statusEl) statusEl.value = offer.status || "open";
+    }
+
+    if (finalMode === "create") {
+      setTitles("Create New Job Offer");
+      clearForm();
+      setEditableState();
+      configureCancel("create", null);
+      renderActionButtons("create", null);
+      return;
+    }
+
+    const offerId = id || params.id;
+    if (!offerId) {
+      navigateTo("offerte.html");
+      return;
+    }
+
+    const isViewMode = finalMode === "view";
+    setTitles(isViewMode ? "View Job Offer" : "Edit Job Offer");
+    configureCancel(finalMode, offerId);
+    if (isViewMode) {
+      setReadonlyState();
+    } else {
+      setEditableState();
+    }
+    renderActionButtons(finalMode, offerId);
+
+    if (window.IESupabase && window.IESupabase.getJobOfferById) {
+      window.IESupabase
+        .getJobOfferById(offerId)
+        .then(function (result) {
+          if (result.error) {
+            if (window.IESupabase.showError) {
+              window.IESupabase.showError(result.error.message || "Offerta non trovata.");
+            }
+            handleMissingOfferAndRedirect();
+            return;
+          }
+          const offer = result.data;
+          if (!offer) {
+            if (window.IESupabase.showError) {
+              window.IESupabase.showError("Offerta non trovata.");
+            }
+            handleMissingOfferAndRedirect();
+            return;
+          }
+          populateFormFromOffer(offer);
+
+          const normalizedStatus = normalizeStatus(offer.status);
+          if (normalizedStatus === "archived") {
+            navigateTo("archiviati.html");
+            return;
+          }
+          const effectiveModeForOffer = resolveEntityMode(offer.status, finalMode);
+          const isViewModeForOffer = effectiveModeForOffer === "view";
+
+          setTitles(isViewModeForOffer ? "View Job Offer" : "Edit Job Offer");
+          if (isViewModeForOffer) {
+            setReadonlyState();
+          } else {
+            setEditableState();
+          }
+          configureCancel(effectiveModeForOffer, offerId);
+          renderActionButtons(effectiveModeForOffer, offerId, offer);
+
+          if (isViewModeForOffer) {
+            setFormDisabled(true);
+            if (normalizedStatus !== "archived") renderAssociatedCandidates(offerId);
+          }
+        })
+        .catch(function (err) {
+          console.error("[ItalianExperience] getJobOfferById error:", err);
+          if (window.IESupabase && window.IESupabase.showError) {
+            window.IESupabase.showError("Errore nel caricamento dell'offerta.");
+          }
+          handleMissingOfferAndRedirect();
+        });
+      return;
+    }
+
+    const localOffer =
+      typeof IE_STORE !== "undefined" && IE_STORE && Array.isArray(IE_STORE.jobOffers)
+        ? IE_STORE.jobOffers.find(function (o) {
+            return o.id === offerId;
+          })
+        : null;
+
+    if (!localOffer) {
+      navigateTo("offerte.html");
+      return;
+    }
+
+    populateFormFromOffer(localOffer);
+
+    const normalizedStatus = normalizeStatus(localOffer.status);
+    if (normalizedStatus === "archived") {
+      navigateTo("archiviati.html");
+      return;
+    }
+    const effectiveModeForOffer = resolveEntityMode(localOffer.status, finalMode);
+    const isViewModeForOffer = effectiveModeForOffer === "view";
+
+    setTitles(isViewModeForOffer ? "View Job Offer" : "Edit Job Offer");
+    if (isViewModeForOffer) {
+      setReadonlyState();
+    } else {
+      setEditableState();
+    }
+    configureCancel(effectiveModeForOffer, offerId);
+    renderActionButtons(effectiveModeForOffer, offerId, localOffer);
+
+    if (isViewModeForOffer) {
+      setFormDisabled(true);
+      if (normalizedStatus !== "archived") renderAssociatedCandidates(offerId);
+    }
+  }
+
+  function updateJobOfferFromForm(id, formData) {
+    const payload = {
+      client_id: (formData.get("client_id") || formData.get("client_id_hidden") || formData.get("clientIdHidden") || formData.get("clientId") || "").toString() || null,
+      title: (formData.get("title") || "").toString().trim(),
+      position: (formData.get("position") || "").toString().trim() || null,
+      description: (formData.get("description") || "").toString() || null,
+      requirements: (formData.get("requirements") || "").toString() || null,
+      notes: (formData.get("notes") || "").toString() || null,
+      salary: (formData.get("salary") || "").toString() || null,
+      contract_type: (formData.get("contract_type") || "").toString() || null,
+      positions: (function () {
+        const raw = (formData.get("positions") || "").toString().trim();
+        const n = Number(raw);
+        return Number.isFinite(n) ? n : null;
+      })(),
+      city: (formData.get("city") || "").toString().trim() || null,
+      state: (formData.get("state") || "").toString().trim() || null,
+      deadline: (formData.get("deadline") || "").toString() || null,
+      status: (formData.get("status") || "open").toString(),
+    };
+
+    if (window.IESupabase && window.IESupabase.updateJobOffer) {
+      window.IESupabase.updateJobOffer(id, payload).then(function (result) {
+        if (result.error) {
+          if (window.IESupabase.showError) {
+            window.IESupabase.showError(result.error.message || "Errore durante il salvataggio.");
+          }
+          return;
+        }
+        if (window.IESupabase.showSuccess) {
+          window.IESupabase.showSuccess("Offerta aggiornata.");
+        }
+        navigateTo("offerte.html");
+      });
+      return;
+    }
+
+    if (typeof IE_STORE !== "undefined" && IE_STORE && Array.isArray(IE_STORE.jobOffers)) {
+      const offer = IE_STORE.jobOffers.find(function (o) {
+        return o.id === id;
+      });
+      if (offer) {
+        Object.assign(offer, payload, {
+          updated_at: new Date().toISOString(),
+        });
+      }
+    }
+    navigateTo("offerte.html");
   }
 
   /**
@@ -2563,6 +3599,7 @@
       status: "",
       source: "",
       archived: "active",
+      jobOfferId: "",
     };
     let currentPage = 1;
     const limit = CANDIDATES_PAGE_SIZE;
@@ -2573,6 +3610,35 @@
     const statusSelect = document.querySelector('[data-filter="candidate-status"]');
     const sourceSelect = document.querySelector('[data-filter="candidate-source"]');
     const archivedSelect = document.querySelector('[data-filter="candidate-archived"]');
+
+    const offerFilterBanner = document.querySelector("[data-ie-offer-filter-banner]");
+    const offerFilterTitleEl = document.querySelector("[data-ie-offer-filter-title]");
+    const clearOfferFilterBtn = document.querySelector("[data-action='clear-offer-filter']");
+
+    const params = new URLSearchParams(window.location.search);
+    const offerFilter = params.get("offer");
+    const hasOfferFilter = !!offerFilter;
+    if (hasOfferFilter) {
+      filters.jobOfferId = offerFilter;
+    }
+
+    function showOfferFilterBanner() {
+      if (!offerFilterBanner || !filters.jobOfferId) return;
+      offerFilterBanner.classList.remove("hidden");
+      if (offerFilterTitleEl) {
+        offerFilterTitleEl.textContent = filters.jobOfferId;
+      }
+      if (window.IESupabase && window.IESupabase.fetchJobOfferById && offerFilterTitleEl) {
+        window.IESupabase
+          .fetchJobOfferById(filters.jobOfferId)
+          .then(function (result) {
+            if (result && result.data && result.data.title) {
+              offerFilterTitleEl.textContent = result.data.title;
+            }
+          })
+          .catch(function () {});
+      }
+    }
 
     function goToPage(page) {
       currentPage = Math.max(1, page);
@@ -2622,12 +3688,37 @@
       });
     }
 
+    if (clearOfferFilterBtn) {
+      clearOfferFilterBtn.addEventListener("click", function () {
+        filters.jobOfferId = "";
+
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.delete("offer");
+        const newUrl =
+          window.location.pathname +
+          (urlParams.toString() ? "?" + urlParams.toString() : "") +
+          window.location.hash;
+        window.history.replaceState({}, "", newUrl);
+
+        if (offerFilterBanner) {
+          offerFilterBanner.classList.add("hidden");
+        }
+
+        currentPage = 1;
+        renderCandidates();
+      });
+    }
+
     const paginationEl = document.querySelector("[data-ie-candidates-body]")?.closest(".glass-card")?.querySelector("[data-ie-pagination]");
     if (paginationEl) {
       const prevBtn = paginationEl.querySelector("[data-ie-pagination-prev]");
       const nextBtn = paginationEl.querySelector("[data-ie-pagination-next]");
       if (prevBtn) prevBtn.addEventListener("click", function () { if (!this.disabled) goToPage(currentPage - 1); });
       if (nextBtn) nextBtn.addEventListener("click", function () { if (!this.disabled) goToPage(currentPage + 1); });
+    }
+
+    if (hasOfferFilter) {
+      showOfferFilterBanner();
     }
 
     tbody.addEventListener("click", function (event) {
@@ -2645,7 +3736,7 @@
         const id = editBtn.getAttribute("data-id");
         if (id) {
           const base = typeof window.IESupabase !== "undefined" && window.IESupabase.getBasePath ? window.IESupabase.getBasePath() : derivePortalBasePath();
-          window.location.href = base + "edit-candidato.html?id=" + encodeURIComponent(id);
+          window.location.href = base + "add-candidato.html?id=" + encodeURIComponent(id) + "&mode=edit";
         }
         return;
       }
@@ -2871,6 +3962,232 @@
     renderCandidates();
   }
 
+  // ---------------------------------------------------------------------------
+  // Job offer quick preview modal (reusable across pages)
+  // ---------------------------------------------------------------------------
+
+  let JOB_OFFER_PREVIEW_MODAL = null;
+  let JOB_OFFER_PREVIEW_PREV_OVERFLOW = "";
+
+  function ensureJobOfferPreviewModal() {
+    if (JOB_OFFER_PREVIEW_MODAL) return JOB_OFFER_PREVIEW_MODAL;
+
+    const root = document.createElement("div");
+    root.className =
+      "fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm hidden";
+    root.setAttribute("role", "dialog");
+    root.setAttribute("aria-modal", "true");
+
+    root.innerHTML = [
+      '<div class="w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">',
+      '  <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">',
+      '    <h2 class="text-lg font-semibold text-[#1b4332]" data-ie-joboffer-preview-title></h2>',
+      '    <button type="button" data-ie-joboffer-preview-close class="p-1.5 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition" aria-label="Close preview">',
+      '      <span class="block text-xl leading-none">&times;</span>',
+      "    </button>",
+      "  </div>",
+      '  <div class="px-6 py-4 space-y-3 text-sm">',
+      '    <p class="text-gray-500" data-ie-joboffer-preview-loading>Caricamento offerta...</p>',
+      '    <p class="text-sm text-red-500 hidden" data-ie-joboffer-preview-error></p>',
+      '    <div class="space-y-2 hidden" data-ie-joboffer-preview-content>',
+      '      <div class="flex justify-between gap-4">',
+      '        <span class="text-gray-400 uppercase tracking-widest text-[10px] font-semibold">Position</span>',
+      '        <span class="text-gray-800 font-medium" data-ie-joboffer-preview-position></span>',
+      "      </div>",
+      '      <div class="flex justify-between gap-4">',
+      '        <span class="text-gray-400 uppercase tracking-widest text-[10px] font-semibold">Client</span>',
+      '        <span class="text-gray-800" data-ie-joboffer-preview-client></span>',
+      "      </div>",
+      '      <div class="flex justify-between gap-4">',
+      '        <span class="text-gray-400 uppercase tracking-widest text-[10px] font-semibold">Location</span>',
+      '        <span class="text-gray-800" data-ie-joboffer-preview-location></span>',
+      "      </div>",
+      '      <div class="flex justify-between gap-4">',
+      '        <span class="text-gray-400 uppercase tracking-widest text-[10px] font-semibold">Status</span>',
+      '        <span class="text-gray-800" data-ie-joboffer-preview-status></span>',
+      "      </div>",
+      '      <div class="flex justify-between gap-4">',
+      '        <span class="text-gray-400 uppercase tracking-widest text-[10px] font-semibold">Created</span>',
+      '        <span class="text-gray-800" data-ie-joboffer-preview-created></span>',
+      "      </div>",
+      "    </div>",
+      "  </div>",
+      '  <div class="px-6 py-4 bg-gray-50 flex items-center justify-end border-t border-gray-100">',
+      '    <button type="button" data-ie-joboffer-preview-open-full class="px-4 py-2 rounded-lg bg-[#1b4332] text-white text-xs font-semibold tracking-widest uppercase hover:bg-[#1b4332]/90 transition shadow-sm">',
+      "      Open Full Page",
+      "    </button>",
+      "  </div>",
+      "</div>",
+    ].join("");
+
+    document.body.appendChild(root);
+
+    const titleEl = root.querySelector("[data-ie-joboffer-preview-title]");
+    const loadingEl = root.querySelector(
+      "[data-ie-joboffer-preview-loading]"
+    );
+    const errorEl = root.querySelector("[data-ie-joboffer-preview-error]");
+    const contentEl = root.querySelector(
+      "[data-ie-joboffer-preview-content]"
+    );
+    const positionEl = root.querySelector(
+      "[data-ie-joboffer-preview-position]"
+    );
+    const clientEl = root.querySelector("[data-ie-joboffer-preview-client]");
+    const locationEl = root.querySelector(
+      "[data-ie-joboffer-preview-location]"
+    );
+    const statusEl = root.querySelector("[data-ie-joboffer-preview-status]");
+    const createdEl = root.querySelector("[data-ie-joboffer-preview-created]");
+    const closeBtn = root.querySelector("[data-ie-joboffer-preview-close]");
+    const openFullBtn = root.querySelector(
+      "[data-ie-joboffer-preview-open-full]"
+    );
+
+    const state = {
+      currentOfferId: null,
+    };
+
+    function setLoading(isLoading) {
+      if (!loadingEl || !contentEl || !errorEl) return;
+      if (isLoading) {
+        loadingEl.classList.remove("hidden");
+        contentEl.classList.add("hidden");
+        errorEl.classList.add("hidden");
+      } else {
+        loadingEl.classList.add("hidden");
+      }
+    }
+
+    function setError(message) {
+      if (!errorEl || !contentEl || !loadingEl) return;
+      loadingEl.classList.add("hidden");
+      contentEl.classList.add("hidden");
+      errorEl.textContent = message || "Errore nel caricamento dell'offerta.";
+      errorEl.classList.remove("hidden");
+    }
+
+    function setData(offer) {
+      if (!offer) {
+        setError("Offerta non trovata.");
+        return;
+      }
+      if (titleEl)
+        titleEl.textContent = offer.title || "Job Offer";
+      if (positionEl)
+        positionEl.textContent = offer.position || "—";
+      if (clientEl)
+        clientEl.textContent = offer.client_name || "—";
+      if (locationEl) {
+        const location =
+          offer.location ||
+          [offer.city, offer.state]
+            .filter(function (x) {
+              return x;
+            })
+            .join(", ");
+        locationEl.textContent = location || "—";
+      }
+      if (statusEl)
+        statusEl.textContent = offer.status || "—";
+      if (createdEl) {
+        if (offer.created_at) {
+          try {
+            const d = new Date(offer.created_at);
+            createdEl.textContent = d.toLocaleString("it-IT");
+          } catch (_) {
+            createdEl.textContent = offer.created_at;
+          }
+        } else {
+          createdEl.textContent = "—";
+        }
+      }
+
+      if (loadingEl) loadingEl.classList.add("hidden");
+      if (errorEl) errorEl.classList.add("hidden");
+      if (contentEl) contentEl.classList.remove("hidden");
+    }
+
+    function open() {
+      JOB_OFFER_PREVIEW_PREV_OVERFLOW = document.body.style.overflow || "";
+      document.body.style.overflow = "hidden";
+      root.classList.remove("hidden");
+    }
+
+    function close() {
+      root.classList.add("hidden");
+      document.body.style.overflow = JOB_OFFER_PREVIEW_PREV_OVERFLOW || "";
+    }
+
+    root.addEventListener("click", function (event) {
+      if (event.target === root) {
+        close();
+      }
+    });
+
+    if (closeBtn) {
+      closeBtn.addEventListener("click", function () {
+        close();
+      });
+    }
+
+    if (openFullBtn) {
+      openFullBtn.addEventListener("click", function () {
+        if (!state.currentOfferId) return;
+        close();
+        navigateTo(
+          "add-offerta.html?id=" +
+            encodeURIComponent(state.currentOfferId) +
+            "&mode=view"
+        );
+      });
+    }
+
+    JOB_OFFER_PREVIEW_MODAL = {
+      root,
+      state,
+      setLoading,
+      setError,
+      setData,
+      open,
+      close,
+    };
+
+    return JOB_OFFER_PREVIEW_MODAL;
+  }
+
+  function openJobOfferPreviewModal(id) {
+    if (!id) return;
+    const modal = ensureJobOfferPreviewModal();
+    modal.state.currentOfferId = id;
+    modal.setLoading(true);
+    modal.open();
+
+    const api = window.IESupabase;
+    if (!api || (!api.fetchJobOfferById && !api.getJobOfferById)) {
+      modal.setError("Supabase non disponibile.");
+      return;
+    }
+
+    const fetchById = api.fetchJobOfferById || api.getJobOfferById;
+
+    fetchById(id)
+      .then(function (result) {
+        if (!result || result.error) {
+          modal.setError(
+            (result && result.error && result.error.message) ||
+              "Offerta non trovata."
+          );
+          return;
+        }
+        modal.setData(result.data || null);
+      })
+      .catch(function (err) {
+        console.error("[ItalianExperience] fetchJobOfferById error:", err);
+        modal.setError("Errore nel caricamento dell'offerta.");
+      });
+  }
+
   // Job offers list
   function initJobOffersPage() {
     const tbody = document.querySelector("[data-ie-joboffers-body]");
@@ -2884,6 +4201,7 @@
       contractType: "",
       offerStatus: "",
       archived: "active",
+      excludeArchivedStatus: true,
     };
     let currentPage = 1;
     const limit = JOB_OFFERS_PAGE_SIZE;
@@ -2896,9 +4214,41 @@
     const contractSelect = document.querySelector('[data-filter="offer-contract"]');
     const archivedSelect = document.querySelector('[data-filter="offer-archived"]');
 
+    const clientFilterBanner = document.querySelector("[data-ie-client-filter-banner]");
+    const clientFilterNameEl = document.querySelector("[data-ie-client-filter-name]");
+    const clearClientFilterBtn = document.querySelector("[data-action='clear-client-filter']");
+
+    const params = new URLSearchParams(window.location.search);
+    const clientFilter = params.get("client");
+    const hasClientFilter = !!clientFilter;
+    if (hasClientFilter) {
+      filters.clientId = clientFilter;
+      filters.offerStatus = "active";
+    }
+
     function goToPage(page) {
       currentPage = Math.max(1, page);
       renderOffers();
+    }
+
+    function updateClientFilterBanner() {
+      if (!clientFilterBanner) return;
+      if (!filters.clientId) {
+        clientFilterBanner.classList.add("hidden");
+        return;
+      }
+      let name = "";
+      if (clientSelect) {
+        const selected = clientSelect.querySelector('option[value="' + filters.clientId + '"]');
+        if (selected && selected.textContent) {
+          name = selected.textContent;
+        }
+      }
+      if (!name) name = filters.clientId;
+      if (clientFilterNameEl) {
+        clientFilterNameEl.textContent = name;
+      }
+      clientFilterBanner.classList.remove("hidden");
     }
 
     // Populate client filter options from Supabase or store
@@ -2920,6 +4270,10 @@
               opt.textContent = client.name || "—";
               clientSelect.appendChild(opt);
             });
+            if (filters.clientId) {
+              clientSelect.value = filters.clientId;
+              updateClientFilterBanner();
+            }
           })
           .catch(function () {});
       } else {
@@ -2930,6 +4284,10 @@
           opt.textContent = client.name;
           clientSelect.appendChild(opt);
         });
+        if (filters.clientId) {
+          clientSelect.value = filters.clientId;
+          updateClientFilterBanner();
+        }
       }
     }
 
@@ -2945,6 +4303,7 @@
         filters.clientId = this.value || "";
         currentPage = 1;
         renderOffers();
+        updateClientFilterBanner();
       });
     }
     if (statusSelect) {
@@ -2991,11 +4350,47 @@
       if (nextBtn) nextBtn.addEventListener("click", function () { if (!this.disabled) goToPage(currentPage + 1); });
     }
 
+    if (hasClientFilter) {
+      if (statusSelect) statusSelect.value = "active";
+    }
+
+    if (clearClientFilterBtn) {
+      clearClientFilterBtn.addEventListener("click", function () {
+        filters.clientId = "";
+        filters.offerStatus = "";
+        if (clientSelect) clientSelect.value = "";
+        if (statusSelect) statusSelect.value = "";
+
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.delete("client");
+        const newUrl =
+          window.location.pathname +
+          (urlParams.toString() ? "?" + urlParams.toString() : "") +
+          window.location.hash;
+        window.history.replaceState({}, "", newUrl);
+
+        if (clientFilterBanner) clientFilterBanner.classList.add("hidden");
+
+        currentPage = 1;
+        renderOffers();
+      });
+    }
+
     tbody.addEventListener("click", function (event) {
-      const archiveBtn = event.target.closest("[data-action='archive-offer']");
+      const target = event.target;
+
+      const candidatesBtn = target.closest("[data-action='view-offer-candidates']");
+      if (candidatesBtn) {
+        const offerId = candidatesBtn.getAttribute("data-id");
+        if (!offerId) return;
+        navigateTo("candidati.html?offer=" + encodeURIComponent(offerId));
+        return;
+      }
+
+      const archiveBtn = target.closest("[data-action='archive-offer']");
       if (archiveBtn) {
-        const id = archiveBtn.getAttribute("data-id");
-        if (!id) return;
+        const archiveId = archiveBtn.getAttribute("data-id");
+        if (!archiveId) return;
         const confirmed = window.confirm(
           "Sei sicuro di voler archiviare questa offerta? Potrai vederla nella vista 'Archived'."
         );
@@ -3003,7 +4398,7 @@
 
         if (window.IESupabase && window.IESupabase.archiveJobOffer) {
           window.IESupabase
-            .archiveJobOffer(id)
+            .archiveJobOffer(archiveId)
             .then(function (result) {
               if (result && result.error) {
                 if (window.IESupabase.showError) {
@@ -3027,33 +4422,80 @@
               }
             });
         } else {
-          archiveRecordById(IE_STORE.jobOffers, id);
+          archiveRecordById(IE_STORE.jobOffers, archiveId);
           renderOffers();
         }
+        return;
+      }
+
+      const previewBtn = target.closest("[data-action='preview-offer']");
+      if (previewBtn) {
+        const previewId =
+          previewBtn.getAttribute("data-id") ||
+          previewBtn.closest("tr")?.getAttribute("data-id");
+        if (!previewId) return;
+        openJobOfferPreviewModal(previewId);
+        return;
+      }
+
+      const titleBtn = target.closest("[data-action='view-offer-full']");
+      if (titleBtn) {
+        const fullId =
+          titleBtn.getAttribute("data-id") ||
+          titleBtn.closest("tr")?.getAttribute("data-id");
+        if (!fullId) return;
+        navigateTo(
+          "add-offerta.html?id=" + encodeURIComponent(fullId) + "&mode=view"
+        );
+        return;
+      }
+
+      const editBtn = target.closest("[data-action='edit-offer']");
+      if (editBtn) {
+        const editId =
+          editBtn.getAttribute("data-id") ||
+          editBtn.closest("tr")?.getAttribute("data-id");
+        if (!editId) return;
+        navigateTo(
+          "add-offerta.html?id=" + encodeURIComponent(editId) + "&mode=edit"
+        );
       }
     });
 
     function mapJobOfferRow(r) {
+      const location =
+        r.location ||
+        [r.city, r.state]
+          .filter(function (x) {
+            return x;
+          })
+          .join(", ");
+      const candidatesCount = (r.candidate_job_associations || []).filter(function (a) {
+        return a && a.candidates && !a.candidates.is_archived;
+      }).length;
       return {
         id: r.id,
         title: r.title ?? "",
         position: r.position ?? "",
         description: r.description ?? "",
         client_id: r.client_id ?? null,
+        client_name: r.client_name ?? "",
         salary: r.salary ?? "",
         city: r.city ?? "",
         state: r.state ?? "",
+        location: location,
         deadline: r.deadline ?? null,
         status: r.status ?? "open",
         created_at: r.created_at,
         is_archived: r.is_archived || false,
+        candidatesCount: candidatesCount,
       };
     }
 
     function renderOfferRows(rows) {
       tbody.innerHTML = "";
       if (!rows.length) {
-        tbody.innerHTML = "<tr><td colspan=\"7\" class=\"px-6 py-8 text-center text-gray-400\">Nessuna offerta trovata.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan=\"8\" class=\"px-6 py-8 text-center text-gray-400\">Nessuna offerta trovata.</td></tr>";
         return;
       }
       if (window.IESupabase) window.IE_ACTIVE_JOB_OFFER_ID = rows[0].id;
@@ -3062,30 +4504,47 @@
         tr.className = "table-row transition" + (row.is_archived ? " opacity-60" : "");
         tr.setAttribute("data-id", row.id);
 
-        const cityValue = row.city || "—";
-        const salaryValue = row.salary || "—";
-        const deadlineValue = row.deadline ? new Date(row.deadline).toLocaleDateString("it-IT") : "—";
+        const clientValue = row.client_name || "—";
+        const locationValue = row.location || "—";
+        const createdAtValue = row.created_at
+          ? new Date(row.created_at).toLocaleDateString("it-IT")
+          : "—";
         const badgeClass = getOfferStatusBadgeClass(row.status);
         const statusLabel = formatOfferStatusLabel(row.status);
         const metaTitle = formatLastUpdatedMeta(row);
         if (metaTitle) tr.title = metaTitle;
 
+        const candidatesCount = typeof row.candidatesCount === "number" ? row.candidatesCount : 0;
+        const candidatesCellHtml =
+          candidatesCount > 0
+            ? '<button type="button" data-action="view-offer-candidates" data-id="' +
+              row.id +
+              '" class="text-[#1b4332] font-semibold hover:underline">' +
+              candidatesCount +
+              "</button>"
+            : "0";
+
         tr.innerHTML = `
-            <td class="px-6 py-4 font-semibold text-gray-800">${row.title}</td>
+            <td class="px-6 py-4 font-semibold text-gray-800">
+              <button type="button" data-action="view-offer-full" data-id="${row.id}" class="text-left hover:underline decoration-[#c5a059] decoration-2 underline-offset-4">
+                ${row.title}
+              </button>
+            </td>
             <td class="px-6 py-4 text-gray-600 font-medium">${row.position || "—"}</td>
-            <td class="px-6 py-4 text-gray-600">${cityValue}</td>
-            <td class="px-6 py-4 text-gray-500 italic">${salaryValue}</td>
+            <td class="px-6 py-4 text-gray-600">${clientValue}</td>
+            <td class="px-6 py-4 text-gray-600">${locationValue}</td>
             <td class="px-6 py-4"><span class="badge ${badgeClass}">${statusLabel}</span></td>
-            <td class="px-6 py-4 text-gray-400">${deadlineValue}</td>
+            <td class="px-6 py-4 text-gray-600">${candidatesCellHtml}</td>
+            <td class="px-6 py-4 text-gray-400">${createdAtValue}</td>
             <td class="px-6 py-4">
               <div class="flex items-center justify-center space-x-2">
-                <button type="button" class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View">
+                <button type="button" data-action="preview-offer" data-id="${row.id}" class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="Quick Preview">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                   </svg>
                 </button>
-                <button type="button" class="p-2 text-gray-400 hover:text-blue-500 transition" title="Edit">
+                <button type="button" data-action="edit-offer" data-id="${row.id}" class="p-2 text-gray-400 hover:text-blue-500 transition" title="Edit">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                   </svg>
@@ -3106,7 +4565,7 @@
       const paginationContainer = document.querySelector("[data-ie-joboffers-body]")?.closest(".glass-card")?.querySelector("[data-ie-pagination]");
 
       if (window.IESupabase && window.IESupabase.fetchJobOffersPaginated) {
-        tbody.innerHTML = "<tr><td colspan=\"7\" class=\"px-6 py-8 text-center text-gray-400\">Caricamento...</td></tr>";
+        tbody.innerHTML = "<tr><td colspan=\"8\" class=\"px-6 py-8 text-center text-gray-400\">Caricamento...</td></tr>";
         window.IESupabase.fetchJobOffersPaginated({
           filters,
           page: currentPage,
@@ -3125,13 +4584,19 @@
           renderAssociationsForActiveOffer();
         }).catch(function (err) {
           console.error("[ItalianExperience] fetchJobOffersPaginated error:", err);
-          tbody.innerHTML = "<tr><td colspan=\"7\" class=\"px-6 py-8 text-center text-red-500\">Errore nel caricamento. Riprova più tardi.</td></tr>";
+          tbody.innerHTML = "<tr><td colspan=\"8\" class=\"px-6 py-8 text-center text-red-500\">Errore nel caricamento. Riprova più tardi.</td></tr>";
           updatePaginationUI(paginationContainer, 0, 1, limit, 0);
         });
         return;
       }
 
       fetchJobOffers(filters).then(async (rows) => {
+        if (filters.excludeArchivedStatus) {
+          rows = rows.filter(function (r) {
+            const s = (r.status || "active").toString().toLowerCase();
+            return s !== "archived";
+          });
+        }
         rows.sort((a, b) => Number(a.is_archived) - Number(b.is_archived));
         const totalCount = rows.length;
         const totalPages = Math.max(1, Math.ceil(totalCount / limit));
@@ -3145,8 +4610,9 @@
     }
 
     function getOfferStatusBadgeClass(status) {
-      switch (status) {
+      switch ((status || "").toString().toLowerCase()) {
         case "open":
+        case "active":
           return "badge-open";
         case "inprogress":
           return "badge-inprogress";
@@ -3158,9 +4624,11 @@
     }
 
     function formatOfferStatusLabel(status) {
-      switch (status) {
+      switch ((status || "").toString().toLowerCase()) {
         case "open":
           return "Open";
+        case "active":
+          return "Active";
         case "inprogress":
           return "In Progress";
         case "closed":
@@ -3232,7 +4700,17 @@
     }
 
     tbody.addEventListener("click", function (event) {
-      const archiveBtn = event.target.closest("[data-action='archive-client']");
+      const target = event.target;
+
+      const offersBtn = target.closest("[data-action='view-client-offers']");
+      if (offersBtn) {
+        const clientId = offersBtn.getAttribute("data-id");
+        if (!clientId) return;
+        navigateTo("offerte.html?client=" + encodeURIComponent(clientId));
+        return;
+      }
+
+      const archiveBtn = target.closest("[data-action='archive-client']");
       if (archiveBtn) {
         const id = archiveBtn.getAttribute("data-id");
         if (!id) return;
@@ -3270,6 +4748,23 @@
           archiveRecordById(IE_STORE.clients, id);
           renderClients();
         }
+        return;
+      }
+
+      const viewBtn = target.closest("[data-action='view-client']");
+      if (viewBtn) {
+        const id = viewBtn.getAttribute("data-id") || viewBtn.closest("tr")?.getAttribute("data-id");
+        if (!id) return;
+        navigateTo("add-cliente.html?id=" + encodeURIComponent(id) + "&mode=view");
+        return;
+      }
+
+      const editBtn = target.closest("[data-action='edit-client']");
+      if (editBtn) {
+        const id = editBtn.getAttribute("data-id") || editBtn.closest("tr")?.getAttribute("data-id");
+        if (!id) return;
+        navigateTo("add-cliente.html?id=" + encodeURIComponent(id) + "&mode=edit");
+        return;
       }
     });
 
@@ -3317,6 +4812,7 @@
             limit,
           })
           .then(function (result) {
+            console.log("[ItalianExperience] fetchClientsPaginated result:", result);
             const rows = result.data || [];
             const totalCount = result.totalCount ?? 0;
             const totalPages = Math.max(1, Math.ceil(totalCount / limit));
@@ -3336,6 +4832,22 @@
             }
 
             rows.forEach(function (row) {
+              const activeOffersCount = (row.job_offers || []).filter(function (o) {
+                if (!o || o.is_archived) return false;
+                const status = o.status || "";
+                return status === "open" || status === "inprogress" || status === "in progress";
+              }).length;
+              const activeOffersHtml =
+                activeOffersCount > 0
+                  ? `<button 
+                      type="button"
+                      data-action="view-client-offers" 
+                      data-id="${row.id}"
+                      class="text-[#1b4332] font-semibold hover:underline">
+                      ${activeOffersCount}
+                    </button>`
+                  : "0";
+
               const tr = document.createElement("tr");
               tr.className = "table-row transition" + (row.is_archived ? " opacity-60" : "");
               tr.setAttribute("data-id", row.id);
@@ -3346,7 +4858,7 @@
               tr.innerHTML = `
                 <td class="px-6 py-4 font-semibold text-gray-800">${row.name || "—"}</td>
                 <td class="px-6 py-4 text-gray-600">${row.city || "—"}</td>
-                <td class="px-6 py-4 text-gray-600">${row.state || "—"}</td>
+                <td class="px-6 py-4 text-gray-600">${activeOffersHtml}</td>
                 <td class="px-6 py-4 text-gray-600">${row.email || "—"}</td>
                 <td class="px-6 py-4 text-gray-600">${row.phone || "—"}</td>
                 <td class="px-6 py-4">
@@ -3411,6 +4923,23 @@
         const pageRows = rows.slice(start, start + limit);
 
         pageRows.forEach((row) => {
+          const activeOffersCount = (IE_STORE.jobOffers || []).filter((offer) => {
+            if (!offer || offer.is_archived) return false;
+            if (offer.client_id !== row.id) return false;
+            const status = offer.status || "";
+            return status === "open" || status === "inprogress" || status === "in progress";
+          }).length;
+          const activeOffersHtml =
+            activeOffersCount > 0
+              ? `<button 
+                  type="button"
+                  data-action="view-client-offers" 
+                  data-id="${row.id}"
+                  class="text-[#1b4332] font-semibold hover:underline">
+                  ${activeOffersCount}
+                </button>`
+              : "0";
+
           const tr = document.createElement("tr");
           tr.className = "table-row transition" + (row.is_archived ? " opacity-60" : "");
           tr.setAttribute("data-id", row.id);
@@ -3418,7 +4947,7 @@
           tr.innerHTML = `
             <td class="px-6 py-4 font-semibold text-gray-800">${row.name}</td>
             <td class="px-6 py-4 text-gray-600">${row.city || "—"}</td>
-            <td class="px-6 py-4 text-gray-600">${row.state || "—"}</td>
+            <td class="px-6 py-4 text-gray-600">${activeOffersHtml}</td>
             <td class="px-6 py-4 text-gray-600">${row.email || "—"}</td>
             <td class="px-6 py-4 text-gray-600">${row.phone || "—"}</td>
             <td class="px-6 py-4">

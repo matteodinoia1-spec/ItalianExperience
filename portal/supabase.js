@@ -536,10 +536,11 @@
         salary: payload.salary || null,
         contract_type: payload.contract_type || null,
         positions: payload.positions ?? null,
+        positions_required: Math.max(1, Number(payload.positions_required ?? payload.positions ?? 1)),
         city: payload.city || null,
         state: payload.state || null,
         deadline: payload.deadline || null,
-        status: payload.status || "open",
+        status: payload.status || "active",
       };
       const { data, error } = await supabase.from("job_offers").insert(row).select().single();
       if (error) {
@@ -551,6 +552,118 @@
       console.error("[Supabase] insertJobOffer exception:", err);
       return { data: null, error: err };
     }
+  }
+
+  /**
+   * Fetch a single job offer by id (with client join).
+   * @param {string} id - job_offer id
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function getJobOfferById(id) {
+    if (!id) return { data: null, error: new Error("Missing id") };
+    try {
+      const { data, error } = await supabase
+        .from("job_offers")
+        .select(
+          `
+          *,
+          clients (
+            id,
+            name,
+            city,
+            state
+          )
+        `
+        )
+        .eq("id", id)
+        .maybeSingle();
+      if (error) {
+        console.error("[Supabase] getJobOfferById error:", error.message, error);
+        return { data: null, error };
+      }
+      if (!data) return { data: null, error: null };
+      const client = data.clients || null;
+      const normalized = {
+        ...data,
+        client_name: data.client_name || (client && client.name) || null,
+      };
+      return { data: normalized, error: null };
+    } catch (err) {
+      console.error("[Supabase] getJobOfferById exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Fetch a single job offer by id (wrapper used by UI code).
+   * Kept separate so different pages (list, modal preview, full view)
+   * can share the same loading function without duplicating queries.
+   * @param {string} id - job_offer id
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function fetchJobOfferById(id) {
+    return getJobOfferById(id);
+  }
+
+  /**
+   * Update an existing job offer by id.
+   * @param {string} id - job_offer id
+   * @param {object} payload - fields to update (same shape as insertJobOffer payload)
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function updateJobOffer(id, payload) {
+    if (!id) return { data: null, error: new Error("Missing id") };
+    try {
+      const updates = {
+        client_id: payload.client_id ?? null,
+        title: payload.title ?? "",
+        position: payload.position ?? null,
+        description: payload.description ?? null,
+        requirements: payload.requirements ?? null,
+        notes: payload.notes ?? null,
+        salary: payload.salary ?? null,
+        contract_type: payload.contract_type ?? null,
+        positions: payload.positions ?? null,
+        city: payload.city ?? null,
+        state: payload.state ?? null,
+        deadline: payload.deadline ?? null,
+        status: payload.status ?? "open",
+      };
+      if (payload.positions !== undefined || payload.positions_required !== undefined) {
+        updates.positions_required = Math.max(1, Number(payload.positions_required ?? payload.positions ?? 1));
+      }
+      const { data, error } = await supabase
+        .from("job_offers")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] updateJobOffer error:", error.message, error);
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] updateJobOffer exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Update only the status of a job offer (lifecycle: active | closed | archived).
+   * @param {string} id - job_offer id
+   * @param {string} status - "active" | "closed" | "archived"
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function updateJobOfferStatus(id, status) {
+    if (!id) return { data: null, error: new Error("Missing id") };
+    const { data, error } = await supabase
+      .from("job_offers")
+      .update({ status })
+      .eq("id", id)
+      .select()
+      .single();
+    return { data, error };
   }
 
   /**
@@ -625,17 +738,54 @@
     if (!userId) return { data: [], totalCount: 0, error: null };
 
     const filters = opts.filters || {};
+    const jobOfferId = filters.jobOfferId || null;
     const page = Math.max(1, parseInt(opts.page, 10) || 1);
     const limit = Math.max(1, Math.min(100, parseInt(opts.limit, 10) || 10));
     const offset = (page - 1) * limit;
 
     try {
       console.log("[Supabase] fetchCandidatesPaginated for user id:", userId, "page:", page, "limit:", limit);
-      const countQuery = buildCandidatesQuery(
-        supabase.from("candidates").select("*", { count: "exact", head: true }),
-        filters,
-        userId
-      );
+      let candidateIdsForOffer = null;
+
+      if (jobOfferId) {
+        const { data: assocRows, error: assocError } = await supabase
+          .from("candidate_job_associations")
+          .select("candidate_id")
+          .eq("job_offer_id", jobOfferId);
+
+        if (assocError) {
+          console.error("[Supabase] fetchCandidatesPaginated associations error:", assocError.message);
+          return { data: [], totalCount: 0, error: assocError };
+        }
+
+        const candidateIds =
+          Array.isArray(assocRows)
+            ? Array.from(
+                new Set(
+                  assocRows
+                    .map(function (r) {
+                      return r && r.candidate_id;
+                    })
+                    .filter(function (id) {
+                      return !!id;
+                    })
+                )
+              )
+            : [];
+
+        if (!candidateIds.length) {
+          return { data: [], totalCount: 0, error: null };
+        }
+
+        candidateIdsForOffer = candidateIds;
+      }
+
+      let baseCountQuery = supabase.from("candidates").select("*", { count: "exact", head: true });
+      if (candidateIdsForOffer && candidateIdsForOffer.length) {
+        baseCountQuery = baseCountQuery.in("id", candidateIdsForOffer);
+      }
+
+      const countQuery = buildCandidatesQuery(baseCountQuery, filters, userId);
       const { count, error: countError } = await countQuery;
       if (countError) {
         console.error("[Supabase] fetchCandidatesPaginated count error:", countError.message);
@@ -643,11 +793,10 @@
       }
       const totalCount = count ?? 0;
 
-      const dataQuery = buildCandidatesQuery(
-        supabase
-          .from("candidates")
-          .select(
-            `
+      let baseDataQuery = supabase
+        .from("candidates")
+        .select(
+          `
             *,
             candidate_job_associations (
               id,
@@ -669,10 +818,13 @@
               )
             )
           `
-          ),
-        filters,
-        userId
-      );
+        );
+
+      if (candidateIdsForOffer && candidateIdsForOffer.length) {
+        baseDataQuery = baseDataQuery.in("id", candidateIdsForOffer);
+      }
+
+      const dataQuery = buildCandidatesQuery(baseDataQuery, filters, userId);
       const { data: rows, error: dataError } = await dataQuery
         .order("created_at", { foreignTable: "candidate_job_associations", ascending: false })
         .order("created_at", { ascending: false })
@@ -741,15 +893,20 @@
 
   /**
    * Build job offers query with filters (same logic for count and data).
-   * Filters: title, offerStatus, archived, city, state. Columns: title, city, state, status, is_archived.
+   * Filters: title, offerStatus, archived (status-based), city, state. Columns: title, city, state, status, is_archived.
+   * Archived filter uses status only (no is_archived).
    */
   function buildJobOffersQuery(supabaseQuery, filters) {
     let q = supabaseQuery;
-    if (filters.archived === "active") q = q.eq("is_archived", false);
-    if (filters.archived === "archived") q = q.eq("is_archived", true);
+    if (filters.excludeArchivedStatus === true) q = q.not("status", "eq", "archived");
+    if (filters.archived === "archived") q = q.eq("status", "archived");
     if (filters.clientId) q = q.eq("client_id", filters.clientId);
     if (filters.contractType) q = q.eq("contract_type", filters.contractType);
-    if (filters.offerStatus) q = q.eq("status", filters.offerStatus);
+    if (filters.offerStatus === "active") {
+      q = q.in("status", ["open", "inprogress", "active"]);
+    } else if (filters.offerStatus) {
+      q = q.eq("status", filters.offerStatus);
+    }
     const titleTerm = (filters.title || "").trim();
     if (titleTerm) {
       const escaped = titleTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
@@ -802,6 +959,14 @@
               name,
               city,
               state
+            ),
+            candidate_job_associations (
+              id,
+              candidate_id,
+              candidates (
+                id,
+                is_archived
+              )
             )
           `
           ),
@@ -844,6 +1009,9 @@
           status: r.status,
           created_at: r.created_at,
           is_archived: r.is_archived,
+          candidate_job_associations: Array.isArray(r.candidate_job_associations)
+            ? r.candidate_job_associations
+            : [],
         };
       });
       return { data, totalCount, error: null };
@@ -865,7 +1033,9 @@
   function buildClientsQuery(supabaseQuery, filters) {
     let q = supabaseQuery;
 
-    if (filters.archived === "active") q = q.eq("is_archived", false);
+    if (filters.archived === "active") {
+      q = q.eq("is_archived", false);
+    }
     if (filters.archived === "archived") q = q.eq("is_archived", true);
 
     const nameTerm = (filters.name || "").trim();
@@ -934,6 +1104,81 @@
   }
 
   /**
+   * Get a single client by id.
+   * @param {string} id - client id
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function getClientById(id) {
+    if (!id) return { data: null, error: new Error("Missing id") };
+    try {
+      const { data, error } = await supabase
+        .from("clients")
+        .select("*")
+        .eq("id", id)
+        .single();
+      if (error) {
+        console.error("[Supabase] getClientById error:", error.message, error);
+        return { data: null, error };
+      }
+      const row = data;
+      return {
+        data: row
+          ? {
+              id: row.id,
+              name: row.name,
+              city: row.city,
+              state: row.state,
+              country: row.country,
+              email: row.email,
+              phone: row.phone,
+              notes: row.notes,
+              is_archived: !!row.is_archived,
+            }
+          : null,
+        error: null,
+      };
+    } catch (err) {
+      console.error("[Supabase] getClientById exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Update an existing client by id.
+   * @param {string} id - client id
+   * @param {object} payload - { name, city?, state?, country?, email?, phone?, notes? }
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function updateClient(id, payload) {
+    if (!id) return { data: null, error: new Error("Missing id") };
+    try {
+      const updates = {
+        name: (payload.name ?? "").toString().trim() || null,
+        city: payload.city ?? null,
+        state: payload.state ?? null,
+        country: payload.country ?? null,
+        email: payload.email ?? null,
+        phone: payload.phone ?? null,
+        notes: payload.notes ?? null,
+      };
+      const { data, error } = await supabase
+        .from("clients")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] updateClient error:", error.message, error);
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] updateClient exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
+  /**
    * Fetch clients with filters and pagination. Returns total count (with same filters) and page of data.
    * @param {object} opts - { filters: object, page: number, limit: number }
    * @returns {Promise<{ data: array, totalCount: number, error: object | null }>}
@@ -957,7 +1202,18 @@
       const totalCount = count ?? 0;
 
       const dataQuery = buildClientsQuery(
-        supabase.from("clients").select("*"),
+        supabase
+          .from("clients")
+          .select(
+            `
+            *,
+            job_offers (
+              id,
+              status,
+              is_archived
+            )
+          `
+          ),
         filters
       );
       const { data: rows, error: dataError } = await dataQuery
@@ -980,6 +1236,8 @@
           phone: r.phone,
           notes: r.notes,
           is_archived: !!r.is_archived,
+          // Nested job_offers used by frontend to compute Active Offers per client
+          job_offers: Array.isArray(r.job_offers) ? r.job_offers : [],
         };
       });
 
@@ -1027,6 +1285,45 @@
       return { data: rows, error: null };
     } catch (err) {
       console.error("[Supabase] searchClientsByName exception:", err);
+      return { data: [], error: err };
+    }
+  }
+
+  /**
+   * Search candidates by first or last name (no created_by filter).
+   * For autocomplete so candidates appear even after association removal.
+   * @param {{ term?: string, limit?: number }} opts
+   * @returns {Promise<{ data: Array, error: object | null }>}
+   */
+  async function searchCandidatesByName(opts) {
+    const term = (opts && opts.term) != null ? String(opts.term).trim() : "";
+    const limit = Math.max(1, Math.min(100, parseInt((opts && opts.limit) || 10, 10) || 10));
+
+    if (!term || term.length < 2) {
+      return { data: [], error: null };
+    }
+
+    try {
+      const safeTerm = term.replace(/,/g, " ");
+      const escaped = safeTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
+      const pattern = "%" + escaped + "%";
+
+      const { data, error } = await supabase
+        .from("candidates")
+        .select("id, first_name, last_name, position, is_archived")
+        .or("first_name.ilike." + pattern + ",last_name.ilike." + pattern)
+        .or("is_archived.is.null,is_archived.eq.false")
+        .order("first_name", { ascending: true })
+        .limit(limit);
+
+      if (error) {
+        console.error("[Supabase] searchCandidatesByName error:", error.message, error);
+        return { data: [], error };
+      }
+
+      return { data: data || [], error: null };
+    } catch (err) {
+      console.error("[Supabase] searchCandidatesByName exception:", err);
       return { data: [], error: err };
     }
   }
@@ -1265,9 +1562,24 @@
       return { data: null, error: err };
     }
     try {
-      console.log("[Supabase] linkCandidateToJob as user id:", userId, "candidate:", payload.candidate_id, "job_offer:", payload.job_offer_id);
+      const candidateId = payload.candidate_id;
+      const { data: candidateRow, error: fetchErr } = await supabase
+        .from("candidates")
+        .select("id")
+        .eq("id", candidateId)
+        .maybeSingle();
+      if (fetchErr) {
+        console.error("[Supabase] linkCandidateToJob fetch candidate error:", fetchErr.message, fetchErr);
+        return { data: null, error: fetchErr };
+      }
+      if (!candidateRow) {
+        const err = new Error("Candidate not found");
+        console.error("[Supabase] linkCandidateToJob:", err.message);
+        return { data: null, error: err };
+      }
+      console.log("[Supabase] linkCandidateToJob as user id:", userId, "candidate:", candidateId, "job_offer:", payload.job_offer_id);
       const row = {
-        candidate_id: payload.candidate_id,
+        candidate_id: candidateId,
         job_offer_id: payload.job_offer_id,
         status: payload.status || "new",
         notes: payload.notes || null,
@@ -1550,6 +1862,159 @@
     }
   }
 
+  /**
+   * Fetch candidates associated with a job offer (with candidate data).
+   * @param {string} jobOfferId - job_offers.id
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function fetchCandidatesForJobOffer(jobOfferId) {
+    if (!jobOfferId) return { data: [], error: null };
+    try {
+      const { data, error } = await supabase
+        .from("candidate_job_associations")
+        .select(
+          `
+          id,
+          status,
+          notes,
+          created_at,
+          candidates (
+            id,
+            first_name,
+            last_name,
+            position,
+            is_archived
+          )
+        `
+        )
+        .eq("job_offer_id", jobOfferId)
+        .order("created_at", { ascending: false });
+      if (error) {
+        console.error("[Supabase] fetchCandidatesForJobOffer error:", error.message, error);
+        return { data: [], error };
+      }
+      return { data: data || [], error: null };
+    } catch (err) {
+      console.error("[Supabase] fetchCandidatesForJobOffer exception:", err);
+      return { data: [], error: err };
+    }
+  }
+
+  /**
+   * Internal helper: sync job_offers.status from hired count (auto-close / auto-reopen).
+   * Not exported. When hired_count >= positions_required -> close; when < required and closed -> active.
+   * Archived offers are never auto-reopened.
+   * @param {string} jobOfferId - job_offers.id
+   */
+  async function syncJobOfferStatusFromHired(jobOfferId) {
+    if (!jobOfferId) return;
+    try {
+      const { count } = await supabase
+        .from("candidate_job_associations")
+        .select("id", { count: "exact", head: true })
+        .eq("job_offer_id", jobOfferId)
+        .eq("status", "hired");
+
+      const { data: offer, error: offerErr } = await supabase
+        .from("job_offers")
+        .select("positions_required, status")
+        .eq("id", jobOfferId)
+        .single();
+
+      if (offerErr || !offer) return;
+
+      const required = offer.positions_required ?? 1;
+      const hiredCount = count ?? 0;
+
+      if (offer.status === "archived") return;
+
+      if (hiredCount >= required && offer.status !== "closed" && offer.status !== "archived") {
+        await supabase.from("job_offers").update({ status: "closed" }).eq("id", jobOfferId);
+      } else if (hiredCount < required && offer.status === "closed") {
+        await supabase.from("job_offers").update({ status: "active" }).eq("id", jobOfferId);
+      }
+    } catch (err) {
+      console.error("[Supabase] syncJobOfferStatusFromHired exception:", err);
+    }
+  }
+
+  /**
+   * Update the status of a candidate-job association.
+   * @param {string} associationId - candidate_job_associations.id
+   * @param {string} status
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function updateCandidateAssociationStatus(associationId, status) {
+    if (!associationId) {
+      const err = new Error("Missing association id");
+      console.error("[Supabase] updateCandidateAssociationStatus:", err);
+      return { data: null, error: err };
+    }
+    try {
+      const { data: oldRow, error: fetchErr } = await supabase
+        .from("candidate_job_associations")
+        .select("candidate_id, job_offer_id, status")
+        .eq("id", associationId)
+        .single();
+      if (fetchErr || !oldRow) {
+        console.error("[Supabase] updateCandidateAssociationStatus fetch error:", fetchErr?.message, fetchErr);
+        return { data: null, error: fetchErr || new Error("Association not found") };
+      }
+
+      const { data, error } = await supabase
+        .from("candidate_job_associations")
+        .update({ status })
+        .eq("id", associationId)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] updateCandidateAssociationStatus error:", error.message, error);
+        return { data: null, error };
+      }
+
+      if (oldRow.job_offer_id) {
+        await syncJobOfferStatusFromHired(oldRow.job_offer_id);
+      }
+
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] updateCandidateAssociationStatus exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Remove a candidate from a job (delete association).
+   * @param {string} associationId - candidate_job_associations.id
+   * @returns {Promise<{ data: array | null, error: object | null }>}
+   */
+  async function removeCandidateFromJob(associationId) {
+    if (!associationId) {
+      const err = new Error("Missing association id");
+      console.error("[Supabase] removeCandidateFromJob:", err);
+      return { data: null, error: err };
+    }
+    try {
+      const { data: deleted, error } = await supabase
+        .from("candidate_job_associations")
+        .delete()
+        .eq("id", associationId)
+        .select();
+      if (error) {
+        console.error("[Supabase] removeCandidateFromJob error:", error.message, error);
+        return { data: null, error };
+      }
+      const deletedRow = Array.isArray(deleted) ? deleted[0] : deleted;
+      if (deletedRow && deletedRow.job_offer_id) {
+        await syncJobOfferStatusFromHired(deletedRow.job_offer_id);
+      }
+      return { data: deleted || [], error: null };
+    } catch (err) {
+      console.error("[Supabase] removeCandidateFromJob exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // User feedback helper
   // ---------------------------------------------------------------------------
@@ -1588,13 +2053,20 @@
     archiveCandidate,
     fetchMyCandidates,
     fetchCandidatesPaginated,
+    searchCandidatesByName,
     // Job offers
     insertJobOffer,
+    getJobOfferById,
+    fetchJobOfferById,
+    updateJobOffer,
+    updateJobOfferStatus,
     archiveJobOffer,
     fetchJobOffers,
     fetchJobOffersPaginated,
     // Clients
     insertClient,
+    getClientById,
+    updateClient,
     archiveClient,
     fetchClientsPaginated,
     searchClientsByName,
@@ -1606,6 +2078,9 @@
     linkCandidateToJob,
     fetchAssociations,
     fetchJobHistoryForCandidate,
+    fetchCandidatesForJobOffer,
+    updateCandidateAssociationStatus,
+    removeCandidateFromJob,
     // Dashboard
     getTotalCandidates,
     getActiveJobOffers,
