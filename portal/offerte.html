@@ -56,6 +56,23 @@
                 </button>
             </div>
 
+            <!-- Client Filter Banner (from URL) -->
+            <div class="mb-4 hidden" data-ie-client-filter-banner>
+                <div class="flex items-center justify-between px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-100 text-sm">
+                    <p class="text-emerald-900">
+                        Filtrato per Cliente:
+                        <span class="font-semibold" data-ie-client-filter-name>—</span>
+                    </p>
+                    <button
+                        type="button"
+                        data-action="clear-client-filter"
+                        class="text-xs font-semibold uppercase tracking-widest text-emerald-900 hover:underline"
+                    >
+                        Clear Filter
+                    </button>
+                </div>
+            </div>
+
             <!-- Filters Section -->
             <div class="glass-card p-6 rounded-2xl">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -79,6 +96,7 @@
                         <label class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2 block">Stato Offerta</label>
                         <select data-filter="offer-status" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none appearance-none cursor-pointer">
                             <option value="">Tutti gli stati</option>
+                            <option value="active">Active (Open + In Progress)</option>
                             <option value="open">Open</option>
                             <option value="inprogress">In Progress</option>
                             <option value="closed">Closed</option>
@@ -98,6 +116,7 @@
                                 <th class="px-6 py-5 font-bold">Client / Company</th>
                                 <th class="px-6 py-5 font-bold">Location</th>
                                 <th class="px-6 py-5 font-bold">Status</th>
+                                <th class="px-6 py-5 font-bold">Candidates</th>
                                 <th class="px-6 py-5 font-bold">Date Created</th>
                                 <th class="px-6 py-5 text-center">Actions</th>
                             </tr>
