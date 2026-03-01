@@ -465,9 +465,7 @@
     const routeMapByLabel = {
       dashboard: "dashboard.html",
       candidati: "candidati.html",
-      "candidati archiviati": "archiviati.html",
       "offerte di lavoro": "offerte.html",
-      "offerte archiviate": "archiviati.html",
       clienti: "clienti.html",
       archiviati: "archiviati.html",
       impostazioni: "profile.html",
