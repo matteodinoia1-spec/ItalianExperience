@@ -3700,6 +3700,18 @@
     const tbody = document.querySelector("[data-ie-candidates-body]");
     if (!tbody) return;
 
+    if (!tbody.__ieClientLinkBound) {
+      tbody.addEventListener("click", function (event) {
+        var link = event.target.closest("[data-action='open-client-from-candidate']");
+        if (!link) return;
+        event.preventDefault();
+        var id = link.getAttribute("data-id");
+        if (!id) return;
+        navigateTo("add-cliente.html?id=" + encodeURIComponent(id) + "&mode=view");
+      });
+      tbody.__ieClientLinkBound = true;
+    }
+
     const filters = {
       name: "",
       position: "",
@@ -3917,16 +3929,20 @@
           ? new Date(row.created_at).toLocaleDateString("it-IT")
           : "";
         let assignmentHtml;
-        if (latestAssoc) {
-          const jobTitle = latestAssoc.job_title || "—";
-          const jobLocation = latestAssoc.job_location || "—";
-          const assocStatus = latestAssoc.status || "new";
-          const assocStatusLabel = formatCandidateStatusLabel(assocStatus);
-          const assocStatusClass = getCandidateStatusBadgeClass(assocStatus);
-          assignmentHtml =
-            '<div class="text-gray-800 font-medium">' + escapeHtml(clientName || "—") + "</div>" +
-            '<div class="text-xs text-gray-500">' + escapeHtml(jobTitle) + (jobLocation ? " · " + escapeHtml(jobLocation) : "") + "</div>" +
-            '<div class="mt-1"><span class="badge ' + assocStatusClass + '">' + escapeHtml(assocStatusLabel) + "</span></div>";
+        if (latestAssoc && latestAssoc.client_name) {
+          if (latestAssoc.client_id) {
+            assignmentHtml =
+              '<a href="#" data-action="open-client-from-candidate" data-id="' +
+              escapeHtml(String(latestAssoc.client_id)) +
+              '" class="text-gray-800 font-medium cursor-pointer hover:underline">' +
+              escapeHtml(latestAssoc.client_name) +
+              "</a>";
+          } else {
+            assignmentHtml =
+              '<div class="text-gray-800 font-medium">' +
+              escapeHtml(latestAssoc.client_name) +
+              "</div>";
+          }
         } else {
           assignmentHtml =
             '<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold">Non assegnato</span>';
@@ -4550,12 +4566,6 @@
       }
 
       fetchJobOffers(filters).then(async (rows) => {
-        if (filters.excludeArchivedStatus) {
-          rows = rows.filter(function (r) {
-            const s = (r.status || "active").toString().toLowerCase();
-            return s !== "archived";
-          });
-        }
         rows.sort((a, b) => Number(a.is_archived) - Number(b.is_archived));
         const totalCount = rows.length;
         const totalPages = Math.max(1, Math.ceil(totalCount / limit));

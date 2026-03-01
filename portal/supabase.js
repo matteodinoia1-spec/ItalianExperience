@@ -880,6 +880,7 @@
                 job_title: latestJob ? latestJob.title : null,
                 job_location: latestJobLocation,
                 client_name: latestClientName,
+                client_id: latestClient ? latestClient.id : null,
               }
             : null,
         };
@@ -893,13 +894,21 @@
 
   /**
    * Build job offers query with filters (same logic for count and data).
-   * Filters: title, offerStatus, archived (status-based), city, state. Columns: title, city, state, status, is_archived.
-   * Archived filter uses status only (no is_archived).
+   * Filters: title, offerStatus, archived (is_archived-based), city, state. Columns: title, city, state, status, is_archived.
+   * Archived filter uses is_archived as the source of truth.
    */
   function buildJobOffersQuery(supabaseQuery, filters) {
     let q = supabaseQuery;
-    if (filters.excludeArchivedStatus === true) q = q.not("status", "eq", "archived");
-    if (filters.archived === "archived") q = q.eq("status", "archived");
+
+    if (filters.archived === "active") {
+      q = q.eq("is_archived", false);
+    } else if (filters.archived === "archived") {
+      q = q.eq("is_archived", true);
+    }
+
+    if (filters.excludeArchivedStatus === true) {
+      q = q.not("status", "eq", "archived");
+    }
     if (filters.clientId) q = q.eq("client_id", filters.clientId);
     if (filters.contractType) q = q.eq("contract_type", filters.contractType);
     if (filters.offerStatus === "active") {
