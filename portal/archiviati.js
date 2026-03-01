@@ -37,6 +37,10 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
   }
 
   function navigateTo(relativePath) {
+    if (window.IEPortal && typeof window.IEPortal.navigateTo === "function") {
+      window.IEPortal.navigateTo(relativePath);
+      return;
+    }
     try {
       const base = new URL(".", window.location.href).href;
       window.location.href = base + relativePath;
@@ -109,46 +113,44 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
     const tbody = el("tbody", SECTIONS.candidates);
     if (!tbody) return;
     tbody.innerHTML = "";
+    const renderRow = window.IEPortal && typeof window.IEPortal.renderEntityRow === "function"
+      ? window.IEPortal.renderEntityRow
+      : null;
     rows.forEach(function (row) {
       const name = [row.first_name, row.last_name].filter(Boolean).join(" ") || "—";
       const position = row.position || "—";
       const status = row.status || "—";
-      const tr = document.createElement("tr");
-      tr.className = "table-row transition hover:bg-[#c5a059]/5";
-      tr.innerHTML =
-        "<td class=\"px-6 py-4\">" + escapeHtml(name) + "</td>" +
-        "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(position) + "</td>" +
-        "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(status) + "</td>" +
-        "<td class=\"px-6 py-4 text-right\"><div class=\"flex items-center justify-end space-x-2\"></div></td>";
-      const actionsDiv = tr.querySelector(".flex.items-center.justify-end.space-x-2");
-      if (!actionsDiv) return;
-
-      const viewBtn = document.createElement("button");
-      viewBtn.type = "button";
-      viewBtn.textContent = "View";
-      viewBtn.className = "px-3 py-1.5 rounded-lg border border-gray-200 text-gray-700 text-xs font-medium hover:bg-gray-50 transition";
-      viewBtn.addEventListener("click", function () {
-        navigateTo("add-candidato.html?id=" + encodeURIComponent(row.id) + "&mode=view");
-      });
-      actionsDiv.appendChild(viewBtn);
-
-      const restoreBtn = document.createElement("button");
-      restoreBtn.type = "button";
-      restoreBtn.setAttribute("data-action", "restore-candidate");
-      restoreBtn.setAttribute("data-id", row.id);
-      restoreBtn.className = "px-3 py-1.5 rounded-lg bg-[#1b4332] text-white text-xs font-medium hover:bg-[#1b4332]/90 transition";
-      restoreBtn.textContent = "Ripristina";
-      actionsDiv.appendChild(restoreBtn);
-
-      const deleteBtn = document.createElement("button");
-      deleteBtn.type = "button";
-      deleteBtn.setAttribute("data-action", "delete-candidate-permanent");
-      deleteBtn.setAttribute("data-id", row.id);
-      deleteBtn.className = "px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 transition";
-      deleteBtn.textContent = "Elimina definitivamente";
-      actionsDiv.appendChild(deleteBtn);
-
-      tbody.appendChild(tr);
+      if (renderRow) {
+        const tr = renderRow({
+          entityType: "candidate",
+          id: row.id,
+          viewUrl: "add-candidato.html?id=" + encodeURIComponent(row.id) + "&mode=view",
+          editUrl: "add-candidato.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+          title: name,
+          isArchived: true,
+          archivedList: true,
+          leadingCells: [],
+          middleCells: [
+            "<span class=\"text-gray-600\">" + escapeHtml(position) + "</span>",
+            "<span class=\"text-gray-600\">" + escapeHtml(status) + "</span>",
+          ],
+          rowClass: "table-row transition hover:bg-[#c5a059]/5",
+        });
+        tbody.appendChild(tr);
+      } else {
+        const tr = document.createElement("tr");
+        tr.className = "table-row transition hover:bg-[#c5a059]/5";
+        tr.innerHTML =
+          "<td class=\"px-6 py-4\">" + escapeHtml(name) + "</td>" +
+          "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(position) + "</td>" +
+          "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(status) + "</td>" +
+          "<td class=\"px-6 py-4 text-right\"><div class=\"flex items-center justify-end space-x-2\">" +
+          "<button type=\"button\" data-action=\"preview-entity\" data-entity=\"candidate\" data-id=\"" + escapeHtml(row.id) + "\" class=\"p-2 text-gray-400 hover:text-[#1b4332] transition\" title=\"View\">👁</button>" +
+          "<button type=\"button\" data-action=\"restore-entity\" data-entity=\"candidate\" data-id=\"" + escapeHtml(row.id) + "\" class=\"px-3 py-1.5 rounded-lg bg-[#1b4332] text-white text-xs font-medium hover:bg-[#1b4332]/90 transition\">Ripristina</button>" +
+          "<button type=\"button\" data-action=\"delete-entity-permanent\" data-entity=\"candidate\" data-id=\"" + escapeHtml(row.id) + "\" class=\"px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 transition\">Elimina definitivamente</button>" +
+          "</div></td>";
+        tbody.appendChild(tr);
+      }
     });
   }
 
@@ -192,24 +194,47 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
   function renderJobsTable(rows) {
     const tbody = el("tbody", SECTIONS.jobs);
     if (!tbody) return;
-    tbody.innerHTML = rows
-      .map(function (row) {
-        const title = row.title || "—";
-        const client = row.client_name || "—";
-        const location = row.location || "—";
-        return (
-          '<tr class="table-row transition hover:bg-[#c5a059]/5">' +
+    tbody.innerHTML = "";
+    const renderRow = window.IEPortal && typeof window.IEPortal.renderEntityRow === "function"
+      ? window.IEPortal.renderEntityRow
+      : null;
+    rows.forEach(function (row) {
+      const title = row.title || "—";
+      const client = row.client_name || "—";
+      const location = row.location || "—";
+      if (renderRow) {
+        const tr = renderRow({
+          entityType: "job_offer",
+          id: row.id,
+          viewUrl: "add-offerta.html?id=" + encodeURIComponent(row.id) + "&mode=view",
+          editUrl: "add-offerta.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+          title: title,
+          isArchived: true,
+          archivedList: true,
+          leadingCells: [],
+          middleCells: [
+            "<span class=\"text-gray-600\">" + escapeHtml(client) + "</span>",
+            "<span class=\"text-gray-600\">" + escapeHtml(location) + "</span>",
+          ],
+          rowClass: "table-row transition hover:bg-[#c5a059]/5",
+        });
+        tbody.appendChild(tr);
+      } else {
+        const tr = document.createElement("tr");
+        tr.className = "table-row transition hover:bg-[#c5a059]/5";
+        tr.innerHTML =
           "<td class=\"px-6 py-4\">" + escapeHtml(title) + "</td>" +
           "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(client) + "</td>" +
           "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(location) + "</td>" +
           '<td class="px-6 py-4 text-right">' +
           '<div class="flex items-center justify-end space-x-2">' +
-          '<button type="button" data-action="restore-job" data-id="' + escapeHtml(row.id) + '" class="px-3 py-1.5 rounded-lg bg-[#1b4332] text-white text-xs font-medium hover:bg-[#1b4332]/90 transition">Ripristina</button>' +
-          '<button type="button" data-action="delete-job-permanent" data-id="' + escapeHtml(row.id) + '" class="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 transition">Elimina definitivamente</button>' +
-          "</div></td></tr>"
-        );
-      })
-      .join("");
+          '<button type="button" data-action="preview-entity" data-entity="job_offer" data-id="' + escapeHtml(row.id) + '" class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View">👁</button>' +
+          '<button type="button" data-action="restore-entity" data-entity="job_offer" data-id="' + escapeHtml(row.id) + '" class="px-3 py-1.5 rounded-lg bg-[#1b4332] text-white text-xs font-medium hover:bg-[#1b4332]/90 transition">Ripristina</button>' +
+          '<button type="button" data-action="delete-entity-permanent" data-entity="job_offer" data-id="' + escapeHtml(row.id) + '" class="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 transition">Elimina definitivamente</button>' +
+          "</div></td>";
+        tbody.appendChild(tr);
+      }
+    });
   }
 
   async function loadClients() {
@@ -252,27 +277,50 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
   function renderClientsTable(rows) {
     const tbody = el("tbody", SECTIONS.clients);
     if (!tbody) return;
-    tbody.innerHTML = rows
-      .map(function (row) {
-        const name = row.name || "—";
-        const city = row.city || "—";
-        const state = row.state || "—";
-        const email = row.email || "—";
-        return (
-          '<tr class="table-row transition hover:bg-[#c5a059]/5">' +
+    tbody.innerHTML = "";
+    const renderRow = window.IEPortal && typeof window.IEPortal.renderEntityRow === "function"
+      ? window.IEPortal.renderEntityRow
+      : null;
+    rows.forEach(function (row) {
+      const name = row.name || "—";
+      const city = row.city || "—";
+      const state = row.state || "—";
+      const email = row.email || "—";
+      if (renderRow) {
+        const tr = renderRow({
+          entityType: "client",
+          id: row.id,
+          viewUrl: "add-cliente.html?id=" + encodeURIComponent(row.id) + "&mode=view",
+          editUrl: "add-cliente.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+          title: name,
+          isArchived: true,
+          archivedList: true,
+          leadingCells: [],
+          middleCells: [
+            "<span class=\"text-gray-600\">" + escapeHtml(city) + "</span>",
+            "<span class=\"text-gray-600\">" + escapeHtml(state) + "</span>",
+            "<span class=\"text-gray-600\">" + escapeHtml(email) + "</span>",
+          ],
+          rowClass: "table-row transition hover:bg-[#c5a059]/5",
+        });
+        tbody.appendChild(tr);
+      } else {
+        const tr = document.createElement("tr");
+        tr.className = "table-row transition hover:bg-[#c5a059]/5";
+        tr.innerHTML =
           "<td class=\"px-6 py-4\">" + escapeHtml(name) + "</td>" +
           "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(city) + "</td>" +
           "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(state) + "</td>" +
           "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(email) + "</td>" +
           '<td class="px-6 py-4 text-right">' +
           '<div class="flex items-center justify-end space-x-2">' +
-          '<button type="button" data-action="view-client" data-id="' + escapeHtml(row.id) + '" class="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-700 text-xs font-medium hover:bg-gray-50 transition">Visualizza</button>' +
-          '<button type="button" data-action="restore-client" data-id="' + escapeHtml(row.id) + '" class="px-3 py-1.5 rounded-lg bg-[#1b4332] text-white text-xs font-medium hover:bg-[#1b4332]/90 transition">Ripristina</button>' +
-          '<button type="button" data-action="delete-client-permanent" data-id="' + escapeHtml(row.id) + '" class="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 transition">Elimina definitivamente</button>' +
-          "</div></td></tr>"
-        );
-      })
-      .join("");
+          '<button type="button" data-action="preview-entity" data-entity="client" data-id="' + escapeHtml(row.id) + '" class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View">👁</button>' +
+          '<button type="button" data-action="restore-entity" data-entity="client" data-id="' + escapeHtml(row.id) + '" class="px-3 py-1.5 rounded-lg bg-[#1b4332] text-white text-xs font-medium hover:bg-[#1b4332]/90 transition">Ripristina</button>' +
+          '<button type="button" data-action="delete-entity-permanent" data-entity="client" data-id="' + escapeHtml(row.id) + '" class="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 transition">Elimina definitivamente</button>' +
+          "</div></td>";
+        tbody.appendChild(tr);
+      }
+    });
   }
 
   function escapeHtml(str) {
@@ -297,107 +345,6 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
     }
     if (nextBtn) {
       nextBtn.disabled = page >= totalPages;
-    }
-  }
-
-  async function restoreCandidate(id) {
-    const IE = getIE();
-    if (!IE || !IE.unarchiveCandidate) return;
-    try {
-      const { error } = await IE.unarchiveCandidate(id);
-      if (error) {
-        showErrorMessage(error.message || "Ripristino non riuscito.");
-        return;
-      }
-      showSuccessMessage("Candidato ripristinato.");
-      await loadCandidates();
-    } catch (err) {
-      console.error("[Archiviati] restoreCandidate", err);
-      showErrorMessage(err && err.message ? err.message : "Errore di rete.");
-    }
-  }
-
-  async function restoreJob(id) {
-    const IE = getIE();
-    if (!IE || !IE.unarchiveJobOffer) return;
-    try {
-      const { error } = await IE.unarchiveJobOffer(id);
-      if (error) {
-        showErrorMessage(error.message || "Ripristino non riuscito.");
-        return;
-      }
-      showSuccessMessage("Offerta ripristinata.");
-      await loadJobs();
-    } catch (err) {
-      console.error("[Archiviati] restoreJob", err);
-      showErrorMessage(err && err.message ? err.message : "Errore di rete.");
-    }
-  }
-
-  async function restoreClient(id) {
-    const IE = getIE();
-    if (!IE || !IE.unarchiveClient) return;
-    try {
-      const { error } = await IE.unarchiveClient(id);
-      if (error) {
-        showErrorMessage(error.message || "Ripristino non riuscito.");
-        return;
-      }
-      showSuccessMessage("Cliente ripristinato.");
-      await loadClients();
-    } catch (err) {
-      console.error("[Archiviati] restoreClient", err);
-      showErrorMessage(err && err.message ? err.message : "Errore di rete.");
-    }
-  }
-
-  async function deletePermanently(id, tableName, section) {
-    const IE = getIE();
-    if (!IE) {
-      console.error("[Archiviati] Supabase non disponibile.");
-      return;
-    }
-
-    if (!IE.deletePermanentRecord) {
-      console.error("[Archiviati] deletePermanentRecord API non disponibile su IESupabase.");
-      showErrorMessage("Funzione di eliminazione non disponibile. Aggiorna la pagina o contatta il supporto.");
-      return;
-    }
-
-    try {
-      const { data, error } = await IE.deletePermanentRecord({
-        table: tableName,
-        id,
-      });
-
-      if (error) {
-        console.error("[Archiviati] Permanent delete error:", error);
-        const msg =
-          error.message ||
-          "Nessuna riga eliminata. Verifica che il record sia archiviato e i permessi RLS.";
-        showErrorMessage(msg);
-        return;
-      }
-
-      const rowCount = Array.isArray(data) ? data.length : data ? 1 : 0;
-      if (!data || rowCount === 0) {
-        console.warn("Nessuna riga eliminata. Probabile blocco RLS o record non archiviato.");
-        showErrorMessage("Nessuna riga eliminata. Verifica che il record sia archiviato e i permessi RLS.");
-        return;
-      }
-
-      showSuccessMessage("Record eliminato definitivamente.");
-
-      if (section === SECTIONS.candidates) {
-        await loadCandidates();
-      } else if (section === SECTIONS.jobs) {
-        await loadJobs();
-      } else if (section === SECTIONS.clients) {
-        await loadClients();
-      }
-    } catch (err) {
-      console.error("[Archiviati] deletePermanently exception:", err);
-      IE?.showError?.(err?.message || "Errore durante eliminazione definitiva.");
     }
   }
 
@@ -485,61 +432,6 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
     });
   }
 
-  function setupRestoreDelegation() {
-    document.addEventListener("click", function (e) {
-      var btn = e.target.closest("[data-action='restore-candidate']");
-      if (btn) {
-        var id = btn.getAttribute("data-id");
-        if (id) restoreCandidate(id);
-        return;
-      }
-      btn = e.target.closest("[data-action='restore-job']");
-      if (btn) {
-        var id = btn.getAttribute("data-id");
-        if (id) restoreJob(id);
-        return;
-      }
-      btn = e.target.closest("[data-action='view-client']");
-      if (btn) {
-        var id = btn.getAttribute("data-id");
-        if (id) navigateTo("add-cliente.html?id=" + encodeURIComponent(id) + "&mode=view");
-        return;
-      }
-      btn = e.target.closest("[data-action='restore-client']");
-      if (btn) {
-        var id = btn.getAttribute("data-id");
-        if (id) restoreClient(id);
-        return;
-      }
-
-      btn = e.target.closest("[data-action='delete-candidate-permanent']");
-      if (btn) {
-        var id = btn.getAttribute("data-id");
-        if (id && window.confirm("Sei sicuro? Questa azione è irreversibile.")) {
-          deletePermanently(id, "candidates", SECTIONS.candidates);
-        }
-        return;
-      }
-
-      btn = e.target.closest("[data-action='delete-job-permanent']");
-      if (btn) {
-        var id = btn.getAttribute("data-id");
-        if (id && window.confirm("Sei sicuro? Questa azione è irreversibile.")) {
-          deletePermanently(id, "job_offers", SECTIONS.jobs);
-        }
-        return;
-      }
-
-      btn = e.target.closest("[data-action='delete-client-permanent']");
-      if (btn) {
-        var id = btn.getAttribute("data-id");
-        if (id && window.confirm("Sei sicuro? Questa azione è irreversibile.")) {
-          deletePermanently(id, "clients", SECTIONS.clients);
-        }
-      }
-    });
-  }
-
   async function init() {
     setupPagination(SECTIONS.candidates);
     setupPagination(SECTIONS.jobs);
@@ -547,7 +439,6 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
     setupSearch(SECTIONS.candidates);
     setupSearch(SECTIONS.jobs);
     setupSearch(SECTIONS.clients);
-    setupRestoreDelegation();
 
     await Promise.all([loadCandidates(), loadJobs(), loadClients()]);
   }

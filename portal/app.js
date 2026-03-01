@@ -3538,6 +3538,101 @@
     return div.innerHTML;
   }
 
+  // ---------------------------------------------------------------------------
+  // Unified entity row renderer (candidati, clienti, offerte, archiviati)
+  // ---------------------------------------------------------------------------
+  var ENTITY_ROW_EYE_SVG =
+    '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">' +
+    '<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>' +
+    '<path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>';
+  var ENTITY_ROW_EDIT_SVG =
+    '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">' +
+    '<path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>';
+  var ENTITY_ROW_ARCHIVE_SVG =
+    '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">' +
+    '<path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>';
+
+  function buildEntityActionsCell(opts) {
+    var entityType = opts.entityType;
+    var id = opts.id;
+    var editUrl = opts.editUrl;
+    var isArchived = !!opts.isArchived;
+    var archivedList = !!opts.archivedList;
+    var idAttr = id ? " data-id=\"" + escapeHtml(id) + "\"" : "";
+    var entityAttr = " data-entity=\"" + escapeHtml(entityType) + "\"";
+    var editUrlAttr = editUrl ? " data-edit-url=\"" + escapeHtml(editUrl) + "\"" : "";
+
+    var html =
+      '<div class="flex items-center justify-center space-x-2">' +
+      '<button type="button" data-action="preview-entity"' + idAttr + entityAttr + ' class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View">' + ENTITY_ROW_EYE_SVG + "</button>";
+    if (!archivedList) {
+      html += '<button type="button" data-action="edit-entity"' + idAttr + entityAttr + editUrlAttr + ' class="p-2 text-gray-400 hover:text-blue-500 transition" title="Edit">' + ENTITY_ROW_EDIT_SVG + "</button>";
+      html += '<button type="button" data-action="archive-entity"' + idAttr + entityAttr + ' class="p-2 text-gray-400 hover:text-red-500 transition" title="' + (isArchived ? "Archiviato" : "Archivia") + '">' + ENTITY_ROW_ARCHIVE_SVG + "</button>";
+    } else {
+      html += '<button type="button" data-action="restore-entity"' + idAttr + entityAttr + ' class="px-3 py-1.5 rounded-lg bg-[#1b4332] text-white text-xs font-medium hover:bg-[#1b4332]/90 transition">Ripristina</button>';
+      html += '<button type="button" data-action="delete-entity-permanent"' + idAttr + entityAttr + ' class="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 transition">Elimina definitivamente</button>';
+    }
+    html += "</div>";
+    return html;
+  }
+
+  function renderEntityRow(options) {
+    var entityType = options.entityType;
+    var id = options.id;
+    var viewUrl = options.viewUrl;
+    var editUrl = options.editUrl;
+    var title = options.title;
+    var isArchived = !!options.isArchived;
+    var archivedList = !!options.archivedList;
+    var leadingCells = options.leadingCells || [];
+    var middleCells = options.middleCells || [];
+    var rowTitle = options.rowTitle;
+    var rowClass = options.rowClass != null ? options.rowClass : "table-row transition" + (isArchived ? " opacity-60" : "");
+
+    var tr = document.createElement("tr");
+    tr.className = rowClass;
+    if (id) tr.setAttribute("data-id", id);
+    if (rowTitle) tr.title = rowTitle;
+
+    var base = typeof derivePortalBasePath === "function" ? derivePortalBasePath() : "";
+    if (options.basePath != null) base = options.basePath;
+
+    var titleTd = document.createElement("td");
+    titleTd.className = "px-6 py-4";
+    var a = document.createElement("a");
+    a.href = base + viewUrl;
+    a.className = "cursor-pointer hover:underline font-semibold text-gray-800";
+    a.setAttribute("data-entity-title-link", "true");
+    a.textContent = title != null && title !== "" ? title : "—";
+    titleTd.appendChild(a);
+
+    leadingCells.forEach(function (cellHtml) {
+      var td = document.createElement("td");
+      td.className = "px-6 py-4";
+      td.innerHTML = cellHtml;
+      tr.appendChild(td);
+    });
+    tr.appendChild(titleTd);
+    middleCells.forEach(function (cellHtml) {
+      var td = document.createElement("td");
+      td.className = "px-6 py-4";
+      td.innerHTML = cellHtml;
+      tr.appendChild(td);
+    });
+    var actionsTd = document.createElement("td");
+    actionsTd.className = "px-6 py-4";
+    var fullEditUrl = (editUrl != null && editUrl !== "") ? (base + editUrl) : null;
+    actionsTd.innerHTML = buildEntityActionsCell({
+      entityType: entityType,
+      id: id,
+      editUrl: fullEditUrl,
+      isArchived: isArchived,
+      archivedList: archivedList,
+    });
+    tr.appendChild(actionsTd);
+    return tr;
+  }
+
   function getDashboardCandidateStatusBadgeClass(status) {
     switch (status) {
       case "new": return "badge-new";
@@ -3722,49 +3817,6 @@
     }
 
     tbody.addEventListener("click", function (event) {
-      const viewBtn = event.target.closest("[data-action='view-candidate']");
-      if (viewBtn) {
-        const rowElement = viewBtn.closest("tr");
-        if (rowElement) {
-          openCandidateDetailModalFromRow(rowElement);
-        }
-        return;
-      }
-
-      const editBtn = event.target.closest("[data-action='edit-candidate']");
-      if (editBtn) {
-        const id = editBtn.getAttribute("data-id");
-        if (id) {
-          const base = typeof window.IESupabase !== "undefined" && window.IESupabase.getBasePath ? window.IESupabase.getBasePath() : derivePortalBasePath();
-          window.location.href = base + "add-candidato.html?id=" + encodeURIComponent(id) + "&mode=edit";
-        }
-        return;
-      }
-
-      const archiveBtn = event.target.closest("[data-action='archive-candidate']");
-      if (archiveBtn) {
-        const id = archiveBtn.getAttribute("data-id");
-        if (!id) return;
-        const confirmed = window.confirm(
-          "Sei sicuro di voler archiviare questo candidato? Potrai vederlo nella vista 'Archived'."
-        );
-        if (!confirmed) return;
-        if (window.IESupabase && window.IESupabase.archiveCandidate) {
-          window.IESupabase.archiveCandidate(id).then(function (result) {
-            if (result.error) {
-              if (window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Errore durante l'archiviazione.");
-              return;
-            }
-            if (window.IESupabase.showSuccess) window.IESupabase.showSuccess("Candidato archiviato.");
-            renderCandidates();
-          });
-        } else {
-          archiveRecordById(IE_STORE.candidates, id);
-          renderCandidates();
-        }
-        return;
-      }
-
       const cvBtn = event.target.closest("[data-action='view-cv']");
       if (cvBtn) {
         const id = cvBtn.getAttribute("data-id");
@@ -3843,10 +3895,7 @@
         tbody.innerHTML = "<tr><td colspan=\"10\" class=\"px-6 py-8 text-center text-gray-400\">Nessun candidato trovato.</td></tr>";
         return;
       }
-      rows.forEach((row) => {
-        const tr = document.createElement("tr");
-        tr.className = "table-row transition" + (row.is_archived ? " opacity-60" : "");
-        tr.setAttribute("data-id", row.id);
+      rows.forEach(function (row) {
         const clientName = findClientNameForCandidate(row);
         const latestAssoc = row.latest_association || null;
         const statusBadgeClass = getCandidateStatusBadgeClass(row.status);
@@ -3854,9 +3903,6 @@
         const createdDate = row.created_at
           ? new Date(row.created_at).toLocaleDateString("it-IT")
           : "";
-        const metaTitle = formatLastUpdatedMeta(row);
-        if (metaTitle) tr.title = metaTitle;
-
         let assignmentHtml;
         if (latestAssoc) {
           const jobTitle = latestAssoc.job_title || "—";
@@ -3865,51 +3911,35 @@
           const assocStatusLabel = formatCandidateStatusLabel(assocStatus);
           const assocStatusClass = getCandidateStatusBadgeClass(assocStatus);
           assignmentHtml =
-            '<div class="text-gray-800 font-medium">' + (clientName || "—") + "</div>" +
-            '<div class="text-xs text-gray-500">' + jobTitle + (jobLocation ? " · " + jobLocation : "") + "</div>" +
-            '<div class="mt-1"><span class="badge ' + assocStatusClass + '">' + assocStatusLabel + "</span></div>";
+            '<div class="text-gray-800 font-medium">' + escapeHtml(clientName || "—") + "</div>" +
+            '<div class="text-xs text-gray-500">' + escapeHtml(jobTitle) + (jobLocation ? " · " + escapeHtml(jobLocation) : "") + "</div>" +
+            '<div class="mt-1"><span class="badge ' + assocStatusClass + '">' + escapeHtml(assocStatusLabel) + "</span></div>";
         } else {
           assignmentHtml =
             '<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold">Non assegnato</span>';
         }
-
-        tr.innerHTML = `
-            <td class="px-6 py-4">
-              <img src="${row.foto_url || ""}" class="w-10 h-10 rounded-full border-2 border-white shadow-sm" alt="${row.first_name} ${row.last_name}">
-            </td>
-            <td class="px-6 py-4 font-semibold text-gray-800">${row.first_name} ${row.last_name}</td>
-            <td class="px-6 py-4 text-gray-600">${row.position || "—"}</td>
-            <td class="px-6 py-4 text-gray-600">${assignmentHtml}</td>
-            <td class="px-6 py-4 text-gray-500 italic">${row.address || "—"}</td>
-            <td class="px-6 py-4"><span class="badge ${statusBadgeClass}">${formatCandidateStatusLabel(row.status)}</span></td>
-            <td class="px-6 py-4 text-xs font-medium text-blue-600">${sourceLabel || "—"}</td>
-            <td class="px-6 py-4 text-gray-400">${createdDate}</td>
-            <td class="px-6 py-4 text-center">
-              <button type="button" data-action="view-cv" data-id="${row.id}" class="text-[#c5a059] hover:bg-[#c5a059]/10 px-3 py-1.5 rounded-md border border-[#c5a059]/20 transition text-xs font-bold">
-                View CV
-              </button>
-            </td>
-            <td class="px-6 py-4">
-              <div class="flex items-center space-x-2">
-                <button type="button" data-action="view-candidate" class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                  </svg>
-                </button>
-                <button type="button" data-action="edit-candidate" data-id="${row.id}" class="p-2 text-gray-400 hover:text-blue-500 transition" title="Edit">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                  </svg>
-                </button>
-                <button type="button" data-action="archive-candidate" data-id="${row.id}" class="p-2 text-gray-400 hover:text-red-500 transition" title="${row.is_archived ? "Archiviato" : "Archivia"}">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                  </svg>
-                </button>
-              </div>
-            </td>
-          `;
+        const photoHtml = '<img src="' + escapeHtml(row.foto_url || "") + '" class="w-10 h-10 rounded-full border-2 border-white shadow-sm" alt="' + escapeHtml((row.first_name || "") + " " + (row.last_name || "")) + '">';
+        const viewCvHtml = '<button type="button" data-action="view-cv" data-id="' + escapeHtml(row.id) + '" class="text-[#c5a059] hover:bg-[#c5a059]/10 px-3 py-1.5 rounded-md border border-[#c5a059]/20 transition text-xs font-bold">View CV</button>';
+        const tr = renderEntityRow({
+          entityType: "candidate",
+          id: row.id,
+          viewUrl: "add-candidato.html?id=" + encodeURIComponent(row.id) + "&mode=view",
+          editUrl: "add-candidato.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+          title: [row.first_name, row.last_name].filter(Boolean).join(" ") || "—",
+          isArchived: row.is_archived,
+          archivedList: false,
+          leadingCells: [photoHtml],
+          middleCells: [
+            (row.position || "—"),
+            assignmentHtml,
+            (row.address || "—"),
+            '<span class="badge ' + statusBadgeClass + '">' + escapeHtml(formatCandidateStatusLabel(row.status)) + "</span>",
+            '<span class="text-xs font-medium text-blue-600">' + escapeHtml(sourceLabel || "—") + "</span>",
+            '<span class="text-gray-400">' + escapeHtml(createdDate) + "</span>",
+            '<div class="text-center">' + viewCvHtml + "</div>",
+          ],
+          rowTitle: formatLastUpdatedMeta(row),
+        });
         tbody.appendChild(tr);
       });
     }
@@ -4387,57 +4417,6 @@
         return;
       }
 
-      const archiveBtn = target.closest("[data-action='archive-offer']");
-      if (archiveBtn) {
-        const archiveId = archiveBtn.getAttribute("data-id");
-        if (!archiveId) return;
-        const confirmed = window.confirm(
-          "Sei sicuro di voler archiviare questa offerta? Potrai vederla nella vista 'Archived'."
-        );
-        if (!confirmed) return;
-
-        if (window.IESupabase && window.IESupabase.archiveJobOffer) {
-          window.IESupabase
-            .archiveJobOffer(archiveId)
-            .then(function (result) {
-              if (result && result.error) {
-                if (window.IESupabase.showError) {
-                  window.IESupabase.showError(
-                    result.error.message || "Errore durante l'archiviazione."
-                  );
-                }
-                return;
-              }
-              if (window.IESupabase.showSuccess) {
-                window.IESupabase.showSuccess("Offerta archiviata.");
-              }
-              renderOffers();
-            })
-            .catch(function (err) {
-              console.error("[ItalianExperience] archiveJobOffer error:", err);
-              if (window.IESupabase && window.IESupabase.showError) {
-                window.IESupabase.showError(
-                  (err && err.message) || "Errore durante l'archiviazione."
-                );
-              }
-            });
-        } else {
-          archiveRecordById(IE_STORE.jobOffers, archiveId);
-          renderOffers();
-        }
-        return;
-      }
-
-      const previewBtn = target.closest("[data-action='preview-offer']");
-      if (previewBtn) {
-        const previewId =
-          previewBtn.getAttribute("data-id") ||
-          previewBtn.closest("tr")?.getAttribute("data-id");
-        if (!previewId) return;
-        openJobOfferPreviewModal(previewId);
-        return;
-      }
-
       const titleBtn = target.closest("[data-action='view-offer-full']");
       if (titleBtn) {
         const fullId =
@@ -4448,17 +4427,6 @@
           "add-offerta.html?id=" + encodeURIComponent(fullId) + "&mode=view"
         );
         return;
-      }
-
-      const editBtn = target.closest("[data-action='edit-offer']");
-      if (editBtn) {
-        const editId =
-          editBtn.getAttribute("data-id") ||
-          editBtn.closest("tr")?.getAttribute("data-id");
-        if (!editId) return;
-        navigateTo(
-          "add-offerta.html?id=" + encodeURIComponent(editId) + "&mode=edit"
-        );
       }
     });
 
@@ -4499,11 +4467,7 @@
         return;
       }
       if (window.IESupabase) window.IE_ACTIVE_JOB_OFFER_ID = rows[0].id;
-      rows.forEach((row) => {
-        const tr = document.createElement("tr");
-        tr.className = "table-row transition" + (row.is_archived ? " opacity-60" : "");
-        tr.setAttribute("data-id", row.id);
-
+      rows.forEach(function (row) {
         const clientValue = row.client_name || "—";
         const locationValue = row.location || "—";
         const createdAtValue = row.created_at
@@ -4511,52 +4475,34 @@
           : "—";
         const badgeClass = getOfferStatusBadgeClass(row.status);
         const statusLabel = formatOfferStatusLabel(row.status);
-        const metaTitle = formatLastUpdatedMeta(row);
-        if (metaTitle) tr.title = metaTitle;
-
         const candidatesCount = typeof row.candidatesCount === "number" ? row.candidatesCount : 0;
         const candidatesCellHtml =
           candidatesCount > 0
             ? '<button type="button" data-action="view-offer-candidates" data-id="' +
-              row.id +
+              escapeHtml(row.id) +
               '" class="text-[#1b4332] font-semibold hover:underline">' +
-              candidatesCount +
+              escapeHtml(String(candidatesCount)) +
               "</button>"
             : "0";
-
-        tr.innerHTML = `
-            <td class="px-6 py-4 font-semibold text-gray-800">
-              <button type="button" data-action="view-offer-full" data-id="${row.id}" class="text-left hover:underline decoration-[#c5a059] decoration-2 underline-offset-4">
-                ${row.title}
-              </button>
-            </td>
-            <td class="px-6 py-4 text-gray-600 font-medium">${row.position || "—"}</td>
-            <td class="px-6 py-4 text-gray-600">${clientValue}</td>
-            <td class="px-6 py-4 text-gray-600">${locationValue}</td>
-            <td class="px-6 py-4"><span class="badge ${badgeClass}">${statusLabel}</span></td>
-            <td class="px-6 py-4 text-gray-600">${candidatesCellHtml}</td>
-            <td class="px-6 py-4 text-gray-400">${createdAtValue}</td>
-            <td class="px-6 py-4">
-              <div class="flex items-center justify-center space-x-2">
-                <button type="button" data-action="preview-offer" data-id="${row.id}" class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="Quick Preview">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                  </svg>
-                </button>
-                <button type="button" data-action="edit-offer" data-id="${row.id}" class="p-2 text-gray-400 hover:text-blue-500 transition" title="Edit">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                  </svg>
-                </button>
-                <button type="button" data-action="archive-offer" data-id="${row.id}" class="p-2 text-gray-400 hover:text-red-500 transition" title="${row.is_archived ? "Archiviata" : "Archivia"}">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                  </svg>
-                </button>
-              </div>
-            </td>
-          `;
+        const tr = renderEntityRow({
+          entityType: "job_offer",
+          id: row.id,
+          viewUrl: "add-offerta.html?id=" + encodeURIComponent(row.id) + "&mode=view",
+          editUrl: "add-offerta.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+          title: row.title || "—",
+          isArchived: row.is_archived,
+          archivedList: false,
+          leadingCells: [],
+          middleCells: [
+            '<span class="text-gray-600 font-medium">' + escapeHtml(row.position || "—") + "</span>",
+            escapeHtml(clientValue),
+            escapeHtml(locationValue),
+            '<span class="badge ' + badgeClass + '">' + escapeHtml(statusLabel) + "</span>",
+            candidatesCellHtml,
+            '<span class="text-gray-400">' + escapeHtml(createdAtValue) + "</span>",
+          ],
+          rowTitle: formatLastUpdatedMeta(row),
+        });
         tbody.appendChild(tr);
       });
     }
@@ -4709,63 +4655,6 @@
         navigateTo("offerte.html?client=" + encodeURIComponent(clientId));
         return;
       }
-
-      const archiveBtn = target.closest("[data-action='archive-client']");
-      if (archiveBtn) {
-        const id = archiveBtn.getAttribute("data-id");
-        if (!id) return;
-        const confirmed = window.confirm(
-          "Sei sicuro di voler archiviare questo cliente? Potrai vederlo nella vista 'Archived'."
-        );
-        if (!confirmed) return;
-
-        if (window.IESupabase && window.IESupabase.archiveClient) {
-          window.IESupabase
-            .archiveClient(id)
-            .then(function (result) {
-              if (result && result.error) {
-                if (window.IESupabase.showError) {
-                  window.IESupabase.showError(
-                    result.error.message || "Errore durante l'archiviazione."
-                  );
-                }
-                return;
-              }
-              if (window.IESupabase.showSuccess) {
-                window.IESupabase.showSuccess("Cliente archiviato.");
-              }
-              renderClients();
-            })
-            .catch(function (err) {
-              console.error("[ItalianExperience] archiveClient error:", err);
-              if (window.IESupabase && window.IESupabase.showError) {
-                window.IESupabase.showError(
-                  (err && err.message) || "Errore durante l'archiviazione."
-                );
-              }
-            });
-        } else if (typeof archiveRecordById === "function" && IE_STORE && IE_STORE.clients) {
-          archiveRecordById(IE_STORE.clients, id);
-          renderClients();
-        }
-        return;
-      }
-
-      const viewBtn = target.closest("[data-action='view-client']");
-      if (viewBtn) {
-        const id = viewBtn.getAttribute("data-id") || viewBtn.closest("tr")?.getAttribute("data-id");
-        if (!id) return;
-        navigateTo("add-cliente.html?id=" + encodeURIComponent(id) + "&mode=view");
-        return;
-      }
-
-      const editBtn = target.closest("[data-action='edit-client']");
-      if (editBtn) {
-        const id = editBtn.getAttribute("data-id") || editBtn.closest("tr")?.getAttribute("data-id");
-        if (!id) return;
-        navigateTo("add-cliente.html?id=" + encodeURIComponent(id) + "&mode=edit");
-        return;
-      }
     });
 
     const paginationEl = document
@@ -4839,54 +4728,26 @@
               }).length;
               const activeOffersHtml =
                 activeOffersCount > 0
-                  ? `<button 
-                      type="button"
-                      data-action="view-client-offers" 
-                      data-id="${row.id}"
-                      class="text-[#1b4332] font-semibold hover:underline">
-                      ${activeOffersCount}
-                    </button>`
+                  ? '<button type="button" data-action="view-client-offers" data-id="' + escapeHtml(row.id) + '" class="text-[#1b4332] font-semibold hover:underline">' + escapeHtml(String(activeOffersCount)) + "</button>"
                   : "0";
 
-              const tr = document.createElement("tr");
-              tr.className = "table-row transition" + (row.is_archived ? " opacity-60" : "");
-              tr.setAttribute("data-id", row.id);
-
-              const metaTitle = formatLastUpdatedMeta(row);
-              if (metaTitle) tr.title = metaTitle;
-
-              tr.innerHTML = `
-                <td class="px-6 py-4 font-semibold text-gray-800">${row.name || "—"}</td>
-                <td class="px-6 py-4 text-gray-600">${row.city || "—"}</td>
-                <td class="px-6 py-4 text-gray-600">${activeOffersHtml}</td>
-                <td class="px-6 py-4 text-gray-600">${row.email || "—"}</td>
-                <td class="px-6 py-4 text-gray-600">${row.phone || "—"}</td>
-                <td class="px-6 py-4">
-                  <div class="flex items-center justify-center space-x-2">
-                    <button type="button" class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                      </svg>
-                    </button>
-                    <button type="button" class="p-2 text-gray-400 hover:text-blue-500 transition" title="Edit">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                      </svg>
-                    </button>
-                    <button type="button" data-action="archive-client" data-id="${
-                      row.id
-                    }" class="p-2 text-gray-400 hover:text-red-500 transition" title="${
-                row.is_archived ? "Archived" : "Archive"
-              }">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-              `;
-
+              const tr = renderEntityRow({
+                entityType: "client",
+                id: row.id,
+                viewUrl: "add-cliente.html?id=" + encodeURIComponent(row.id) + "&mode=view",
+                editUrl: "add-cliente.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+                title: row.name || "—",
+                isArchived: row.is_archived,
+                archivedList: false,
+                leadingCells: [],
+                middleCells: [
+                  escapeHtml(row.city || "—"),
+                  activeOffersHtml,
+                  escapeHtml(row.email || "—"),
+                  escapeHtml(row.phone || "—"),
+                ],
+                rowTitle: formatLastUpdatedMeta(row),
+              });
               tbody.appendChild(tr);
             });
 
@@ -4922,8 +4783,8 @@
         const start = (currentPage - 1) * limit;
         const pageRows = rows.slice(start, start + limit);
 
-        pageRows.forEach((row) => {
-          const activeOffersCount = (IE_STORE.jobOffers || []).filter((offer) => {
+        pageRows.forEach(function (row) {
+          const activeOffersCount = (IE_STORE.jobOffers || []).filter(function (offer) {
             if (!offer || offer.is_archived) return false;
             if (offer.client_id !== row.id) return false;
             const status = offer.status || "";
@@ -4931,51 +4792,26 @@
           }).length;
           const activeOffersHtml =
             activeOffersCount > 0
-              ? `<button 
-                  type="button"
-                  data-action="view-client-offers" 
-                  data-id="${row.id}"
-                  class="text-[#1b4332] font-semibold hover:underline">
-                  ${activeOffersCount}
-                </button>`
+              ? '<button type="button" data-action="view-client-offers" data-id="' + escapeHtml(row.id) + '" class="text-[#1b4332] font-semibold hover:underline">' + escapeHtml(String(activeOffersCount)) + "</button>"
               : "0";
 
-          const tr = document.createElement("tr");
-          tr.className = "table-row transition" + (row.is_archived ? " opacity-60" : "");
-          tr.setAttribute("data-id", row.id);
-
-          tr.innerHTML = `
-            <td class="px-6 py-4 font-semibold text-gray-800">${row.name}</td>
-            <td class="px-6 py-4 text-gray-600">${row.city || "—"}</td>
-            <td class="px-6 py-4 text-gray-600">${activeOffersHtml}</td>
-            <td class="px-6 py-4 text-gray-600">${row.email || "—"}</td>
-            <td class="px-6 py-4 text-gray-600">${row.phone || "—"}</td>
-            <td class="px-6 py-4">
-              <div class="flex items-center justify-center space-x-2">
-                <button type="button" class="p-2 text-gray-400 hover:text-[#1b4332] transition" title="View">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                  </svg>
-                </button>
-                <button type="button" class="p-2 text-gray-400 hover:text-blue-500 transition" title="Edit">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                  </svg>
-                </button>
-                <button type="button" data-action="archive-client" data-id="${
-                  row.id
-                }" class="p-2 text-gray-400 hover:text-red-500 transition" title="${
-            row.is_archived ? "Archiviato" : "Archivia"
-          }">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                  </svg>
-                </button>
-              </div>
-            </td>
-          `;
-
+          const tr = renderEntityRow({
+            entityType: "client",
+            id: row.id,
+            viewUrl: "add-cliente.html?id=" + encodeURIComponent(row.id) + "&mode=view",
+            editUrl: "add-cliente.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+            title: row.name || "—",
+            isArchived: row.is_archived,
+            archivedList: false,
+            leadingCells: [],
+            middleCells: [
+              escapeHtml(row.city || "—"),
+              activeOffersHtml,
+              escapeHtml(row.email || "—"),
+              escapeHtml(row.phone || "—"),
+            ],
+            rowTitle: formatLastUpdatedMeta(row),
+          });
           tbody.appendChild(tr);
         });
 
@@ -5061,4 +4897,126 @@
       }
     });
   }
+
+  // ---------------------------------------------------------------------------
+  // Global event delegation for entity row actions (edit, archive, preview, restore, delete)
+  // ---------------------------------------------------------------------------
+  function openPreviewModal(entity, id) {
+    if (!id) return;
+    if (entity === "candidate") {
+      const tr = document.querySelector("tr[data-id=\"" + id + "\"]");
+      if (tr && typeof openCandidateDetailModalFromRow === "function") {
+        openCandidateDetailModalFromRow(tr);
+      } else {
+        navigateTo("add-candidato.html?id=" + encodeURIComponent(id) + "&mode=view");
+      }
+      return;
+    }
+    if (entity === "job_offer") {
+      if (typeof openJobOfferPreviewModal === "function") {
+        openJobOfferPreviewModal(id);
+      } else {
+        navigateTo("add-offerta.html?id=" + encodeURIComponent(id) + "&mode=view");
+      }
+      return;
+    }
+    if (entity === "client") {
+      navigateTo("add-cliente.html?id=" + encodeURIComponent(id) + "&mode=view");
+    }
+  }
+
+  document.addEventListener("click", async function (e) {
+    const actionBtn = e.target.closest("[data-action]");
+    if (!actionBtn) return;
+
+    const action = actionBtn.dataset.action;
+    const id = actionBtn.dataset.id;
+    const entity = actionBtn.dataset.entity;
+
+    if (!action) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    // PREVIEW
+    if (action === "preview-entity") {
+      if (typeof openPreviewModal === "function") {
+        openPreviewModal(entity, id);
+      }
+      return;
+    }
+
+    // EDIT
+    if (action === "edit-entity") {
+      if (actionBtn.dataset.editUrl) {
+        navigateTo(actionBtn.dataset.editUrl);
+      }
+      return;
+    }
+
+    // ARCHIVE
+    if (action === "archive-entity") {
+      if (!window.IESupabase) return;
+
+      if (entity === "candidate") {
+        await window.IESupabase.archiveCandidate(id);
+      }
+
+      if (entity === "client") {
+        await window.IESupabase.archiveClient(id);
+      }
+
+      if (entity === "job_offer") {
+        await window.IESupabase.archiveJobOffer(id);
+      }
+
+      location.reload();
+      return;
+    }
+
+    // RESTORE
+    if (action === "restore-entity") {
+      if (!window.IESupabase) return;
+
+      if (entity === "candidate") {
+        await window.IESupabase.unarchiveCandidate(id);
+      }
+
+      if (entity === "client") {
+        await window.IESupabase.unarchiveClient(id);
+      }
+
+      if (entity === "job_offer") {
+        await window.IESupabase.unarchiveJobOffer(id);
+      }
+
+      location.reload();
+      return;
+    }
+
+    // DELETE PERMANENT
+    if (action === "delete-entity-permanent") {
+      if (!window.IESupabase) return;
+
+      if (!confirm("Sei sicuro? Questa azione è irreversibile.")) return;
+
+      const tableMap = {
+        candidate: "candidates",
+        client: "clients",
+        job_offer: "job_offers"
+      };
+
+      await window.IESupabase.deletePermanentRecord({
+        table: tableMap[entity],
+        id: id
+      });
+
+      location.reload();
+      return;
+    }
+  });
+
+  window.IEPortal = window.IEPortal || {};
+  window.IEPortal.navigateTo = navigateTo;
+  window.IEPortal.renderEntityRow = renderEntityRow;
 })();
