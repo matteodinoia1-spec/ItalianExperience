@@ -3482,12 +3482,27 @@
       var statusClass = getDashboardCandidateStatusBadgeClass(row.status);
       var statusLabel = formatDashboardCandidateStatusLabel(row.status);
       tr.innerHTML =
-        "<td class=\"px-6 py-4 font-semibold text-gray-800\">" + escapeHtml(fullName) + "</td>" +
+        "<td class=\"px-6 py-4\">" +
+        "<a href=\"#\" data-action=\"dashboard-open-candidate\" data-id=\"" + escapeHtml(String(row.id || '')) + "\" class=\"font-semibold text-gray-800 cursor-pointer hover:underline\">" +
+        escapeHtml(fullName) +
+        "</a>" +
+        "</td>" +
         "<td class=\"px-6 py-4 text-gray-600\">" + escapeHtml(row.position || "—") + "</td>" +
         "<td class=\"px-6 py-4 text-gray-500 text-sm\">" + escapeHtml(createdDate) + "</td>" +
         "<td class=\"px-6 py-4\"><span class=\"badge " + statusClass + "\">" + escapeHtml(statusLabel) + "</span></td>";
       tbody.appendChild(tr);
     });
+    if (!tbody.__ieDashboardRecentBound) {
+      tbody.addEventListener("click", function (event) {
+        var link = event.target.closest("[data-action='dashboard-open-candidate']");
+        if (!link) return;
+        event.preventDefault();
+        var id = link.getAttribute("data-id");
+        if (!id) return;
+        navigateTo("add-candidato.html?id=" + encodeURIComponent(id) + "&mode=view");
+      });
+      tbody.__ieDashboardRecentBound = true;
+    }
   }
 
   function renderDashboardSources(items) {
@@ -3621,11 +3636,11 @@
     });
     var actionsTd = document.createElement("td");
     actionsTd.className = "px-6 py-4";
-    var fullEditUrl = (editUrl != null && editUrl !== "") ? (base + editUrl) : null;
+    var safeEditUrl = (editUrl != null && editUrl !== "") ? editUrl : null;
     actionsTd.innerHTML = buildEntityActionsCell({
       entityType: entityType,
       id: id,
-      editUrl: fullEditUrl,
+      editUrl: safeEditUrl,
       isArchived: isArchived,
       archivedList: archivedList,
     });
