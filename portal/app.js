@@ -3588,16 +3588,16 @@
       }
     }
 
-    function handleMissingOfferAndRedirect() {
+  function handleMissingOfferAndRedirect() {
       try {
         window.alert("Offerta non trovata.");
       } catch (e) {
         // ignore
       }
       navigateTo("offerte.html");
-    }
+  }
 
-    async function openReopenOfferModal(offerId, offer, options) {
+  async function openReopenOfferModal(offerId, offer, options) {
       var onConfirm = options && typeof options.onConfirm === "function" ? options.onConfirm : null;
       var hiredCount = 0;
       if (window.IESupabase && window.IESupabase.fetchCandidatesForJobOffer) {
@@ -3818,6 +3818,7 @@
           var name = [c.first_name, c.last_name].filter(Boolean).join(" ") || "—";
           var position = (c.position && c.position.toString()) || "—";
           var status = (item.status && item.status.toString()) || "—";
+          var rejectionReason = item.rejection_reason || null;
           var tr = document.createElement("tr");
           tr.className = "border-b border-gray-100";
           tr.setAttribute("data-row-association-id", item.id);
@@ -3850,9 +3851,85 @@
             select.appendChild(option);
           });
           var previousStatus = status;
+
+          var rejectionBtn = null;
+          function ensureRejectionButton() {
+            if (rejectionBtn) return;
+            rejectionBtn = document.createElement("button");
+            rejectionBtn.type = "button";
+            rejectionBtn.className = "mt-2 text-xs text-[#1b4332] font-semibold hover:underline block text-left";
+            rejectionBtn.textContent = rejectionReason ? "View / Edit rejection reason" : "Add rejection reason";
+            rejectionBtn.addEventListener("click", function () {
+              openAssociationRejectionModal({
+                associationId: item.id,
+                candidateName: name,
+                jobTitle: offer && offer.title ? String(offer.title) : "this job",
+                initialReason: rejectionReason,
+                onSaved: function (newReason) {
+                  rejectionReason = newReason;
+                  if (rejectionBtn) {
+                    rejectionBtn.textContent = newReason ? "View / Edit rejection reason" : "Add rejection reason";
+                  }
+                  previousStatus = "rejected";
+                  select.value = "rejected";
+                  var statusCell = tr.querySelector(".status-cell");
+                  if (statusCell) {
+                    statusCell.innerHTML = "";
+                    var badgeEl = document.createElement("span");
+                    badgeEl.className = "badge " + getApplicationStatusBadgeClass("rejected");
+                    badgeEl.textContent = formatApplicationStatusLabel("rejected");
+                    statusCell.appendChild(badgeEl);
+                  }
+                },
+              });
+            });
+            tdChange.appendChild(rejectionBtn);
+          }
+
+          function removeRejectionButton() {
+            if (rejectionBtn && rejectionBtn.parentNode) {
+              rejectionBtn.parentNode.removeChild(rejectionBtn);
+            }
+            rejectionBtn = null;
+          }
+
+          if (status === "rejected") {
+            ensureRejectionButton();
+          }
+
           select.addEventListener("change", async function () {
             var associationId = select.getAttribute("data-association-id");
             var newStatus = select.value;
+
+            if (newStatus === "rejected") {
+              // Keep visual status unchanged until the recruiter confirms in the modal.
+              select.value = previousStatus;
+              openAssociationRejectionModal({
+                associationId: associationId,
+                candidateName: name,
+                jobTitle: offer && offer.title ? String(offer.title) : "this job",
+                initialReason: rejectionReason,
+                onSaved: function (newReason) {
+                  rejectionReason = newReason;
+                  previousStatus = "rejected";
+                  select.value = "rejected";
+                  var statusCell = tr.querySelector(".status-cell");
+                  if (statusCell) {
+                    statusCell.innerHTML = "";
+                    var badgeEl = document.createElement("span");
+                    badgeEl.className = "badge " + getApplicationStatusBadgeClass("rejected");
+                    badgeEl.textContent = formatApplicationStatusLabel("rejected");
+                    statusCell.appendChild(badgeEl);
+                  }
+                  ensureRejectionButton();
+                  if (rejectionBtn) {
+                    rejectionBtn.textContent = newReason ? "View / Edit rejection reason" : "Add rejection reason";
+                  }
+                },
+              });
+              return;
+            }
+
             var statusSelect = document.querySelector('#jobOfferForm [name="status"]');
             var normalizedOfferStatus = statusSelect
               ? normalizeStatus(statusSelect.value)
@@ -3887,6 +3964,10 @@
               badge.className = "badge " + getApplicationStatusBadgeClass(newStatus);
               badge.textContent = formatApplicationStatusLabel(newStatus);
               statusCell.appendChild(badge);
+            }
+            previousStatus = newStatus;
+            if (newStatus !== "rejected") {
+              removeRejectionButton();
             }
           });
           tdChange.appendChild(select);
@@ -4097,8 +4178,74 @@
       } else if (modeToConfigure === "edit" && offerId) {
         cancelButton.addEventListener("click", function () {
           navigateTo("add-offerta.html?id=" + encodeURIComponent(offerId) + "&mode=view");
-        });
-      }
+      });
+    }
+  }
+
+  function openAssociationRejectionModal(config) {
+    var associationId = config && config.associationId;
+    if (!associationId) return;
+
+    var candidateName = (config && config.candidateName) || "this candidate";
+    var jobTitle = (config && config.jobTitle) || "this job";
+    var initialReason = (config && config.initialReason) || "";
+    var onSaved = config && typeof config.onSaved === "function" ? config.onSaved : null;
+
+    openModal({
+      title: "Confirm Rejection",
+      fullPageHref: null,
+      render: function (mount) {
+        var safeName = String(candidateName || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        var safeJobTitle = String(jobTitle || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        mount.innerHTML =
+          "<p class=\"text-gray-700 text-sm mb-4\">Mark <strong>" + safeName + "</strong> as rejected for <strong>" + safeJobTitle + "</strong>? You can optionally provide an internal rejection reason.</p>" +
+          "<label class=\"block text-sm font-medium text-gray-700 mb-1\" for=\"ie-rejection-reason\">Rejection reason (optional)</label>" +
+          "<textarea id=\"ie-rejection-reason\" class=\"form-input w-full text-sm py-2 px-3 rounded-lg border border-gray-300\" rows=\"4\" placeholder=\"Add an internal note about why this candidate was rejected...\"></textarea>" +
+          "<div class=\"flex gap-3 mt-4\">" +
+          "<button type=\"button\" data-ie-rejection-confirm class=\"px-4 py-2.5 rounded-xl bg-[#1b4332] text-white text-sm font-semibold hover:opacity-90 transition-all\">Confirm</button>" +
+          "<button type=\"button\" data-ie-modal-close class=\"px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-all\">Cancel</button>" +
+          "</div>";
+
+        var textarea = mount.querySelector("#ie-rejection-reason");
+        var confirmBtn = mount.querySelector("[data-ie-rejection-confirm]");
+
+        if (textarea && initialReason) {
+          textarea.value = initialReason;
+        }
+
+        if (confirmBtn) {
+          confirmBtn.addEventListener("click", async function () {
+            if (!window.IESupabase || !window.IESupabase.updateCandidateAssociationStatus) return;
+
+            var value = textarea ? textarea.value.trim() : "";
+            var payloadReason = value === "" ? null : value;
+
+            confirmBtn.disabled = true;
+            try {
+              var res = await window.IESupabase.updateCandidateAssociationStatus(
+                associationId,
+                "rejected",
+                { rejectionReason: payloadReason }
+              );
+              if (res && res.error) {
+                if (window.IESupabase.showError) {
+                  window.IESupabase.showError(res.error.message || "Errore aggiornamento stato.");
+                }
+                return;
+              }
+              if (onSaved) onSaved(payloadReason);
+              closeModal();
+            } catch (e) {
+              if (window.IESupabase && window.IESupabase.showError) {
+                window.IESupabase.showError(e && e.message ? e.message : "Errore aggiornamento stato.");
+              }
+            } finally {
+              confirmBtn.disabled = false;
+            }
+          });
+        }
+      },
+    });
     }
 
     function clearForm() {

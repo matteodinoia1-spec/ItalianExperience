@@ -2059,6 +2059,7 @@
           id,
           status,
           notes,
+          rejection_reason,
           created_at,
           candidates (
             id,
@@ -2171,9 +2172,12 @@
    * Update the status of a candidate-job association.
    * @param {string} associationId - candidate_job_associations.id
    * @param {string} status
+   * @param {object} [options]
+   * @param {string|null} [options.rejectionReason]
    * @returns {Promise<{ data: object | null, error: object | null }>}
    */
-  async function updateCandidateAssociationStatus(associationId, status) {
+  async function updateCandidateAssociationStatus(associationId, status, options) {
+    options = options || {};
     if (!associationId) {
       const err = new Error("Missing association id");
       console.error("[Supabase] updateCandidateAssociationStatus:", err);
@@ -2190,9 +2194,14 @@
         return { data: null, error: fetchErr || new Error("Association not found") };
       }
 
+      const updatePayload = { status };
+      if (status === "rejected") {
+        updatePayload.rejection_reason = options.rejectionReason ?? null;
+      }
+
       const { data, error } = await supabase
         .from("candidate_job_associations")
-        .update({ status })
+        .update(updatePayload)
         .eq("id", associationId)
         .select()
         .single();
