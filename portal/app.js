@@ -2712,6 +2712,8 @@
    * Update candidate from edit form (Supabase only).
    */
   function updateCandidateFromForm(id, formData) {
+    if (!id) return;
+
     const payload = {
       first_name: (formData.get("first_name") || "").toString().trim(),
       last_name: (formData.get("last_name") || "").toString().trim(),
@@ -2727,7 +2729,33 @@
         return;
       }
       if (window.IESupabase.showSuccess) window.IESupabase.showSuccess("Candidato aggiornato.");
-      navigateTo("candidati.html");
+
+      if (window.IESupabase && typeof window.IESupabase.getCandidateById === "function") {
+        window.IESupabase
+          .getCandidateById(id)
+          .then(function (freshResult) {
+            if (freshResult && !freshResult.error && freshResult.data) {
+              var metadataEl = document.getElementById("candidateMetadata");
+              if (metadataEl) {
+                metadataEl.innerHTML = renderEntityMetadata(freshResult.data);
+              }
+            }
+          })
+          .catch(function () {
+            // Ignore metadata refresh errors to avoid impacting save flow.
+          });
+      }
+
+      try {
+        var url = new URL(window.location.href);
+        url.searchParams.set("mode", "view");
+        url.searchParams.set("id", id);
+        window.history.replaceState(window.history.state, document.title, url.toString());
+      } catch (e) {
+        // Ignore URL update errors to avoid impacting save flow.
+      }
+
+      initAddCandidatePage();
     });
   }
 
@@ -2735,6 +2763,8 @@
    * Update client from edit form (Supabase only).
    */
   function updateClientFromForm(id, formData) {
+    if (!id) return;
+
     const payload = {
       name: (formData.get("name") || "").toString().trim(),
       city: (formData.get("city") || "").toString().trim(),
@@ -2750,7 +2780,33 @@
         return;
       }
       if (window.IESupabase.showSuccess) window.IESupabase.showSuccess("Cliente aggiornato.");
-      navigateTo("clienti.html");
+
+      if (window.IESupabase && typeof window.IESupabase.getClientById === "function") {
+        window.IESupabase
+          .getClientById(id)
+          .then(function (freshResult) {
+            if (freshResult && !freshResult.error && freshResult.data) {
+              var metadataEl = document.getElementById("clientMetadata");
+              if (metadataEl) {
+                metadataEl.innerHTML = renderEntityMetadata(freshResult.data);
+              }
+            }
+          })
+          .catch(function () {
+            // Ignore metadata refresh errors to avoid impacting save flow.
+          });
+      }
+
+      try {
+        var url = new URL(window.location.href);
+        url.searchParams.set("mode", "view");
+        url.searchParams.set("id", id);
+        window.history.replaceState(window.history.state, document.title, url.toString());
+      } catch (e) {
+        // Ignore URL update errors to avoid impacting save flow.
+      }
+
+      initAddClientePage();
     });
   }
 
@@ -3676,6 +3732,8 @@
   }
 
   function updateJobOfferFromForm(id, formData) {
+    if (!id) return;
+
     const payload = {
       client_id: (formData.get("client_id") || formData.get("client_id_hidden") || formData.get("clientIdHidden") || formData.get("clientId") || "").toString() || null,
       title: (formData.get("title") || "").toString().trim(),
@@ -3707,7 +3765,33 @@
         if (window.IESupabase.showSuccess) {
           window.IESupabase.showSuccess("Offerta aggiornata.");
         }
-        navigateTo("offerte.html");
+
+        if (typeof window.IESupabase.getJobOfferById === "function") {
+          window.IESupabase
+            .getJobOfferById(id)
+            .then(function (freshResult) {
+              if (freshResult && !freshResult.error && freshResult.data) {
+                var metadataEl = document.getElementById("jobOfferMetadata");
+                if (metadataEl) {
+                  metadataEl.innerHTML = renderEntityMetadata(freshResult.data);
+                }
+              }
+            })
+            .catch(function () {
+              // Ignore metadata refresh errors to avoid impacting save flow.
+            });
+        }
+
+        try {
+          var url = new URL(window.location.href);
+          url.searchParams.set("mode", "view");
+          url.searchParams.set("id", id);
+          window.history.replaceState(window.history.state, document.title, url.toString());
+        } catch (e) {
+          // Ignore URL update errors to avoid impacting save flow.
+        }
+
+        setPageMode("view", id);
       });
       return;
     }
@@ -3722,7 +3806,6 @@
         });
       }
     }
-    navigateTo("offerte.html");
   }
 
   /**
