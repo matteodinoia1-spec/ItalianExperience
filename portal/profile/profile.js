@@ -47,6 +47,7 @@
     renderProfile(currentProfile);
     bindFormSubmit();
     bindCancelButton();
+    bindChangePasswordForm();
   });
 
   /**
@@ -182,6 +183,68 @@
       if (!currentProfile) return;
       renderProfile(currentProfile);
       hideError();
+    });
+  }
+
+  function bindChangePasswordForm() {
+    const form = document.getElementById("changePasswordForm");
+    if (!form) return;
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const newPassword = document.getElementById("newPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+      const messageEl = document.getElementById("changePasswordMessage");
+      const submitBtn = document.getElementById("changePasswordBtn");
+
+      messageEl.textContent = "";
+      messageEl.className = "text-sm mt-2";
+
+      if (newPassword !== confirmPassword) {
+        messageEl.textContent = "Le password non coincidono.";
+        messageEl.classList.add("text-red-600");
+        return;
+      }
+
+      if (newPassword.length < 8) {
+        messageEl.textContent = "La password deve avere almeno 8 caratteri.";
+        messageEl.classList.add("text-red-600");
+        return;
+      }
+
+      if (!window.IESupabase || !window.IESupabase.supabase) {
+        messageEl.textContent = "Errore interno. Riprova più tardi.";
+        messageEl.classList.add("text-red-600");
+        return;
+      }
+
+      submitBtn.disabled = true;
+
+      const { data: sessionData } = await window.IESupabase.getSession();
+      if (!sessionData?.session) {
+        messageEl.textContent = "Sessione scaduta. Effettua di nuovo il login.";
+        messageEl.classList.add("text-red-600");
+        submitBtn.disabled = false;
+        return;
+      }
+
+      const result = await window.IESupabase.supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (result.error) {
+        messageEl.textContent = result.error.message || "Errore aggiornamento password.";
+        messageEl.classList.add("text-red-600");
+        submitBtn.disabled = false;
+        return;
+      }
+
+      messageEl.textContent = "Password aggiornata con successo.";
+      messageEl.classList.add("text-green-600");
+
+      document.getElementById("changePasswordForm").reset();
+      submitBtn.disabled = false;
     });
   }
 

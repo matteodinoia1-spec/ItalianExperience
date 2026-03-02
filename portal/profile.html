@@ -132,6 +132,27 @@
 
             </form>
 
+            <!-- Section: Change Password -->
+            <div class="glass-card p-8 rounded-3xl">
+                <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Modifica Password</h3>
+                <form id="changePasswordForm" class="space-y-6 mt-6">
+                    <div>
+                        <label class="form-label" for="newPassword">Nuova password</label>
+                        <input type="password" id="newPassword" name="newPassword" class="input-field w-full py-3 px-4 rounded-xl" placeholder="••••••••" autocomplete="new-password">
+                    </div>
+                    <div>
+                        <label class="form-label" for="confirmPassword">Conferma password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="input-field w-full py-3 px-4 rounded-xl" placeholder="••••••••" autocomplete="new-password">
+                    </div>
+                    <div>
+                        <button type="submit" id="changePasswordBtn" class="px-10 py-3 rounded-xl btn-gold text-white font-semibold text-sm shadow-lg hover:opacity-90 transition-all">
+                            Aggiorna password
+                        </button>
+                        <div id="changePasswordMessage" class="text-sm mt-2"></div>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </main>
 
