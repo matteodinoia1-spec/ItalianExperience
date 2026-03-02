@@ -2572,6 +2572,18 @@
         });
       }
       renderCandidateLifecycleActions(lifecycleStatus);
+
+      var existingCandidateMeta = document.getElementById("candidateMetadata");
+      if (existingCandidateMeta && existingCandidateMeta.parentNode) {
+        existingCandidateMeta.parentNode.removeChild(existingCandidateMeta);
+      }
+
+      var metadataContainer = document.createElement("div");
+      metadataContainer.id = "candidateMetadata";
+      if (form && form.parentNode) {
+        form.parentNode.appendChild(metadataContainer);
+      }
+      metadataContainer.innerHTML = renderEntityMetadata(candidate);
     });
   }
 
@@ -2681,6 +2693,18 @@
         onArchive: onArchive,
         onReopen: onReopen,
       });
+
+      var existingClientMeta = document.getElementById("clientMetadata");
+      if (existingClientMeta && existingClientMeta.parentNode) {
+        existingClientMeta.parentNode.removeChild(existingClientMeta);
+      }
+
+      var metadataContainer = document.createElement("div");
+      metadataContainer.id = "clientMetadata";
+      if (form && form.parentNode) {
+        form.parentNode.appendChild(metadataContainer);
+      }
+      metadataContainer.innerHTML = renderEntityMetadata(client);
     });
   }
 
@@ -2736,6 +2760,57 @@
     if (s === "closed") return "closed";
     if (s === "archived") return "archived";
     return "active";
+  }
+
+  function renderEntityMetadata(entity) {
+    if (!entity) return "";
+
+    function formatDate(value) {
+      if (!value) return null;
+      try {
+        return new Date(value).toLocaleString(undefined, {
+          dateStyle: "medium",
+          timeStyle: "short",
+        });
+      } catch (_) {
+        return value;
+      }
+    }
+
+    function getFullName(profile) {
+      if (!profile) return "";
+      var first = (profile.first_name || "").toString().trim();
+      var last = (profile.last_name || "").toString().trim();
+      var parts = [];
+      if (first) parts.push(first);
+      if (last) parts.push(last);
+      return parts.join(" ");
+    }
+
+    var createdDate = formatDate(entity.created_at);
+    var createdName = getFullName(entity.created_by_profile);
+    var createdParts = [];
+    if (createdDate) createdParts.push(createdDate);
+    if (createdName) createdParts.push(createdName);
+    var createdText = createdParts.length ? createdParts.join(" \u2022 ") : "\u2014";
+
+    var updatedDate = formatDate(entity.updated_at);
+    var updatedName = getFullName(entity.updated_by_profile);
+    var updatedParts = [];
+    if (updatedDate) updatedParts.push(updatedDate);
+    if (updatedName) updatedParts.push(updatedName);
+    var updatedText = updatedParts.length ? updatedParts.join(" \u2022 ") : "\u2014";
+
+    return (
+      '<div class="mt-10 pt-6 border-t border-gray-200 text-xs text-gray-400 space-y-1">' +
+      '<div><strong>Created:</strong> ' +
+      createdText +
+      "</div>" +
+      '<div><strong>Updated:</strong> ' +
+      updatedText +
+      "</div>" +
+      "</div>"
+    );
   }
 
   function resolveEntityMode(status, requestedMode) {
@@ -3534,6 +3609,18 @@
           configureCancel(effectiveModeForOffer, offerId);
           renderActionButtons(effectiveModeForOffer, offerId, offer);
           renderOfferStatusBadge(offer.status);
+
+          var existingOfferMeta = document.getElementById("jobOfferMetadata");
+          if (existingOfferMeta && existingOfferMeta.parentNode) {
+            existingOfferMeta.parentNode.removeChild(existingOfferMeta);
+          }
+
+          var metadataContainer = document.createElement("div");
+          metadataContainer.id = "jobOfferMetadata";
+          if (form && form.parentNode) {
+            form.parentNode.appendChild(metadataContainer);
+          }
+          metadataContainer.innerHTML = renderEntityMetadata(offer);
 
           if (isViewModeForOffer) {
             setFormDisabled(true);
@@ -4419,6 +4506,16 @@
         } else {
           createdEl.textContent = "—";
         }
+      }
+
+      var metadataContainer = root.querySelector("[data-ie-joboffer-metadata]");
+      if (!metadataContainer && contentEl) {
+        metadataContainer = document.createElement("div");
+        metadataContainer.setAttribute("data-ie-joboffer-metadata", "true");
+        contentEl.appendChild(metadataContainer);
+      }
+      if (metadataContainer) {
+        metadataContainer.innerHTML = renderEntityMetadata(offer);
       }
 
       if (loadingEl) loadingEl.classList.add("hidden");

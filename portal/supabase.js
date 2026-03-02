@@ -135,6 +135,32 @@
   }
 
   /**
+   * Internal helper: augment update payloads with audit fields.
+   * - Requires an authenticated user.
+   * - Adds updated_at (ISO string) and updated_by (user.id).
+   * @param {object} updates
+   * @returns {Promise<object>} merged updates
+   */
+  async function withUpdateAuditFields(updates) {
+    const { data, error } = await getSession();
+    if (error) {
+      console.error("[Supabase] withUpdateAuditFields getSession error:", error.message || error, error);
+      throw error;
+    }
+    const user = data && data.user;
+    if (!user || !user.id) {
+      const err = new Error("Not authenticated");
+      console.error("[Supabase] withUpdateAuditFields:", err);
+      throw err;
+    }
+    return {
+      ...updates,
+      updated_at: new Date().toISOString(),
+      updated_by: user.id,
+    };
+  }
+
+  /**
    * Redirect to dashboard (portal root-relative path).
    */
   function redirectToDashboard() {
@@ -380,24 +406,34 @@
         .from("candidates")
         .select(
           `
-          *,
-          candidate_job_associations (
-            job_offer_id,
-            job_offers (
+            *,
+            created_by_profile:profiles!candidates_created_by_profiles_fkey(
               id,
-              title,
-              position,
-              city,
-              state,
-              clients (
+              first_name,
+              last_name
+            ),
+            updated_by_profile:profiles!candidates_updated_by_profiles_fkey(
+              id,
+              first_name,
+              last_name
+            ),
+            candidate_job_associations (
+              job_offer_id,
+              job_offers (
                 id,
-                name,
+                title,
+                position,
                 city,
-                state
+                state,
+                clients (
+                  id,
+                  name,
+                  city,
+                  state
+                )
               )
             )
-          )
-        `
+          `
         )
         .eq("id", id)
         .maybeSingle();
@@ -421,7 +457,7 @@
   async function updateCandidate(id, payload) {
     if (!id) return { data: null, error: new Error("Missing id") };
     try {
-      const updates = {
+      const baseUpdates = {
         first_name: payload.first_name ?? "",
         last_name: payload.last_name ?? "",
         position: payload.position ?? null,
@@ -430,6 +466,7 @@
         source: payload.source ?? null,
         notes: payload.notes ?? null,
       };
+      const updates = await withUpdateAuditFields(baseUpdates);
       const { data, error } = await supabase
         .from("candidates")
         .update(updates)
@@ -566,14 +603,24 @@
         .from("job_offers")
         .select(
           `
-          *,
-          clients (
-            id,
-            name,
-            city,
-            state
-          )
-        `
+            *,
+            created_by_profile:profiles!job_offers_created_by_profiles_fkey(
+              id,
+              first_name,
+              last_name
+            ),
+            updated_by_profile:profiles!job_offers_updated_by_profiles_fkey(
+              id,
+              first_name,
+              last_name
+            ),
+            clients (
+              id,
+              name,
+              city,
+              state
+            )
+          `
         )
         .eq("id", id)
         .maybeSingle();
@@ -614,7 +661,7 @@
   async function updateJobOffer(id, payload) {
     if (!id) return { data: null, error: new Error("Missing id") };
     try {
-      const updates = {
+      const baseUpdates = {
         client_id: payload.client_id ?? null,
         title: payload.title ?? "",
         position: payload.position ?? null,
@@ -630,8 +677,9 @@
         status: payload.status ?? "open",
       };
       if (payload.positions !== undefined || payload.positions_required !== undefined) {
-        updates.positions_required = Math.max(1, Number(payload.positions_required ?? payload.positions ?? 1));
+        baseUpdates.positions_required = Math.max(1, Number(payload.positions_required ?? payload.positions ?? 1));
       }
+      const updates = await withUpdateAuditFields(baseUpdates);
       const { data, error } = await supabase
         .from("job_offers")
         .update(updates)
@@ -1122,7 +1170,21 @@
     try {
       const { data, error } = await supabase
         .from("clients")
-        .select("*")
+        .select(
+          `
+            *,
+            created_by_profile:profiles!clients_created_by_profiles_fkey(
+              id,
+              first_name,
+              last_name
+            ),
+            updated_by_profile:profiles!clients_updated_by_profiles_fkey(
+              id,
+              first_name,
+              last_name
+            )
+          `
+        )
         .eq("id", id)
         .single();
       if (error) {
@@ -1142,6 +1204,10 @@
               phone: row.phone,
               notes: row.notes,
               is_archived: !!row.is_archived,
+              created_at: row.created_at,
+              updated_at: row.updated_at,
+              created_by_profile: row.created_by_profile || null,
+              updated_by_profile: row.updated_by_profile || null,
             }
           : null,
         error: null,
@@ -1161,7 +1227,7 @@
   async function updateClient(id, payload) {
     if (!id) return { data: null, error: new Error("Missing id") };
     try {
-      const updates = {
+      const baseUpdates = {
         name: (payload.name ?? "").toString().trim() || null,
         city: payload.city ?? null,
         state: payload.state ?? null,
@@ -1170,6 +1236,7 @@
         phone: payload.phone ?? null,
         notes: payload.notes ?? null,
       };
+      const updates = await withUpdateAuditFields(baseUpdates);
       const { data, error } = await supabase
         .from("clients")
         .update(updates)
