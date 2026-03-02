@@ -1828,6 +1828,88 @@
   }
 
   /**
+   * Search available, non-archived candidates for association.
+   * Primary source of truth for operational availability is availability_status.
+   * Excludes candidates with status = 'hired'.
+   * @param {object} opts - { term: string, limit?: number, clientId?: string | null, jobOfferId?: string | null }
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function searchAvailableCandidatesForAssociation(opts) {
+    const termRaw = (opts && opts.term ? String(opts.term) : "").trim();
+    if (termRaw.length < 2) {
+      return { data: [], error: null };
+    }
+    const limit =
+      opts && typeof opts.limit === "number"
+        ? Math.max(1, Math.min(50, opts.limit))
+        : 20;
+
+    // Escape % and _ for ilike search.
+    const escaped = termRaw.replace(/%/g, "\\%").replace(/_/g, "\\_");
+    const pattern = "%" + escaped + "%";
+
+    try {
+      let q = supabase
+        .from("candidates")
+        .select(
+          `
+          id,
+          first_name,
+          last_name,
+          position,
+          status,
+          availability_status,
+          is_archived
+        `
+        )
+        .or(
+          [
+            "first_name.ilike." + pattern,
+            "last_name.ilike." + pattern,
+          ].join(",")
+        )
+        .or("is_archived.is.null,is_archived.eq.false")
+        .eq("availability_status", "available")
+        .not("status", "eq", "hired")
+        .order("first_name", { ascending: true })
+        .order("last_name", { ascending: true })
+        .limit(limit);
+
+      const { data, error } = await q;
+      if (error) {
+        console.error(
+          "[Supabase] searchAvailableCandidatesForAssociation error:",
+          error.message || error,
+          { term: termRaw }
+        );
+        return { data: [], error };
+      }
+      return {
+        data:
+          (data || []).map(function (row) {
+            return {
+              id: row.id,
+              first_name: row.first_name,
+              last_name: row.last_name,
+              position: row.position,
+              status: row.status,
+              availability_status: row.availability_status,
+              is_archived: row.is_archived,
+            };
+          }),
+        error: null,
+      };
+    } catch (err) {
+      console.error(
+        "[Supabase] searchAvailableCandidatesForAssociation exception:",
+        err,
+        { term: termRaw }
+      );
+      return { data: [], error: err };
+    }
+  }
+
+  /**
    * Link a candidate to a job offer.
    * Table: candidate_job_associations (candidate_id, job_offer_id, status, notes, created_by, ...)
    * @param {object} payload - { candidate_id, job_offer_id, status, notes }
@@ -1884,23 +1966,81 @@
   }
 
   /**
-   * Fetch associations (optionally for a job_offer_id or candidate_id).
-   * @param {object} opts - { job_offer_id?: string, candidate_id?: string }
+   * Search active, non-archived job offers for association.
+   * Delegates active/archived semantics to buildJobOffersQuery.
+   * @param {object} opts - { term?: string, limit?: number, clientId?: string | null }
    * @returns {Promise<{ data: array, error: object | null }>}
    */
-  async function fetchAssociations(opts = {}) {
+  async function searchActiveJobOffersForAssociation(opts) {
+    const termRaw = opts && typeof opts.term === "string" ? opts.term : "";
+    const term = termRaw.trim();
+    const limit =
+      opts && typeof opts.limit === "number"
+        ? Math.max(1, Math.min(50, opts.limit))
+        : 20;
+    const clientId = opts && opts.clientId ? String(opts.clientId) : null;
+
+    const filters = {
+      archived: "active",
+      offerStatus: "active",
+      title: term || "",
+      clientId: clientId || undefined,
+    };
+
     try {
-      let q = supabase.from("candidate_job_associations").select("*");
-      if (opts.job_offer_id) q = q.eq("job_offer_id", opts.job_offer_id);
-      if (opts.candidate_id) q = q.eq("candidate_id", opts.candidate_id);
-      const { data, error } = await q.order("created_at", { ascending: false });
+      let baseQuery = supabase
+        .from("job_offers")
+        .select(
+          `
+          id,
+          title,
+          status,
+          is_archived,
+          client_id,
+          clients (
+            id,
+            name
+          )
+        `
+        );
+
+      const filteredQuery = buildJobOffersQuery(baseQuery, filters);
+      const { data: rows, error } = await filteredQuery
+        .order("created_at", { ascending: false })
+        .range(0, limit - 1);
+
       if (error) {
-        console.error("[Supabase] fetchAssociations error:", error.message, error);
+        console.error(
+          "[Supabase] searchActiveJobOffersForAssociation error:",
+          error.message || error,
+          { term, clientId }
+        );
         return { data: [], error };
       }
-      return { data: data || [], error: null };
+
+      const data =
+        rows && Array.isArray(rows)
+          ? rows.map(function (r) {
+              const client = r.clients || null;
+              return {
+                id: r.id,
+                title: r.title,
+                status: r.status,
+                is_archived: r.is_archived,
+                client_id: r.client_id,
+                client_name:
+                  (client && client.name) || r.client_name || null,
+              };
+            })
+          : [];
+
+      return { data, error: null };
     } catch (err) {
-      console.error("[Supabase] fetchAssociations exception:", err);
+      console.error(
+        "[Supabase] searchActiveJobOffersForAssociation exception:",
+        err,
+        { term, clientId }
+      );
       return { data: [], error: err };
     }
   }
@@ -2989,7 +3129,8 @@
     unarchiveClient,
     // Associations
     linkCandidateToJob,
-    fetchAssociations,
+    searchAvailableCandidatesForAssociation,
+    searchActiveJobOffersForAssociation,
     fetchJobHistoryForCandidate,
     fetchCandidatesForJobOffer,
     updateCandidateAssociationStatus,

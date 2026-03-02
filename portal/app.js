@@ -691,16 +691,6 @@
       });
     }
 
-    // Associate Candidate button inside Job Offers
-    const associateCandidateButtons = document.querySelectorAll(
-      '[data-action="associate-candidate"]'
-    );
-    associateCandidateButtons.forEach((btn) => {
-      btn.addEventListener("click", function (event) {
-        event.preventDefault();
-        openAssociateCandidateModal();
-      });
-    });
   }
 
   // ---------------------------------------------------------------------------
@@ -1637,126 +1627,6 @@
         mount.innerHTML = "";
         mount.appendChild(fragment);
         bindFormHandlers(mount);
-      },
-    });
-  }
-
-  function openAssociateCandidateModal() {
-    openModal({
-      title: "Associate Candidate",
-      fullPageHref: null,
-      render: async (mount) => {
-        const candidateOptions =
-          window.IESupabase
-            ? (await window.IESupabase.fetchMyCandidates()).data || []
-            : IE_STORE.candidates;
-        const candidateSelectOptions =
-          window.IESupabase
-            ? candidateOptions
-                .map(function (c) {
-                  return "<option value=\"" + (c.id || "") + "\">" + (c.first_name || "") + " " + (c.last_name || "") + " – " + (c.position || "") + "</option>";
-                })
-                .join("")
-            : candidateOptions
-                .map(function (c) {
-                  return "<option value=\"" + (c.slug || c.id) + "\">" + (c.first_name || "") + " " + (c.last_name || "") + " – " + (c.position || "") + "</option>";
-                })
-                .join("");
-        mount.innerHTML = `
-          <div class="space-y-6">
-            <div class="glass-card rounded-2xl p-6">
-              <h3 class="serif text-lg font-bold text-[#1b4332] mb-4">New Candidate Association</h3>
-              <form id="associateCandidateForm" class="space-y-5">
-                <div>
-                  <label class="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Select Candidate</label>
-                  <select name="candidate" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none appearance-none cursor-pointer">
-                    <option value="">Choose a candidate...</option>
-                    ${candidateSelectOptions}
-                  </select>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Status</label>
-                    <select name="status" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none appearance-none cursor-pointer">
-                      <option value="new">New</option>
-                      <option value="interview">Interview</option>
-                      <option value="hired">Hired</option>
-                      <option value="rejected">Rejected</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Position (optional)</label>
-                    <input
-                      type="text"
-                      name="position"
-                      class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none"
-                      placeholder="Es. Head Sommelier"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Notes</label>
-                  <textarea
-                    name="notes"
-                    rows="3"
-                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:ring-1 focus:ring-[#c5a059] outline-none resize-none"
-                    placeholder="Inserisci eventuali note sull'associazione..."
-                  ></textarea>
-                </div>
-
-                <div class="flex items-center justify-end space-x-3 pt-2">
-                  <button
-                    type="button"
-                    class="px-5 py-2 rounded-lg border border-gray-200 text-gray-500 text-xs font-semibold uppercase tracking-widest hover:bg-gray-50 transition"
-                    data-ie-modal-close
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    class="px-6 py-2 rounded-lg bg-[#1b4332] text-white text-xs font-semibold uppercase tracking-widest shadow-md hover:bg-[#1b4332]/90 transition"
-                  >
-                    Save Association
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        `;
-
-        const form = mount.querySelector("#associateCandidateForm");
-        if (!form) return;
-
-        form.addEventListener("submit", async function (event) {
-          event.preventDefault();
-          const formData = new FormData(form);
-          if (window.IESupabase) {
-            const candidateId = (formData.get("candidate") || "").toString().trim();
-            const jobOfferId = window.IE_ACTIVE_JOB_OFFER_ID || (await window.IESupabase.fetchJobOffers()).data?.[0]?.id;
-            if (!candidateId || !jobOfferId) {
-              window.IESupabase.showError("Seleziona un candidato e assicurati che ci sia un'offerta attiva.");
-              return;
-            }
-            const { error } = await window.IESupabase.linkCandidateToJob({
-              candidate_id: candidateId,
-              job_offer_id: jobOfferId,
-              status: (formData.get("status") || "new").toString(),
-              notes: (formData.get("notes") || "").toString(),
-            });
-            if (error) {
-              window.IESupabase.showError(error.message || "Errore nel salvataggio dell'associazione.");
-              return;
-            }
-            window.IESupabase.showSuccess("Associazione salvata con successo.");
-            closeModal();
-            renderAssociationsForActiveOffer();
-            return;
-          }
-          saveCandidateAssociation(formData);
-          closeModal();
-        });
       },
     });
   }
@@ -3212,51 +3082,7 @@
     navigateTo("clienti.html");
   }
 
-  function saveCandidateAssociation(formData, jobOfferIdOverride) {
-    const now = new Date().toISOString();
-    const currentUser = getCurrentUserDisplayName();
-
-    const candidateSlug = (formData.get("candidate") || "").toString();
-    const status = (formData.get("status") || "new").toString();
-    const notes = (formData.get("notes") || "").toString();
-
-    const candidate = IE_STORE.candidates.find((c) => c.slug === candidateSlug);
-    const jobOfferId =
-      jobOfferIdOverride ||
-      (IE_STORE.jobOffers.length ? IE_STORE.jobOffers[0].id : null);
-
-    if (!candidate || !jobOfferId) {
-      console.warn(
-        "[ItalianExperience] saveCandidateAssociation() – missing candidate or job offer context"
-      );
-      alert("Impossibile salvare l'associazione (manca il contesto).");
-      return;
-    }
-
-    const association = {
-      id: "assoc-" + Math.random().toString(36).slice(2, 10),
-      candidate_id: candidate.id,
-      job_offer_id: jobOfferId,
-      status,
-      notes,
-      created_at: now,
-      updated_at: now,
-      created_by: currentUser,
-      updated_by: currentUser,
-    };
-
-    IE_STORE.candidateJobAssociations.push(association);
-
-    console.info(
-      "[ItalianExperience] saveCandidateAssociation() – payload ready for API:",
-      association
-    );
-
-    alert("Associazione candidato salvata con successo (simulazione)");
-
-    // Best-effort refresh of associations table if present on the page
-    renderAssociationsForActiveOffer();
-  }
+  // Legacy saveCandidateAssociation removed with list-page associations UI.
 
   // ---------------------------------------------------------------------------
   // Filtering + archive helpers
@@ -3465,6 +3291,8 @@
 
   function getApplicationStatusBadgeClass(status) {
     switch (status) {
+      case "new":
+        return "badge-new";
       case "applied":
         return "badge-applied";
       case "screening":
@@ -3486,6 +3314,8 @@
 
   function formatApplicationStatusLabel(status) {
     switch (status) {
+      case "new":
+        return "New";
       case "applied":
         return "Applied";
       case "screening":
@@ -3503,6 +3333,705 @@
       default:
         return status || "Applied";
     }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Inline association panels (embedded UX)
+  // ---------------------------------------------------------------------------
+
+  function debounce(fn, delayMs) {
+    var t = null;
+    return function () {
+      var ctx = this;
+      var args = arguments;
+      if (t) clearTimeout(t);
+      t = setTimeout(function () {
+        t = null;
+        fn.apply(ctx, args);
+      }, delayMs);
+    };
+  }
+
+  function normalizeOfferStatus(status) {
+    var s = (status || "").toString().toLowerCase();
+    if (s === "active") return "open";
+    if (s === "in progress") return "inprogress";
+    return s || "open";
+  }
+
+  function getOfferStatusBadgeClass(status) {
+    switch (normalizeOfferStatus(status)) {
+      case "open":
+        return "badge-open";
+      case "inprogress":
+        return "badge-inprogress";
+      case "closed":
+        return "badge-closed";
+      default:
+        return "badge-open";
+    }
+  }
+
+  function formatOfferStatusLabel(status) {
+    switch (normalizeOfferStatus(status)) {
+      case "open":
+        return "Open";
+      case "inprogress":
+        return "In Progress";
+      case "closed":
+        return "Closed";
+      default:
+        return (status || "Open").toString();
+    }
+  }
+
+  function normalizeAvailabilityStatus(raw) {
+    var s = (raw || "").toString().toLowerCase();
+    if (s === "available") return "available";
+    if (s === "unavailable") return "unavailable";
+    return "";
+  }
+
+  function computeCandidateAvailability(candidate) {
+    if (!candidate) return "available";
+    var explicit = normalizeAvailabilityStatus(candidate.availability_status);
+    if (explicit) return explicit;
+    var assocStatus =
+      candidate.latest_association && candidate.latest_association.status
+        ? String(candidate.latest_association.status).toLowerCase()
+        : "";
+    if (assocStatus && assocStatus !== "rejected" && assocStatus !== "not_selected") {
+      return "unavailable";
+    }
+    return "available";
+  }
+
+  function getAvailabilityBadgeClass(candidateOrStatus) {
+    var status =
+      typeof candidateOrStatus === "string"
+        ? normalizeAvailabilityStatus(candidateOrStatus)
+        : computeCandidateAvailability(candidateOrStatus);
+    return status === "available" ? "badge-open" : "badge-closed";
+  }
+
+  function formatAvailabilityLabel(candidateOrStatus) {
+    var status =
+      typeof candidateOrStatus === "string"
+        ? normalizeAvailabilityStatus(candidateOrStatus)
+        : computeCandidateAvailability(candidateOrStatus);
+    return status === "available" ? "Available" : "Unavailable";
+  }
+
+  function isCandidateHired(candidate) {
+    var s = candidate && candidate.status != null ? String(candidate.status).toLowerCase() : "";
+    return s === "hired";
+  }
+
+  function createInlineBadge(label, badgeClass) {
+    var el = document.createElement("span");
+    el.className = "badge " + (badgeClass || "");
+    el.textContent = label || "—";
+    return el;
+  }
+
+  function renderInlineCandidateRow(candidate, opts) {
+    if (!candidate) return null;
+    if (isCandidateHired(candidate)) return null;
+
+    var fullName =
+      ((candidate.first_name || "") + " " + (candidate.last_name || "")).trim() || "—";
+    var position = (candidate.position || "").toString().trim();
+    var status = (candidate.status || "new").toString().toLowerCase();
+    var availability = computeCandidateAvailability(candidate);
+
+    var row = document.createElement("button");
+    row.type = "button";
+    row.className =
+      "w-full text-left px-4 py-3 hover:bg-emerald-50 transition flex items-center justify-between gap-4";
+    row.setAttribute("data-id", candidate.id || "");
+
+    var left = document.createElement("div");
+    left.className = "min-w-0";
+    var nameEl = document.createElement("div");
+    nameEl.className = "font-semibold text-gray-800 text-sm truncate";
+    nameEl.textContent = fullName;
+    left.appendChild(nameEl);
+    if (position) {
+      var posEl = document.createElement("div");
+      posEl.className = "text-xs text-gray-500 truncate";
+      posEl.textContent = position;
+      left.appendChild(posEl);
+    }
+
+    var right = document.createElement("div");
+    right.className = "flex items-center gap-2 flex-shrink-0";
+    right.appendChild(
+      createInlineBadge(formatCandidateStatusLabel(status), getCandidateStatusBadgeClass(status))
+    );
+    right.appendChild(
+      createInlineBadge(formatAvailabilityLabel(availability), getAvailabilityBadgeClass(availability))
+    );
+
+    row.appendChild(left);
+    row.appendChild(right);
+
+    row.addEventListener("click", function () {
+      if (opts && typeof opts.onClick === "function") opts.onClick(candidate);
+    });
+
+    return row;
+  }
+
+  function renderInlineOfferRow(offer, opts) {
+    if (!offer) return null;
+    var title = (offer.title || "—").toString();
+    var clientName = (offer.client_name || "—").toString();
+    var status = offer.status || "open";
+    var required = offer.positions_required != null ? Number(offer.positions_required) : null;
+    if (!Number.isFinite(required)) {
+      required = offer.positions != null ? Number(offer.positions) : null;
+    }
+    if (!Number.isFinite(required)) required = 1;
+
+    var row = document.createElement("button");
+    row.type = "button";
+    row.className =
+      "w-full text-left px-4 py-3 hover:bg-emerald-50 transition flex items-center justify-between gap-4";
+    row.setAttribute("data-id", offer.id || "");
+
+    var left = document.createElement("div");
+    left.className = "min-w-0";
+    var titleEl = document.createElement("div");
+    titleEl.className = "font-semibold text-gray-800 text-sm truncate";
+    titleEl.textContent = title;
+    left.appendChild(titleEl);
+    var clientEl = document.createElement("div");
+    clientEl.className = "text-xs text-gray-500 truncate";
+    clientEl.textContent = clientName;
+    left.appendChild(clientEl);
+
+    var right = document.createElement("div");
+    right.className = "flex items-center gap-3 flex-shrink-0";
+    right.appendChild(
+      createInlineBadge(formatOfferStatusLabel(status), getOfferStatusBadgeClass(status))
+    );
+    var count = document.createElement("div");
+    count.className = "text-xs font-semibold text-gray-600";
+    count.textContent = "— / " + String(required);
+    right.appendChild(count);
+
+    row.appendChild(left);
+    row.appendChild(right);
+
+    row.addEventListener("click", function () {
+      if (opts && typeof opts.onClick === "function") opts.onClick(offer);
+    });
+
+    return row;
+  }
+
+  function renderCandidateAvailableOffersSection(opts) {
+    var candidateId = opts && opts.candidateId ? String(opts.candidateId) : "";
+    var candidate = opts && opts.candidate ? opts.candidate : null;
+    var mode = opts && opts.mode ? String(opts.mode) : "view";
+    var isArchived = !!(opts && opts.isArchived);
+    var insertAfterEl = opts && opts.insertAfterEl ? opts.insertAfterEl : null;
+
+    var existing = document.getElementById("candidateAvailableOffersSection");
+    if (existing && existing.parentNode) {
+      existing.parentNode.removeChild(existing);
+    }
+
+    if (!candidateId || !candidate || mode !== "view" || isArchived) {
+      return;
+    }
+
+    var wrapper = document.createElement("section");
+    wrapper.id = "candidateAvailableOffersSection";
+    wrapper.className = "mt-8";
+
+    var card = document.createElement("div");
+    card.className = "glass-card p-6 rounded-3xl";
+
+    var header = document.createElement("div");
+    header.className = "flex items-center justify-between gap-4 mb-4";
+    var title = document.createElement("h3");
+    title.className = "serif text-xl font-bold text-[#1b4332] section-title";
+    title.textContent = "Available Offers";
+    header.appendChild(title);
+    card.appendChild(header);
+
+    var searchWrap = document.createElement("div");
+    searchWrap.className = "mb-3";
+    var input = document.createElement("input");
+    input.type = "text";
+    input.className = "form-input text-sm";
+    input.placeholder = "Search offers by title...";
+    input.setAttribute("autocomplete", "off");
+    searchWrap.appendChild(input);
+    card.appendChild(searchWrap);
+
+    var list = document.createElement("div");
+    list.className = "max-h-72 overflow-y-auto rounded-2xl border border-gray-100 bg-white divide-y divide-gray-50";
+    card.appendChild(list);
+
+    wrapper.appendChild(card);
+
+    // Insert into DOM just after metadata, before activity if possible.
+    if (insertAfterEl && insertAfterEl.parentNode) {
+      if (insertAfterEl.nextSibling) {
+        insertAfterEl.parentNode.insertBefore(wrapper, insertAfterEl.nextSibling);
+      } else {
+        insertAfterEl.parentNode.appendChild(wrapper);
+      }
+    } else {
+      var activity = document.getElementById("activity-container");
+      if (activity && activity.parentNode) {
+        activity.parentNode.insertBefore(wrapper, activity);
+      } else {
+        document.body.appendChild(wrapper);
+      }
+    }
+
+    var reqSeq = 0;
+    var lastTerm = "";
+
+    function getAssociatedOfferIds() {
+      var assocs = candidate && Array.isArray(candidate.candidate_job_associations)
+        ? candidate.candidate_job_associations
+        : [];
+      var set = {};
+      assocs.forEach(function (a) {
+        if (a && a.job_offer_id) set[String(a.job_offer_id)] = true;
+      });
+      return set;
+    }
+
+    async function loadOffers(term) {
+      lastTerm = term || "";
+      reqSeq += 1;
+      var thisReq = reqSeq;
+
+      if (!window.IESupabase || typeof window.IESupabase.fetchJobOffersPaginated !== "function") {
+        list.innerHTML =
+          '<div class="px-4 py-4 text-sm text-gray-400">Offers API not available.</div>';
+        return;
+      }
+
+      list.innerHTML = '<div class="px-4 py-4 text-sm text-gray-400">Loading...</div>';
+
+      var filters = {
+        archived: "active",
+        offerStatus: "active",
+        excludeArchivedStatus: true,
+        title: (term || "").toString(),
+      };
+
+      try {
+        var result = await window.IESupabase.fetchJobOffersPaginated({
+          filters: filters,
+          page: 1,
+          limit: 20,
+        });
+        if (thisReq !== reqSeq) return;
+        if (!result || result.error) {
+          list.innerHTML =
+            '<div class="px-4 py-4 text-sm text-red-500">Unable to load offers.</div>';
+          return;
+        }
+
+        var rows = Array.isArray(result.data) ? result.data : [];
+        var associated = getAssociatedOfferIds();
+        var filtered = rows.filter(function (o) {
+          if (!o || !o.id) return false;
+          if (associated[String(o.id)]) return false;
+          return true;
+        });
+
+        list.innerHTML = "";
+        if (!filtered.length) {
+          list.innerHTML =
+            '<div class="px-4 py-4 text-sm text-gray-400">No offers available.</div>';
+          return;
+        }
+
+        filtered.slice(0, 20).forEach(function (offer) {
+          var row = renderInlineOfferRow(offer, {
+            onClick: async function (o) {
+              if (!o || !o.id) return;
+              if (!window.IESupabase || typeof window.IESupabase.linkCandidateToJob !== "function") return;
+
+              row.disabled = true;
+              row.classList.add("opacity-60", "cursor-not-allowed");
+              try {
+                var linkRes = await window.IESupabase.linkCandidateToJob({
+                  candidate_id: candidateId,
+                  job_offer_id: o.id,
+                });
+                if (linkRes && linkRes.error) {
+                  if (window.IESupabase && window.IESupabase.showError) {
+                    window.IESupabase.showError(linkRes.error.message || "Errore collegamento.");
+                  }
+                  return;
+                }
+
+                if (window.IESupabase && typeof window.IESupabase.getCandidateById === "function") {
+                  var fresh = await window.IESupabase.getCandidateById(candidateId);
+                  if (fresh && !fresh.error && fresh.data) {
+                    candidate = fresh.data;
+                    var meta = document.getElementById("candidateMetadata");
+                    if (meta) meta.innerHTML = renderEntityMetadata(candidate);
+                  }
+                }
+
+                await loadOffers(lastTerm);
+              } catch (e) {
+                if (window.IESupabase && window.IESupabase.showError) {
+                  window.IESupabase.showError(e && e.message ? e.message : "Errore.");
+                }
+              } finally {
+                row.disabled = false;
+                row.classList.remove("opacity-60", "cursor-not-allowed");
+              }
+            },
+          });
+          if (row) list.appendChild(row);
+        });
+      } catch (e) {
+        if (thisReq !== reqSeq) return;
+        console.error("[ItalianExperience] Candidate Available Offers load error:", e);
+        list.innerHTML =
+          '<div class="px-4 py-4 text-sm text-red-500">Unable to load offers.</div>';
+      }
+    }
+
+    input.addEventListener(
+      "input",
+      debounce(function () {
+        loadOffers((input.value || "").trim());
+      }, 250)
+    );
+
+    loadOffers("");
+  }
+
+  function renderClientPositionsSection(opts) {
+    var clientId = opts && opts.clientId ? String(opts.clientId) : "";
+    var client = opts && opts.client ? opts.client : null;
+    var mode = opts && opts.mode ? String(opts.mode) : "view";
+    var isArchived = !!(opts && opts.isArchived);
+    var insertAfterEl = opts && opts.insertAfterEl ? opts.insertAfterEl : null;
+
+    var existing = document.getElementById("clientPositionsSection");
+    if (existing && existing.parentNode) {
+      existing.parentNode.removeChild(existing);
+    }
+
+    if (!clientId || !client || mode !== "view" || isArchived) {
+      return;
+    }
+
+    var wrapper = document.createElement("section");
+    wrapper.id = "clientPositionsSection";
+    wrapper.className = "mt-8";
+
+    var card = document.createElement("div");
+    card.className = "glass-card p-6 rounded-3xl";
+    wrapper.appendChild(card);
+
+    var header = document.createElement("div");
+    header.className = "flex items-center justify-between gap-4 mb-4";
+    var title = document.createElement("h3");
+    title.className = "serif text-xl font-bold text-[#1b4332] section-title";
+    title.textContent = "Client Positions";
+    header.appendChild(title);
+    card.appendChild(header);
+
+    var content = document.createElement("div");
+    card.appendChild(content);
+
+    if (insertAfterEl && insertAfterEl.parentNode) {
+      if (insertAfterEl.nextSibling) {
+        insertAfterEl.parentNode.insertBefore(wrapper, insertAfterEl.nextSibling);
+      } else {
+        insertAfterEl.parentNode.appendChild(wrapper);
+      }
+    } else {
+      var activity = document.getElementById("activity-container");
+      if (activity && activity.parentNode) {
+        activity.parentNode.insertBefore(wrapper, activity);
+      } else {
+        document.body.appendChild(wrapper);
+      }
+    }
+
+    var state = {
+      expandedOfferId: null,
+      offerSearchTerms: {},
+    };
+
+    function getRequiredPositions(offer) {
+      var required = offer && offer.positions_required != null ? Number(offer.positions_required) : null;
+      if (!Number.isFinite(required)) required = offer && offer.positions != null ? Number(offer.positions) : null;
+      if (!Number.isFinite(required)) required = 1;
+      return required;
+    }
+
+    function getAssociatedCandidateIdSet(offer) {
+      var assocs = offer && Array.isArray(offer.candidate_job_associations) ? offer.candidate_job_associations : [];
+      var set = {};
+      assocs.forEach(function (a) {
+        if (!a) return;
+        if (a.candidate_id) set[String(a.candidate_id)] = true;
+      });
+      return set;
+    }
+
+    async function loadOffers() {
+      if (!window.IESupabase || typeof window.IESupabase.fetchJobOffersPaginated !== "function") {
+        content.innerHTML = '<div class="text-sm text-gray-400">Offers API not available.</div>';
+        return;
+      }
+      content.innerHTML = '<div class="text-sm text-gray-400 py-2">Loading client offers...</div>';
+
+      try {
+        var result = await window.IESupabase.fetchJobOffersPaginated({
+          filters: {
+            archived: "active",
+            excludeArchivedStatus: true,
+            clientId: clientId,
+          },
+          page: 1,
+          limit: 20,
+        });
+        if (!result || result.error) {
+          content.innerHTML = '<div class="text-sm text-red-500">Unable to load client offers.</div>';
+          return;
+        }
+
+        var rows = Array.isArray(result.data) ? result.data : [];
+        var active = [];
+        var closed = [];
+        rows.forEach(function (o) {
+          var s = normalizeOfferStatus(o && o.status);
+          if (s === "closed") closed.push(o);
+          else active.push(o);
+        });
+
+        content.innerHTML = "";
+        if (!active.length && !closed.length) {
+          content.innerHTML = '<div class="text-sm text-gray-400">No job offers found for this client.</div>';
+          return;
+        }
+
+        function renderDivider(label) {
+          var div = document.createElement("div");
+          div.className = "my-4 flex items-center gap-3";
+          var line1 = document.createElement("div");
+          line1.className = "flex-1 h-px bg-gray-200";
+          var text = document.createElement("div");
+          text.className = "text-[10px] uppercase tracking-[0.18em] text-gray-400 font-bold";
+          text.textContent = label;
+          var line2 = document.createElement("div");
+          line2.className = "flex-1 h-px bg-gray-200";
+          div.appendChild(line1);
+          div.appendChild(text);
+          div.appendChild(line2);
+          return div;
+        }
+
+        function renderOfferCard(offer) {
+          var offerId = offer && offer.id ? String(offer.id) : "";
+          if (!offerId) return null;
+
+          var outer = document.createElement("div");
+          outer.className = "rounded-2xl border border-gray-100 bg-white";
+          outer.setAttribute("data-offer-card", offerId);
+
+          var headerBtn = document.createElement("button");
+          headerBtn.type = "button";
+          headerBtn.className = "w-full text-left px-4 py-4 flex items-center justify-between gap-4";
+
+          var left = document.createElement("div");
+          left.className = "min-w-0";
+          var t = document.createElement("div");
+          t.className = "font-semibold text-gray-800 truncate";
+          t.textContent = offer.title || "—";
+          left.appendChild(t);
+
+          var meta = document.createElement("div");
+          meta.className = "mt-1 text-xs text-gray-500 flex items-center gap-2 flex-wrap";
+          meta.appendChild(createInlineBadge(formatOfferStatusLabel(offer.status), getOfferStatusBadgeClass(offer.status)));
+          var req = getRequiredPositions(offer);
+          var count = document.createElement("span");
+          count.className = "text-xs font-semibold text-gray-600";
+          count.textContent = "— / " + String(req);
+          meta.appendChild(count);
+          left.appendChild(meta);
+
+          var chevron = document.createElement("div");
+          chevron.className = "text-gray-400 flex-shrink-0 transition-transform transform";
+          chevron.innerHTML =
+            '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>';
+
+          headerBtn.appendChild(left);
+          headerBtn.appendChild(chevron);
+          outer.appendChild(headerBtn);
+
+          var expand = document.createElement("div");
+          expand.className = "px-4 pb-4 hidden";
+          outer.appendChild(expand);
+
+          function setExpanded(expanded) {
+            if (expanded) {
+              expand.classList.remove("hidden");
+              chevron.classList.add("rotate-180");
+            } else {
+              expand.classList.add("hidden");
+              chevron.classList.remove("rotate-180");
+            }
+          }
+
+          headerBtn.addEventListener("click", function () {
+            var isOpen = state.expandedOfferId === offerId;
+            state.expandedOfferId = isOpen ? null : offerId;
+            loadOffers();
+          });
+
+          if (state.expandedOfferId === offerId) {
+            setExpanded(true);
+
+            var sectionTitle = document.createElement("div");
+            sectionTitle.className = "mt-2 text-xs font-bold uppercase tracking-[0.18em] text-gray-400";
+            sectionTitle.textContent = "Available Candidates";
+            expand.appendChild(sectionTitle);
+
+            var input = document.createElement("input");
+            input.type = "text";
+            input.className = "form-input text-sm mt-3";
+            input.placeholder = "Search candidate by name...";
+            input.setAttribute("autocomplete", "off");
+            input.value = state.offerSearchTerms[offerId] || "";
+            expand.appendChild(input);
+
+            var list = document.createElement("div");
+            list.className = "mt-3 max-h-72 overflow-y-auto rounded-2xl border border-gray-100 bg-white divide-y divide-gray-50";
+            expand.appendChild(list);
+
+            var excluded = getAssociatedCandidateIdSet(offer);
+            var reqSeq = 0;
+
+            async function loadCandidates(term) {
+              state.offerSearchTerms[offerId] = term || "";
+              reqSeq += 1;
+              var thisReq = reqSeq;
+
+              if (!window.IESupabase || typeof window.IESupabase.fetchCandidatesPaginated !== "function") {
+                list.innerHTML = '<div class="px-4 py-4 text-sm text-gray-400">Candidates API not available.</div>';
+                return;
+              }
+
+              list.innerHTML = '<div class="px-4 py-4 text-sm text-gray-400">Loading...</div>';
+
+              try {
+                var res = await window.IESupabase.fetchCandidatesPaginated({
+                  filters: { archived: "active", name: (term || "").toString() },
+                  page: 1,
+                  limit: 20,
+                });
+                if (thisReq !== reqSeq) return;
+                if (!res || res.error) {
+                  list.innerHTML = '<div class="px-4 py-4 text-sm text-red-500">Unable to load candidates.</div>';
+                  return;
+                }
+                var rows = Array.isArray(res.data) ? res.data : [];
+                var filtered = rows.filter(function (c) {
+                  if (!c || !c.id) return false;
+                  if (excluded[String(c.id)]) return false;
+                  if (isCandidateHired(c)) return false;
+                  return computeCandidateAvailability(c) === "available";
+                });
+
+                list.innerHTML = "";
+                if (!filtered.length) {
+                  list.innerHTML = '<div class="px-4 py-4 text-sm text-gray-400">No candidates available.</div>';
+                  return;
+                }
+
+                filtered.slice(0, 20).forEach(function (c) {
+                  var row = renderInlineCandidateRow(c, {
+                    onClick: async function (cand) {
+                      if (!cand || !cand.id) return;
+                      if (!window.IESupabase || typeof window.IESupabase.linkCandidateToJob !== "function") return;
+                      row.disabled = true;
+                      row.classList.add("opacity-60", "cursor-not-allowed");
+                      try {
+                        var linkRes = await window.IESupabase.linkCandidateToJob({
+                          candidate_id: cand.id,
+                          job_offer_id: offerId,
+                        });
+                        if (linkRes && linkRes.error) {
+                          if (window.IESupabase && window.IESupabase.showError) {
+                            window.IESupabase.showError(linkRes.error.message || "Errore collegamento.");
+                          }
+                          return;
+                        }
+                        excluded[String(cand.id)] = true;
+                        await loadOffers();
+                      } catch (e) {
+                        if (window.IESupabase && window.IESupabase.showError) {
+                          window.IESupabase.showError(e && e.message ? e.message : "Errore.");
+                        }
+                      } finally {
+                        row.disabled = false;
+                        row.classList.remove("opacity-60", "cursor-not-allowed");
+                      }
+                    },
+                  });
+                  if (row) list.appendChild(row);
+                });
+              } catch (e) {
+                if (thisReq !== reqSeq) return;
+                console.error("[ItalianExperience] Client offer candidates load error:", e);
+                list.innerHTML = '<div class="px-4 py-4 text-sm text-red-500">Unable to load candidates.</div>';
+              }
+            }
+
+            input.addEventListener(
+              "input",
+              debounce(function () {
+                loadCandidates((input.value || "").trim());
+              }, 250)
+            );
+
+            loadCandidates((input.value || "").trim());
+          } else {
+            setExpanded(false);
+          }
+
+          return outer;
+        }
+
+        active.forEach(function (o) {
+          var cardEl = renderOfferCard(o);
+          if (cardEl) content.appendChild(cardEl);
+        });
+
+        if (active.length && closed.length) {
+          content.appendChild(renderDivider("Closed offers"));
+        }
+
+        closed.forEach(function (o) {
+          var cardEl = renderOfferCard(o);
+          if (cardEl) content.appendChild(cardEl);
+        });
+      } catch (e) {
+        console.error("[ItalianExperience] Client Positions load error:", e);
+        content.innerHTML = '<div class="text-sm text-red-500">Unable to load client offers.</div>';
+      }
+    }
+
+    loadOffers();
   }
 
   /**
@@ -3680,6 +4209,14 @@
       }
       metadataContainer.innerHTML = renderEntityMetadata(candidate);
 
+      renderCandidateAvailableOffersSection({
+        candidateId: candidateId,
+        candidate: candidate,
+        mode: effectiveMode,
+        isArchived: !!candidate.is_archived,
+        insertAfterEl: metadataContainer,
+      });
+
       if (window.ActivitySection && typeof window.ActivitySection.init === "function") {
         window.ActivitySection.init({
           entityType: "candidate",
@@ -3836,6 +4373,14 @@
         form.parentNode.appendChild(metadataContainer);
       }
       metadataContainer.innerHTML = renderEntityMetadata(client);
+
+      renderClientPositionsSection({
+        clientId: clientId,
+        client: client,
+        mode: effectiveMode,
+        isArchived: !!client.is_archived,
+        insertAfterEl: metadataContainer,
+      });
 
       if (window.ActivitySection && typeof window.ActivitySection.init === "function") {
         window.ActivitySection.init({
@@ -4245,17 +4790,37 @@
               confirmBtn.disabled = true;
               try {
                 var statusResult = null;
-                if (window.IESupabase && window.IESupabase.updateJobOffer) {
-                  var updateResult = await window.IESupabase.updateJobOffer(offerId, { positions: positions });
-                  if (updateResult && updateResult.error) {
-                    if (window.IESupabase.showError) window.IESupabase.showError(updateResult.error.message || "Errore.");
-                    return;
-                  }
-                }
                 if (window.IESupabase && window.IESupabase.updateJobOfferStatus) {
                   statusResult = await window.IESupabase.updateJobOfferStatus(offerId, "active");
                   if (statusResult && statusResult.error) {
                     if (window.IESupabase.showError) window.IESupabase.showError(statusResult.error.message || "Errore.");
+                    return;
+                  }
+                }
+                if (window.IESupabase && window.IESupabase.updateJobOffer) {
+                  var payload = {
+                    client_id: offer && offer.client_id != null ? offer.client_id : null,
+                    title: (offer && offer.title != null && offer.title !== undefined) ? offer.title : "",
+                    position: (offer && offer.position != null) ? offer.position : null,
+                    description: (offer && offer.description != null) ? offer.description : null,
+                    requirements: (offer && offer.requirements != null) ? offer.requirements : null,
+                    notes: (offer && offer.notes != null) ? offer.notes : null,
+                    salary: (offer && offer.salary != null) ? offer.salary : null,
+                    contract_type: (offer && offer.contract_type != null) ? offer.contract_type : null,
+                    positions: positions,
+                    city: (offer && offer.city != null) ? offer.city : null,
+                    state: (offer && offer.state != null) ? offer.state : null,
+                    deadline: (offer && offer.deadline != null) ? offer.deadline : null,
+                    status: "active"
+                  };
+                  var updateResult = await window.IESupabase.updateJobOffer(offerId, payload);
+                  if (updateResult && updateResult.error) {
+                    if (window.IESupabase.showError) window.IESupabase.showError(updateResult.error.message || "Errore aggiornamento posizioni.");
+                    var fallbackOffer = (statusResult && statusResult.data)
+                      ? Object.assign({}, offer || {}, statusResult.data, { positions: positions })
+                      : (offer ? Object.assign({}, offer, { status: "active", positions: positions }) : { status: "active", positions: positions });
+                    if (onConfirm) await onConfirm(fallbackOffer);
+                    closeModal();
                     return;
                   }
                 }
@@ -4374,6 +4939,7 @@
           });
         }
       });
+
     }
 
     function renderOfferStatusBadge(status) {
@@ -4399,6 +4965,7 @@
     }
 
     var STATUS_OPTIONS = [
+      "new",
       "applied",
       "screening",
       "interview",
@@ -4654,13 +5221,13 @@
       addCandidateBtn.className = "px-4 py-2.5 rounded-xl border border-[#1b4332] text-[#1b4332] font-semibold text-sm hover:bg-[#1b4332]/5 transition-all flex items-center gap-2";
       addCandidateBtn.innerHTML = "<span class=\"text-lg leading-none\">+</span> Add Candidate";
       addCandidateBtn.addEventListener("click", function () {
-        var existingWrap = container.querySelector("[data-autocomplete-wrap]");
+        var existingWrap = container.querySelector("[data-assoc-inline-wrap='joboffer-add-candidate']");
         if (existingWrap) {
           existingWrap.remove();
           addCandidateBtn.setAttribute("aria-expanded", "false");
           return;
         }
-        showAddCandidateAutocomplete(container, addCandidateBtn, jobOfferId, associatedCandidateIds, function () {
+        showAddCandidateInlinePanel(container, addCandidateBtn, jobOfferId, associatedCandidateIds, function () {
           renderAssociatedCandidates(jobOfferId, offer);
         });
         addCandidateBtn.setAttribute("aria-expanded", "true");
@@ -4669,151 +5236,142 @@
       container.appendChild(addCandidateWrap);
     }
 
-    function showAddCandidateAutocomplete(container, triggerBtn, jobOfferId, associatedCandidateIds, onLinked) {
+    function showAddCandidateInlinePanel(container, triggerBtn, jobOfferId, associatedCandidateIds, onLinked) {
       var wrap = document.createElement("div");
-      wrap.className = "mt-3 p-4 rounded-2xl border border-gray-200 bg-white shadow-sm relative";
-      wrap.setAttribute("data-autocomplete-wrap", "true");
+      wrap.className = "mt-3 p-4 rounded-2xl border border-gray-200 bg-white shadow-sm";
+      wrap.setAttribute("data-assoc-inline-wrap", "joboffer-add-candidate");
 
       var inputRow = document.createElement("div");
-      inputRow.className = "flex gap-2 items-center";
+      inputRow.className = "flex flex-col sm:flex-row gap-2 sm:items-center";
+
       var input = document.createElement("input");
       input.type = "text";
       input.placeholder = "Search candidate by name...";
       input.className = "form-input flex-1 text-sm";
       input.setAttribute("autocomplete", "off");
+
       var cancelBtn = document.createElement("button");
       cancelBtn.type = "button";
       cancelBtn.className = "px-3 py-2 rounded-lg border border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition-all";
       cancelBtn.textContent = "Cancel";
-      cancelBtn.addEventListener("click", close);
+
       inputRow.appendChild(input);
       inputRow.appendChild(cancelBtn);
       wrap.appendChild(inputRow);
 
-      var dropdown = document.createElement("div");
-      dropdown.className = "absolute left-4 right-4 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-20 max-h-60 overflow-y-auto hidden";
-      dropdown.setAttribute("data-autocomplete-dropdown", "true");
-      wrap.appendChild(dropdown);
+      var list = document.createElement("div");
+      list.className = "mt-3 max-h-72 overflow-y-auto rounded-2xl border border-gray-100 bg-white divide-y divide-gray-50";
+      wrap.appendChild(list);
 
-      var debounceTimer = null;
+      var excluded = {};
+      (associatedCandidateIds || []).forEach(function (id) {
+        if (id) excluded[String(id)] = true;
+      });
+
+      var reqSeq = 0;
+      var lastTerm = "";
 
       function close() {
         if (triggerBtn) triggerBtn.setAttribute("aria-expanded", "false");
         wrap.remove();
-        document.removeEventListener("click", handleOutsideClick);
-        document.removeEventListener("keydown", handleEscape);
       }
 
-      function handleOutsideClick(e) {
-        if (!wrap.contains(e.target) && e.target !== triggerBtn) close();
-      }
+      cancelBtn.addEventListener("click", close);
 
-      function handleEscape(e) {
-        if (e.key === "Escape") close();
-      }
+      async function loadCandidates(term) {
+        lastTerm = (term || "").toString();
+        reqSeq += 1;
+        var thisReq = reqSeq;
 
-      function renderResults(candidates) {
-        dropdown.innerHTML = "";
-        dropdown.classList.remove("hidden");
-        if (!candidates || candidates.length === 0) {
-          var empty = document.createElement("div");
-          empty.className = "px-4 py-3 text-sm text-gray-500";
-          empty.textContent = "No matching candidates";
-          dropdown.appendChild(empty);
+        if (!window.IESupabase || typeof window.IESupabase.fetchCandidatesPaginated !== "function") {
+          list.innerHTML = '<div class="px-4 py-4 text-sm text-gray-400">Candidates API not available.</div>';
           return;
         }
-        candidates.forEach(function (c) {
-          var row = document.createElement("button");
-          row.type = "button";
-          row.className = "w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors flex flex-col gap-0.5";
-          var name = [c.first_name, c.last_name].filter(Boolean).join(" ") || "—";
-          var position = (c.position && c.position.toString()) || "—";
-          row.innerHTML = "<span class=\"font-medium text-gray-800\">" + escapeHtml(name) + "</span><span class=\"text-xs text-gray-500\">" + escapeHtml(position) + "</span>";
-          row.addEventListener("click", function () {
-            selectCandidate(c);
+
+        list.innerHTML = '<div class="px-4 py-4 text-sm text-gray-400">Loading...</div>';
+
+        var filters = {
+          archived: "active",
+          name: lastTerm,
+        };
+
+        try {
+          var result = await window.IESupabase.fetchCandidatesPaginated({
+            filters: filters,
+            page: 1,
+            limit: 20,
           });
-          dropdown.appendChild(row);
-        });
-      }
-
-      function escapeHtml(s) {
-        var div = document.createElement("div");
-        div.textContent = s;
-        return div.innerHTML;
-      }
-
-      function selectCandidate(c) {
-        if (!window.IESupabase || !window.IESupabase.linkCandidateToJob) return;
-        if (associatedCandidateIds.indexOf(c.id) !== -1) {
-          if (window.IESupabase.showError) window.IESupabase.showError("This candidate is already associated with this job offer.");
-          return;
-        }
-        wrap.querySelector("input").disabled = true;
-        window.IESupabase.linkCandidateToJob({
-          candidate_id: c.id,
-          job_offer_id: jobOfferId,
-          status: "applied"
-        }).then(function (res) {
-          wrap.querySelector("input").disabled = false;
-          if (res.error) {
-            var msg = res.error.message || "";
-            var code = res.error.code || (msg.indexOf("23505") !== -1 ? "23505" : null);
-            if (code === "23505" || msg.indexOf("23505") !== -1) {
-              alert("Candidate already linked");
-              return;
-            }
-            if (msg.toLowerCase().indexOf("already hired") !== -1) {
-              alert(msg);
-              return;
-            }
-            if (window.IESupabase.showError) window.IESupabase.showError(msg || "Errore collegamento.");
+          if (thisReq !== reqSeq) return;
+          if (!result || result.error) {
+            list.innerHTML = '<div class="px-4 py-4 text-sm text-red-500">Unable to load candidates.</div>';
             return;
           }
-          close();
-          if (typeof onLinked === "function") onLinked();
-        }).catch(function () {
-          wrap.querySelector("input").disabled = false;
-        });
+
+          var rows = Array.isArray(result.data) ? result.data : [];
+          var filtered = rows.filter(function (c) {
+            if (!c || !c.id) return false;
+            if (excluded[String(c.id)]) return false;
+            if (isCandidateHired(c)) return false;
+            return computeCandidateAvailability(c) === "available";
+          });
+
+          list.innerHTML = "";
+          if (!filtered.length) {
+            list.innerHTML = '<div class="px-4 py-4 text-sm text-gray-400">No candidates available.</div>';
+            return;
+          }
+
+          filtered.slice(0, 20).forEach(function (c) {
+            var row = renderInlineCandidateRow(c, {
+              onClick: async function (candidate) {
+                if (!candidate || !candidate.id) return;
+                if (!window.IESupabase || typeof window.IESupabase.linkCandidateToJob !== "function") return;
+
+                row.disabled = true;
+                row.classList.add("opacity-60", "cursor-not-allowed");
+                try {
+                  var res = await window.IESupabase.linkCandidateToJob({
+                    candidate_id: candidate.id,
+                    job_offer_id: jobOfferId,
+                  });
+                  if (res && res.error) {
+                    if (window.IESupabase && window.IESupabase.showError) {
+                      window.IESupabase.showError(res.error.message || "Errore collegamento.");
+                    }
+                    return;
+                  }
+                  excluded[String(candidate.id)] = true;
+                  if (typeof onLinked === "function") onLinked();
+                  await loadCandidates(lastTerm);
+                } catch (e) {
+                  if (window.IESupabase && window.IESupabase.showError) {
+                    window.IESupabase.showError(e && e.message ? e.message : "Errore.");
+                  }
+                } finally {
+                  row.disabled = false;
+                  row.classList.remove("opacity-60", "cursor-not-allowed");
+                }
+              },
+            });
+            if (row) list.appendChild(row);
+          });
+        } catch (e) {
+          if (thisReq !== reqSeq) return;
+          console.error("[ItalianExperience] Add Candidate panel load error:", e);
+          list.innerHTML = '<div class="px-4 py-4 text-sm text-red-500">Unable to load candidates.</div>';
+        }
       }
 
-      input.addEventListener("input", function () {
-        var term = (input.value || "").trim();
-        if (debounceTimer) clearTimeout(debounceTimer);
-        if (term.length < 2) {
-          dropdown.classList.add("hidden");
-          dropdown.innerHTML = "";
-          return;
-        }
-        debounceTimer = setTimeout(function () {
-          debounceTimer = null;
-          if (!window.IESupabase || !window.IESupabase.searchCandidatesByName) return;
-          window.IESupabase.searchCandidatesByName({
-            term: term,
-            limit: 10
-          }).then(function (result) {
-            if (result.error) {
-              renderResults([]);
-              return;
-            }
-            var data = result.data || [];
-            var excluded = {};
-            associatedCandidateIds.forEach(function (id) { excluded[id] = true; });
-            var filtered = data.filter(function (c) { return !excluded[c.id]; });
-            renderResults(filtered);
-          });
-        }, 300);
-      });
-
-      input.addEventListener("focus", function () {
-        var term = (input.value || "").trim();
-        if (term.length >= 2 && dropdown.children.length > 0) dropdown.classList.remove("hidden");
-      });
-
-      document.addEventListener("click", handleOutsideClick);
-      document.addEventListener("keydown", handleEscape);
-      setTimeout(function () { input.focus(); }, 50);
+      input.addEventListener(
+        "input",
+        debounce(function () {
+          loadCandidates((input.value || "").trim());
+        }, 250)
+      );
 
       triggerBtn.parentNode.insertBefore(wrap, triggerBtn.nextSibling);
+      setTimeout(function () { input.focus(); }, 50);
+      loadCandidates("");
     }
 
     function configureCancel(modeToConfigure, offerId) {
@@ -6511,7 +7069,6 @@
           }
           await renderOfferRows(rows);
           updatePaginationUI(paginationContainer, totalCount, currentPage, limit, rows.length);
-          renderAssociationsForActiveOffer();
         }).catch(function (err) {
           console.error("[ItalianExperience] fetchJobOffersPaginated error:", err);
           tbody.innerHTML = "<tr><td colspan=\"9\" class=\"px-6 py-8 text-center text-red-500\">Errore nel caricamento. Riprova più tardi.</td></tr>";
@@ -6529,7 +7086,6 @@
         const pageRows = rows.slice(start, start + limit);
         await renderOfferRows(pageRows);
         updatePaginationUI(paginationContainer, totalCount, currentPage, limit, pageRows.length);
-        await renderAssociationsForActiveOffer();
       });
     }
 
@@ -6806,75 +7362,7 @@
   // Associations table rendering (job offers page)
   // ---------------------------------------------------------------------------
 
-  async function renderAssociationsForActiveOffer() {
-    const tbody = document.querySelector("[data-ie-associations-body]");
-    if (!tbody) return;
-
-    const firstOfferRow = document.querySelector("[data-ie-joboffers-body] tr");
-    let activeOfferId = null;
-    if (firstOfferRow) activeOfferId = firstOfferRow.getAttribute("data-id");
-    if (!activeOfferId && IE_STORE.jobOffers.length) activeOfferId = IE_STORE.jobOffers[0].id;
-
-    if (window.IESupabase && activeOfferId) {
-      const { data: assocs } = await window.IESupabase.fetchAssociations({ job_offer_id: activeOfferId });
-      const { data: candidates } = await window.IESupabase.fetchMyCandidates();
-      const candidateMap = (candidates || []).reduce(function (acc, c) {
-        acc[c.id] = c;
-        return acc;
-      }, {});
-      tbody.innerHTML = "";
-      (assocs || []).forEach(function (assoc) {
-        const c = candidateMap[assoc.candidate_id];
-        const fullName = c ? (c.first_name || "") + " " + (c.last_name || "") : "—";
-        const positionLabel = c ? (c.position || "—") : "—";
-        const tr = document.createElement("tr");
-        tr.className = "table-row transition";
-        tr.innerHTML =
-          "<td class=\"px-6 py-4 font-semibold text-gray-800\">" + fullName + "</td>" +
-          "<td class=\"px-6 py-4 text-gray-600\">" + positionLabel + "</td>" +
-          "<td class=\"px-6 py-4\"><span class=\"badge " + getApplicationStatusBadgeClass(assoc.status) + "\">" + formatApplicationStatusLabel(assoc.status) + "</span></td>" +
-          "<td class=\"px-6 py-4 text-gray-500 italic text-xs\">" + (assoc.notes || "—") + "</td>" +
-          "<td class=\"px-6 py-4 text-center\"><button type=\"button\" class=\"text-red-500 hover:text-red-600 text-xs font-semibold uppercase tracking-widest\" data-action=\"remove-association\" data-id=\"" + (assoc.id || "") + "\">Remove</button></td>";
-        tbody.appendChild(tr);
-      });
-      return;
-    }
-
-    if (!activeOfferId) return;
-    const rows = IE_STORE.candidateJobAssociations.filter(
-      (assoc) => assoc.job_offer_id === activeOfferId
-    );
-    tbody.innerHTML = "";
-    rows.forEach((assoc) => {
-      const candidate = IE_STORE.candidates.find((c) => c.id === assoc.candidate_id);
-      if (!candidate) return;
-      const tr = document.createElement("tr");
-      tr.className = "table-row transition";
-      const metaTitle = formatLastUpdatedMeta(assoc);
-      if (metaTitle) tr.title = metaTitle;
-      tr.innerHTML =
-        "<td class=\"px-6 py-4 font-semibold text-gray-800\">" + (candidate.first_name || "") + " " + (candidate.last_name || "") + "</td>" +
-        "<td class=\"px-6 py-4 text-gray-600\">" + (candidate.posizione || "—") + "</td>" +
-        "<td class=\"px-6 py-4\"><span class=\"badge " + getApplicationStatusBadgeClass(assoc.status) + "\">" + formatApplicationStatusLabel(assoc.status) + "</span></td>" +
-        "<td class=\"px-6 py-4 text-gray-500 italic text-xs\">" + (assoc.notes || "—") + "</td>" +
-        "<td class=\"px-6 py-4 text-center\"><button type=\"button\" class=\"text-red-500 hover:text-red-600 text-xs font-semibold uppercase tracking-widest\" data-action=\"remove-association\" data-id=\"" + assoc.id + "\">Remove</button></td>";
-      tbody.appendChild(tr);
-    });
-
-    tbody.addEventListener("click", function (event) {
-      const btn = event.target.closest("[data-action='remove-association']");
-      if (!btn) return;
-      const id = btn.getAttribute("data-id");
-      if (!id) return;
-      const confirmed = window.confirm("Vuoi rimuovere questa associazione candidato-offerta? (simulazione)");
-      if (!confirmed) return;
-      const idx = IE_STORE.candidateJobAssociations.findIndex((a) => a.id === id);
-      if (idx >= 0) {
-        IE_STORE.candidateJobAssociations.splice(idx, 1);
-        renderAssociationsForActiveOffer();
-      }
-    });
-  }
+  // Legacy renderAssociationsForActiveOffer removed with list-page associations UI.
 
   // ---------------------------------------------------------------------------
   // Global event delegation for entity row actions (edit, archive, preview, restore, delete)
