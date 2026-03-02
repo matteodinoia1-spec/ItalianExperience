@@ -1938,7 +1938,38 @@
       if (offer.status === "archived") return;
 
       if (hiredCount >= required && offer.status !== "closed" && offer.status !== "archived") {
-        await supabase.from("job_offers").update({ status: "closed" }).eq("id", jobOfferId);
+        const { error: jobUpdateError } = await supabase
+          .from("job_offers")
+          .update({
+            status: "closed",
+            closure_note: "Auto-closed: positions filled",
+          })
+          .eq("id", jobOfferId);
+
+        if (jobUpdateError) {
+          console.error(
+            "[Supabase] syncJobOfferStatusFromHired job_offers update error:",
+            jobUpdateError.message || jobUpdateError,
+            jobUpdateError,
+            { jobOfferId }
+          );
+          return;
+        }
+
+        const { error: assocUpdateError } = await supabase
+          .from("candidate_job_associations")
+          .update({ status: "not_selected" })
+          .eq("job_offer_id", jobOfferId)
+          .not("status", "in", "(hired,rejected)");
+
+        if (assocUpdateError) {
+          console.error(
+            "[Supabase] syncJobOfferStatusFromHired associations update error:",
+            assocUpdateError.message || assocUpdateError,
+            assocUpdateError,
+            { jobOfferId }
+          );
+        }
       } else if (hiredCount < required && offer.status === "closed") {
         await supabase.from("job_offers").update({ status: "active" }).eq("id", jobOfferId);
       }

@@ -2236,7 +2236,7 @@
         if (!filters.offerStatus) return true;
         const status = item.status || "";
         if (filters.offerStatus === "active") {
-          return status === "open" || status === "inprogress" || status === "in progress";
+          return status === "active" || status === "open" || status === "inprogress" || status === "in progress";
         }
         return status === filters.offerStatus;
       });
@@ -2316,6 +2316,78 @@
     const params = new URLSearchParams(window.location.search);
     const state = resolveEntityPageState(params);
     return { mode: state.mode, id: state.id };
+  }
+
+  function getCandidateStatusBadgeClass(status) {
+    switch (status) {
+      case "new":
+        return "badge-new";
+      case "interview":
+        return "badge-interview";
+      case "hired":
+        return "badge-hired";
+      case "rejected":
+        return "badge-rejected";
+      default:
+        return "badge-new";
+    }
+  }
+
+  function formatCandidateStatusLabel(status) {
+    switch (status) {
+      case "new":
+        return "New";
+      case "interview":
+        return "Interview";
+      case "hired":
+        return "Hired";
+      case "rejected":
+        return "Rejected";
+      default:
+        return status || "New";
+    }
+  }
+
+  function getApplicationStatusBadgeClass(status) {
+    switch (status) {
+      case "applied":
+        return "badge-applied";
+      case "screening":
+        return "badge-screening";
+      case "interview":
+        return "badge-interview";
+      case "offered":
+        return "badge-offered";
+      case "hired":
+        return "badge-hired";
+      case "rejected":
+        return "badge-rejected";
+      case "not_selected":
+        return "badge-neutral";
+      default:
+        return "badge-applied";
+    }
+  }
+
+  function formatApplicationStatusLabel(status) {
+    switch (status) {
+      case "applied":
+        return "Applied";
+      case "screening":
+        return "Screening";
+      case "interview":
+        return "Interview";
+      case "offered":
+        return "Offered";
+      case "hired":
+        return "Hired";
+      case "rejected":
+        return "Rejected";
+      case "not_selected":
+        return "Not Selected";
+      default:
+        return status || "Applied";
+    }
   }
 
   /**
@@ -2746,6 +2818,39 @@
       navigateTo("offerte.html");
     }
 
+    function openReopenOfferModal(offerId, offer, options) {
+      var onConfirm = options && typeof options.onConfirm === "function" ? options.onConfirm : null;
+      openModal({
+        title: "Reopen Job Offer?",
+        fullPageHref: null,
+        render: function (mount) {
+          mount.innerHTML =
+            "<p class=\"text-gray-700 text-sm mb-4\">This job offer is closed. Reopen it to edit, add candidates, or mark someone as hired.</p>" +
+            "<div class=\"flex gap-3 mt-4\">" +
+            "<button type=\"button\" data-reopen-confirm class=\"px-4 py-2.5 rounded-xl bg-[#1b4332] text-white text-sm font-semibold hover:opacity-90 transition-all\">Confirm</button>" +
+            "<button type=\"button\" data-ie-modal-close class=\"px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-all\">Cancel</button>" +
+            "</div>";
+          var confirmBtn = mount.querySelector("[data-reopen-confirm]");
+          if (confirmBtn && onConfirm) {
+            confirmBtn.addEventListener("click", async function () {
+              if (confirmBtn.disabled) return;
+              confirmBtn.disabled = true;
+              try {
+                await onConfirm();
+                closeModal();
+              } catch (e) {
+                if (window.IESupabase && window.IESupabase.showError) {
+                  window.IESupabase.showError(e && e.message ? e.message : "Errore.");
+                }
+              } finally {
+                confirmBtn.disabled = false;
+              }
+            });
+          }
+        },
+      });
+    }
+
     function renderActionButtons(modeToRender, offerId, offer) {
       if (!actionsContainer) return;
       function reloadPage() {
@@ -2772,24 +2877,42 @@
           if (result && result.error && window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Errore.");
           else navigateTo("offerte.html");
         },
-        onReopen: async function () {
-          if (!window.IESupabase || !window.IESupabase.updateJobOfferStatus) return;
-          var result = await window.IESupabase.updateJobOfferStatus(offerId, "active");
-          if (result && result.error && window.IESupabase.showError) {
-            window.IESupabase.showError(result.error.message || "Errore.");
-          } else if (result && result.data && offer) {
-            offer.status = result.data.status;
-            renderActionButtons("view", offerId, offer);
-          } else {
-            reloadPage();
-          }
+        onReopen: function () {
+          openReopenOfferModal(offerId, offer, {
+            onConfirm: async function () {
+              if (!window.IESupabase || !window.IESupabase.updateJobOfferStatus) return;
+              var result = await window.IESupabase.updateJobOfferStatus(offerId, "active");
+              if (result && result.error) {
+                if (window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Errore.");
+                throw new Error(result.error.message || "Errore.");
+              }
+              if (result && result.data) {
+                if (offer) {
+                  offer.status = result.data.status;
+                  if (result.data.positions != null) offer.positions = result.data.positions;
+                }
+                var updatedOffer = offer || result.data;
+                populateFormFromOffer(updatedOffer);
+                renderActionButtons("view", offerId, updatedOffer);
+                renderAssociatedCandidates(offerId, updatedOffer);
+              }
+            },
+          });
         }
       });
     }
 
-    var STATUS_OPTIONS = ["applied", "screening", "interview", "offered", "hired", "rejected"];
+    var STATUS_OPTIONS = [
+      "applied",
+      "screening",
+      "interview",
+      "offered",
+      "hired",
+      "rejected",
+      "not_selected"
+    ];
 
-    async function renderAssociatedCandidates(jobOfferId) {
+    async function renderAssociatedCandidates(jobOfferId, offer) {
       if (!window.IESupabase || !window.IESupabase.fetchCandidatesForJobOffer) return;
       var container = document.getElementById("associated-candidates-container");
       if (!container) {
@@ -2848,7 +2971,6 @@
           var name = [c.first_name, c.last_name].filter(Boolean).join(" ") || "—";
           var position = (c.position && c.position.toString()) || "—";
           var status = (item.status && item.status.toString()) || "—";
-          var isHired = status === "hired";
           var tr = document.createElement("tr");
           tr.className = "border-b border-gray-100";
           tr.setAttribute("data-row-association-id", item.id);
@@ -2862,14 +2984,11 @@
           tr.appendChild(tdPosition);
           var tdStatus = document.createElement("td");
           tdStatus.className = "py-3 text-sm text-gray-600 status-cell";
-          if (isHired) {
-            var hiredBadge = document.createElement("span");
-            hiredBadge.className = "badge badge-hired";
-            hiredBadge.textContent = "Hired";
-            tdStatus.appendChild(hiredBadge);
-          } else {
-            tdStatus.textContent = status;
-          }
+          var badge = document.createElement("span");
+          badge.className = "badge " + getApplicationStatusBadgeClass(status);
+          badge.textContent = formatApplicationStatusLabel(status);
+          tdStatus.innerHTML = "";
+          tdStatus.appendChild(badge);
           tr.appendChild(tdStatus);
           var tdChange = document.createElement("td");
           tdChange.className = "py-3";
@@ -2883,9 +3002,41 @@
             if (opt === status) option.selected = true;
             select.appendChild(option);
           });
+          var previousStatus = status;
           select.addEventListener("change", async function () {
             var associationId = select.getAttribute("data-association-id");
             var newStatus = select.value;
+            var statusSelect = document.querySelector('#jobOfferForm [name="status"]');
+            var normalizedOfferStatus = statusSelect
+              ? normalizeStatus(statusSelect.value)
+              : "active";
+            if (normalizedOfferStatus === "closed" && newStatus === "hired") {
+              select.value = previousStatus;
+              openReopenOfferModal(jobOfferId, offer, {
+                onConfirm: async function () {
+                  if (!window.IESupabase || !window.IESupabase.updateJobOfferStatus) return;
+                  var reopenResult = await window.IESupabase.updateJobOfferStatus(jobOfferId, "active");
+                  if (reopenResult && reopenResult.error) {
+                    if (window.IESupabase.showError) window.IESupabase.showError(reopenResult.error.message || "Errore.");
+                    throw new Error(reopenResult.error.message || "Errore.");
+                  }
+                  if (reopenResult && reopenResult.data && offer) {
+                    offer.status = reopenResult.data.status;
+                    if (reopenResult.data.positions != null) offer.positions = reopenResult.data.positions;
+                    populateFormFromOffer(offer);
+                    renderActionButtons("view", jobOfferId, offer);
+                  }
+                  if (!window.IESupabase || !window.IESupabase.updateCandidateAssociationStatus) return;
+                  var hireRes = await window.IESupabase.updateCandidateAssociationStatus(associationId, "hired");
+                  if (hireRes.error) {
+                    if (window.IESupabase.showError) window.IESupabase.showError(hireRes.error.message || "Errore aggiornamento stato.");
+                    throw new Error(hireRes.error.message || "Errore aggiornamento stato.");
+                  }
+                  await renderAssociatedCandidates(jobOfferId, offer);
+                },
+              });
+              return;
+            }
             if (!window.IESupabase || !window.IESupabase.updateCandidateAssociationStatus) return;
             var res = await window.IESupabase.updateCandidateAssociationStatus(associationId, newStatus);
             if (res.error) {
@@ -2894,15 +3045,11 @@
             }
             var statusCell = tr.querySelector(".status-cell");
             if (statusCell) {
-              if (newStatus === "hired") {
-                statusCell.innerHTML = "";
-                var hiredBadge = document.createElement("span");
-                hiredBadge.className = "badge badge-hired";
-                hiredBadge.textContent = "Hired";
-                statusCell.appendChild(hiredBadge);
-              } else {
-                statusCell.textContent = newStatus;
-              }
+              statusCell.innerHTML = "";
+              var badge = document.createElement("span");
+              badge.className = "badge " + getApplicationStatusBadgeClass(newStatus);
+              badge.textContent = formatApplicationStatusLabel(newStatus);
+              statusCell.appendChild(badge);
             }
           });
           tdChange.appendChild(select);
@@ -2919,7 +3066,7 @@
             if (!window.IESupabase || !window.IESupabase.removeCandidateFromJob) return;
             var result = await window.IESupabase.removeCandidateFromJob(associationId);
             if (!result.error) {
-              await renderAssociatedCandidates(jobOfferId);
+              await renderAssociatedCandidates(jobOfferId, offer);
             } else {
               if (window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Errore rimozione.");
             }
@@ -2947,7 +3094,7 @@
           return;
         }
         showAddCandidateAutocomplete(container, addCandidateBtn, jobOfferId, associatedCandidateIds, function () {
-          renderAssociatedCandidates(jobOfferId);
+          renderAssociatedCandidates(jobOfferId, offer);
         });
         addCandidateBtn.setAttribute("aria-expanded", "true");
       });
@@ -3250,7 +3397,7 @@
 
           if (isViewModeForOffer) {
             setFormDisabled(true);
-            if (normalizedStatus !== "archived") renderAssociatedCandidates(offerId);
+            if (normalizedStatus !== "archived") renderAssociatedCandidates(offerId, offer);
           }
         })
         .catch(function (err) {
@@ -3296,7 +3443,7 @@
 
     if (isViewModeForOffer) {
       setFormDisabled(true);
-      if (normalizedStatus !== "archived") renderAssociatedCandidates(offerId);
+      if (normalizedStatus !== "archived") renderAssociatedCandidates(offerId, localOffer);
     }
   }
 
@@ -3986,36 +4133,6 @@
       if (!offer) return "—";
       const client = IE_STORE.clients.find((c) => c.id === offer.client_id);
       return client ? client.name : "—";
-    }
-
-    function getCandidateStatusBadgeClass(status) {
-      switch (status) {
-        case "new":
-          return "badge-new";
-        case "interview":
-          return "badge-interview";
-        case "hired":
-          return "badge-hired";
-        case "rejected":
-          return "badge-rejected";
-        default:
-          return "badge-new";
-      }
-    }
-
-    function formatCandidateStatusLabel(status) {
-      switch (status) {
-        case "new":
-          return "New";
-        case "interview":
-          return "Interview";
-        case "hired":
-          return "Hired";
-        case "rejected":
-          return "Rejected";
-        default:
-          return status || "New";
-      }
     }
 
     renderCandidates();
@@ -4747,7 +4864,7 @@
               const activeOffersCount = (row.job_offers || []).filter(function (o) {
                 if (!o || o.is_archived) return false;
                 const status = o.status || "";
-                return status === "open" || status === "inprogress" || status === "in progress";
+                return status === "active" || status === "open" || status === "inprogress" || status === "in progress";
               }).length;
               const activeOffersHtml =
                 activeOffersCount > 0
@@ -4811,7 +4928,7 @@
             if (!offer || offer.is_archived) return false;
             if (offer.client_id !== row.id) return false;
             const status = offer.status || "";
-            return status === "open" || status === "inprogress" || status === "in progress";
+            return status === "active" || status === "open" || status === "inprogress" || status === "in progress";
           }).length;
           const activeOffersHtml =
             activeOffersCount > 0
@@ -4877,7 +4994,7 @@
         tr.innerHTML =
           "<td class=\"px-6 py-4 font-semibold text-gray-800\">" + fullName + "</td>" +
           "<td class=\"px-6 py-4 text-gray-600\">" + positionLabel + "</td>" +
-          "<td class=\"px-6 py-4\"><span class=\"badge " + getCandidateStatusBadgeClass(assoc.status) + "\">" + formatCandidateStatusLabel(assoc.status) + "</span></td>" +
+          "<td class=\"px-6 py-4\"><span class=\"badge " + getApplicationStatusBadgeClass(assoc.status) + "\">" + formatApplicationStatusLabel(assoc.status) + "</span></td>" +
           "<td class=\"px-6 py-4 text-gray-500 italic text-xs\">" + (assoc.notes || "—") + "</td>" +
           "<td class=\"px-6 py-4 text-center\"><button type=\"button\" class=\"text-red-500 hover:text-red-600 text-xs font-semibold uppercase tracking-widest\" data-action=\"remove-association\" data-id=\"" + (assoc.id || "") + "\">Remove</button></td>";
         tbody.appendChild(tr);
@@ -4900,7 +5017,7 @@
       tr.innerHTML =
         "<td class=\"px-6 py-4 font-semibold text-gray-800\">" + (candidate.first_name || "") + " " + (candidate.last_name || "") + "</td>" +
         "<td class=\"px-6 py-4 text-gray-600\">" + (candidate.posizione || "—") + "</td>" +
-        "<td class=\"px-6 py-4\"><span class=\"badge " + getCandidateStatusBadgeClass(assoc.status) + "\">" + formatCandidateStatusLabel(assoc.status) + "</span></td>" +
+        "<td class=\"px-6 py-4\"><span class=\"badge " + getApplicationStatusBadgeClass(assoc.status) + "\">" + formatApplicationStatusLabel(assoc.status) + "</span></td>" +
         "<td class=\"px-6 py-4 text-gray-500 italic text-xs\">" + (assoc.notes || "—") + "</td>" +
         "<td class=\"px-6 py-4 text-center\"><button type=\"button\" class=\"text-red-500 hover:text-red-600 text-xs font-semibold uppercase tracking-widest\" data-action=\"remove-association\" data-id=\"" + assoc.id + "\">Remove</button></td>";
       tbody.appendChild(tr);
