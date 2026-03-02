@@ -2652,6 +2652,55 @@
   }
 
   /**
+   * Fetch all activity logs created by the logged-in user.
+   * Returns a flat array of logs scoped to the current user.
+   * @returns {Promise<{ data: array | null, error: object | null }>}
+   */
+  async function fetchMyActivityLogs() {
+    const { data: sessionData, error: sessionError } = await getSession();
+    if (sessionError) {
+      console.error("[Supabase] fetchMyActivityLogs session error:", sessionError.message || sessionError, sessionError);
+      return { data: null, error: sessionError };
+    }
+    const userId = sessionData?.user?.id;
+    if (!userId) {
+      const err = new Error("Not authenticated");
+      console.error("[Supabase] fetchMyActivityLogs:", err);
+      return { data: null, error: err };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from("activity_logs")
+        .select(
+          `
+          id,
+          entity_type,
+          entity_id,
+          event_type,
+          message,
+          created_at,
+          updated_at,
+          updated_by
+        `
+        )
+        .eq("created_by", userId)
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: false });
+
+      if (error) {
+        console.error("[Supabase] fetchMyActivityLogs error:", error.message || error, error);
+        return { data: null, error };
+      }
+
+      return { data: Array.isArray(data) ? data : [], error: null };
+    } catch (err) {
+      console.error("[Supabase] fetchMyActivityLogs exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
+  /**
    * Update an activity log message.
    * @param {string} logId
    * @param {string} message
@@ -2684,6 +2733,48 @@
       return { data, error: null };
     } catch (err) {
       console.error("[Supabase] updateLog exception:", err, { logId });
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Update a manual activity log created by the current user.
+   * @param {string} id
+   * @param {{ message: string }} payload
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function updateMyManualLog(id, payload) {
+    if (!id || typeof id !== "string") {
+      const error = new Error("Missing id");
+      console.error("[Supabase] updateMyManualLog:", error);
+      return { data: null, error };
+    }
+
+    try {
+      const userId = await getCurrentUserId();
+      const cleanedMessage = normalizeMessage(payload && payload.message);
+
+      const { data, error } = await supabase
+        .from("activity_logs")
+        .update({
+          message: cleanedMessage,
+          updated_at: new Date().toISOString(),
+          updated_by: userId,
+        })
+        .eq("id", id)
+        .eq("created_by", userId)
+        .eq("event_type", "manual_note")
+        .select()
+        .single();
+
+      if (error) {
+        console.error("[Supabase] updateMyManualLog error:", error.message || error, error, { id });
+        return { data: null, error };
+      }
+
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] updateMyManualLog exception:", err, { id });
       return { data: null, error: err };
     }
   }
@@ -2723,6 +2814,48 @@
       return { data: { success: true }, error: null };
     } catch (err) {
       console.error("[Supabase] deleteLog exception:", err, { logId });
+      return { data: { success: false }, error: err };
+    }
+  }
+
+  /**
+   * Delete a manual activity log created by the current user.
+   * @param {string} id
+   * @returns {Promise<{ data: { success: boolean } | null, error: object | null }>}
+   */
+  async function deleteMyManualLog(id) {
+    if (!id || typeof id !== "string") {
+      const error = new Error("Missing id");
+      console.error("[Supabase] deleteMyManualLog:", error);
+      return { data: null, error };
+    }
+
+    try {
+      const userId = await getCurrentUserId();
+
+      const { data, error } = await supabase
+        .from("activity_logs")
+        .delete()
+        .eq("id", id)
+        .eq("created_by", userId)
+        .eq("event_type", "manual_note")
+        .select();
+
+      if (error) {
+        console.error("[Supabase] deleteMyManualLog error:", error.message || error, error, { id });
+        return { data: { success: false }, error };
+      }
+
+      const rowCount = Array.isArray(data) ? data.length : data ? 1 : 0;
+      if (rowCount === 0) {
+        const zeroError = new Error("Delete succeeded but 0 rows affected");
+        console.error("[Supabase] deleteMyManualLog zero rows:", { id });
+        return { data: { success: false }, error: zeroError };
+      }
+
+      return { data: { success: true }, error: null };
+    } catch (err) {
+      console.error("[Supabase] deleteMyManualLog exception:", err, { id });
       return { data: { success: false }, error: err };
     }
   }
@@ -2842,11 +2975,14 @@
     fetchClientsPaginated,
     searchClientsByName,
     // Activity Logs
+    fetchMyActivityLogs,
     createLog,
     fetchLogs,
     updateLog,
     deleteLog,
     createAutoLog,
+    updateMyManualLog,
+    deleteMyManualLog,
     // Restore (unarchive) for Archiviati page
     unarchiveCandidate,
     unarchiveJobOffer,
