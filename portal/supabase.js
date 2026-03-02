@@ -792,7 +792,6 @@
     const offset = (page - 1) * limit;
 
     try {
-      console.log("[Supabase] fetchCandidatesPaginated for user id:", userId, "page:", page, "limit:", limit);
       let candidateIdsForOffer = null;
 
       if (jobOfferId) {
@@ -919,6 +918,10 @@
           is_archived: r.is_archived,
           client_name: latestClientName,
           photo_url: r.photo_url,
+          cv_url:
+            typeof r.cv_url === "string" && r.cv_url.trim().length > 0
+              ? r.cv_url
+              : null,
           latest_association: latestAssociation
             ? {
                 id: latestAssociation.id,
@@ -1959,7 +1962,8 @@
             first_name,
             last_name,
             position,
-            is_archived
+            is_archived,
+            cv_url
           )
         `
         )

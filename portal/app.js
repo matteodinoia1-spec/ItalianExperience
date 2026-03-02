@@ -2377,6 +2377,10 @@
           source: r.source || "",
           client_name: r.client_name || null,
           foto_url: r.photo_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent((r.first_name || "") + "+" + (r.last_name || "")) + "&background=dbeafe&color=1e40af",
+          cv_url:
+            typeof r.cv_url === "string" && r.cv_url.trim().length > 0
+              ? r.cv_url
+              : null,
           created_at: r.created_at,
           is_archived: r.is_archived || false,
         };
@@ -4892,7 +4896,10 @@
         client_name: r.client_name || null,
         foto_url: r.foto_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent((first_name || "") + "+" + (last_name || "")) + "&background=dbeafe&color=1e40af",
         photo_storage_path: r.photo_url || null,
-        cv_url: r.cv_url || null,
+        cv_url:
+          typeof r.cv_url === "string" && r.cv_url.trim().length > 0
+            ? r.cv_url
+            : null,
         created_at: r.created_at,
         is_archived: r.is_archived || false,
         latest_association: r.latest_association || null,
