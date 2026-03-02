@@ -554,7 +554,6 @@
           )
         `
         )
-        .eq("created_by", userId)
         .order("created_at", { ascending: false });
       if (error) {
         console.error("[Supabase] fetchMyCandidates error:", error.message, error);
@@ -846,7 +845,7 @@
    * Columns: first_name, last_name, position, address, status, source, is_archived, created_by.
    */
   function buildCandidatesQuery(supabaseQuery, filters, userId) {
-    let q = supabaseQuery.eq("created_by", userId);
+    let q = supabaseQuery;
     if (filters.archived === "active") q = q.eq("is_archived", false);
     if (filters.archived === "archived") q = q.eq("is_archived", true);
     if (filters.status) q = q.eq("status", filters.status);
@@ -1618,6 +1617,70 @@
       console.error("[Supabase] deletePermanent exception:", err, { table, id });
       return { data: null, error: err };
     }
+  }
+
+  /**
+   * Wrapper for permanent deletes that first cleans up related activity_logs.
+   * - Deletes activity_logs for the resolved entityType/entity_id pair.
+   * - Only proceeds to the underlying deletePermanent helper if log cleanup succeeds.
+   * - Falls back to deletePermanent when entityType cannot be resolved from table.
+   *
+   * @param {{ table: string, id: string, entityType?: "candidate"|"job_offer"|"client" }} params
+   * @returns {Promise<{ data: any, error: any }>}
+   */
+  async function deletePermanentRecord(params) {
+    const table = params && params.table;
+    const id = params && params.id;
+
+    if (!table || !id) {
+      const error = new Error("Missing table or id");
+      console.error("[Supabase] deletePermanentRecord:", error, { table, id });
+      return { data: null, error };
+    }
+
+    let entityType = params && params.entityType;
+
+    if (!entityType) {
+      if (table === "candidates") {
+        entityType = "candidate";
+      } else if (table === "job_offers") {
+        entityType = "job_offer";
+      } else if (table === "clients") {
+        entityType = "client";
+      }
+    }
+
+    if (!entityType) {
+      // Unknown table mapping: fall back to original behavior without log cleanup.
+      return deletePermanent({ table, id });
+    }
+
+    try {
+      const { error: logError } = await supabase
+        .from("activity_logs")
+        .delete()
+        .eq("entity_type", entityType)
+        .eq("entity_id", id);
+
+      if (logError) {
+        console.error(
+          "[Supabase] deletePermanentRecord log cleanup error:",
+          logError.message || logError,
+          logError,
+          { entityType, entity_id: id, table }
+        );
+        return { data: null, error: logError };
+      }
+    } catch (err) {
+      console.error("[Supabase] deletePermanentRecord log cleanup exception:", err, {
+        entityType,
+        entity_id: id,
+        table,
+      });
+      return { data: null, error: err };
+    }
+
+    return deletePermanent({ table, id });
   }
 
   // ---------------------------------------------------------------------------
@@ -2803,7 +2866,7 @@
     getRecentCandidates,
     getCandidatesBySource,
     // Deletes / archive helpers
-    deletePermanentRecord: deletePermanent,
+    deletePermanentRecord: deletePermanentRecord,
     // Helpers
     showError,
     showSuccess,

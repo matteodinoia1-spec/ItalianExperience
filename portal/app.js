@@ -2909,6 +2909,9 @@
     }
   }
 
+  var candidateOriginalStatus = null;
+  var jobOfferOriginalStatus = null;
+
   function getCandidatePageParams() {
     const params = new URLSearchParams(window.location.search);
     const state = resolveEntityPageState(params);
@@ -3043,6 +3046,8 @@
         return;
       }
 
+      candidateOriginalStatus = (candidate.status || "new").toString();
+
       const lifecycleStatus = candidate.is_archived ? "archived" : "active";
       const effectiveMode = resolveEntityMode(lifecycleStatus, requestedMode);
       console.log("DEBUG CANDIDATE PAGE");
@@ -3129,12 +3134,40 @@
           },
           onArchive: async function () {
             const res = await window.IESupabase.archiveCandidate(candidateId);
-            if (!res.error) navigateTo("candidati.html");
+            if (!res.error) {
+              if (
+                typeof window !== "undefined" &&
+                window.IESupabase &&
+                typeof window.IESupabase.createAutoLog === "function"
+              ) {
+                window.IESupabase
+                  .createAutoLog("candidate", candidateId, {
+                    event_type: "system_event",
+                    message: "Candidate archived",
+                    metadata: null,
+                  })
+                  .catch(function () {});
+              }
+              navigateTo("candidati.html");
+            }
           },
           onReopen: async function () {
             const res = await window.IESupabase.unarchiveCandidate(candidateId);
             if (!res.error) {
               candidate.is_archived = false;
+              if (
+                typeof window !== "undefined" &&
+                window.IESupabase &&
+                typeof window.IESupabase.createAutoLog === "function"
+              ) {
+                window.IESupabase
+                  .createAutoLog("candidate", candidateId, {
+                    event_type: "system_event",
+                    message: "Candidate restored",
+                    metadata: null,
+                  })
+                  .catch(function () {});
+              }
               renderCandidateLifecycleActions("active");
             }
           },
@@ -3239,13 +3272,41 @@
       }
       function onArchive() {
         return window.IESupabase.archiveClient(clientId).then(function (res) {
-          if (!res.error) navigateTo("clienti.html");
+          if (!res.error) {
+            if (
+              typeof window !== "undefined" &&
+              window.IESupabase &&
+              typeof window.IESupabase.createAutoLog === "function"
+            ) {
+              window.IESupabase
+                .createAutoLog("client", clientId, {
+                  event_type: "system_event",
+                  message: "Client archived",
+                  metadata: null,
+                })
+                .catch(function () {});
+            }
+            navigateTo("clienti.html");
+          }
         });
       }
       function onReopen() {
         return window.IESupabase.unarchiveClient(clientId).then(function (res) {
           if (!res.error) {
             client.is_archived = false;
+            if (
+              typeof window !== "undefined" &&
+              window.IESupabase &&
+              typeof window.IESupabase.createAutoLog === "function"
+            ) {
+              window.IESupabase
+                .createAutoLog("client", clientId, {
+                  event_type: "system_event",
+                  message: "Client restored",
+                  metadata: null,
+                })
+                .catch(function () {});
+            }
             renderLifecycleActions({
               entityType: "client",
               entityId: clientId,
@@ -3308,12 +3369,32 @@
       source: (formData.get("source") || "").toString(),
       notes: (formData.get("notes") || "").toString(),
     };
+    var newStatus = payload.status;
     window.IESupabase.updateCandidate(id, payload).then(function (result) {
       if (result.error) {
         if (window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Errore durante il salvataggio.");
         return;
       }
       if (window.IESupabase.showSuccess) window.IESupabase.showSuccess("Candidato aggiornato.");
+
+      if (
+        typeof window !== "undefined" &&
+        window.IESupabase &&
+        typeof window.IESupabase.createAutoLog === "function" &&
+        candidateOriginalStatus &&
+        newStatus &&
+        candidateOriginalStatus !== newStatus
+      ) {
+        window.IESupabase
+          .createAutoLog("candidate", id, {
+            event_type: "status_change",
+            message: "Status changed from " + candidateOriginalStatus + " to " + newStatus,
+            metadata: { from: candidateOriginalStatus, to: newStatus },
+          })
+          .catch(function () {});
+      }
+
+      candidateOriginalStatus = newStatus;
 
       if (window.IESupabase && typeof window.IESupabase.getCandidateById === "function") {
         window.IESupabase
@@ -3614,6 +3695,7 @@
   }
 
   async function openReopenOfferModal(offerId, offer, options) {
+      var oldStatus = offer && offer.status ? offer.status.toString() : null;
       var onConfirm = options && typeof options.onConfirm === "function" ? options.onConfirm : null;
       var hiredCount = 0;
       if (window.IESupabase && window.IESupabase.fetchCandidatesForJobOffer) {
@@ -3684,6 +3766,23 @@
                     return;
                   }
                 }
+                var newStatus = statusResult && statusResult.data && statusResult.data.status ? statusResult.data.status.toString() : "active";
+                if (
+                  typeof window !== "undefined" &&
+                  window.IESupabase &&
+                  typeof window.IESupabase.createAutoLog === "function" &&
+                  oldStatus &&
+                  newStatus &&
+                  oldStatus !== newStatus
+                ) {
+                  window.IESupabase
+                    .createAutoLog("job_offer", offerId, {
+                      event_type: "status_change",
+                      message: "Status changed from " + oldStatus + " to " + newStatus,
+                      metadata: { from: oldStatus, to: newStatus },
+                    })
+                    .catch(function () {});
+                }
                 var updatedOffer = offer ? Object.assign({}, offer, { status: "active", positions: positions }) : { status: "active", positions: positions };
                 if (statusResult && statusResult.data) {
                   updatedOffer.status = statusResult.data.status;
@@ -3706,6 +3805,7 @@
 
     function renderActionButtons(modeToRender, offerId, offer) {
       if (!actionsContainer) return;
+      var oldStatus = offer && offer.status ? offer.status.toString() : null;
       function reloadPage() {
         window.location.reload();
       }
@@ -3721,14 +3821,54 @@
         onClose: async function () {
           if (!window.IESupabase || !window.IESupabase.updateJobOfferStatus) return;
           var result = await window.IESupabase.updateJobOfferStatus(offerId, "closed");
-          if (result && result.error && window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Errore.");
-          else reloadPage();
+          if (result && result.error && window.IESupabase.showError) {
+            window.IESupabase.showError(result.error.message || "Errore.");
+          } else {
+            var newStatus = result && result.data && result.data.status ? result.data.status.toString() : "closed";
+            if (
+              typeof window !== "undefined" &&
+              window.IESupabase &&
+              typeof window.IESupabase.createAutoLog === "function" &&
+              oldStatus &&
+              newStatus &&
+              oldStatus !== newStatus
+            ) {
+              window.IESupabase
+                .createAutoLog("job_offer", offerId, {
+                  event_type: "status_change",
+                  message: "Status changed from " + oldStatus + " to " + newStatus,
+                  metadata: { from: oldStatus, to: newStatus },
+                })
+                .catch(function () {});
+            }
+            reloadPage();
+          }
         },
         onArchive: async function () {
           if (!window.IESupabase || !window.IESupabase.updateJobOfferStatus) return;
           var result = await window.IESupabase.updateJobOfferStatus(offerId, "archived");
-          if (result && result.error && window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Errore.");
-          else navigateTo("offerte.html");
+          if (result && result.error && window.IESupabase.showError) {
+            window.IESupabase.showError(result.error.message || "Errore.");
+          } else {
+            var newStatus = result && result.data && result.data.status ? result.data.status.toString() : "archived";
+            if (
+              typeof window !== "undefined" &&
+              window.IESupabase &&
+              typeof window.IESupabase.createAutoLog === "function" &&
+              oldStatus &&
+              newStatus &&
+              oldStatus !== newStatus
+            ) {
+              window.IESupabase
+                .createAutoLog("job_offer", offerId, {
+                  event_type: "status_change",
+                  message: "Status changed from " + oldStatus + " to " + newStatus,
+                  metadata: { from: oldStatus, to: newStatus },
+                })
+                .catch(function () {});
+            }
+            navigateTo("offerte.html");
+          }
         },
         onReopen: function () {
           openReopenOfferModal(offerId, offer, {
@@ -4378,6 +4518,7 @@
             handleMissingOfferAndRedirect();
             return;
           }
+          jobOfferOriginalStatus = (offer.status || "open").toString();
           populateFormFromOffer(offer);
 
           const normalizedStatus = normalizeStatus(offer.status);
@@ -4445,6 +4586,7 @@
       return;
     }
 
+    jobOfferOriginalStatus = (localOffer.status || "open").toString();
     populateFormFromOffer(localOffer);
 
     const normalizedStatus = normalizeStatus(localOffer.status);
@@ -4502,6 +4644,8 @@
       status: (formData.get("status") || "open").toString(),
     };
 
+    var newStatus = payload.status;
+
     if (window.IESupabase && window.IESupabase.updateJobOffer) {
       window.IESupabase.updateJobOffer(id, payload).then(function (result) {
         if (result.error) {
@@ -4513,6 +4657,25 @@
         if (window.IESupabase.showSuccess) {
           window.IESupabase.showSuccess("Offerta aggiornata.");
         }
+
+        if (
+          typeof window !== "undefined" &&
+          window.IESupabase &&
+          typeof window.IESupabase.createAutoLog === "function" &&
+          jobOfferOriginalStatus &&
+          newStatus &&
+          jobOfferOriginalStatus !== newStatus
+        ) {
+          window.IESupabase
+            .createAutoLog("job_offer", id, {
+              event_type: "status_change",
+              message: "Status changed from " + jobOfferOriginalStatus + " to " + newStatus,
+              metadata: { from: jobOfferOriginalStatus, to: newStatus },
+            })
+            .catch(function () {});
+        }
+
+        jobOfferOriginalStatus = newStatus;
 
         if (typeof window.IESupabase.getJobOfferById === "function") {
           window.IESupabase
@@ -6281,15 +6444,54 @@
       if (!window.IESupabase) return;
 
       if (entity === "candidate") {
-        await window.IESupabase.archiveCandidate(id);
+      const res = await window.IESupabase.archiveCandidate(id);
+      if (
+        res &&
+        !res.error &&
+        typeof window.IESupabase.createAutoLog === "function"
+      ) {
+        window.IESupabase
+          .createAutoLog("candidate", id, {
+            event_type: "system_event",
+            message: "Candidate archived",
+            metadata: null,
+          })
+          .catch(function () {});
+      }
       }
 
       if (entity === "client") {
-        await window.IESupabase.archiveClient(id);
+      const res = await window.IESupabase.archiveClient(id);
+      if (
+        res &&
+        !res.error &&
+        typeof window.IESupabase.createAutoLog === "function"
+      ) {
+        window.IESupabase
+          .createAutoLog("client", id, {
+            event_type: "system_event",
+            message: "Client archived",
+            metadata: null,
+          })
+          .catch(function () {});
+      }
       }
 
       if (entity === "job_offer") {
-        await window.IESupabase.archiveJobOffer(id);
+      const res = await window.IESupabase.archiveJobOffer(id);
+      if (
+        res &&
+        !res.error &&
+        typeof window.IESupabase.createAutoLog === "function"
+      ) {
+        window.IESupabase
+          .createAutoLog("job_offer", id, {
+            event_type: "system_event",
+            message: "Job offer archived",
+            metadata: null,
+          })
+          .catch(function () {});
+      }
       }
 
       location.reload();
@@ -6301,15 +6503,54 @@
       if (!window.IESupabase) return;
 
       if (entity === "candidate") {
-        await window.IESupabase.unarchiveCandidate(id);
+      const res = await window.IESupabase.unarchiveCandidate(id);
+      if (
+        res &&
+        !res.error &&
+        typeof window.IESupabase.createAutoLog === "function"
+      ) {
+        window.IESupabase
+          .createAutoLog("candidate", id, {
+            event_type: "system_event",
+            message: "Candidate restored",
+            metadata: null,
+          })
+          .catch(function () {});
+      }
       }
 
       if (entity === "client") {
-        await window.IESupabase.unarchiveClient(id);
+      const res = await window.IESupabase.unarchiveClient(id);
+      if (
+        res &&
+        !res.error &&
+        typeof window.IESupabase.createAutoLog === "function"
+      ) {
+        window.IESupabase
+          .createAutoLog("client", id, {
+            event_type: "system_event",
+            message: "Client restored",
+            metadata: null,
+          })
+          .catch(function () {});
+      }
       }
 
       if (entity === "job_offer") {
-        await window.IESupabase.unarchiveJobOffer(id);
+      const res = await window.IESupabase.unarchiveJobOffer(id);
+      if (
+        res &&
+        !res.error &&
+        typeof window.IESupabase.createAutoLog === "function"
+      ) {
+        window.IESupabase
+          .createAutoLog("job_offer", id, {
+            event_type: "system_event",
+            message: "Job offer restored",
+            metadata: null,
+          })
+          .catch(function () {});
+      }
       }
 
       location.reload();
