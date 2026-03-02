@@ -193,6 +193,7 @@
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
 
+      const currentPassword = document.getElementById("currentPassword").value;
       const newPassword = document.getElementById("newPassword").value;
       const confirmPassword = document.getElementById("confirmPassword").value;
       const messageEl = document.getElementById("changePasswordMessage");
@@ -200,6 +201,12 @@
 
       messageEl.textContent = "";
       messageEl.className = "text-sm mt-2";
+
+      if (!currentPassword) {
+        messageEl.textContent = "Inserisci la password attuale.";
+        messageEl.classList.add("text-red-600");
+        return;
+      }
 
       if (newPassword !== confirmPassword) {
         messageEl.textContent = "Le password non coincidono.";
@@ -224,6 +231,19 @@
       const { data: sessionData } = await window.IESupabase.getSession();
       if (!sessionData?.session) {
         messageEl.textContent = "Sessione scaduta. Effettua di nuovo il login.";
+        messageEl.classList.add("text-red-600");
+        submitBtn.disabled = false;
+        return;
+      }
+
+      const userEmail = sessionData.session.user.email;
+      const verifyResult = await window.IESupabase.supabase.auth.signInWithPassword({
+        email: userEmail,
+        password: currentPassword,
+      });
+
+      if (verifyResult.error) {
+        messageEl.textContent = "Password attuale non corretta.";
         messageEl.classList.add("text-red-600");
         submitBtn.disabled = false;
         return;
