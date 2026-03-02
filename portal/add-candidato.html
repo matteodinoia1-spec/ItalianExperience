@@ -45,13 +45,24 @@
 
         <!-- Page Content -->
         <div class="p-8 space-y-8 max-w-[1000px] mx-auto w-full">
-            
+
             <div class="mb-6">
                 <h2 class="text-3xl font-bold serif text-[#1b4332]">Candidate Profile</h2>
                 <p class="text-gray-500 text-sm italic">Compila i campi sottostanti per inserire un nuovo talento nel database.</p>
             </div>
 
             <div id="candidateActions" class="flex items-center justify-end gap-2 mb-4"></div>
+
+            <div class="flex justify-center mb-4">
+                <div class="candidate-photo-wrapper w-[140px] h-[140px] rounded-full overflow-hidden border border-gray-200 shadow-sm flex items-center justify-center bg-gray-100">
+                    <img
+                        id="candidatePhotoPreview"
+                        src="https://ui-avatars.com/api/?name=Candidato&background=1b4332&color=fff"
+                        alt="Candidate photo"
+                        class="w-full h-full object-cover"
+                    >
+                </div>
+            </div>
 
             <form id="candidateForm" class="space-y-8">
                 
@@ -109,27 +120,23 @@
                 </div>
 
                 <!-- Section: Documents -->
-                <div class="glass-card p-8 rounded-3xl">
+                <div id="candidateDocumentsSection" class="glass-card p-8 rounded-3xl">
                     <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Documents</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
                             <label class="form-label">Upload CV (PDF)</label>
-                            <div class="file-upload-wrapper">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto text-[#c5a059] mb-2 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                <p class="text-xs text-gray-500">Trascina qui il file o <span class="text-[#c5a059] font-bold">sfoglia</span></p>
-                                <input type="file" name="cv_file" accept=".pdf" class="absolute inset-0 opacity-0 cursor-pointer">
+                            <div class="candidate-file-block" data-file-type="cv">
+                                <div class="file-state text-xs text-gray-500"></div>
+                                <div class="file-actions mt-2 flex flex-wrap gap-2"></div>
+                                <input type="file" name="cv_file" accept=".pdf" class="hidden">
                             </div>
                         </div>
                         <div>
                             <label class="form-label">Upload Photo</label>
-                            <div class="file-upload-wrapper">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto text-[#c5a059] mb-2 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 00-2 2z" />
-                                </svg>
-                                <p class="text-xs text-gray-500">Carica una foto profilo professionale</p>
-                                <input type="file" name="foto_file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                            <div class="candidate-file-block" data-file-type="photo">
+                                <div class="file-state text-xs text-gray-500"></div>
+                                <div class="file-actions mt-2 flex flex-wrap gap-2"></div>
+                                <input type="file" name="foto_file" accept="image/*" class="hidden">
                             </div>
                         </div>
                     </div>

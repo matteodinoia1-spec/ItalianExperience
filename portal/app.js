@@ -28,6 +28,21 @@
   ];
 
   var pageKey = getCurrentPageKey();
+  var pendingCandidateTempId = null;
+  var pendingCandidatePhotoPath = null;
+  var pendingCandidateCvPath = null;
+  var CANDIDATE_PHOTO_SIGNED_URLS = {};
+
+  function getCandidateDefaultAvatar(firstName, lastName) {
+    var first = firstName || "";
+    var last = lastName || "";
+    var full = (first + " " + last).trim() || "Candidato";
+    return (
+      "https://ui-avatars.com/api/?name=" +
+      encodeURIComponent(full.replace(/\s+/g, "+")) +
+      "&background=1b4332&color=fff"
+    );
+  }
   var isProtectedPage = PROTECTED_PAGES.indexOf(pageKey) !== -1;
   if (isProtectedPage) {
     window.__IE_AUTH_GUARD__ = (async function () {
@@ -188,6 +203,24 @@
         updateHeaderUserBlock();
       });
   });
+
+  function ensurePendingCandidateTempId() {
+    if (pendingCandidateTempId) {
+      return pendingCandidateTempId;
+    }
+    var id = null;
+    try {
+      if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        id = window.crypto.randomUUID();
+      }
+    } catch (e) {
+    }
+    if (!id) {
+      id = "tmp-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+    }
+    pendingCandidateTempId = id;
+    return pendingCandidateTempId;
+  }
 
   // ---------------------------------------------------------------------------
   // Layout & Sidebar
@@ -872,6 +905,38 @@
           navigateTo("candidati.html");
         });
       }
+
+      const cvInput = candidateForm.querySelector('input[name="cv_file"]');
+      const photoInput = candidateForm.querySelector('input[name="foto_file"]');
+
+      if (cvInput && cvInput.dataset.ieBoundFile !== "true") {
+        cvInput.dataset.ieBoundFile = "true";
+        cvInput.addEventListener("change", function () {
+          handleCandidateFileChange({
+            input: cvInput,
+            type: "cv",
+          }).catch(function (err) {
+            console.error("[ItalianExperience] handleCandidateFileChange (cv) failed:", err);
+          });
+        });
+      }
+
+      if (photoInput && photoInput.dataset.ieBoundFile !== "true") {
+        photoInput.dataset.ieBoundFile = "true";
+        photoInput.addEventListener("change", function () {
+          handleCandidateFileChange({
+            input: photoInput,
+            type: "photo",
+          }).catch(function (err) {
+            console.error("[ItalianExperience] handleCandidateFileChange (photo) failed:", err);
+          });
+        });
+      }
+
+      if (typeof renderCandidateFileState === "function") {
+        renderCandidateFileState("cv", null, "edit");
+        renderCandidateFileState("photo", null, "edit");
+      }
     }
 
     const jobOfferForm = scope.querySelector("#jobOfferForm");
@@ -914,6 +979,318 @@
         cancelBtn.addEventListener("click", function () {
           navigateTo("clienti.html");
         });
+      }
+    }
+  }
+
+  function renderCandidateFileState(type, candidate, mode) {
+    var section = document.getElementById("candidateDocumentsSection");
+    if (!section) return;
+    var block = section.querySelector('.candidate-file-block[data-file-type="' + type + '"]');
+    if (!block) return;
+
+    var stateEl = block.querySelector(".file-state");
+    var actionsEl = block.querySelector(".file-actions");
+    var input =
+      type === "photo"
+        ? block.querySelector('input[name="foto_file"]')
+        : block.querySelector('input[name="cv_file"]');
+
+    if (!stateEl || !actionsEl || !input) return;
+
+    var hasCandidate = !!candidate;
+    var path = "";
+    if (hasCandidate) {
+      if (type === "photo") {
+        path = candidate.photo_url || "";
+      } else {
+        path = candidate.cv_url || "";
+      }
+    }
+    if (!path && input.dataset && input.dataset.currentPath) {
+      path = input.dataset.currentPath;
+    }
+
+    var hasFile = !!path;
+    actionsEl.innerHTML = "";
+
+    var isView = mode === "view";
+    if (isView) {
+      input.disabled = true;
+      input.classList.add("hidden");
+    } else {
+      input.disabled = false;
+    }
+
+    if (type === "photo") {
+      stateEl.textContent = hasFile ? "Photo uploaded" : "No photo uploaded";
+    } else {
+      stateEl.textContent = hasFile ? "CV uploaded" : "No CV uploaded";
+    }
+
+    function createButton(label, variant) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = label;
+      btn.className =
+        "inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold border transition " +
+        (variant === "primary"
+          ? "bg-[#c5a059] text-white border-[#c5a059] hover:bg-[#c5a059]/90"
+          : variant === "danger"
+          ? "text-red-600 border-red-200 hover:bg-red-50"
+          : "text-[#c5a059] border-[#c5a059]/30 hover:bg-[#c5a059]/10");
+      return btn;
+    }
+
+    function resolvePath() {
+      var p = path;
+      if (!p && input.dataset && input.dataset.currentPath) {
+        p = input.dataset.currentPath;
+      }
+      return p || "";
+    }
+
+    function handleDownload() {
+      var p = resolvePath();
+      if (!p) return;
+      if (window.IESupabase && window.IESupabase.createSignedCandidateUrl) {
+        window.IESupabase
+          .createSignedCandidateUrl(p)
+          .then(function (signedUrl) {
+            var url = signedUrl || p;
+            window.open(url, "_blank", "noopener");
+          })
+          .catch(function () {
+            window.open(p, "_blank", "noopener");
+          });
+      } else {
+        window.open(p, "_blank", "noopener");
+      }
+    }
+
+    function handlePreview() {
+      var p = resolvePath();
+      if (!p) return;
+      if (type === "cv" && candidate && candidate.id && typeof openCandidateCvPreview === "function") {
+        openCandidateCvPreview(candidate.id);
+        return;
+      }
+      handleDownload();
+    }
+
+    if (isView) {
+      if (hasFile) {
+        if (type === "cv") {
+          var previewBtnView = createButton("Preview", "primary");
+          previewBtnView.addEventListener("click", handlePreview);
+          actionsEl.appendChild(previewBtnView);
+
+          var downloadBtnView = createButton("Download", "secondary");
+          downloadBtnView.addEventListener("click", handleDownload);
+          actionsEl.appendChild(downloadBtnView);
+        } else {
+          var downloadBtnViewOnly = createButton("Download", "secondary");
+          downloadBtnViewOnly.addEventListener("click", handleDownload);
+          actionsEl.appendChild(downloadBtnViewOnly);
+        }
+      }
+      return;
+    }
+
+    if (hasFile) {
+      if (type === "cv") {
+        var previewBtn = createButton("Preview", "secondary");
+        previewBtn.addEventListener("click", handlePreview);
+        actionsEl.appendChild(previewBtn);
+      }
+      var downloadBtn = createButton("Download", "secondary");
+      downloadBtn.addEventListener("click", handleDownload);
+      actionsEl.appendChild(downloadBtn);
+
+      var replaceBtn = createButton("Replace", "primary");
+      replaceBtn.addEventListener("click", function () {
+        input.click();
+      });
+      actionsEl.appendChild(replaceBtn);
+
+      var removeBtn = createButton("Remove", "danger");
+      removeBtn.addEventListener("click", function () {
+        if (typeof removeCandidateFile === "function") {
+          removeCandidateFile(type);
+        }
+      });
+      actionsEl.appendChild(removeBtn);
+    } else {
+      var uploadBtn = createButton(type === "photo" ? "Upload photo" : "Upload CV", "primary");
+      uploadBtn.addEventListener("click", function () {
+        input.click();
+      });
+      actionsEl.appendChild(uploadBtn);
+    }
+  }
+
+  async function handleCandidateFileChange(config) {
+    var input = config && config.input;
+    var type = config && config.type;
+    if (!input || !type) return;
+    if (!window.IESupabase || !window.IESupabase.uploadCandidateFile) {
+      return;
+    }
+
+    var files = input.files;
+    var file = files && files[0];
+    if (!file) return;
+
+    var previewImg = document.getElementById("candidatePhotoPreview");
+    var candidateId = null;
+
+    try {
+      if (typeof getCandidatePageParams === "function") {
+        var params = getCandidatePageParams();
+        if (params && params.id) {
+          candidateId = params.id;
+        }
+      }
+    } catch (e) {
+      candidateId = null;
+    }
+
+    try {
+      if (candidateId) {
+        // EDIT mode: upload directly under candidate id
+        var currentPath = input.dataset.currentPath || "";
+        if (currentPath) {
+          var confirmMessage =
+            type === "photo"
+              ? "Sostituire la foto del candidato esistente?"
+              : "Sostituire il CV del candidato esistente?";
+          var proceed = window.confirm(confirmMessage);
+          if (!proceed) {
+            input.value = "";
+            return;
+          }
+        }
+
+        var finalPath =
+          type === "photo"
+            ? candidateId + "/photo.jpg"
+            : candidateId + "/cv.pdf";
+
+        var uploadOptions =
+          type === "photo"
+            ? { upsert: true, cacheControl: "3600" }
+            : { upsert: true };
+
+        var uploadResult = await window.IESupabase.uploadCandidateFile(
+          finalPath,
+          file,
+          uploadOptions
+        );
+        if (uploadResult && uploadResult.error) {
+          if (window.IESupabase.showError) {
+            window.IESupabase.showError(
+              uploadResult.error.message || "Errore nel caricamento del file.",
+              "handleCandidateFileChange"
+            );
+          }
+          return;
+        }
+
+        var updatePayload =
+          type === "photo"
+            ? { photo_url: finalPath }
+            : { cv_url: finalPath };
+
+        if (window.IESupabase.updateCandidateFiles) {
+          var updateResult = await window.IESupabase.updateCandidateFiles(
+            candidateId,
+            updatePayload
+          );
+          if (updateResult && updateResult.error) {
+            if (window.IESupabase.showError) {
+              window.IESupabase.showError(
+                updateResult.error.message || "Errore nel salvataggio del candidato.",
+                "handleCandidateFileChange"
+              );
+            }
+            return;
+          }
+        }
+
+        input.dataset.currentPath = finalPath;
+
+        if (typeof renderCandidateFileState === "function") {
+          var candidateForState =
+            type === "photo"
+              ? { photo_url: finalPath }
+              : { cv_url: finalPath };
+          renderCandidateFileState(type, candidateForState, "edit");
+        }
+
+        if (type === "photo" && previewImg && window.IESupabase.createSignedCandidateUrl) {
+          var signedUrl = await window.IESupabase.createSignedCandidateUrl(finalPath);
+          if (signedUrl) {
+            previewImg.src = signedUrl;
+            previewImg.dataset.storagePath = finalPath;
+          }
+        }
+      } else {
+        // CREATE mode: upload to temp/{uuid}
+        var tempId = ensurePendingCandidateTempId();
+        var tempPath =
+          type === "photo"
+            ? "temp/" + tempId + "/photo.jpg"
+            : "temp/" + tempId + "/cv.pdf";
+
+        var tempUploadResult = await window.IESupabase.uploadCandidateFile(
+          tempPath,
+          file,
+          { upsert: true }
+        );
+        if (tempUploadResult && tempUploadResult.error) {
+          if (type === "photo") {
+            pendingCandidatePhotoPath = null;
+          } else {
+            pendingCandidateCvPath = null;
+          }
+          if (window.IESupabase.showError) {
+            window.IESupabase.showError(
+              tempUploadResult.error.message || "Errore nel caricamento del file.",
+              "handleCandidateFileChange"
+            );
+          }
+          return;
+        }
+
+        if (type === "photo") {
+          pendingCandidatePhotoPath = tempPath;
+        } else {
+          pendingCandidateCvPath = tempPath;
+        }
+
+        if (type === "photo" && previewImg && window.IESupabase.createSignedCandidateUrl) {
+          var tempSignedUrl = await window.IESupabase.createSignedCandidateUrl(tempPath);
+          if (tempSignedUrl) {
+            previewImg.src = tempSignedUrl;
+            previewImg.dataset.storagePath = tempPath;
+          }
+        }
+      }
+    } catch (err) {
+      if (!candidateId) {
+        if (type === "photo") {
+          pendingCandidatePhotoPath = null;
+        } else {
+          pendingCandidateCvPath = null;
+        }
+      }
+      if (window.IESupabase && window.IESupabase.showError) {
+        window.IESupabase.showError(
+          "Errore durante il caricamento del file.",
+          "handleCandidateFileChange"
+        );
+      } else {
+        console.error("[ItalianExperience] handleCandidateFileChange exception:", err);
       }
     }
   }
@@ -1146,6 +1523,102 @@
         mount.innerHTML = "";
         mount.appendChild(fragment);
         bindFormHandlers(mount);
+      },
+    });
+  }
+
+  async function openCandidateCvPreview(candidateId) {
+    if (!candidateId) return;
+
+    let candidate = null;
+    if (window.IESupabase && typeof window.IESupabase.getCandidateById === "function") {
+      try {
+        const result = await window.IESupabase.getCandidateById(candidateId);
+        if (result && result.error) {
+          if (window.IESupabase.showError) {
+            window.IESupabase.showError(
+              result.error.message || "Errore nel caricamento del candidato.",
+              "openCandidateCvPreview"
+            );
+          }
+          return;
+        }
+        candidate = result && result.data;
+      } catch (err) {
+        console.error("[ItalianExperience] openCandidateCvPreview getCandidateById failed:", err);
+        if (window.IESupabase && window.IESupabase.showError) {
+          window.IESupabase.showError(
+            "Errore nel caricamento del candidato.",
+            "openCandidateCvPreview"
+          );
+        }
+        return;
+      }
+    } else if (typeof IE_STORE !== "undefined" && IE_STORE && Array.isArray(IE_STORE.candidates)) {
+      candidate = IE_STORE.candidates.find(function (c) {
+        return c && c.id === candidateId;
+      });
+    }
+
+    if (!candidate) {
+      if (window.IESupabase && window.IESupabase.showError) {
+        window.IESupabase.showError(
+          "Candidato non trovato.",
+          "openCandidateCvPreview"
+        );
+      } else {
+        alert("Candidato non trovato.");
+      }
+      return;
+    }
+
+    var rawPath = candidate.cv_url || "";
+    if (!rawPath) {
+      if (window.IESupabase && window.IESupabase.showError) {
+        window.IESupabase.showError(
+          "Nessun CV caricato per questo candidato.",
+          "openCandidateCvPreview"
+        );
+      } else {
+        alert("Nessun CV caricato per questo candidato.");
+      }
+      return;
+    }
+
+    var finalUrl = rawPath;
+    var isAbsolute = /^https?:\/\//i.test(rawPath);
+    var isLegacyUploads = /^\/?uploads\//i.test(rawPath);
+
+    if (!isAbsolute && !isLegacyUploads && window.IESupabase && window.IESupabase.createSignedCandidateUrl) {
+      try {
+        var signed = await window.IESupabase.createSignedCandidateUrl(rawPath);
+        if (signed) {
+          finalUrl = signed;
+        }
+      } catch (err2) {
+        console.error(
+          "[ItalianExperience] openCandidateCvPreview signing failed:",
+          err2,
+          { path: rawPath }
+        );
+      }
+    }
+
+    var fullName = ((candidate.first_name || "") + " " + (candidate.last_name || "")).trim();
+    var title = fullName ? "CV \u2013 " + fullName : "CV Preview";
+
+    openModal({
+      title: title,
+      fullPageHref: null,
+      render: function (mount) {
+        mount.innerHTML = "";
+        var iframe = document.createElement("iframe");
+        iframe.src = finalUrl;
+        iframe.style.width = "100%";
+        iframe.style.height = "80vh";
+        iframe.style.border = "none";
+        iframe.loading = "lazy";
+        mount.appendChild(iframe);
       },
     });
   }
@@ -1977,6 +2450,69 @@
         window.IESupabase.showError(error.message || "Errore nel salvataggio del candidato.", "saveCandidate");
         return;
       }
+
+      try {
+        const newId = data && data.id;
+        if (newId && (pendingCandidatePhotoPath || pendingCandidateCvPath)) {
+          const updates = [];
+
+          if (pendingCandidatePhotoPath && window.IESupabase.moveCandidateFile) {
+            const finalPhotoPath = newId + "/photo.jpg";
+            const movePhotoResult = await window.IESupabase.moveCandidateFile(
+              pendingCandidatePhotoPath,
+              finalPhotoPath
+            );
+            if (!movePhotoResult || !movePhotoResult.error) {
+              updates.push({ photo_url: finalPhotoPath });
+            }
+          }
+
+          if (pendingCandidateCvPath && window.IESupabase.moveCandidateFile) {
+            const finalCvPath = newId + "/cv.pdf";
+            const moveCvResult = await window.IESupabase.moveCandidateFile(
+              pendingCandidateCvPath,
+              finalCvPath
+            );
+            if (!moveCvResult || !moveCvResult.error) {
+              updates.push({ cv_url: finalCvPath });
+            }
+          }
+
+          if (updates.length && window.IESupabase.updateCandidateFiles) {
+            const mergedPayload = updates.reduce(function (acc, patch) {
+              for (const key in patch) {
+                if (Object.prototype.hasOwnProperty.call(patch, key)) {
+                  acc[key] = patch[key];
+                }
+              }
+              return acc;
+            }, {});
+            try {
+              await window.IESupabase.updateCandidateFiles(newId, mergedPayload);
+            } catch (updateErr) {
+              console.error("[ItalianExperience] saveCandidate() file URL update error:", updateErr);
+            }
+          }
+
+          const tempPathsToDelete = [];
+          if (pendingCandidatePhotoPath) tempPathsToDelete.push(pendingCandidatePhotoPath);
+          if (pendingCandidateCvPath) tempPathsToDelete.push(pendingCandidateCvPath);
+          if (tempPathsToDelete.length && window.IESupabase.deleteCandidateFiles) {
+            try {
+              await window.IESupabase.deleteCandidateFiles(tempPathsToDelete);
+            } catch (deleteErr) {
+              console.error("[ItalianExperience] saveCandidate() temp file cleanup error:", deleteErr);
+            }
+          }
+        }
+      } catch (finalizeErr) {
+        console.error("[ItalianExperience] saveCandidate() file finalization error:", finalizeErr);
+      } finally {
+        pendingCandidateTempId = null;
+        pendingCandidatePhotoPath = null;
+        pendingCandidateCvPath = null;
+      }
+
       window.IESupabase.showSuccess("Candidato salvato con successo.");
       navigateTo("candidati.html");
       return;
@@ -2518,6 +3054,9 @@
       const statusEl = form.querySelector('[name="status"]');
       const sourceEl = form.querySelector('[name="source"]');
       const notesEl = form.querySelector('[name="notes"]');
+      const photoInputEl = form.querySelector('[name="foto_file"]');
+      const cvInputEl = form.querySelector('[name="cv_file"]');
+      const previewImg = document.getElementById("candidatePhotoPreview");
       if (firstNameEl) firstNameEl.value = candidate.first_name || "";
       if (lastNameEl) lastNameEl.value = candidate.last_name || "";
       if (addressEl) addressEl.value = candidate.address || "";
@@ -2525,6 +3064,27 @@
       if (statusEl) statusEl.value = candidate.status || "new";
       if (sourceEl) sourceEl.value = candidate.source || "";
       if (notesEl) notesEl.value = candidate.notes || "";
+
+      if (photoInputEl) {
+        photoInputEl.dataset.currentPath = candidate.photo_url || "";
+      }
+      if (cvInputEl) {
+        cvInputEl.dataset.currentPath = candidate.cv_url || "";
+      }
+
+      if (previewImg && candidate.photo_url && window.IESupabase && window.IESupabase.createSignedCandidateUrl) {
+        window.IESupabase
+          .createSignedCandidateUrl(candidate.photo_url)
+          .then(function (signedUrl) {
+            if (signedUrl) {
+              previewImg.src = signedUrl;
+              previewImg.dataset.storagePath = candidate.photo_url;
+            }
+          })
+          .catch(function () {
+            // Ignore preview errors to avoid impacting page lifecycle.
+          });
+      }
 
       function setFormReadonly(readonly) {
         const fields = form.querySelectorAll("input, textarea, select");
@@ -2542,6 +3102,11 @@
         }
       }
       setFormReadonly(effectiveMode === "view");
+
+      if (typeof renderCandidateFileState === "function") {
+        renderCandidateFileState("photo", candidate, effectiveMode);
+        renderCandidateFileState("cv", candidate, effectiveMode);
+      }
 
       const headerTitleEl = document.querySelector("header h1");
       const docTitleEl = document.querySelector("title");
@@ -4304,14 +4869,14 @@
       if (cvBtn) {
         const id = cvBtn.getAttribute("data-id");
         if (!id) return;
-        const candidate = IE_STORE.candidates.find((c) => c.id === id);
-        if (candidate && candidate.cv_url) {
-          window.open(candidate.cv_url, "_blank", "noopener");
-        } else {
-          alert("Nessun CV caricato per questo candidato (simulazione).");
+        if (cvBtn.disabled) return;
+        if (typeof openCandidateCvPreview === "function") {
+          openCandidateCvPreview(id);
         }
       }
     });
+
+    const CANDIDATE_SIGNED_PHOTO_CACHE = {};
 
     function mapCandidateRow(r) {
       const first_name = r.first_name ?? "";
@@ -4325,7 +4890,9 @@
         status: r.status ?? "new",
         source: r.source ?? "",
         client_name: r.client_name || null,
-        foto_url: r.photo_url || r.foto_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent((first_name || "") + "+" + (last_name || "")) + "&background=dbeafe&color=1e40af",
+        foto_url: r.foto_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent((first_name || "") + "+" + (last_name || "")) + "&background=dbeafe&color=1e40af",
+        photo_storage_path: r.photo_url || null,
+        cv_url: r.cv_url || null,
         created_at: r.created_at,
         is_archived: r.is_archived || false,
         latest_association: r.latest_association || null,
@@ -4406,8 +4973,32 @@
           assignmentHtml =
             '<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold">Non assegnato</span>';
         }
-        const photoHtml = '<img src="' + escapeHtml(row.foto_url || "") + '" class="w-10 h-10 rounded-full border-2 border-white shadow-sm" alt="' + escapeHtml((row.first_name || "") + " " + (row.last_name || "")) + '">';
-        const viewCvHtml = '<button type="button" data-action="view-cv" data-id="' + escapeHtml(row.id) + '" class="text-[#c5a059] hover:bg-[#c5a059]/10 px-3 py-1.5 rounded-md border border-[#c5a059]/20 transition text-xs font-bold">View CV</button>';
+        let initialPhotoUrl = "";
+        const fallbackAvatarUrl =
+          "https://ui-avatars.com/api/?name=" +
+          encodeURIComponent((row.first_name || "") + "+" + (row.last_name || "")) +
+          "&background=dbeafe&color=1e40af";
+        if (row.foto_url && (/^https?:\/\//i.test(row.foto_url) || row.foto_url.charAt(0) === "/")) {
+          initialPhotoUrl = row.foto_url;
+        } else {
+          initialPhotoUrl = fallbackAvatarUrl;
+        }
+        const photoHtml =
+          '<img data-ie-candidate-photo="' +
+          escapeHtml(row.id) +
+          '" src="' +
+          escapeHtml(initialPhotoUrl) +
+          '" class="w-10 h-10 rounded-full border-2 border-white shadow-sm" alt="' +
+          escapeHtml((row.first_name || "") + " " + (row.last_name || "")) +
+          '">';
+        const hasCv = !!row.cv_url;
+        const viewCvHtml = hasCv
+          ? '<button type="button" data-action="view-cv" data-id="' +
+            escapeHtml(row.id) +
+            '" class="text-[#c5a059] hover:bg-[#c5a059]/10 px-3 py-1.5 rounded-md border border-[#c5a059]/20 transition text-xs font-bold">View CV</button>'
+          : '<button type="button" data-action="view-cv" data-id="' +
+            escapeHtml(row.id) +
+            '" class="px-3 py-1.5 rounded-md border border-gray-200 text-xs font-semibold text-gray-400 bg-gray-50 cursor-not-allowed" disabled>View CV</button>';
         const tr = renderEntityRow({
           entityType: "candidate",
           id: row.id,
@@ -4429,7 +5020,46 @@
           rowTitle: formatLastUpdatedMeta(row),
         });
         tbody.appendChild(tr);
+        resolveCandidatePhoto(row);
       });
+    }
+
+    function resolveCandidatePhoto(row) {
+      const path = row && row.photo_storage_path;
+      if (!path) return;
+      if (/^https?:\/\//i.test(path) || path.charAt(0) === "/") return;
+      if (!window.IESupabase || !window.IESupabase.createSignedCandidateUrl) return;
+
+      const cached = CANDIDATE_SIGNED_PHOTO_CACHE[path];
+      const selector =
+        '[data-ie-candidate-photo="' + String(row.id != null ? row.id : "") + '"]';
+      if (cached) {
+        const imgCached = tbody.querySelector(selector);
+        if (imgCached) {
+          imgCached.src = cached;
+          imgCached.dataset.storagePath = path;
+        }
+        return;
+      }
+
+      window.IESupabase
+        .createSignedCandidateUrl(path)
+        .then(function (signedUrl) {
+          if (!signedUrl) return;
+          CANDIDATE_SIGNED_PHOTO_CACHE[path] = signedUrl;
+          const imgEl = tbody.querySelector(selector);
+          if (imgEl) {
+            imgEl.src = signedUrl;
+            imgEl.dataset.storagePath = path;
+          }
+        })
+        .catch(function (err) {
+          console.error(
+            "[ItalianExperience] Failed to resolve candidate photo signed URL",
+            err,
+            { path: path, id: row && row.id }
+          );
+        });
     }
 
     function findClientNameForCandidate(candidate) {
@@ -5511,6 +6141,23 @@
         client: "clients",
         job_offer: "job_offers"
       };
+
+      if (entity === "candidate" && window.IESupabase.getCandidateById && window.IESupabase.deleteCandidateFiles) {
+        try {
+          const candidateResult = await window.IESupabase.getCandidateById(id);
+          if (candidateResult && !candidateResult.error && candidateResult.data) {
+            const candidate = candidateResult.data;
+            const paths = [];
+            if (candidate.photo_url) paths.push(candidate.photo_url);
+            if (candidate.cv_url) paths.push(candidate.cv_url);
+            if (paths.length) {
+              await window.IESupabase.deleteCandidateFiles(paths);
+            }
+          }
+        } catch (cleanupErr) {
+          console.error("[ItalianExperience] Failed to delete candidate files from storage:", cleanupErr);
+        }
+      }
 
       await window.IESupabase.deletePermanentRecord({
         table: tableMap[entity],

@@ -2138,6 +2138,159 @@
   }
 
   // ---------------------------------------------------------------------------
+  // Candidate file storage helpers (Supabase Storage)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Upload a candidate-related file to the private "candidate-files" bucket.
+   * @param {string} path - object key inside the bucket (e.g. "123/photo.jpg")
+   * @param {File|Blob} file - browser File/Blob instance
+   * @param {object} [options] - Supabase storage upload options (upsert, cacheControl, etc.)
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function uploadCandidateFile(path, file, options) {
+    if (!path || !file) {
+      const err = new Error("Missing path or file");
+      console.error("[Supabase Storage] uploadCandidateFile:", err, { path });
+      return { data: null, error: err };
+    }
+    try {
+      const opts = Object.assign({ upsert: false }, options || {});
+      const { data, error } = await supabase
+        .storage
+        .from("candidate-files")
+        .upload(path, file, opts);
+      if (error) {
+        console.error("[Supabase Storage] uploadCandidateFile error:", error.message || error, { path });
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase Storage] uploadCandidateFile exception:", err, { path });
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Create a short-lived signed URL for a candidate file.
+   * @param {string} path - object key inside the "candidate-files" bucket
+   * @param {number} [expiresInSeconds=60] - TTL for the signed URL
+   * @returns {Promise<string|null>} signed URL or null on error
+   */
+  async function createSignedCandidateUrl(path, expiresInSeconds) {
+    if (!path) return null;
+    const ttl = typeof expiresInSeconds === "number" && expiresInSeconds > 0 ? expiresInSeconds : 60;
+    try {
+      const { data, error } = await supabase
+        .storage
+        .from("candidate-files")
+        .createSignedUrl(path, ttl);
+      if (error) {
+        console.error("[Supabase Storage] createSignedCandidateUrl error:", error.message || error, { path });
+        return null;
+      }
+      return (data && data.signedUrl) || null;
+    } catch (err) {
+      console.error("[Supabase Storage] createSignedCandidateUrl exception:", err, { path });
+      return null;
+    }
+  }
+
+  /**
+   * Delete one or more candidate files from storage.
+   * @param {string[]|string} paths - one or more object keys in the bucket
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function deleteCandidateFiles(paths) {
+    const raw = Array.isArray(paths) ? paths : [paths];
+    const keys = raw
+      .map(function (p) {
+        return (p || "").toString().trim();
+      })
+      .filter(function (p) {
+        return !!p;
+      });
+    if (!keys.length) {
+      return { data: null, error: null };
+    }
+    try {
+      const { data, error } = await supabase
+        .storage
+        .from("candidate-files")
+        .remove(keys);
+      if (error) {
+        console.error("[Supabase Storage] deleteCandidateFiles error:", error.message || error, { keys });
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase Storage] deleteCandidateFiles exception:", err, { keys });
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Move/rename a candidate file inside the same bucket (e.g. temp -> final path).
+   * @param {string} fromPath - current object key
+   * @param {string} toPath - new object key
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function moveCandidateFile(fromPath, toPath) {
+    if (!fromPath || !toPath) {
+      const err = new Error("Missing fromPath or toPath");
+      console.error("[Supabase Storage] moveCandidateFile:", err, { fromPath, toPath });
+      return { data: null, error: err };
+    }
+    try {
+      const { data, error } = await supabase
+        .storage
+        .from("candidate-files")
+        .move(fromPath, toPath);
+      if (error) {
+        console.error("[Supabase Storage] moveCandidateFile error:", error.message || error, { fromPath, toPath });
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase Storage] moveCandidateFile exception:", err, { fromPath, toPath });
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Patch candidate row with file-related columns (photo_url, cv_url) plus audit fields.
+   * Leaves all other columns untouched.
+   * @param {string} id - candidates.id
+   * @param {object} payload - partial update (e.g. { photo_url, cv_url })
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function updateCandidateFiles(id, payload) {
+    if (!id) {
+      const err = new Error("Missing id");
+      console.error("[Supabase] updateCandidateFiles:", err);
+      return { data: null, error: err };
+    }
+    try {
+      const basePayload = payload || {};
+      const updates = await withUpdateAuditFields(Object.assign({}, basePayload));
+      const { data, error } = await supabase
+        .from("candidates")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] updateCandidateFiles error:", error.message || error, { id });
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] updateCandidateFiles exception:", err, { id });
+      return { data: null, error: err };
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // User feedback helper
   // ---------------------------------------------------------------------------
 
@@ -2176,6 +2329,11 @@
     fetchMyCandidates,
     fetchCandidatesPaginated,
     searchCandidatesByName,
+    uploadCandidateFile,
+    createSignedCandidateUrl,
+    deleteCandidateFiles,
+    moveCandidateFile,
+    updateCandidateFiles,
     // Job offers
     insertJobOffer,
     getJobOfferById,
