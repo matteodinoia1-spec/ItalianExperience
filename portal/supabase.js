@@ -705,13 +705,71 @@
    */
   async function updateJobOfferStatus(id, status) {
     if (!id) return { data: null, error: new Error("Missing id") };
-    const { data, error } = await supabase
-      .from("job_offers")
-      .update({ status })
-      .eq("id", id)
-      .select()
-      .single();
-    return { data, error };
+    try {
+      const { data: existing, error: fetchError } = await supabase
+        .from("job_offers")
+        .select("status")
+        .eq("id", id)
+        .single();
+
+      if (fetchError) {
+        console.error("[Supabase] updateJobOfferStatus fetch error:", fetchError.message, fetchError);
+        return { data: null, error: fetchError };
+      }
+
+      const oldStatus = existing?.status || null;
+
+      const { data, error } = await supabase
+        .from("job_offers")
+        .update({ status })
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("[Supabase] updateJobOfferStatus update error:", error.message, error);
+        return { data: null, error };
+      }
+
+      // Manual close path: when transitioning into "closed", update associations and
+      // then recalculate availability for affected candidates.
+      if (oldStatus !== "closed" && status === "closed") {
+        const { data: updatedAssocs, error: assocError } = await supabase
+          .from("candidate_job_associations")
+          .update({ status: "not_selected" })
+          .eq("job_offer_id", id)
+          .not("status", "in", "(hired,rejected,not_selected)")
+          .select("candidate_id");
+
+        if (assocError) {
+          console.error(
+            "[Supabase] updateJobOfferStatus associations update error:",
+            assocError.message || assocError,
+            assocError,
+            { jobOfferId: id }
+          );
+        } else if (Array.isArray(updatedAssocs) && updatedAssocs.length > 0) {
+          const candidateIds = Array.from(
+            new Set(
+              updatedAssocs
+                .map(function (row) {
+                  return row && row.candidate_id;
+                })
+                .filter(Boolean)
+            )
+          );
+
+          for (const candidateId of candidateIds) {
+            await recalculateCandidateAvailability(candidateId);
+          }
+        }
+      }
+
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] updateJobOfferStatus exception:", err);
+      return { data: null, error: err };
+    }
   }
 
   /**
@@ -1627,6 +1685,49 @@
   // ---------------------------------------------------------------------------
 
   /**
+   * Recalculate a candidate's availability_status based on active associations.
+   * A candidate is unavailable if they have ANY association whose status is NOT
+   * in ("rejected", "not_selected"); otherwise they are available.
+   * This helper must NOT call updateCandidateAssociationStatus to avoid loops.
+   * @param {string} candidateId
+   */
+  async function recalculateCandidateAvailability(candidateId) {
+    if (!candidateId) return;
+    try {
+      const { count, error } = await supabase
+        .from("candidate_job_associations")
+        .select("id", { count: "exact", head: true })
+        .eq("candidate_id", candidateId)
+        .not("status", "in", "(rejected,not_selected)");
+
+      if (error) {
+        console.error(
+          "[Supabase] recalculateCandidateAvailability count error:",
+          error.message || error,
+          { candidateId }
+        );
+        return;
+      }
+
+      const hasActiveAssociations = (count ?? 0) > 0;
+      const { error: updateErr } = await supabase
+        .from("candidates")
+        .update({ availability_status: hasActiveAssociations ? "unavailable" : "available" })
+        .eq("id", candidateId);
+
+      if (updateErr) {
+        console.error(
+          "[Supabase] recalculateCandidateAvailability update error:",
+          updateErr.message || updateErr,
+          { candidateId }
+        );
+      }
+    } catch (err) {
+      console.error("[Supabase] recalculateCandidateAvailability exception:", err, { candidateId });
+    }
+  }
+
+  /**
    * Link a candidate to a job offer.
    * Table: candidate_job_associations (candidate_id, job_offer_id, status, notes, created_by, ...)
    * @param {object} payload - { candidate_id, job_offer_id, status, notes }
@@ -1673,6 +1774,8 @@
         console.error("[Supabase] linkCandidateToJob error:", error.message, error);
         return { data: null, error };
       }
+      // Any new association (by definition) makes the candidate unavailable.
+      await recalculateCandidateAvailability(candidateId);
       return { data, error: null };
     } catch (err) {
       console.error("[Supabase] linkCandidateToJob exception:", err);
@@ -2027,11 +2130,12 @@
           return;
         }
 
-        const { error: assocUpdateError } = await supabase
+        const { data: updatedAssocs, error: assocUpdateError } = await supabase
           .from("candidate_job_associations")
           .update({ status: "not_selected" })
           .eq("job_offer_id", jobOfferId)
-          .not("status", "in", "(hired,rejected)");
+          .not("status", "in", "(hired,rejected)")
+          .select("candidate_id");
 
         if (assocUpdateError) {
           console.error(
@@ -2040,6 +2144,20 @@
             assocUpdateError,
             { jobOfferId }
           );
+        } else if (Array.isArray(updatedAssocs) && updatedAssocs.length > 0) {
+          const candidateIds = Array.from(
+            new Set(
+              updatedAssocs
+                .map(function (row) {
+                  return row && row.candidate_id;
+                })
+                .filter(Boolean)
+            )
+          );
+
+          for (const candidateId of candidateIds) {
+            await recalculateCandidateAvailability(candidateId);
+          }
         }
       } else if (hiredCount < required && offer.status === "closed") {
         await supabase.from("job_offers").update({ status: "active" }).eq("id", jobOfferId);
@@ -2083,7 +2201,7 @@
         return { data: null, error };
       }
 
-      // Sync candidate status when hired
+      // Sync candidate status when hired (pipeline logic only; do not change)
       if (status === "hired" && oldRow.candidate_id) {
         const { error: candidateUpdateError } = await supabase
           .from("candidates")
@@ -2096,6 +2214,11 @@
             candidateUpdateError.message
           );
         }
+      }
+
+      // Recalculate candidate availability based on all associations.
+      if (oldRow.candidate_id) {
+        await recalculateCandidateAvailability(oldRow.candidate_id);
       }
 
       if (oldRow.job_offer_id) {
