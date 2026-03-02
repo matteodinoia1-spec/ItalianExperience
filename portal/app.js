@@ -169,6 +169,7 @@
       .then(function () {
         initLayout();
         initNavigation();
+        initBackButton();
         initButtons();
         initForms();
         initDataViews();
@@ -178,6 +179,7 @@
       })
       .catch(function (error) {
         console.error("[ItalianExperience] Sidebar loading failed", error);
+        initBackButton();
         initButtons();
         initForms();
         initDataViews();
@@ -190,6 +192,66 @@
   // ---------------------------------------------------------------------------
   // Layout & Sidebar
   // ---------------------------------------------------------------------------
+
+  function initBackButton() {
+    var backButtons = document.querySelectorAll("[data-back-button]");
+    if (!backButtons || backButtons.length === 0) return;
+
+    var pageKey = getCurrentPageKey();
+    var listingPages = ["dashboard", "candidati", "offerte", "clients", "archiviati"];
+    var searchParams = new URLSearchParams(window.location.search);
+    var hasIdParam = searchParams.has("id");
+
+    var shouldShowBackButton;
+    if (pageKey === "profile") {
+      shouldShowBackButton = true;
+    } else if (hasIdParam) {
+      shouldShowBackButton = true;
+    } else if (listingPages.indexOf(pageKey) !== -1) {
+      shouldShowBackButton = false;
+    } else {
+      shouldShowBackButton = true;
+    }
+
+    backButtons.forEach(function (backButton) {
+      backButton.style.display = shouldShowBackButton ? "" : "none";
+
+      backButton.addEventListener("click", function (event) {
+        event.preventDefault();
+
+        var href = backButton.getAttribute("href") || "./dashboard.html";
+        var referrer = document.referrer;
+        var isSafeReferrer = false;
+
+        if (referrer) {
+          try {
+            var refUrl = new URL(referrer, window.location.href);
+            var isSameOrigin = refUrl.origin === window.location.origin;
+            var cameFromLogin = false;
+
+            var loginPaths = ["/portal/index.html", "/portal/", "/index.html", "/"];
+            for (var i = 0; i < loginPaths.length; i++) {
+              if (refUrl.pathname === loginPaths[i]) {
+                cameFromLogin = true;
+                break;
+              }
+            }
+
+            if (isSameOrigin && !cameFromLogin && window.history.length > 1) {
+              isSafeReferrer = true;
+            }
+          } catch (e) {
+          }
+        }
+
+        if (isSafeReferrer) {
+          window.history.back();
+        } else {
+          window.location.assign(href);
+        }
+      });
+    });
+  }
 
   function ensureSidebarLoaded() {
     const container = document.getElementById("sidebar");
