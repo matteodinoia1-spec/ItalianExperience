@@ -3153,6 +3153,14 @@
         form.parentNode.appendChild(metadataContainer);
       }
       metadataContainer.innerHTML = renderEntityMetadata(candidate);
+
+      if (window.ActivitySection && typeof window.ActivitySection.init === "function") {
+        window.ActivitySection.init({
+          entityType: "candidate",
+          entityId: candidateId,
+          container: document.getElementById("activity-container"),
+        });
+      }
     });
   }
 
@@ -3274,6 +3282,14 @@
         form.parentNode.appendChild(metadataContainer);
       }
       metadataContainer.innerHTML = renderEntityMetadata(client);
+
+      if (window.ActivitySection && typeof window.ActivitySection.init === "function") {
+        window.ActivitySection.init({
+          entityType: "client",
+          entityId: clientId,
+          container: document.getElementById("activity-container"),
+        });
+      }
     });
   }
 
@@ -4394,6 +4410,14 @@
           }
           metadataContainer.innerHTML = renderEntityMetadata(offer);
 
+          if (window.ActivitySection && typeof window.ActivitySection.init === "function") {
+            window.ActivitySection.init({
+              entityType: "job_offer",
+              entityId: offerId,
+              container: document.getElementById("activity-container"),
+            });
+          }
+
           if (isViewModeForOffer) {
             setFormDisabled(true);
             if (normalizedStatus !== "archived") renderAssociatedCandidates(offerId, offer);
@@ -4440,6 +4464,14 @@
     configureCancel(effectiveModeForOffer, offerId);
     renderActionButtons(effectiveModeForOffer, offerId, localOffer);
     renderOfferStatusBadge(localOffer.status);
+
+    if (window.ActivitySection && typeof window.ActivitySection.init === "function") {
+      window.ActivitySection.init({
+        entityType: "job_offer",
+        entityId: offerId,
+        container: document.getElementById("activity-container"),
+      });
+    }
 
     if (isViewModeForOffer) {
       setFormDisabled(true);

@@ -160,6 +160,43 @@
     };
   }
 
+  // ---------------------------------------------------------------------------
+  // Activity Logs (internal helpers)
+  // ---------------------------------------------------------------------------
+
+  function assertEntity(entityType, entityId) {
+    const allowed = ["candidate", "job_offer", "client"];
+    if (!allowed.includes(entityType)) {
+      throw new Error("Invalid entityType");
+    }
+    if (typeof entityId !== "string" || !entityId) {
+      throw new Error("Invalid entityId");
+    }
+  }
+
+  function normalizeMessage(message) {
+    const cleaned = String(message ?? "").trim();
+    if (!cleaned) {
+      throw new Error("Message is required");
+    }
+    if (cleaned.length > 500) {
+      throw new Error("Message too long (max 500 chars)");
+    }
+    return cleaned;
+  }
+
+  async function getCurrentUserId() {
+    const { data: sessionData, error } = await getSession();
+    if (error) {
+      throw error;
+    }
+    const userId = sessionData?.user?.id;
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+    return userId;
+  }
+
   /**
    * Redirect to dashboard (portal root-relative path).
    */
@@ -2427,6 +2464,261 @@
   }
 
   // ---------------------------------------------------------------------------
+  // Activity Logs
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Create a manual activity log note for an entity.
+   * @param {"candidate"|"job_offer"|"client"} entityType
+   * @param {string} entityId
+   * @param {string} message
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function createLog(entityType, entityId, message) {
+    try {
+      assertEntity(entityType, entityId);
+      const cleanedMessage = normalizeMessage(message);
+      const userId = await getCurrentUserId();
+
+      const row = {
+        entity_type: entityType,
+        entity_id: entityId,
+        message: cleanedMessage,
+        created_by: userId,
+        event_type: "manual_note",
+        metadata: null,
+      };
+
+      const { data, error } = await supabase
+        .from("activity_logs")
+        .insert(row)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] createLog error:", error.message || error, error, { entityType, entityId });
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] createLog exception:", err, { entityType, entityId });
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Fetch activity logs for an entity.
+   * Default (compact) mode: returns first 20 logs + hasMore computed from 21-row fetch.
+   * Full mode: returns all logs.
+   * @param {"candidate"|"job_offer"|"client"} entityType
+   * @param {string} entityId
+   * @param {{ full?: boolean }=} options
+   * @returns {Promise<{ data: { logs: array, hasMore: boolean } | null, error: object | null }>}
+   */
+  async function fetchLogs(entityType, entityId, options) {
+    try {
+      assertEntity(entityType, entityId);
+
+      const isFull = !!(options && options.full === true);
+      let q = supabase
+        .from("activity_logs")
+        .select("*")
+        .eq("entity_type", entityType)
+        .eq("entity_id", entityId)
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: false });
+
+      if (!isFull) {
+        q = q.limit(21);
+      }
+
+      const { data: rows, error } = await q;
+      if (error) {
+        console.error("[Supabase] fetchLogs error:", error.message || error, error, { entityType, entityId });
+        return { data: { logs: [], hasMore: false }, error };
+      }
+
+      const allLogs = Array.isArray(rows) ? rows : [];
+      const hasMore = !isFull && allLogs.length > 20;
+      const logs = !isFull ? allLogs.slice(0, 20) : allLogs;
+
+      const createdByIds = Array.from(
+        new Set(
+          logs
+            .map(function (l) {
+              return l && l.created_by;
+            })
+            .filter(Boolean)
+        )
+      );
+
+      let profileById = {};
+      if (createdByIds.length) {
+        const { data: profiles, error: profilesError } = await supabase
+          .from("profiles")
+          .select("id,first_name,last_name")
+          .in("id", createdByIds);
+
+        if (profilesError) {
+          console.error("[Supabase] fetchLogs profiles error:", profilesError.message || profilesError, profilesError);
+        } else {
+          profileById = (profiles || []).reduce(function (acc, p) {
+            if (p && p.id) {
+              acc[p.id] = {
+                id: p.id,
+                first_name: p.first_name ?? null,
+                last_name: p.last_name ?? null,
+              };
+            }
+            return acc;
+          }, {});
+        }
+      }
+
+      const normalized = logs.map(function (l) {
+        const createdBy = l && l.created_by;
+        return Object.assign({}, l, {
+          created_by_profile: createdBy ? profileById[createdBy] || null : null,
+        });
+      });
+
+      return { data: { logs: normalized, hasMore }, error: null };
+    } catch (err) {
+      console.error("[Supabase] fetchLogs exception:", err, { entityType, entityId });
+      return { data: { logs: [], hasMore: false }, error: err };
+    }
+  }
+
+  /**
+   * Update an activity log message.
+   * @param {string} logId
+   * @param {string} message
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function updateLog(logId, message) {
+    if (!logId) {
+      const error = new Error("Missing logId");
+      console.error("[Supabase] updateLog:", error);
+      return { data: null, error };
+    }
+    try {
+      const cleanedMessage = normalizeMessage(message);
+      const userId = await getCurrentUserId();
+
+      const { data, error } = await supabase
+        .from("activity_logs")
+        .update({
+          message: cleanedMessage,
+          updated_at: new Date().toISOString(),
+          updated_by: userId,
+        })
+        .eq("id", logId)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] updateLog error:", error.message || error, error, { logId });
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] updateLog exception:", err, { logId });
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Delete an activity log by id.
+   * @param {string} logId
+   * @returns {Promise<{ data: { success: boolean } | null, error: object | null }>}
+   */
+  async function deleteLog(logId) {
+    if (!logId) {
+      const error = new Error("Missing logId");
+      console.error("[Supabase] deleteLog:", error);
+      return { data: null, error };
+    }
+    try {
+      await getCurrentUserId();
+
+      const { data, error } = await supabase
+        .from("activity_logs")
+        .delete()
+        .eq("id", logId)
+        .select();
+
+      if (error) {
+        console.error("[Supabase] deleteLog error:", error.message || error, error, { logId });
+        return { data: { success: false }, error };
+      }
+
+      const rowCount = Array.isArray(data) ? data.length : data ? 1 : 0;
+      if (rowCount === 0) {
+        const zeroError = new Error("Delete succeeded but 0 rows affected");
+        console.error("[Supabase] deleteLog zero rows:", { logId });
+        return { data: { success: false }, error: zeroError };
+      }
+
+      return { data: { success: true }, error: null };
+    } catch (err) {
+      console.error("[Supabase] deleteLog exception:", err, { logId });
+      return { data: { success: false }, error: err };
+    }
+  }
+
+  /**
+   * Create an automatic/system activity log for an entity.
+   * @param {"candidate"|"job_offer"|"client"} entityType
+   * @param {string} entityId
+   * @param {{ event_type: string, message: string, metadata: object | null }} payload
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function createAutoLog(entityType, entityId, payload) {
+    try {
+      assertEntity(entityType, entityId);
+
+      const allowedEventTypes = ["status_change", "salary_update", "rejection", "system_event"];
+      const eventType = payload && payload.event_type;
+      if (!allowedEventTypes.includes(eventType)) {
+        const error = new Error("Invalid event_type");
+        console.error("[Supabase] createAutoLog:", error, { event_type: eventType });
+        return { data: null, error };
+      }
+
+      const cleanedMessage = normalizeMessage(payload && payload.message);
+      const metadata = payload ? payload.metadata : null;
+      if (metadata !== null && (typeof metadata !== "object" || Array.isArray(metadata))) {
+        const error = new Error("Invalid metadata");
+        console.error("[Supabase] createAutoLog:", error, { metadataType: typeof metadata });
+        return { data: null, error };
+      }
+
+      const userId = await getCurrentUserId();
+
+      const row = {
+        entity_type: entityType,
+        entity_id: entityId,
+        message: cleanedMessage,
+        created_by: userId,
+        event_type: eventType,
+        metadata: metadata ?? null,
+      };
+
+      const { data, error } = await supabase
+        .from("activity_logs")
+        .insert(row)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] createAutoLog error:", error.message || error, error, { entityType, entityId, event_type: eventType });
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] createAutoLog exception:", err, { entityType, entityId });
+      return { data: null, error: err };
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // User feedback helper
   // ---------------------------------------------------------------------------
 
@@ -2486,6 +2778,12 @@
     archiveClient,
     fetchClientsPaginated,
     searchClientsByName,
+    // Activity Logs
+    createLog,
+    fetchLogs,
+    updateLog,
+    deleteLog,
+    createAutoLog,
     // Restore (unarchive) for Archiviati page
     unarchiveCandidate,
     unarchiveJobOffer,
