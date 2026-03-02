@@ -2195,7 +2195,8 @@
       })
       .filter((item) => {
         if (!filters.status) return true;
-        return item.status === filters.status;
+        const effectiveStatus = getEffectiveCandidateStatus(item);
+        return effectiveStatus === filters.status;
       })
       .filter((item) => {
         if (!filters.source) return true;
@@ -2346,6 +2347,22 @@
       default:
         return status || "New";
     }
+  }
+
+  function getEffectiveCandidateStatus(candidate) {
+    if (!candidate) return "new";
+
+    const assocStatus = candidate.latest_association?.status;
+
+    if (assocStatus === "hired") {
+      return "hired";
+    }
+
+    if (assocStatus) {
+      return assocStatus;
+    }
+
+    return "new";
   }
 
   function getApplicationStatusBadgeClass(status) {
@@ -2818,25 +2835,83 @@
       navigateTo("offerte.html");
     }
 
-    function openReopenOfferModal(offerId, offer, options) {
+    async function openReopenOfferModal(offerId, offer, options) {
       var onConfirm = options && typeof options.onConfirm === "function" ? options.onConfirm : null;
+      var hiredCount = 0;
+      if (window.IESupabase && window.IESupabase.fetchCandidatesForJobOffer) {
+        try {
+          var result = await window.IESupabase.fetchCandidatesForJobOffer(offerId);
+          if (result && result.data && Array.isArray(result.data)) {
+            hiredCount = result.data.filter(function (a) { return a.status === "hired"; }).length;
+          }
+        } catch (e) {
+          hiredCount = 0;
+        }
+      }
+      var positionsValue = offer && offer.positions != null ? String(offer.positions) : "";
       openModal({
         title: "Reopen Job Offer?",
         fullPageHref: null,
         render: function (mount) {
           mount.innerHTML =
             "<p class=\"text-gray-700 text-sm mb-4\">This job offer is closed. Reopen it to edit, add candidates, or mark someone as hired.</p>" +
+            "<div class=\"mb-4\">" +
+            "<label class=\"block text-sm font-medium text-gray-700 mb-1\">Number of positions</label>" +
+            "<input type=\"number\" min=\"1\" data-reopen-positions class=\"form-input w-full text-sm py-2 px-3 rounded-lg border border-gray-300\" value=\"" + (positionsValue.replace(/"/g, "&quot;")) + "\" />" +
+            "<div data-reopen-error class=\"text-red-500 text-xs hidden mt-1\"></div>" +
+            "</div>" +
             "<div class=\"flex gap-3 mt-4\">" +
             "<button type=\"button\" data-reopen-confirm class=\"px-4 py-2.5 rounded-xl bg-[#1b4332] text-white text-sm font-semibold hover:opacity-90 transition-all\">Confirm</button>" +
             "<button type=\"button\" data-ie-modal-close class=\"px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-all\">Cancel</button>" +
             "</div>";
+          var positionsInput = mount.querySelector("[data-reopen-positions]");
+          var errorEl = mount.querySelector("[data-reopen-error]");
           var confirmBtn = mount.querySelector("[data-reopen-confirm]");
-          if (confirmBtn && onConfirm) {
+          function validatePositions() {
+            var positions = Number(positionsInput.value);
+            var valid = Number.isFinite(positions) && positions >= 1 && positions > hiredCount;
+            if (!valid) {
+              errorEl.textContent = "You already hired " + hiredCount + " candidate(s). Increase positions above " + hiredCount + ".";
+              errorEl.classList.remove("hidden");
+              confirmBtn.disabled = true;
+              confirmBtn.classList.add("opacity-50", "cursor-not-allowed");
+            } else {
+              errorEl.textContent = "";
+              errorEl.classList.add("hidden");
+              confirmBtn.disabled = false;
+              confirmBtn.classList.remove("opacity-50", "cursor-not-allowed");
+            }
+          }
+          if (positionsInput) positionsInput.addEventListener("input", validatePositions);
+          validatePositions();
+          if (confirmBtn) {
             confirmBtn.addEventListener("click", async function () {
+              var positions = Number(positionsInput.value);
+              if (!Number.isFinite(positions) || positions <= hiredCount) return;
               if (confirmBtn.disabled) return;
               confirmBtn.disabled = true;
               try {
-                await onConfirm();
+                var statusResult = null;
+                if (window.IESupabase && window.IESupabase.updateJobOffer) {
+                  var updateResult = await window.IESupabase.updateJobOffer(offerId, { positions: positions });
+                  if (updateResult && updateResult.error) {
+                    if (window.IESupabase.showError) window.IESupabase.showError(updateResult.error.message || "Errore.");
+                    return;
+                  }
+                }
+                if (window.IESupabase && window.IESupabase.updateJobOfferStatus) {
+                  statusResult = await window.IESupabase.updateJobOfferStatus(offerId, "active");
+                  if (statusResult && statusResult.error) {
+                    if (window.IESupabase.showError) window.IESupabase.showError(statusResult.error.message || "Errore.");
+                    return;
+                  }
+                }
+                var updatedOffer = offer ? Object.assign({}, offer, { status: "active", positions: positions }) : { status: "active", positions: positions };
+                if (statusResult && statusResult.data) {
+                  updatedOffer.status = statusResult.data.status;
+                  if (statusResult.data.positions != null) updatedOffer.positions = statusResult.data.positions;
+                }
+                if (onConfirm) await onConfirm(updatedOffer);
                 closeModal();
               } catch (e) {
                 if (window.IESupabase && window.IESupabase.showError) {
@@ -2879,27 +2954,37 @@
         },
         onReopen: function () {
           openReopenOfferModal(offerId, offer, {
-            onConfirm: async function () {
-              if (!window.IESupabase || !window.IESupabase.updateJobOfferStatus) return;
-              var result = await window.IESupabase.updateJobOfferStatus(offerId, "active");
-              if (result && result.error) {
-                if (window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Errore.");
-                throw new Error(result.error.message || "Errore.");
-              }
-              if (result && result.data) {
-                if (offer) {
-                  offer.status = result.data.status;
-                  if (result.data.positions != null) offer.positions = result.data.positions;
-                }
-                var updatedOffer = offer || result.data;
-                populateFormFromOffer(updatedOffer);
-                renderActionButtons("view", offerId, updatedOffer);
-                renderAssociatedCandidates(offerId, updatedOffer);
-              }
+            onConfirm: async function (updatedOffer) {
+              populateFormFromOffer(updatedOffer);
+              renderActionButtons("view", offerId, updatedOffer);
+              renderOfferStatusBadge(updatedOffer.status);
+              renderAssociatedCandidates(offerId, updatedOffer);
             },
           });
         }
       });
+    }
+
+    function renderOfferStatusBadge(status) {
+      var el = document.getElementById("jobOfferHeaderStatus");
+      if (!el) return;
+      var normalized = normalizeStatus(status);
+      var badgeClass = "badge ";
+      var label = "Active";
+      if (normalized === "active") {
+        badgeClass += "badge-open";
+        label = "Active";
+      } else if (normalized === "closed") {
+        badgeClass += "badge-closed";
+        label = "Closed";
+      } else if (normalized === "archived") {
+        badgeClass += "bg-gray-200 text-gray-600";
+        label = "Archived";
+      } else {
+        badgeClass += "badge-open";
+        label = "Active";
+      }
+      el.innerHTML = "<span class=\"" + badgeClass + "\">" + escapeHtml(label) + "</span>";
     }
 
     var STATUS_OPTIONS = [
@@ -3013,26 +3098,16 @@
             if (normalizedOfferStatus === "closed" && newStatus === "hired") {
               select.value = previousStatus;
               openReopenOfferModal(jobOfferId, offer, {
-                onConfirm: async function () {
-                  if (!window.IESupabase || !window.IESupabase.updateJobOfferStatus) return;
-                  var reopenResult = await window.IESupabase.updateJobOfferStatus(jobOfferId, "active");
-                  if (reopenResult && reopenResult.error) {
-                    if (window.IESupabase.showError) window.IESupabase.showError(reopenResult.error.message || "Errore.");
-                    throw new Error(reopenResult.error.message || "Errore.");
-                  }
-                  if (reopenResult && reopenResult.data && offer) {
-                    offer.status = reopenResult.data.status;
-                    if (reopenResult.data.positions != null) offer.positions = reopenResult.data.positions;
-                    populateFormFromOffer(offer);
-                    renderActionButtons("view", jobOfferId, offer);
-                  }
+                onConfirm: async function (updatedOffer) {
+                  populateFormFromOffer(updatedOffer);
+                  renderActionButtons("view", jobOfferId, updatedOffer);
                   if (!window.IESupabase || !window.IESupabase.updateCandidateAssociationStatus) return;
                   var hireRes = await window.IESupabase.updateCandidateAssociationStatus(associationId, "hired");
                   if (hireRes.error) {
                     if (window.IESupabase.showError) window.IESupabase.showError(hireRes.error.message || "Errore aggiornamento stato.");
                     throw new Error(hireRes.error.message || "Errore aggiornamento stato.");
                   }
-                  await renderAssociatedCandidates(jobOfferId, offer);
+                  await renderAssociatedCandidates(jobOfferId, updatedOffer);
                 },
               });
               return;
@@ -3334,6 +3409,8 @@
 
     if (finalMode === "create") {
       setTitles("Create New Job Offer");
+      var headerStatusEl = document.getElementById("jobOfferHeaderStatus");
+      if (headerStatusEl) headerStatusEl.innerHTML = "";
       clearForm();
       setEditableState();
       configureCancel("create", null);
@@ -3394,6 +3471,7 @@
           }
           configureCancel(effectiveModeForOffer, offerId);
           renderActionButtons(effectiveModeForOffer, offerId, offer);
+          renderOfferStatusBadge(offer.status);
 
           if (isViewModeForOffer) {
             setFormDisabled(true);
@@ -3440,6 +3518,7 @@
     }
     configureCancel(effectiveModeForOffer, offerId);
     renderActionButtons(effectiveModeForOffer, offerId, localOffer);
+    renderOfferStatusBadge(localOffer.status);
 
     if (isViewModeForOffer) {
       setFormDisabled(true);
@@ -4070,7 +4149,8 @@
       rows.forEach(function (row) {
         const clientName = findClientNameForCandidate(row);
         const latestAssoc = row.latest_association || null;
-        const statusBadgeClass = getCandidateStatusBadgeClass(row.status);
+        const effectiveStatus = getEffectiveCandidateStatus(row);
+        const statusBadgeClass = getCandidateStatusBadgeClass(effectiveStatus);
         const sourceLabel = (row.source || "").toUpperCase();
         const createdDate = row.created_at
           ? new Date(row.created_at).toLocaleDateString("it-IT")
@@ -4109,7 +4189,7 @@
             (row.position || "—"),
             assignmentHtml,
             (row.address || "—"),
-            '<span class="badge ' + statusBadgeClass + '">' + escapeHtml(formatCandidateStatusLabel(row.status)) + "</span>",
+            '<span class="badge ' + statusBadgeClass + '">' + escapeHtml(formatCandidateStatusLabel(effectiveStatus)) + "</span>",
             '<span class="text-xs font-medium text-blue-600">' + escapeHtml(sourceLabel || "—") + "</span>",
             '<span class="text-gray-400">' + escapeHtml(createdDate) + "</span>",
             '<div class="text-center">' + viewCvHtml + "</div>",
@@ -4369,6 +4449,21 @@
     const tbody = document.querySelector("[data-ie-joboffers-body]");
     if (!tbody) return;
 
+    const table = tbody.closest("table");
+    const headerRow = table?.querySelector("thead tr");
+    const candidatesTh = headerRow ? Array.from(headerRow.children).find(function (th) {
+      return th.textContent.trim().toLowerCase() === "candidates";
+    }) : null;
+    if (candidatesTh) {
+      const thAssociated = document.createElement("th");
+      thAssociated.className = "px-6 py-5 font-bold";
+      thAssociated.textContent = "Associated";
+      const thRequired = document.createElement("th");
+      thRequired.className = "px-6 py-5 font-bold";
+      thRequired.textContent = "Required";
+      candidatesTh.replaceWith(thAssociated, thRequired);
+    }
+
     const filters = {
       title: "",
       clientId: "",
@@ -4603,17 +4698,38 @@
         created_at: r.created_at,
         is_archived: r.is_archived || false,
         candidatesCount: candidatesCount,
+        positions: r.positions != null ? Number(r.positions) : 0,
       };
     }
 
-    function renderOfferRows(rows) {
+    async function renderOfferRows(rows) {
       tbody.innerHTML = "";
       if (!rows.length) {
-        tbody.innerHTML = "<tr><td colspan=\"8\" class=\"px-6 py-8 text-center text-gray-400\">Nessuna offerta trovata.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan=\"9\" class=\"px-6 py-8 text-center text-gray-400\">Nessuna offerta trovata.</td></tr>";
         return;
       }
       if (window.IESupabase) window.IE_ACTIVE_JOB_OFFER_ID = rows[0].id;
-      rows.forEach(function (row) {
+
+      const associationResults = await Promise.all(
+        rows.map(function (row) {
+          return window.IESupabase && window.IESupabase.fetchCandidatesForJobOffer
+            ? window.IESupabase.fetchCandidatesForJobOffer(row.id)
+            : Promise.resolve({ data: [] });
+        })
+      );
+
+      rows.forEach(function (row, i) {
+        const associations = associationResults[i]?.data || [];
+        const associatedActive = associations.filter(function (a) {
+          const s = (a.status || "").toString().toLowerCase();
+          return s !== "rejected" && s !== "not_selected";
+        }).length;
+        const hiredCount = associations.filter(function (a) {
+          const s = (a.status || "").toString().toLowerCase();
+          return s === "hired";
+        }).length;
+        const positions = row.positions || 0;
+
         const clientValue = row.client_name || "—";
         const locationValue = row.location || "—";
         const createdAtValue = row.created_at
@@ -4621,15 +4737,22 @@
           : "—";
         const badgeClass = getOfferStatusBadgeClass(row.status);
         const statusLabel = formatOfferStatusLabel(row.status);
-        const candidatesCount = typeof row.candidatesCount === "number" ? row.candidatesCount : 0;
-        const candidatesCellHtml =
-          candidatesCount > 0
-            ? '<button type="button" data-action="view-offer-candidates" data-id="' +
-              escapeHtml(row.id) +
-              '" class="text-[#1b4332] font-semibold hover:underline">' +
-              escapeHtml(String(candidatesCount)) +
-              "</button>"
-            : "0";
+
+        const associatedCellHtml =
+          '<button type="button" data-action="view-offer-candidates" data-id="' +
+          escapeHtml(row.id) +
+          '" class="hover:underline font-bold">' +
+          escapeHtml(String(associatedActive)) +
+          "</button>";
+        let countColorClass = "text-green-600";
+        if (positions > 0 && hiredCount >= positions) {
+          countColorClass = "text-red-500";
+        }
+        const requiredCellHtml =
+          '<span class="' + countColorClass + '">' +
+          escapeHtml(String(hiredCount)) + " / " + escapeHtml(String(positions)) +
+          "</span>";
+
         const tr = renderEntityRow({
           entityType: "job_offer",
           id: row.id,
@@ -4644,7 +4767,8 @@
             escapeHtml(clientValue),
             escapeHtml(locationValue),
             '<span class="badge ' + badgeClass + '">' + escapeHtml(statusLabel) + "</span>",
-            candidatesCellHtml,
+            associatedCellHtml,
+            requiredCellHtml,
             '<span class="text-gray-400">' + escapeHtml(createdAtValue) + "</span>",
           ],
           rowTitle: formatLastUpdatedMeta(row),
@@ -4657,12 +4781,12 @@
       const paginationContainer = document.querySelector("[data-ie-joboffers-body]")?.closest(".glass-card")?.querySelector("[data-ie-pagination]");
 
       if (window.IESupabase && window.IESupabase.fetchJobOffersPaginated) {
-        tbody.innerHTML = "<tr><td colspan=\"8\" class=\"px-6 py-8 text-center text-gray-400\">Caricamento...</td></tr>";
+        tbody.innerHTML = "<tr><td colspan=\"9\" class=\"px-6 py-8 text-center text-gray-400\">Caricamento...</td></tr>";
         window.IESupabase.fetchJobOffersPaginated({
           filters,
           page: currentPage,
           limit,
-        }).then(function (result) {
+        }).then(async function (result) {
           const rows = (result.data || []).map(mapJobOfferRow);
           const totalCount = result.totalCount ?? 0;
           const totalPages = Math.max(1, Math.ceil(totalCount / limit));
@@ -4671,12 +4795,12 @@
             renderOffers();
             return;
           }
-          renderOfferRows(rows);
+          await renderOfferRows(rows);
           updatePaginationUI(paginationContainer, totalCount, currentPage, limit, rows.length);
           renderAssociationsForActiveOffer();
         }).catch(function (err) {
           console.error("[ItalianExperience] fetchJobOffersPaginated error:", err);
-          tbody.innerHTML = "<tr><td colspan=\"8\" class=\"px-6 py-8 text-center text-red-500\">Errore nel caricamento. Riprova più tardi.</td></tr>";
+          tbody.innerHTML = "<tr><td colspan=\"9\" class=\"px-6 py-8 text-center text-red-500\">Errore nel caricamento. Riprova più tardi.</td></tr>";
           updatePaginationUI(paginationContainer, 0, 1, limit, 0);
         });
         return;
@@ -4689,7 +4813,7 @@
         if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
         const start = (currentPage - 1) * limit;
         const pageRows = rows.slice(start, start + limit);
-        renderOfferRows(pageRows);
+        await renderOfferRows(pageRows);
         updatePaginationUI(paginationContainer, totalCount, currentPage, limit, pageRows.length);
         await renderAssociationsForActiveOffer();
       });

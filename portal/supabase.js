@@ -2012,6 +2012,21 @@
         return { data: null, error };
       }
 
+      // Sync candidate status when hired
+      if (status === "hired" && oldRow.candidate_id) {
+        const { error: candidateUpdateError } = await supabase
+          .from("candidates")
+          .update({ status: "hired" })
+          .eq("id", oldRow.candidate_id);
+
+        if (candidateUpdateError) {
+          console.error(
+            "[Supabase] Failed to sync candidate status to hired:",
+            candidateUpdateError.message
+          );
+        }
+      }
+
       if (oldRow.job_offer_id) {
         await syncJobOfferStatusFromHired(oldRow.job_offer_id);
       }
