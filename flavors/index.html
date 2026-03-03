@@ -32,24 +32,31 @@
 
     .hub-grid{
       width:100%;
-      min-height:100vh;
-      min-height:100dvh;
       display:flex;
       flex-direction:column;
       background:#000;
     }
 
-    @media (max-width:1024px){
-      .hub-grid{
-        height:auto;
-        min-height:100vh;
-        min-height:100dvh;
-      }
+    .hub-grid > .ie-hero-content-layer{
+      width:100%;
+      flex:1;
+      min-height:0;
+      display:flex;
+      flex-direction:inherit;
     }
 
     @media (min-width:1025px){
       .hub-grid{
         flex-direction:row;
+      }
+      .hub-grid > .ie-hero-content-layer{
+        flex-direction:row;
+      }
+    }
+
+    @media (max-width:1024px){
+      .hub-grid > .ie-hero-content-layer{
+        flex-direction:column;
       }
     }
 
@@ -354,53 +361,55 @@
   <main>
     <h1 class="sr-only">Flavors Hub</h1>
 
-    <section class="hub-grid" aria-label="Flavors hub navigation">
+    <section class="hub-grid ie-hero-shell ie-hero-offset" aria-label="Flavors hub navigation">
 
-      <a href="/ItalianExperience/flavors/for-your-home/" class="hub-panel">
-        <div class="hub-bg" style="background-image:url('/ItalianExperience/assets/img/flavors/flavors-home.jpg');" aria-hidden="true"></div>
-        <div class="hub-gradient" aria-hidden="true"></div>
+      <div class="ie-hero-content-layer">
+        <a href="/ItalianExperience/flavors/for-your-home/" class="hub-panel">
+          <div class="hub-bg" style="background-image:url('/ItalianExperience/assets/img/flavors/flavors-home.jpg');" aria-hidden="true"></div>
+          <div class="hub-gradient" aria-hidden="true"></div>
 
-        <div class="hub-content">
-          <div class="hub-glass-card">
-            <p class="hub-kicker">Gourmet Experience</p>
-            <div class="hub-line"></div>
-            <h2 class="hub-title">For Your Home</h2>
-            <p class="hub-sub">E-Commerce Store</p>
+          <div class="hub-content">
+            <div class="hub-glass-card">
+              <p class="hub-kicker">Gourmet Experience</p>
+              <div class="hub-line"></div>
+              <h2 class="hub-title">For Your Home</h2>
+              <p class="hub-sub">E-Commerce Store</p>
+            </div>
           </div>
-        </div>
-      </a>
+        </a>
 
-      <a href="/ItalianExperience/flavors/for-your-business/" class="hub-panel">
-        <div class="hub-bg" style="background-image:url('/ItalianExperience/assets/img/flavors/flavors-business.jpg');" aria-hidden="true"></div>
-        <div class="hub-gradient" aria-hidden="true"></div>
+        <a href="/ItalianExperience/flavors/for-your-business/" class="hub-panel">
+          <div class="hub-bg" style="background-image:url('/ItalianExperience/assets/img/flavors/flavors-business.jpg');" aria-hidden="true"></div>
+          <div class="hub-gradient" aria-hidden="true"></div>
 
-        <div class="hub-content">
-          <div class="hub-glass-card">
-            <p class="hub-kicker">Professional Supply</p>
-            <div class="hub-line"></div>
-            <h2 class="hub-title">For Your Business</h2>
-            <p class="hub-sub">Wholesale</p>
+          <div class="hub-content">
+            <div class="hub-glass-card">
+              <p class="hub-kicker">Professional Supply</p>
+              <div class="hub-line"></div>
+              <h2 class="hub-title">For Your Business</h2>
+              <p class="hub-sub">Wholesale</p>
+            </div>
           </div>
-        </div>
-      </a>
+        </a>
 
-      <a href="/ItalianExperience/flavors/aziende-italiane/" class="hub-panel">
-        <div class="hub-bg" style="background-image:url('/ItalianExperience/assets/img/flavors/flavors-italian-companies.jpg');" aria-hidden="true"></div>
-        <div class="hub-gradient" aria-hidden="true"></div>
+        <a href="/ItalianExperience/flavors/aziende-italiane/" class="hub-panel">
+          <div class="hub-bg" style="background-image:url('/ItalianExperience/assets/img/flavors/flavors-italian-companies.jpg');" aria-hidden="true"></div>
+          <div class="hub-gradient" aria-hidden="true"></div>
 
-        <div class="hub-content">
-          <div class="hub-glass-card">
-            <p class="hub-kicker">Expansion Advisory</p>
-            <div class="hub-line"></div>
-            <h2 class="hub-title">Italian Companies</h2>
-            <p class="hub-sub">Export to USA Market</p>
+          <div class="hub-content">
+            <div class="hub-glass-card">
+              <p class="hub-kicker">Expansion Advisory</p>
+              <div class="hub-line"></div>
+              <h2 class="hub-title">Italian Companies</h2>
+              <p class="hub-sub">Export to USA Market</p>
 
-            <p class="hub-disclaimer">
-              This specific service is available exclusively for the Italian market. Content is provided in Italian.
-            </p>
+              <p class="hub-disclaimer">
+                This specific service is available exclusively for the Italian market. Content is provided in Italian.
+              </p>
+            </div>
           </div>
-        </div>
-      </a>
+        </a>
+      </div>
 
     </section>
 
