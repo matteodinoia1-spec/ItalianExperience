@@ -110,7 +110,7 @@
       flex-direction: column;
       justify-content: center;
       text-align: center;
-      transition: background 0.5s ease, border-color 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease, min-height 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: background 0.5s ease, border-color 0.5s ease;
       box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
       cursor: pointer;
       pointer-events: auto;
@@ -133,8 +133,6 @@
     .glass-card:hover {
       background: rgba(255, 255, 255, 0.12);
       border-color: rgba(255, 255, 255, 0.3);
-      transform: translateY(-6px);
-      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.65);
     }
 
     .label-gold {
@@ -294,6 +292,15 @@
 
       .feature-text p {
         font-size: 0.7rem;
+      }
+    }
+
+    @media (hover: none) {
+      .glass-card:hover {
+        background: var(--ice-bg);
+        border-color: var(--ice-border);
+        transform: none;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
       }
     }
   </style>
