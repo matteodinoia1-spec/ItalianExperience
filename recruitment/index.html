@@ -26,104 +26,59 @@
   <div id="site-header"></div>
 
   <main>
-    <section class="ie-hero-shell hero--recruitment" aria-label="Recruitment hub hero">
+    <section class="ie-hero-shell recruitment-portal" aria-label="Recruitment portal hero">
       <h1 class="sr-only">Recruitment Hub</h1>
-      <div class="ie-hero-content-layer hero-layout--split">
-        <section class="pillar">
-        <div class="pillar-bg">
-          <img width="1400" height="1051" src="/ItalianExperience/assets/img/recruitment/recruitment-bg-employer.jpg" alt="Employer">
+
+      <div class="recruitment-portal-bg" aria-hidden="true"></div>
+
+      <div class="recruitment-portal-inner">
+        <div class="portal-intro ie-hero-lockup">
+          <p class="ie-hero-eyebrow">Recruitment Hub</p>
+          <h2 class="ie-hero-title ie-hero-title-compact">
+            Italian Hospitality Talent, Precisely Placed
+          </h2>
+          <p class="ie-hero-copy">
+            Italian Experience Recruitment connects elite hospitality professionals and visionary employers through curated, high-touch placements that respect culture, craft, and long-term growth.
+          </p>
         </div>
 
-        <div class="glass-card">
-          <span class="label-gold">Strategic Partnership</span>
-          <h2 class="pillar-title">I am an <br>Employer</h2>
-          <p class="pillar-desc">Acquire authentic Italian personnel and elite talent through our meticulously tailored recruitment framework.</p>
-
-          <div class="details-box">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-              <div class="feature-item">
-                <i class="fas fa-search-plus"></i>
-                <div class="feature-text">
-                  <h4>Needs Analysis</h4>
-                  <p>Customized approach to fit your specific company culture.</p>
-                </div>
-              </div>
-
-              <div class="feature-item">
-                <i class="fas fa-video"></i>
-                <div class="feature-text">
-                  <h4>Vetted Screening</h4>
-                  <p>Rigorous evaluations to ensure the highest standards.</p>
-                </div>
-              </div>
-
-              <div class="feature-item">
-                <i class="fas fa-check-double"></i>
-                <div class="feature-text">
-                  <h4>Reference Checks</h4>
-                  <p>Thorough verification for absolute quality assurance.</p>
-                </div>
-              </div>
+        <div class="portal-grid">
+          <article class="portal-card portal-card--employer ie-reveal" data-delay="1">
+            <div class="portal-card-header">
+              <span class="portal-label">For Employers</span>
+              <h3 class="portal-title">Build a world-class Italian team</h3>
+              <p class="portal-copy">
+                Strategic staffing for hotels, restaurants, and hospitality groups seeking authentic Italian excellence and long-term partnership.
+              </p>
             </div>
-
-            <div class="text-center mt-6">
-              <a href="/ItalianExperience/recruitment/employer/" class="cta-button">Explore Solutions</a>
+            <ul class="portal-list">
+              <li>Structured talent pipeline from Italy and EU</li>
+              <li>Rigorous multi-step screening and reference checks</li>
+              <li>Visa, relocation, and onboarding coordination</li>
+            </ul>
+            <div class="portal-cta">
+              <a href="/ItalianExperience/recruitment/employer/" class="cta-button">Explore Employer Solutions</a>
             </div>
-          </div>
+          </article>
+
+          <article class="portal-card portal-card--candidate ie-reveal" data-delay="2">
+            <div class="portal-card-header">
+              <span class="portal-label">For Candidates</span>
+              <h3 class="portal-title">Turn your craft into a career</h3>
+              <p class="portal-copy">
+                Tailored paths for chefs, front-of-house, and hospitality talent ready to grow in premium destinations worldwide.
+              </p>
+            </div>
+            <ul class="portal-list">
+              <li>Guided selection and profile positioning</li>
+              <li>Placement in USA, Europe, and key hubs</li>
+              <li>Ongoing support, visas, and career evolution</li>
+            </ul>
+            <div class="portal-cta">
+              <a href="/ItalianExperience/recruitment/candidate/" class="cta-button">Discover Candidate Journey</a>
+            </div>
+          </article>
         </div>
-      </section>
-
-      <section class="pillar">
-        <div class="pillar-bg">
-          <img width="1400" height="1050" src="/ItalianExperience/assets/img/recruitment/recruitment-bg-candidate.jpg" alt="Candidate">
-        </div>
-
-        <div class="glass-card">
-          <span class="label-gold">Career Mastery</span>
-          <h2 class="pillar-title">I am a <br>Candidate</h2>
-          <p class="pillar-desc">Dedicated to assisting elite candidates in launching prestigious careers through curated opportunities.</p>
-
-          <div class="details-box">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-              <div class="feature-item">
-                <span class="text-gold font-bold text-lg mr-2">01</span>
-                <div class="feature-text">
-                  <h4>Selection</h4>
-                  <p>Individual sessions to evaluate your profile and goals.</p>
-                </div>
-              </div>
-
-              <div class="feature-item">
-                <span class="text-gold font-bold text-lg mr-2">02</span>
-                <div class="feature-text">
-                  <h4>Placement</h4>
-                  <p>Strategic positioning in USA, Europe or local markets.</p>
-                </div>
-              </div>
-
-              <div class="feature-item">
-                <span class="text-gold font-bold text-lg mr-2">03</span>
-                <div class="feature-text">
-                  <h4>Relocation</h4>
-                  <p>Visa support, housing, and relocation guidance.</p>
-                </div>
-              </div>
-
-              <div class="feature-item">
-                <span class="text-gold font-bold text-lg mr-2">04</span>
-                <div class="feature-text">
-                  <h4>Evolution</h4>
-                  <p>Continuous follow-up and career development access.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="text-center mt-10">
-              <a href="/ItalianExperience/recruitment/candidate/" class="cta-button">Live the Dream</a>
-            </div>
-          </div>
-        </div>
-      </section>
       </div>
     </section>
   </main>
@@ -132,17 +87,6 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const glassCards = document.querySelectorAll('.glass-card');
-      glassCards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-          const rect = card.getBoundingClientRect();
-          const x = ((e.clientX - rect.left) / card.clientWidth) * 100;
-          const y = ((e.clientY - rect.top) / card.clientHeight) * 100;
-          card.style.setProperty('--mouse-x', `${x}%`);
-          card.style.setProperty('--mouse-y', `${y}%`);
-        });
-      });
-
       (function () {
         const base = "/ItalianExperience";
         const headerMount = document.getElementById("site-header");
