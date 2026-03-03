@@ -236,6 +236,32 @@
       .hub-bg{transition:filter 0.4s ease}
       .hub-panel:hover .hub-bg{transform:scale(1.02)}
     }
+
+    @media (max-width:1024px){
+      /* Allow hero to grow naturally on mobile */
+      .hero--flavors.hub-grid{
+        height:auto;
+        min-height:auto;
+        flex-direction:column;
+      }
+
+      /* Stack panels vertically */
+      .hero--flavors .ie-hero-content-layer.hero-layout--split{
+        flex-direction:column;
+        height:auto;
+      }
+
+      /* Each panel takes full viewport height */
+      .hero--flavors .hub-panel{
+        height:100dvh;
+        min-height:100dvh;
+      }
+
+      /* Reduce content vertical offset for smaller screens */
+      .hero--flavors .hub-content{
+        transform:translateY(0);
+      }
+    }
   </style>
 </head>
 
