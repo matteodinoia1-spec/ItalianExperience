@@ -870,8 +870,10 @@ body:has(.recruitment-portal) #site-header {
   position:relative;
   overflow:hidden;
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   justify-content:center;
+  padding-top:calc(var(--ie-header-h) + 80px);
+  padding-bottom:120px;
 }
 
 .recruitment-portal .recruitment-portal-bg{
@@ -891,7 +893,7 @@ body:has(.recruitment-portal) #site-header {
   max-width:min(1160px, 100%);
   margin-inline:auto;
   padding-inline:var(--ie-content-padding-inline);
-  padding-top:calc(var(--ie-header-h) + 1.5rem);
+  padding-top:0;
   padding-bottom:clamp(3rem, 6vh, 4rem);
   display:flex;
   flex-direction:column;
@@ -957,6 +959,7 @@ body:has(.recruitment-portal) #site-header {
   height:100%;
   object-fit:cover;
   filter:brightness(0.45) contrast(1.05);
+  transition:transform 1.4s cubic-bezier(0.23,1,0.32,1), filter 0.8s ease;
 }
 
 .recruitment-portal .portal-overlay{
@@ -985,16 +988,32 @@ body:has(.recruitment-portal) #site-header {
 }
 
 .recruitment-portal .portal-label{
-  font-size:0.8rem;
+  font-size:0.95rem;
   text-transform:uppercase;
-  letter-spacing:0.35em;
+  letter-spacing:0.45em;
+  font-weight:600;
   color:var(--brand-gold);
+  margin-bottom:1.2rem;
+  opacity:0.9;
 }
 
 .recruitment-portal .portal-title{
   font-family:'Playfair Display',serif;
-  font-size:clamp(2rem, 3vw, 2.8rem);
-  line-height:1.2;
+  font-weight:500;
+  letter-spacing:-0.02em;
+  text-transform:none;
+  font-size:clamp(2.3rem, 3.2vw, 3.1rem);
+  line-height:1.15;
+}
+
+.recruitment-portal .portal-title::after{
+  content:"";
+  display:block;
+  width:40px;
+  height:1px;
+  background:var(--brand-gold);
+  margin-top:1.4rem;
+  opacity:0.6;
 }
 
 .recruitment-portal .portal-copy{
@@ -1026,12 +1045,39 @@ body:has(.recruitment-portal) #site-header {
   margin-top:1.4rem;
 }
 
+.recruitment-portal .portal-cta .cta-button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0.9rem 1.8rem;
+  margin-top:auto;
+  border:1px solid rgba(255,255,255,0.3);
+  border-radius:4px;
+  font-size:0.75rem;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  background:rgba(0,0,0,0.3);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  transition:all 0.35s ease;
+}
+
+.recruitment-portal .portal-card:hover .cta-button{
+  border-color:var(--brand-gold);
+  color:var(--brand-gold);
+}
+
 .recruitment-portal .portal-card--employer{
   border-color:rgba(197,160,89,0.36);
 }
 
 .recruitment-portal .portal-card--candidate{
   border-color:rgba(197,160,89,0.24);
+}
+
+.recruitment-portal .portal-card:hover .portal-image img{
+  transform:scale(1.06);
+  filter:brightness(0.42) contrast(1.08);
 }
 
 @media (min-width:900px){
