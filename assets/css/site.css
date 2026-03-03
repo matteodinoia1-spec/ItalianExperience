@@ -232,7 +232,7 @@ input,textarea,select,button{font-size:16px}
 /* HEADER GLASS */
 .glass-header{
   position:fixed;top:0;left:0;width:100%;z-index:9999;
-  height:110px;
+  height:var(--ie-header-h);
   padding:0 4rem;
   display:flex;align-items:center;justify-content:space-between;
   background:transparent;
@@ -249,7 +249,7 @@ input,textarea,select,button{font-size:16px}
 }
 .glass-header.nav-up{transform:translateY(-110%)}
 .glass-header.scrolled{
-  height:90px;
+  height:calc(var(--ie-header-h) - 20px);
   padding:0 2rem;
   background:rgba(15,15,15,0.45);
   backdrop-filter:blur(22px) saturate(165%);
@@ -512,17 +512,19 @@ textarea:focus-visible{
 
 /* RESPONSIVE HEADER */
 @media (max-width:1024px){
+  :root{
+    --ie-header-h:160px;
+  }
   .nav-container{display:none}
   .glass-header{
     flex-direction:column;
     justify-content:center;
     align-items:center;
-    height:160px;
     padding:1rem 0;
     gap:4px;
   }
   .glass-header.scrolled{
-    height:130px;
+    height:calc(var(--ie-header-h) - 30px);
     padding:0.6rem 0;
   }
   .logo-wrap{transform:scale(0.80);transform-origin:center top;margin-bottom:-10px}
@@ -530,9 +532,10 @@ textarea:focus-visible{
   #central-menu-btn{display:flex;margin-top:0}
 }
 @media (max-width:350px){
+  :root{
+    --ie-header-h:140px;
+  }
   .logo-wrap{transform:scale(0.65);margin-bottom:-18px}
-  .glass-header{height:140px}
-  .glass-header.scrolled{height:120px}
   #central-menu-btn{margin-top:0}
 }
 
