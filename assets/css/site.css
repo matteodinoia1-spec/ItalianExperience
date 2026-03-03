@@ -84,7 +84,6 @@ input,textarea,select,button{font-size:16px}
 .ie-hero-content-layer{
   position:relative;
   z-index:10;
-  padding-top:calc(var(--ie-header-clearance) + 0.75rem);
 }
 
 /* Split hero layout variant for hub-style heroes (panels side-by-side on desktop, stacked on mobile) */
@@ -380,9 +379,6 @@ input,textarea,select,button{font-size:16px}
   }
   .ie-hero-offset{
     margin-top:calc(-1 * var(--ie-header-clearance));
-  }
-  .ie-hero-content-layer{
-    padding-top:calc(var(--ie-header-clearance) + 0.5rem);
   }
   .ie-hero-lockup{
     padding-inline:var(--ie-content-padding-inline) !important;
@@ -1057,4 +1053,14 @@ form button[type="submit"]:active{
 body:has(.hero--recruitment) #site-header,
 body:has(.hero--flavors) #site-header{
   height:0 !important;
+}
+
+/* Recruitment hero content positioning */
+.hero--recruitment .glass-card{
+margin-top: var(--ie-header-h);
+}
+
+/* Flavors hero content positioning */
+.hero--flavors .hub-panel{
+padding-top: var(--ie-header-h);
 }
