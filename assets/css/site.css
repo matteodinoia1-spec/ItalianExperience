@@ -117,6 +117,7 @@ input,textarea,select,button{font-size:16px}
 
 .hero--recruitment .pillar{
   position:relative;
+  height:100%;
   flex:1;
   display:flex;
   flex-direction:column;
@@ -1048,22 +1049,32 @@ form button[type="submit"]:active{
   }
 }
 
-/* Disable header placeholder ONLY on recruitment and flavors */
-body:has(.hero--recruitment) #site-header,
+/* Disable header placeholder ONLY on flavors (recruitment uses immersive header overlay) */
 body:has(.hero--flavors) #site-header {
   height: 0 !important;
 }
 
-/* Exact fullscreen hero only on Recruitment and Flavors */
-.hero--recruitment.ie-hero-shell,
+/* Exact fullscreen hero */
+.hero--recruitment.ie-hero-shell{
+  height:100dvh;
+  min-height:100dvh;
+  position:relative;
+  overflow:hidden;
+}
+
 .hero--flavors.ie-hero-shell {
   height: 100dvh;
   min-height: 100dvh;
 }
 
 /* Content positioned below header without overflow */
-.hero--recruitment .ie-hero-content-layer,
 .hero--flavors .ie-hero-content-layer {
   height: calc(100dvh - var(--ie-header-h));
   margin-top: var(--ie-header-h);
+}
+
+/* Recruitment hero content layer fills hero and clears glass header */
+.hero--recruitment .ie-hero-content-layer{
+  height:100%;
+  padding-top:calc(var(--ie-header-h) + 16px);
 }
