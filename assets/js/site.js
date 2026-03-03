@@ -511,6 +511,22 @@
     }
   }
 
+  function syncScopedHeroOffset() {
+    const header = document.querySelector('.glass-header');
+    if (!header) return;
+
+    const headerHeight = header.getBoundingClientRect().height;
+
+    document
+      .querySelectorAll('.hero--recruitment .ie-hero-content-layer, .hero--flavors .ie-hero-content-layer')
+      .forEach(layer => {
+        layer.style.paddingTop = headerHeight + 'px';
+      });
+  }
+
+  window.addEventListener('load', syncScopedHeroOffset);
+  window.addEventListener('resize', syncScopedHeroOffset);
+
   function IEInit(root) {
     if (window[GLOBAL_INIT_FLAG]) {
       applyPremiumCards(root);
@@ -531,6 +547,7 @@
     initLogoMouse('logo-header');
     initLogoMouse('logo-footer');
     initGlobalHeaderOffset();
+    syncScopedHeroOffset();
     initRevealObserver();
   }
 
