@@ -32,32 +32,7 @@
 
     .hub-grid{
       width:100%;
-      display:flex;
-      flex-direction:column;
       background:#000;
-    }
-
-    .hub-grid > .ie-hero-content-layer{
-      width:100%;
-      flex:1;
-      min-height:0;
-      display:flex;
-      flex-direction:inherit;
-    }
-
-    @media (min-width:1025px){
-      .hub-grid{
-        flex-direction:row;
-      }
-      .hub-grid > .ie-hero-content-layer{
-        flex-direction:row;
-      }
-    }
-
-    @media (max-width:1024px){
-      .hub-grid > .ie-hero-content-layer{
-        flex-direction:column;
-      }
     }
 
     .hub-panel{
@@ -361,9 +336,9 @@
   <main>
     <h1 class="sr-only">Flavors Hub</h1>
 
-    <section class="hub-grid ie-hero-shell ie-hero-offset" aria-label="Flavors hub navigation">
+    <section class="hub-grid ie-hero-shell ie-hero-offset hero--flavors" aria-label="Flavors hub navigation">
 
-      <div class="ie-hero-content-layer">
+      <div class="ie-hero-content-layer hero-layout--split">
         <a href="/ItalianExperience/flavors/for-your-home/" class="hub-panel">
           <div class="hub-bg" style="background-image:url('/ItalianExperience/assets/img/flavors/flavors-home.jpg');" aria-hidden="true"></div>
           <div class="hub-gradient" aria-hidden="true"></div>
