@@ -36,24 +36,36 @@
     }
 
     .hero--flavors.hub-grid{
+      height:100dvh;
+      min-height:100dvh;
       display:flex;
-      flex-direction:column;
     }
 
     .hero--flavors .ie-hero-content-layer{
       position:relative;
       z-index:10;
+      flex:1;
+      display:flex;
+      height:100%;
+    }
+
+    .hero--flavors .ie-hero-content-layer.hero-layout--split{
+      flex-direction:row;
+      height:100%;
+      align-items:stretch;
     }
 
     /* PANEL */
 
     .hero--flavors .hub-panel{
+      flex:1;
       position:relative;
-      overflow:hidden;
-      border:none;
+      height:100%;
       display:flex;
       align-items:center;
       justify-content:center;
+      overflow:hidden;
+      border:none;
       text-decoration:none;
       cursor:pointer;
     }
