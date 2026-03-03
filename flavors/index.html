@@ -32,18 +32,12 @@
 
     .hub-grid{
       width:100%;
-      height:100vh;
-      height:100dvh;
       min-height:100vh;
       min-height:calc(100dvh + 2.5rem);
       background:#000;
       display:flex;
       flex-direction:column;
       overflow:hidden;
-    }
-    /* Usa lo spazio dell'header per allineare la hero all'inizio della viewport */
-    .hub-grid.ie-hero-shell.ie-hero-offset{
-      margin-top:calc(-1 * var(--ie-header-clearance)) !important;
     }
 
     @media (max-width:1024px){
@@ -362,7 +356,7 @@
   <main>
     <h1 class="sr-only">Flavors Hub</h1>
 
-    <section class="hub-grid ie-hero-shell ie-hero-offset" aria-label="Flavors hub navigation">
+    <section class="hub-grid ie-hero-shell" aria-label="Flavors hub navigation">
 
       <a href="/ItalianExperience/flavors/for-your-home/" class="hub-panel">
         <div class="hub-bg" style="background-image:url('/ItalianExperience/assets/img/flavors/flavors-home.jpg');" aria-hidden="true"></div>
