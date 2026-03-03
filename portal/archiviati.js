@@ -116,6 +116,7 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
     const renderRow = window.IEPortal && typeof window.IEPortal.renderEntityRow === "function"
       ? window.IEPortal.renderEntityRow
       : null;
+    const links = window.IEPortal && window.IEPortal.links ? window.IEPortal.links : null;
     rows.forEach(function (row) {
       const name = [row.first_name, row.last_name].filter(Boolean).join(" ") || "—";
       const position = row.position || "—";
@@ -124,8 +125,12 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
         const tr = renderRow({
           entityType: "candidate",
           id: row.id,
-          viewUrl: "add-candidato.html?id=" + encodeURIComponent(row.id) + "&mode=view",
-          editUrl: "add-candidato.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+          viewUrl: links
+            ? links.candidateView(row.id)
+            : "candidate.html?id=" + encodeURIComponent(row.id),
+          editUrl: links
+            ? links.candidateEdit(row.id)
+            : "add-candidato.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
           title: name,
           isArchived: true,
           archivedList: true,
@@ -198,6 +203,7 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
     const renderRow = window.IEPortal && typeof window.IEPortal.renderEntityRow === "function"
       ? window.IEPortal.renderEntityRow
       : null;
+    const links = window.IEPortal && window.IEPortal.links ? window.IEPortal.links : null;
     rows.forEach(function (row) {
       const title = row.title || "—";
       const client = row.client_name || "—";
@@ -206,8 +212,12 @@ console.log("ARCHIVIATI JS ACTIVE - VERSION 1");
         const tr = renderRow({
           entityType: "job_offer",
           id: row.id,
-          viewUrl: "add-offerta.html?id=" + encodeURIComponent(row.id) + "&mode=view",
-          editUrl: "add-offerta.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+          viewUrl: links
+            ? links.offerView(row.id)
+            : "add-offerta.html?id=" + encodeURIComponent(row.id) + "&mode=view",
+          editUrl: links
+            ? links.offerEdit(row.id)
+            : "add-offerta.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
           title: title,
           isArchived: true,
           archivedList: true,

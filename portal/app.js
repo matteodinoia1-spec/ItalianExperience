@@ -883,11 +883,16 @@
         const formData = new FormData(candidateForm);
         const candidateParams = new URLSearchParams(window.location.search);
         const candidateId = candidateParams.get("id");
-        if (getCurrentPageKey() === "add-candidato" && candidateId && window.IESupabase && window.IESupabase.updateCandidate) {
-          updateCandidateFromForm(candidateId, formData);
+        if (
+          getCurrentPageKey() === "add-candidato" &&
+          candidateId &&
+          window.IESupabase &&
+          window.IESupabase.updateCandidate
+        ) {
+          updateCandidateFromForm(candidateId, formData, candidateForm);
           return;
         }
-        saveCandidate(formData);
+        saveCandidate(formData, candidateForm);
       });
       const cancelBtn = candidateForm.querySelector("[data-edit-cancel]");
       if (cancelBtn) {
@@ -1513,6 +1518,10 @@
         mount.innerHTML = "";
         mount.appendChild(fragment);
         bindFormHandlers(mount);
+        const form = mount.querySelector("#candidateForm");
+        if (form) {
+          initCandidateProfileSections(form, "create", null);
+        }
       },
     });
   }
@@ -2791,7 +2800,8 @@
     return Promise.resolve(applyClientFilters(base, filters || {}));
   }
 
-  async function saveCandidate(formData) {
+  async function saveCandidate(formData, form) {
+    var profile = collectCandidateProfileData(form);
     const first_name = (formData.get("first_name") || "").toString().trim();
     const last_name = (formData.get("last_name") || "").toString().trim();
     const position = (formData.get("position") || "").toString().trim();
@@ -2810,6 +2820,11 @@
         status: status,
         notes: notes,
         source: source,
+        email: profile.email || null,
+        phone: profile.phone || null,
+        linkedin_url: profile.linkedin_url || null,
+        date_of_birth: profile.date_of_birth || null,
+        summary: profile.summary || null,
       });
       if (error) {
         window.IESupabase.showError(error.message || "Errore nel salvataggio del candidato.", "saveCandidate");
@@ -2876,6 +2891,16 @@
         pendingCandidateTempId = null;
         pendingCandidatePhotoPath = null;
         pendingCandidateCvPath = null;
+      }
+
+      var newId = data && data.id;
+      if (newId) {
+        var childrenResult = await saveCandidateProfileChildren(newId, profile);
+        if (!childrenResult || childrenResult.ok === false) {
+          // Error already shown inside saveCandidateProfileChildren.
+          return;
+        }
+        await logCandidateProfileUpdated(newId);
       }
 
       window.IESupabase.showSuccess("Candidato salvato con successo.");
@@ -4034,6 +4059,452 @@
     loadOffers();
   }
 
+  // ---------------------------------------------------------------------------
+  // Candidate profile sections (contact, summary, repeatable sections)
+  // ---------------------------------------------------------------------------
+
+  const PROFILE_SECTIONS = ["skills", "languages", "experience", "education", "certifications", "hobbies"];
+
+  function updateRepeatableEmptyState(sectionEl) {
+    if (!sectionEl) return;
+    var itemsContainer = sectionEl.querySelector("[data-items]");
+    var emptyState = sectionEl.querySelector(".empty-state");
+    if (!itemsContainer || !emptyState) return;
+    var items = itemsContainer.children.length;
+    if (items > 0) {
+      emptyState.style.display = "none";
+    } else {
+      emptyState.style.display = "";
+    }
+  }
+
+  function getRepeatableSectionConfig(sectionName) {
+    switch (sectionName) {
+      case "skills":
+        return {
+          templateId: "skillItemTemplate",
+          addAction: "add-skill",
+          removeAction: "remove-skill",
+        };
+      case "languages":
+        return {
+          templateId: "languageItemTemplate",
+          addAction: "add-language",
+          removeAction: "remove-language",
+        };
+      case "experience":
+        return {
+          templateId: "experienceItemTemplate",
+          addAction: "add-experience",
+          removeAction: "remove-experience",
+        };
+      case "education":
+        return {
+          templateId: "educationItemTemplate",
+          addAction: "add-education",
+          removeAction: "remove-education",
+        };
+      case "certifications":
+        return {
+          templateId: "certificationItemTemplate",
+          addAction: "add-certification",
+          removeAction: "remove-certification",
+        };
+      case "hobbies":
+        return {
+          templateId: "hobbyItemTemplate",
+          addAction: "add-hobby",
+          removeAction: "remove-hobby",
+        };
+      default:
+        return null;
+    }
+  }
+
+  function addRepeatableItem(sectionName, form, values) {
+    if (!form) return null;
+    var config = getRepeatableSectionConfig(sectionName);
+    if (!config) return null;
+
+    var sectionEl = form.querySelector('[data-repeatable-section="' + sectionName + '"]');
+    if (!sectionEl) return null;
+    var itemsContainer = sectionEl.querySelector('[data-items="' + sectionName + '"]');
+    if (!itemsContainer) return null;
+
+    var template = document.getElementById(config.templateId);
+    if (!template || !template.content || !template.content.firstElementChild) return null;
+
+    var row = template.content.firstElementChild.cloneNode(true);
+    row.setAttribute("data-item-section", sectionName);
+
+    var fields = row.querySelectorAll("[data-field]");
+    fields.forEach(function (el) {
+      var key = el.getAttribute("data-field");
+      if (!key) return;
+      var value = values && Object.prototype.hasOwnProperty.call(values, key) && values[key] != null ? values[key] : "";
+      if (value != null && typeof value !== "string") {
+        value = String(value);
+      }
+      if ("value" in el) {
+        el.value = value;
+      }
+    });
+
+    var removeButtons = row.querySelectorAll('[data-action="' + config.removeAction + '"]');
+    removeButtons.forEach(function (btn) {
+      if (btn.dataset.ieBoundRemove === "true") return;
+      btn.dataset.ieBoundRemove = "true";
+      btn.addEventListener("click", function () {
+        var container = btn.closest("[data-item-section]");
+        if (container && container.parentNode) {
+          container.parentNode.removeChild(container);
+        }
+        updateRepeatableEmptyState(sectionEl);
+      });
+    });
+
+    itemsContainer.appendChild(row);
+    updateRepeatableEmptyState(sectionEl);
+    return row;
+  }
+
+  function renderRepeatableSection(options) {
+    if (!options) return;
+    var sectionName = options.sectionName;
+    var form = options.form;
+    var mode = options.mode;
+    var items = options.items || [];
+    if (!sectionName || !form) return;
+
+    var config = getRepeatableSectionConfig(sectionName);
+    if (!config) return;
+
+    var sectionEl = form.querySelector('[data-repeatable-section="' + sectionName + '"]');
+    if (!sectionEl) return;
+    var itemsContainer = sectionEl.querySelector('[data-items="' + sectionName + '"]');
+    if (!itemsContainer) return;
+
+    var template = document.getElementById(config.templateId);
+    if (!template || !template.content || !template.content.firstElementChild) return;
+
+    while (itemsContainer.firstChild) {
+      itemsContainer.removeChild(itemsContainer.firstChild);
+    }
+
+    var rows = Array.isArray(items) ? items : [];
+    rows.forEach(function (item) {
+      addRepeatableItem(sectionName, form, item);
+    });
+
+    updateRepeatableEmptyState(sectionEl);
+
+    var addBtn = sectionEl.querySelector('[data-action="' + config.addAction + '"]');
+    if (addBtn) {
+      if (mode === "view") {
+        addBtn.style.display = "none";
+      } else {
+        addBtn.style.display = "";
+        if (addBtn.dataset.ieBoundAdd !== "true") {
+          addBtn.dataset.ieBoundAdd = "true";
+          addBtn.addEventListener("click", function () {
+            addRepeatableItem(sectionName, form, null);
+          });
+        }
+      }
+    }
+
+    if (mode === "view") {
+      var removeButtons = sectionEl.querySelectorAll('[data-action="' + config.removeAction + '"]');
+      removeButtons.forEach(function (btn) {
+        btn.style.display = "none";
+      });
+    }
+  }
+
+  function collectRepeatableItems(form, sectionName) {
+    if (!form) return [];
+    var config = getRepeatableSectionConfig(sectionName);
+    if (!config) return [];
+
+    var sectionEl = form.querySelector('[data-repeatable-section="' + sectionName + '"]');
+    if (!sectionEl) return [];
+    var itemsContainer = sectionEl.querySelector('[data-items="' + sectionName + '"]');
+    if (!itemsContainer) return [];
+
+    var result = [];
+    var children = itemsContainer.children;
+    for (var i = 0; i < children.length; i++) {
+      var row = children[i];
+      var fields = row.querySelectorAll("[data-field]");
+      var obj = {};
+      var hasNonEmpty = false;
+
+      fields.forEach(function (el) {
+        var key = el.getAttribute("data-field");
+        if (!key) return;
+        var value = "";
+        if ("value" in el && el.value != null) {
+          value = el.value.toString().trim();
+        }
+        if (value !== "") {
+          hasNonEmpty = true;
+        }
+        obj[key] = value;
+      });
+
+      if (hasNonEmpty) {
+        result.push(obj);
+      }
+    }
+
+    return result;
+  }
+
+  function collectCandidateProfileData(form) {
+    function readField(name) {
+      if (!form) return "";
+      var el = form.querySelector('[name="' + name + '"]');
+      if (!el || !("value" in el) || el.value == null) return "";
+      return el.value.toString().trim();
+    }
+
+    var profile = {
+      email: readField("email"),
+      phone: readField("phone"),
+      linkedin_url: readField("linkedin_url"),
+      date_of_birth: readField("date_of_birth"),
+      summary: readField("summary"),
+    };
+
+    PROFILE_SECTIONS.forEach(function (sectionName) {
+      profile[sectionName] = collectRepeatableItems(form, sectionName);
+    });
+
+    return profile;
+  }
+
+  async function saveCandidateProfileChildren(candidateId, profile) {
+    if (!candidateId) return { ok: true };
+    if (typeof window === "undefined" || !window.IESupabase) return { ok: true };
+
+    var api = window.IESupabase;
+    var errorMessage = "Errore nel salvataggio del profilo candidato.";
+
+    try {
+      if (typeof api.replaceCandidateSkills === "function") {
+        var skillsResult = await api.replaceCandidateSkills(
+          candidateId,
+          (profile && profile.skills) || []
+        );
+        if (skillsResult && skillsResult.error) {
+          console.error("[ItalianExperience] replaceCandidateSkills error:", skillsResult.error);
+          if (api.showError) api.showError(errorMessage, "replaceCandidateSkills");
+          return { ok: false, error: skillsResult.error };
+        }
+      }
+
+      if (typeof api.replaceCandidateLanguages === "function") {
+        var languagesResult = await api.replaceCandidateLanguages(
+          candidateId,
+          (profile && profile.languages) || []
+        );
+        if (languagesResult && languagesResult.error) {
+          console.error("[ItalianExperience] replaceCandidateLanguages error:", languagesResult.error);
+          if (api.showError) api.showError(errorMessage, "replaceCandidateLanguages");
+          return { ok: false, error: languagesResult.error };
+        }
+      }
+
+      if (typeof api.replaceCandidateExperience === "function") {
+        var experienceResult = await api.replaceCandidateExperience(
+          candidateId,
+          (profile && profile.experience) || []
+        );
+        if (experienceResult && experienceResult.error) {
+          console.error("[ItalianExperience] replaceCandidateExperience error:", experienceResult.error);
+          if (api.showError) api.showError(errorMessage, "replaceCandidateExperience");
+          return { ok: false, error: experienceResult.error };
+        }
+      }
+
+      if (typeof api.replaceCandidateEducation === "function") {
+        var educationResult = await api.replaceCandidateEducation(
+          candidateId,
+          (profile && profile.education) || []
+        );
+        if (educationResult && educationResult.error) {
+          console.error("[ItalianExperience] replaceCandidateEducation error:", educationResult.error);
+          if (api.showError) api.showError(errorMessage, "replaceCandidateEducation");
+          return { ok: false, error: educationResult.error };
+        }
+      }
+
+      if (typeof api.replaceCandidateCertifications === "function") {
+        var certificationsResult = await api.replaceCandidateCertifications(
+          candidateId,
+          (profile && profile.certifications) || []
+        );
+        if (certificationsResult && certificationsResult.error) {
+          console.error(
+            "[ItalianExperience] replaceCandidateCertifications error:",
+            certificationsResult.error
+          );
+          if (api.showError) api.showError(errorMessage, "replaceCandidateCertifications");
+          return { ok: false, error: certificationsResult.error };
+        }
+      }
+
+      if (typeof api.replaceCandidateHobbies === "function") {
+        var hobbiesResult = await api.replaceCandidateHobbies(
+          candidateId,
+          (profile && profile.hobbies) || []
+        );
+        if (hobbiesResult && hobbiesResult.error) {
+          console.error("[ItalianExperience] replaceCandidateHobbies error:", hobbiesResult.error);
+          if (api.showError) api.showError(errorMessage, "replaceCandidateHobbies");
+          return { ok: false, error: hobbiesResult.error };
+        }
+      }
+    } catch (err) {
+      console.error("[ItalianExperience] saveCandidateProfileChildren exception:", err);
+      if (api.showError) api.showError(errorMessage, "saveCandidateProfileChildren");
+      return { ok: false, error: err };
+    }
+
+    return { ok: true };
+  }
+
+  async function logCandidateProfileUpdated(candidateId) {
+    if (
+      !candidateId ||
+      typeof window === "undefined" ||
+      !window.IESupabase ||
+      typeof window.IESupabase.createAutoLog !== "function"
+    ) {
+      return;
+    }
+
+    try {
+      await window.IESupabase.createAutoLog("candidate", candidateId, {
+        event_type: "updated",
+        message: "Candidate profile updated",
+        metadata: null,
+      });
+    } catch (err) {
+      // Logging failures should never block the UI.
+      console.error("[ItalianExperience] logCandidateProfileUpdated error:", err);
+    }
+  }
+
+  function initCandidateProfileSections(form, mode, candidate) {
+    if (!form) return;
+
+    // Single-value fields from main candidate row
+    var emailEl = form.querySelector('[name="email"]');
+    var phoneEl = form.querySelector('[name="phone"]');
+    var linkedinEl = form.querySelector('[name="linkedin_url"]');
+    var dobEl = form.querySelector('[name="date_of_birth"]');
+    var summaryEl = form.querySelector('[name="summary"]');
+
+    if (candidate) {
+      if (emailEl) emailEl.value = (candidate.email || "").toString();
+      if (phoneEl) phoneEl.value = (candidate.phone || "").toString();
+      if (linkedinEl) linkedinEl.value = (candidate.linkedin_url || "").toString();
+      if (dobEl) dobEl.value = candidate.date_of_birth || "";
+      if (summaryEl) summaryEl.value = candidate.summary || "";
+    }
+
+    // Initialize repeatable sections with empty state and add handlers.
+    PROFILE_SECTIONS.forEach(function (sectionName) {
+      renderRepeatableSection({
+        sectionName: sectionName,
+        items: [],
+        form: form,
+        mode: mode,
+      });
+    });
+
+    document.querySelectorAll("[data-repeatable-section]").forEach(function (section) {
+      updateRepeatableEmptyState(section);
+    });
+
+    if (
+      mode === "create" ||
+      !candidate ||
+      !candidate.id ||
+      typeof window === "undefined" ||
+      !window.IESupabase
+    ) {
+      return;
+    }
+
+    var api = window.IESupabase;
+    var candidateId = candidate.id;
+
+    var skillsPromise =
+      typeof api.getCandidateSkills === "function"
+        ? api.getCandidateSkills(candidateId)
+        : Promise.resolve({ data: [], error: null });
+    var languagesPromise =
+      typeof api.getCandidateLanguages === "function"
+        ? api.getCandidateLanguages(candidateId)
+        : Promise.resolve({ data: [], error: null });
+    var experiencePromise =
+      typeof api.getCandidateExperience === "function"
+        ? api.getCandidateExperience(candidateId)
+        : Promise.resolve({ data: [], error: null });
+    var educationPromise =
+      typeof api.getCandidateEducation === "function"
+        ? api.getCandidateEducation(candidateId)
+        : Promise.resolve({ data: [], error: null });
+    var certificationsPromise =
+      typeof api.getCandidateCertifications === "function"
+        ? api.getCandidateCertifications(candidateId)
+        : Promise.resolve({ data: [], error: null });
+    var hobbiesPromise =
+      typeof api.getCandidateHobbies === "function"
+        ? api.getCandidateHobbies(candidateId)
+        : Promise.resolve({ data: [], error: null });
+
+    Promise.all([
+      skillsPromise,
+      languagesPromise,
+      experiencePromise,
+      educationPromise,
+      certificationsPromise,
+      hobbiesPromise,
+    ])
+      .then(function (results) {
+        var sections = ["skills", "languages", "experience", "education", "certifications", "hobbies"];
+        results.forEach(function (result, index) {
+          var sectionName = sections[index];
+          if (result && result.error) {
+            console.error(
+              "[ItalianExperience] load candidate " + sectionName + " error:",
+              result.error
+            );
+            if (api.showError) {
+              api.showError(
+                "Impossibile caricare la sezione del profilo candidato.",
+                "loadCandidate" + sectionName.charAt(0).toUpperCase() + sectionName.slice(1)
+              );
+            }
+            return;
+          }
+          var items = (result && result.data) || [];
+          renderRepeatableSection({
+            sectionName: sectionName,
+            items: items,
+            form: form,
+            mode: mode,
+          });
+        });
+      })
+      .catch(function (err) {
+        console.error("[ItalianExperience] load candidate profile sections error:", err);
+      });
+  }
+
   /**
    * Add/Edit/View candidate page: create mode (no id), or load candidate by id and apply lifecycle (edit/view).
    */
@@ -4049,6 +4520,7 @@
       const docTitleEl = document.querySelector("title");
       if (headerTitleEl) headerTitleEl.textContent = "Add New Candidate";
       if (docTitleEl) docTitleEl.textContent = "Add New Candidate | Italian Experience Recruitment";
+      initCandidateProfileSections(form, "create", null);
       return;
     }
 
@@ -4059,12 +4531,18 @@
 
     window.IESupabase.getCandidateById(candidateId).then(function (result) {
       if (result.error) {
-        if (window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Candidato non trovato.");
+        if (window.IESupabase.showError) {
+          window.IESupabase.showError(result.error.message || "Candidato non trovato.");
+        }
+        navigateTo("candidati.html");
         return;
       }
       const candidate = result.data;
       if (!candidate) {
-        if (window.IESupabase.showError) window.IESupabase.showError("Candidato non trovato.");
+        if (window.IESupabase.showError) {
+          window.IESupabase.showError("Candidato non trovato.");
+        }
+        navigateTo("candidati.html");
         return;
       }
 
@@ -4132,6 +4610,8 @@
           cancelBtn.textContent = readonly ? "Back" : "Cancel";
         }
       }
+
+      initCandidateProfileSections(form, effectiveMode, candidate);
       setFormReadonly(effectiveMode === "view");
 
       if (typeof renderCandidateFileState === "function") {
@@ -4152,7 +4632,7 @@
           mode: effectiveMode,
           containerId: "candidateActions",
           onEdit: function () {
-            navigateTo("add-candidato.html?id=" + encodeURIComponent(candidateId) + "&mode=edit");
+            navigateTo(window.IEPortal.links.candidateEdit(candidateId));
           },
           onArchive: async function () {
             const res = await window.IESupabase.archiveCandidate(candidateId);
@@ -4395,8 +4875,10 @@
   /**
    * Update candidate from edit form (Supabase only).
    */
-  function updateCandidateFromForm(id, formData) {
+  function updateCandidateFromForm(id, formData, form) {
     if (!id) return;
+
+    var profile = collectCandidateProfileData(form);
 
     const payload = {
       first_name: (formData.get("first_name") || "").toString().trim(),
@@ -4406,13 +4888,25 @@
       status: (formData.get("status") || "new").toString(),
       source: (formData.get("source") || "").toString(),
       notes: (formData.get("notes") || "").toString(),
+      email: profile.email || null,
+      phone: profile.phone || null,
+      linkedin_url: profile.linkedin_url || null,
+      date_of_birth: profile.date_of_birth || null,
+      summary: profile.summary || null,
     };
     var newStatus = payload.status;
-    window.IESupabase.updateCandidate(id, payload).then(function (result) {
+    window.IESupabase.updateCandidate(id, payload).then(async function (result) {
       if (result.error) {
         if (window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Errore durante il salvataggio.");
         return;
       }
+
+      var childrenResult = await saveCandidateProfileChildren(id, profile);
+      if (!childrenResult || childrenResult.ok === false) {
+        // Error already shown inside saveCandidateProfileChildren.
+        return;
+      }
+
       if (window.IESupabase.showSuccess) window.IESupabase.showSuccess("Candidato aggiornato.");
 
       if (
@@ -4458,6 +4952,8 @@
       } catch (e) {
         // Ignore URL update errors to avoid impacting save flow.
       }
+
+      await logCandidateProfileUpdated(id);
 
       initAddCandidatePage();
     });
@@ -4874,7 +5370,7 @@
         mode: modeToRender,
         containerId: "jobOfferActions",
         onEdit: function () {
-          navigateTo("add-offerta.html?id=" + encodeURIComponent(offerId) + "&mode=edit");
+          navigateTo(window.IEPortal.links.offerEdit(offerId));
         },
         onClose: async function () {
           if (!window.IESupabase || !window.IESupabase.updateJobOfferStatus) return;
@@ -5031,6 +5527,7 @@
         var tbody = document.createElement("tbody");
         list.forEach(function (item) {
           var c = item.candidates || {};
+          var candidateId = c && c.id ? c.id : null;
           var name = [c.first_name, c.last_name].filter(Boolean).join(" ") || "—";
           var position = (c.position && c.position.toString()) || "—";
           var status = (item.status && item.status.toString()) || "—";
@@ -5039,8 +5536,16 @@
           tr.className = "border-b border-gray-100";
           tr.setAttribute("data-row-association-id", item.id);
           var tdName = document.createElement("td");
-          tdName.className = "py-3 text-sm text-gray-800";
-          tdName.textContent = name;
+          tdName.className = "py-3 text-sm";
+          if (candidateId) {
+            var nameLink = document.createElement("a");
+            nameLink.href = window.IEPortal.links.candidateView(candidateId);
+            nameLink.className = "text-[#1b4332] font-semibold hover:underline";
+            nameLink.textContent = name;
+            tdName.appendChild(nameLink);
+          } else {
+            tdName.textContent = name;
+          }
           tr.appendChild(tdName);
           var tdPosition = document.createElement("td");
           tdPosition.className = "py-3 text-sm text-gray-600";
@@ -5384,10 +5889,10 @@
         });
       } else if (modeToConfigure === "edit" && offerId) {
         cancelButton.addEventListener("click", function () {
-          navigateTo("add-offerta.html?id=" + encodeURIComponent(offerId) + "&mode=view");
-      });
+          navigateTo(window.IEPortal.links.offerView(offerId));
+        });
+      }
     }
-  }
 
   function openAssociationRejectionModal(config) {
     var associationId = config && config.associationId;
@@ -5894,6 +6399,7 @@
       var tr = document.createElement("tr");
       tr.className = "table-row transition";
       var fullName = [row.first_name, row.last_name].filter(Boolean).join(" ").trim() || "—";
+      var candidateHref = window.IEPortal.links.candidateView(row.id);
       var createdDate = row.created_at
         ? new Date(row.created_at).toLocaleDateString("it-IT")
         : "";
@@ -5901,7 +6407,7 @@
       var statusLabel = formatDashboardCandidateStatusLabel(row.status);
       tr.innerHTML =
         "<td class=\"px-6 py-4\">" +
-        "<a href=\"#\" data-action=\"dashboard-open-candidate\" data-id=\"" + escapeHtml(String(row.id || '')) + "\" class=\"font-semibold text-gray-800 cursor-pointer hover:underline\">" +
+        "<a href=\"" + candidateHref + "\" data-action=\"dashboard-open-candidate\" data-id=\"" + escapeHtml(String(row.id || '')) + "\" class=\"text-[#1b4332] font-semibold hover:underline\">" +
         escapeHtml(fullName) +
         "</a>" +
         "</td>" +
@@ -5917,7 +6423,7 @@
         event.preventDefault();
         var id = link.getAttribute("data-id");
         if (!id) return;
-        navigateTo("add-candidato.html?id=" + encodeURIComponent(id) + "&mode=view");
+        navigateTo(window.IEPortal.links.candidateView(id));
       });
       tbody.__ieDashboardRecentBound = true;
     }
@@ -6034,7 +6540,11 @@
     titleTd.className = "px-6 py-4";
     var a = document.createElement("a");
     a.href = base + viewUrl;
-    a.className = "cursor-pointer hover:underline font-semibold text-gray-800";
+    if (entityType === "candidate") {
+      a.className = "cursor-pointer hover:underline font-semibold text-[#1b4332]";
+    } else {
+      a.className = "cursor-pointer hover:underline font-semibold text-gray-800";
+    }
     a.setAttribute("data-entity-title-link", "true");
     a.textContent = title != null && title !== "" ? title : "—";
     titleTd.appendChild(a);
@@ -6402,8 +6912,8 @@
         const tr = renderEntityRow({
           entityType: "candidate",
           id: row.id,
-          viewUrl: "add-candidato.html?id=" + encodeURIComponent(row.id) + "&mode=view",
-          editUrl: "add-candidato.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+          viewUrl: window.IEPortal.links.candidateView(row.id),
+          editUrl: window.IEPortal.links.candidateEdit(row.id),
           title: [row.first_name, row.last_name].filter(Boolean).join(" ") || "—",
           isArchived: row.is_archived,
           archivedList: false,
@@ -6659,17 +7169,13 @@
       });
     }
 
-    if (openFullBtn) {
-      openFullBtn.addEventListener("click", function () {
-        if (!state.currentOfferId) return;
-        close();
-        navigateTo(
-          "add-offerta.html?id=" +
-            encodeURIComponent(state.currentOfferId) +
-            "&mode=view"
-        );
-      });
-    }
+      if (openFullBtn) {
+        openFullBtn.addEventListener("click", function () {
+          if (!state.currentOfferId) return;
+          close();
+          navigateTo(window.IEPortal.links.offerView(state.currentOfferId));
+        });
+      }
 
     JOB_OFFER_PREVIEW_MODAL = {
       root,
@@ -6936,9 +7442,7 @@
           titleBtn.getAttribute("data-id") ||
           titleBtn.closest("tr")?.getAttribute("data-id");
         if (!fullId) return;
-        navigateTo(
-          "add-offerta.html?id=" + encodeURIComponent(fullId) + "&mode=view"
-        );
+        navigateTo(window.IEPortal.links.offerView(fullId));
         return;
       }
     });
@@ -7028,8 +7532,8 @@
         const tr = renderEntityRow({
           entityType: "job_offer",
           id: row.id,
-          viewUrl: "add-offerta.html?id=" + encodeURIComponent(row.id) + "&mode=view",
-          editUrl: "add-offerta.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+          viewUrl: window.IEPortal.links.offerView(row.id),
+          editUrl: window.IEPortal.links.offerEdit(row.id),
           title: row.title || "—",
           isArchived: row.is_archived,
           archivedList: false,
@@ -7374,7 +7878,7 @@
       if (tr && typeof openCandidateDetailModalFromRow === "function") {
         openCandidateDetailModalFromRow(tr);
       } else {
-        navigateTo("add-candidato.html?id=" + encodeURIComponent(id) + "&mode=view");
+        navigateTo(window.IEPortal.links.candidateView(id));
       }
       return;
     }
@@ -7382,7 +7886,7 @@
       if (typeof openJobOfferPreviewModal === "function") {
         openJobOfferPreviewModal(id);
       } else {
-        navigateTo("add-offerta.html?id=" + encodeURIComponent(id) + "&mode=view");
+        navigateTo(window.IEPortal.links.offerView(id));
       }
       return;
     }
@@ -7578,6 +8082,28 @@
   });
 
   window.IEPortal = window.IEPortal || {};
+
+  window.IEPortal.links = {
+    candidateView: function (id) {
+      return "candidate.html?id=" + encodeURIComponent(String(id || ""));
+    },
+    candidateEdit: function (id) {
+      return (
+        "add-candidato.html?id=" + encodeURIComponent(String(id || "")) + "&mode=edit"
+      );
+    },
+    offerView: function (id) {
+      return (
+        "add-offerta.html?id=" + encodeURIComponent(String(id || "")) + "&mode=view"
+      );
+    },
+    offerEdit: function (id) {
+      return (
+        "add-offerta.html?id=" + encodeURIComponent(String(id || "")) + "&mode=edit"
+      );
+    }
+  };
+
   window.IEPortal.navigateTo = navigateTo;
   window.IEPortal.renderEntityRow = renderEntityRow;
 })();
