@@ -853,74 +853,25 @@ body:has(.recruitment-portal) #site-header {
   height: 0 !important;
 }
 
-/* Flavors portal hero */
-.hero--flavors.ie-hero-shell {
-  min-height: 100dvh;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: calc(var(--ie-header-h) + 80px);
-  padding-bottom: 140px;
-}
-
-.hero--flavors .hero-flavors-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background:
-    radial-gradient(140% 160% at 10% -10%, rgba(197,160,89,0.20), transparent 60%),
-    radial-gradient(140% 160% at 90% -10%, rgba(197,160,89,0.16), transparent 62%),
-    radial-gradient(160% 200% at 50% 110%, rgba(0,0,0,0.9), #050505 90%);
-  pointer-events: none;
-}
-
-.hero--flavors .portal-grid {
-  width: 100%;
-  max-width: 1400px;
-  margin-inline: auto;
-
-  display: grid;
-  gap: 2.5rem;
-  grid-template-columns: 1fr;
-  position: relative;
-  z-index: 1;
-}
-
-@media (min-width: 1024px) {
-  .hero--flavors .portal-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+/* Flavors portal hero uses base .ie-hero-shell behavior; layout handled by shared system */
 
 .hero--flavors .portal-card {
   position: relative;
-  min-height: 460px;
-  padding: 3rem;
   overflow: hidden;
 
-  display: flex;
-  flex-direction: column;
-
   background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 
   border: 1px solid rgba(255,255,255,0.12);
 
-  box-shadow:
-    0 40px 80px rgba(0,0,0,0.6),
-    inset 0 1px 0 rgba(255,255,255,0.08);
-
   transition:
     transform 0.6s cubic-bezier(0.23,1,0.32,1),
-    box-shadow 0.6s ease,
     border-color 0.4s ease;
-  text-decoration: none;
-  color: inherit;
 }
 
 .hero--flavors .portal-card:hover {
-  transform: translateY(-10px);
+  transform: translateY(-8px);
   border-color: var(--brand-gold);
 }
 
@@ -934,16 +885,11 @@ body:has(.recruitment-portal) #site-header {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: brightness(0.38) contrast(1.08);
-
-  transition:
-    transform 1.4s cubic-bezier(0.23,1,0.32,1),
-    filter 0.8s ease;
+  transition: transform 1.2s cubic-bezier(0.23,1,0.32,1);
 }
 
 .hero--flavors .portal-card:hover .portal-image img {
   transform: scale(1.05);
-  filter: brightness(0.42) contrast(1.1);
 }
 
 .hero--flavors .portal-overlay {
@@ -979,18 +925,6 @@ body:has(.recruitment-portal) #site-header {
   font-family: 'Playfair Display', serif;
   font-weight: 500;
   letter-spacing: -0.02em;
-  font-size: clamp(2rem, 2.5vw, 2.6rem);
-  line-height: 1.15;
-}
-
-.hero--flavors .portal-title::after {
-  content: "";
-  display: block;
-  width: 36px;
-  height: 1px;
-  background: var(--brand-gold);
-  margin-top: 1.2rem;
-  opacity: 0.6;
 }
 
 .hero--flavors .portal-copy {
@@ -1000,41 +934,17 @@ body:has(.recruitment-portal) #site-header {
   color: rgba(226,232,240,0.86);
 }
 
-.hero--flavors .portal-cta {
-  margin-top: auto;
-}
-
-.hero--flavors .portal-cta .cta-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0.85rem 1.6rem;
-  margin-top: auto;
-
+.hero--flavors .cta-button {
+  display: inline-block;
+  padding: 0.75rem 1.6rem;
   border: 1px solid rgba(255,255,255,0.3);
   border-radius: 4px;
-
-  font-size: 0.72rem;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-
-  background: rgba(0,0,0,0.3);
-  backdrop-filter: blur(6px);
-
-  transition: all 0.35s ease;
+  transition: all 0.3s ease;
 }
 
 .hero--flavors .portal-card:hover .cta-button {
   border-color: var(--brand-gold);
   color: var(--brand-gold);
-}
-
-@media (max-width: 768px) {
-  .hero--flavors .portal-card {
-    min-height: 360px;
-    padding: 2.2rem;
-  }
 }
 
 /* Recruitment portal hero */
