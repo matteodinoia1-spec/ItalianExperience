@@ -1052,3 +1052,9 @@ form button[type="submit"]:active{
     opacity:1;
   }
 }
+
+/* Disable header layout placeholder ONLY on recruitment and flavors hub heroes */
+body:has(.hero--recruitment) #site-header,
+body:has(.hero--flavors) #site-header{
+  height:0 !important;
+}
