@@ -165,32 +165,20 @@
       max-width: 380px;
       margin-left: auto;
       margin-right: auto;
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .pillar:hover .pillar-desc {
       opacity: 1;
-      max-height: 150px;
+      max-height: none;
       margin-top: 1rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .details-box {
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-      text-align: left;
-    }
-
-    .pillar:hover .details-box {
-      max-height: 800px;
       opacity: 1;
-      padding-top: 2.5rem;
+      max-height: none;
+      padding-top: 1.5rem;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: left;
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .feature-item {
@@ -267,18 +255,7 @@
       }
 
       .pillar-desc {
-        opacity: 1;
-        max-height: 1000px;
-        margin-top: 0.75rem;
-        margin-bottom: 0.75rem;
         font-size: 0.88rem;
-      }
-
-      .details-box {
-        max-height: 1000px;
-        opacity: 1;
-        margin-top: 0.8rem;
-        padding-top: 0.9rem;
       }
 
       .feature-item {
