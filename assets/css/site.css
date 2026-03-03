@@ -53,10 +53,9 @@ input,textarea,select,button{font-size:16px}
 .ie-hero-shell{
   position:relative;
   width:100%;
-  min-height:100vh;
   min-height:100dvh;
+  min-height:100vh;
   overflow:hidden;
-  background:#000;
 }
 .ie-hero-offset{
   /* Pull the first hero back to viewport top while keeping header mount flow */
@@ -1049,18 +1048,18 @@ form button[type="submit"]:active{
   }
 }
 
-/* Disable header layout placeholder ONLY on recruitment and flavors hub heroes */
+/* Disable header placeholder ONLY on recruitment and flavors */
 body:has(.hero--recruitment) #site-header,
-body:has(.hero--flavors) #site-header{
-  height:0 !important;
+body:has(.hero--flavors) #site-header {
+  height: 0 !important;
 }
 
-/* Recruitment hero content positioning */
-.hero--recruitment .glass-card{
-margin-top: var(--ie-header-h);
+/* Recruitment content offset */
+.hero--recruitment .ie-hero-content-layer {
+  padding-top: var(--ie-header-h);
 }
 
-/* Flavors hero content positioning */
-.hero--flavors .hub-panel{
-padding-top: var(--ie-header-h);
+/* Flavors content offset */
+.hero--flavors .ie-hero-content-layer {
+  padding-top: var(--ie-header-h);
 }
