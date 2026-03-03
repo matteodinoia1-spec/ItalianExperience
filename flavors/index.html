@@ -35,187 +35,130 @@
       background:#000;
     }
 
+    /* PANEL */
+
     .hub-panel{
       flex:1;
       position:relative;
       overflow:hidden;
-      border-radius:0 !important;
-      border:none !important;
-      box-shadow:none !important;
       display:flex;
-      flex-direction:column;
-      justify-content:center;
       align-items:center;
+      justify-content:center;
       text-decoration:none;
-      cursor:pointer;
-      min-height:420px;
-      border-bottom:none !important;
-      border-right:1px solid rgba(255,255,255,0.05);
-      padding:2rem;
-      transition:transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-      will-change:transform;
+      min-height:480px;
+      padding:3rem;
+      border-right:1px solid rgba(255,255,255,0.06);
+      transition:transform 0.6s cubic-bezier(0.23,1,0.32,1);
     }
 
-    @media (min-width:1025px){
+    @media (max-width:1024px){
       .hub-panel{
-        border-bottom:none !important;
-        border-right:none !important;
-        min-height:0;
+        border-right:none;
+        border-bottom:1px solid rgba(255,255,255,0.06);
       }
       .hub-panel:last-child{
-        border-right:none;
+        border-bottom:none;
       }
     }
+
+    /* IMAGE */
 
     .hub-bg{
       position:absolute;
       inset:0;
       background-size:cover;
-      background-position:center top;
-      filter:brightness(0.22);
+      background-position:center;
+      filter:brightness(0.35) contrast(1.08);
       transform:scale(1.02);
-      transition:transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
+      transition:transform 1.4s cubic-bezier(0.23,1,0.32,1), filter 0.8s ease;
       z-index:0;
     }
 
     .hub-panel:hover .hub-bg{
-      transform:scale(1.05);
-      filter:brightness(0.4);
+      transform:scale(1.06);
+      filter:brightness(0.42);
     }
+
+    /* OVERLAY */
 
     .hub-gradient{
       position:absolute;
       inset:0;
-      background:linear-gradient(to bottom, rgba(8,8,8,0) 0%, var(--brand-obsidian) 100%);
-      z-index:5;
+      background:linear-gradient(to bottom, rgba(0,0,0,0.15), rgba(0,0,0,0.85));
+      z-index:1;
     }
+
+    /* CONTENT */
 
     .hub-content{
       position:relative;
-      z-index:10;
+      z-index:2;
       width:100%;
-      display:flex;
-      justify-content:center;
-      pointer-events:none;
-      transition:transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-      padding-top:4rem;
-      padding-bottom:4rem;
+      max-width:420px;
+      text-align:center;
     }
 
-    .hub-panel:hover .hub-content{
-      transform:translateY(-15px);
-    }
+    /* GLASS CARD */
 
     .hub-glass-card{
-      position:relative;
-      width:100%;
-      max-width:360px;
-      padding:2.5rem 1.5rem;
+      padding:3rem 2rem;
       border-radius:var(--radius-premium);
-      background:rgba(255,255,255,0);
-      backdrop-filter:blur(0px);
-      border:1px solid rgba(255,255,255,0);
-      text-align:center;
-      overflow:hidden;
-      transition:all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .hub-glass-card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.08), transparent 40%);
-      opacity:0;
-      pointer-events:none;
-      transition:opacity 0.5s ease;
-      z-index:-1;
+      background:linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      backdrop-filter:blur(18px);
+      border:1px solid rgba(255,255,255,0.12);
+      box-shadow:0 40px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+      transition:transform 0.6s cubic-bezier(0.23,1,0.32,1), border-color 0.4s ease;
     }
 
     .hub-panel:hover .hub-glass-card{
-      background:var(--ice-bg);
-      backdrop-filter:blur(20px) saturate(180%);
-      border:1px solid var(--ice-border);
-      box-shadow:0 30px 60px rgba(0,0,0,0.4);
+      transform:translateY(-12px);
+      border-color:var(--brand-gold);
     }
 
-    .hub-panel:hover .hub-glass-card::before{
-      opacity:1;
-    }
-
-    .hub-line{
-      width:1px;
-      height:52px;
-      background:var(--brand-gold);
-      margin:0 auto 1.2rem;
-      transition:height 0.4s ease, opacity 0.4s ease;
-      opacity:0.85;
-    }
-
-    .hub-panel:hover .hub-line{
-      height:74px;
-      opacity:1;
-    }
+    /* TEXT */
 
     .hub-kicker{
-      font-size:0.62rem;
+      font-size:0.85rem;
+      letter-spacing:0.45em;
       text-transform:uppercase;
-      letter-spacing:0.55em;
+      font-weight:600;
       color:var(--brand-gold);
-      font-weight:700;
-      text-shadow:0 2px 10px rgba(0,0,0,0.9);
-      margin-bottom:0.8rem;
+      margin-bottom:1.2rem;
     }
 
     .hub-title{
       font-family:'Playfair Display',serif;
-      font-size:clamp(2.1rem, 4.8vw, 3.45rem);
-      line-height:1.03;
-      font-style:italic;
-      margin-bottom:0;
-      color:#fff;
-      letter-spacing:-0.01em;
-      text-shadow:0 4px 15px rgba(0,0,0,0.8);
+      font-size:clamp(2.4rem,4vw,3.2rem);
+      line-height:1.1;
+      font-weight:500;
+      letter-spacing:-0.02em;
+      margin-bottom:1rem;
+    }
+
+    .hub-title::after{
+      content:"";
+      display:block;
+      width:40px;
+      height:1px;
+      background:var(--brand-gold);
+      margin:1.4rem auto 0;
+      opacity:0.6;
     }
 
     .hub-sub{
-      font-size:0.85rem;
+      font-size:0.8rem;
+      letter-spacing:0.25em;
       text-transform:uppercase;
-      letter-spacing:0.2em;
       color:rgba(255,255,255,0.6);
-      font-weight:500;
-      line-height:1.6;
-      margin-top:0;
-      max-height:0;
-      opacity:0;
-      overflow:hidden;
-      transition:opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1), margin-top 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .hub-panel:hover .hub-sub{
-      opacity:1;
-      max-height:60px;
       margin-top:1rem;
     }
 
     .hub-disclaimer{
       font-size:0.7rem;
-      color:rgba(255,255,255,0.42);
-      margin-top:0;
-      max-width:320px;
-      margin-inline:auto;
+      color:rgba(255,255,255,0.45);
+      margin-top:1.4rem;
       line-height:1.6;
-      letter-spacing:0.02em;
       font-style:italic;
-      max-height:0;
-      opacity:0;
-      overflow:hidden;
-      transition:opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1), margin-top 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .hub-panel:hover .hub-disclaimer{
-      opacity:1;
-      max-height:120px;
-      margin-top:1rem;
     }
 
     .split-content{position:relative}
@@ -274,57 +217,10 @@
       display:none !important;
     }
 
-    @media (max-width:768px){
-      .hub-panel{
-        border-right:none;
-        border-bottom:1px solid rgba(255,255,255,0.08);
-      }
-
-      .hub-panel:last-child{
-        border-bottom:none;
-      }
-
-      .hub-content{
-        padding-top:4.5rem;
-        padding-bottom:4.5rem;
-      }
-
-      .hub-glass-card{
-        max-width:95%;
-        padding:2rem 1.2rem;
-        background:rgba(10,10,10,0.4);
-        backdrop-filter:blur(12px);
-        border:1px solid rgba(255,255,255,0.1);
-      }
-
-      .hub-title{
-        font-size:clamp(1.7rem, 8.4vw, 2.55rem);
-        line-height:1.05;
-      }
-
-      .hub-kicker{
-        font-size:0.58rem;
-      }
-
-      .hub-sub{
-        font-size:0.65rem;
-        opacity:1;
-        max-height:100px;
-        margin-top:0.9rem;
-      }
-
-      .hub-disclaimer{
-        opacity:1;
-        max-height:120px;
-        margin-top:0.9rem;
-      }
-    }
     @media (hover:none){
       .hub-panel{transition:none}
       .hub-bg{transition:filter 0.4s ease}
-      .hub-panel:hover{flex:1}
       .hub-panel:hover .hub-bg{transform:scale(1.02)}
-      .hub-panel:hover .hub-content{transform:none}
     }
   </style>
 </head>
@@ -335,78 +231,59 @@
 
   <main>
 
-    <section class="ie-hero-shell hero--flavors" aria-label="Flavors hub navigation">
-      <h1 class="sr-only">Flavors Hub</h1>
+    <section class="hub-grid ie-hero-shell hero--flavors" aria-label="Flavors hub navigation">
 
-      <div class="portal-grid">
-        <a
-          class="portal-card portal-card--flavor-home ie-reveal"
-          data-delay="1"
-          href="/ItalianExperience/flavors/for-your-home/"
-        >
-          <div class="portal-image">
-            <img src="/ItalianExperience/assets/img/flavors/flavors-home.jpg" alt="Curated Italian flavors for your home" />
-          </div>
+      <div class="ie-hero-content-layer hero-layout--split">
 
-          <div class="portal-overlay"></div>
+        <!-- PANEL 1 -->
+        <a href="/ItalianExperience/flavors/for-your-home/" class="hub-panel">
+          <div class="hub-bg" style="background-image:url('/ItalianExperience/assets/img/flavors/flavors-home.jpg');"></div>
+          <div class="hub-gradient"></div>
 
-          <div class="portal-card-inner">
-            <div class="portal-label">For Your Home</div>
-            <h2 class="portal-title">Gourmet Italian pantry</h2>
-            <p class="portal-copy">
-              E-commerce destination for authentic Italian products, curated to elevate everyday cooking at home.
-            </p>
-            <div class="portal-cta">
-              <span class="cta-button">Explore Home Gourmet</span>
+          <div class="hub-content">
+            <div class="hub-glass-card">
+              <p class="hub-kicker">Gourmet Experience</p>
+              <div class="hub-line"></div>
+              <h2 class="hub-title">For Your Home</h2>
+              <p class="hub-sub">E-Commerce Store</p>
             </div>
           </div>
         </a>
 
-        <a
-          class="portal-card portal-card--flavor-business ie-reveal"
-          data-delay="2"
-          href="/ItalianExperience/flavors/for-your-business/"
-        >
-          <div class="portal-image">
-            <img src="/ItalianExperience/assets/img/flavors/flavors-business.jpg" alt="Professional Italian supply for your business" />
-          </div>
+        <!-- PANEL 2 -->
+        <a href="/ItalianExperience/flavors/for-your-business/" class="hub-panel">
+          <div class="hub-bg" style="background-image:url('/ItalianExperience/assets/img/flavors/flavors-business.jpg');"></div>
+          <div class="hub-gradient"></div>
 
-          <div class="portal-overlay"></div>
-
-          <div class="portal-card-inner">
-            <div class="portal-label">For Your Business</div>
-            <h2 class="portal-title">Wholesale & professional supply</h2>
-            <p class="portal-copy">
-              Structured sourcing, logistics, and support for restaurants, retailers, and hospitality partners.
-            </p>
-            <div class="portal-cta">
-              <span class="cta-button">Discover Business Solutions</span>
+          <div class="hub-content">
+            <div class="hub-glass-card">
+              <p class="hub-kicker">Professional Supply</p>
+              <div class="hub-line"></div>
+              <h2 class="hub-title">For Your Business</h2>
+              <p class="hub-sub">Wholesale</p>
             </div>
           </div>
         </a>
 
-        <a
-          class="portal-card portal-card--flavor-companies ie-reveal"
-          data-delay="3"
-          href="/ItalianExperience/flavors/aziende-italiane/"
-        >
-          <div class="portal-image">
-            <img src="/ItalianExperience/assets/img/flavors/flavors-italian-companies.jpg" alt="Italian companies expanding to the USA market" />
-          </div>
+        <!-- PANEL 3 -->
+        <a href="/ItalianExperience/flavors/aziende-italiane/" class="hub-panel">
+          <div class="hub-bg" style="background-image:url('/ItalianExperience/assets/img/flavors/flavors-italian-companies.jpg');"></div>
+          <div class="hub-gradient"></div>
 
-          <div class="portal-overlay"></div>
+          <div class="hub-content">
+            <div class="hub-glass-card">
+              <p class="hub-kicker">Expansion Advisory</p>
+              <div class="hub-line"></div>
+              <h2 class="hub-title">Italian Companies</h2>
+              <p class="hub-sub">Export to USA Market</p>
 
-          <div class="portal-card-inner">
-            <div class="portal-label">Italian Companies</div>
-            <h2 class="portal-title">Export advisory to the USA</h2>
-            <p class="portal-copy">
-              Strategic partner for Italian brands expanding into the U.S. market. Service available in Italian.
-            </p>
-            <div class="portal-cta">
-              <span class="cta-button">Explore Export Advisory</span>
+              <p class="hub-disclaimer">
+                This specific service is available exclusively for the Italian market.
+              </p>
             </div>
           </div>
         </a>
+
       </div>
 
     </section>
