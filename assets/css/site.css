@@ -1054,12 +1054,16 @@ body:has(.hero--flavors) #site-header {
   height: 0 !important;
 }
 
-/* Recruitment content offset */
-.hero--recruitment .ie-hero-content-layer {
-  padding-top: var(--ie-header-h);
+/* Exact fullscreen hero only on Recruitment and Flavors */
+.hero--recruitment.ie-hero-shell,
+.hero--flavors.ie-hero-shell {
+  height: 100dvh;
+  min-height: 100dvh;
 }
 
-/* Flavors content offset */
+/* Content positioned below header without overflow */
+.hero--recruitment .ie-hero-content-layer,
 .hero--flavors .ie-hero-content-layer {
-  padding-top: var(--ie-header-h);
+  height: calc(100dvh - var(--ie-header-h));
+  margin-top: var(--ie-header-h);
 }
