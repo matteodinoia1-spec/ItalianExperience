@@ -36,36 +36,26 @@
     }
 
     .hero--flavors.hub-grid{
-      min-height:100vh;
-      min-height:100dvh;
       display:flex;
       flex-direction:column;
     }
 
     .hero--flavors .ie-hero-content-layer{
-      flex:1;
-      display:flex;
-      align-items:center;
-    }
-
-    .hero--flavors .ie-hero-content-layer.hero-layout--split{
-      height:100%;
+      position:relative;
+      z-index:10;
     }
 
     /* PANEL */
 
     .hero--flavors .hub-panel{
-      flex:1;
       position:relative;
       overflow:hidden;
       border:none;
       display:flex;
-      flex-direction:column;
-      justify-content:center;
       align-items:center;
+      justify-content:center;
       text-decoration:none;
       cursor:pointer;
-      height:100%;
     }
 
     @media (min-width:1025px){
@@ -81,7 +71,6 @@
       inset:0;
       background-size:cover;
       background-position:center;
-      height:100%;
       filter:brightness(0.35) contrast(1.08);
       transition:transform 1.4s cubic-bezier(0.23,1,0.32,1), filter 0.8s ease;
       z-index:0;
