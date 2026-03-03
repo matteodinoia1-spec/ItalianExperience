@@ -417,6 +417,11 @@
         status: payload.status || "new",
         source: payload.source || null,
         notes: payload.notes || null,
+        email: payload.email || null,
+        phone: payload.phone || null,
+        linkedin_url: payload.linkedin_url || null,
+        date_of_birth: payload.date_of_birth || null,
+        summary: payload.summary || null,
         is_archived: false,
       };
       const { data, error } = await supabase.from("candidates").insert(row).select().single();
@@ -502,6 +507,11 @@
         status: payload.status ?? "new",
         source: payload.source ?? null,
         notes: payload.notes ?? null,
+        email: payload.email ?? null,
+        phone: payload.phone ?? null,
+        linkedin_url: payload.linkedin_url ?? null,
+        date_of_birth: payload.date_of_birth ?? null,
+        summary: payload.summary ?? null,
       };
       const updates = await withUpdateAuditFields(baseUpdates);
       const { data, error } = await supabase
@@ -2667,6 +2677,464 @@
   }
 
   // ---------------------------------------------------------------------------
+  // Candidate profile details (skills, languages, experience, education, certifications, hobbies)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Fetch skills for a candidate.
+   * @param {string} candidateId
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function getCandidateSkills(candidateId) {
+    if (!candidateId) {
+      return { data: [], error: null };
+    }
+    try {
+      const { data, error } = await supabase
+        .from("candidate_skills")
+        .select("*")
+        .eq("candidate_id", candidateId)
+        .order("created_at", { ascending: true });
+      if (error) {
+        console.error("[Supabase] getCandidateSkills error:", error.message || error, { candidateId });
+        return { data: [], error };
+      }
+      return { data: Array.isArray(data) ? data : [], error: null };
+    } catch (err) {
+      console.error("[Supabase] getCandidateSkills exception:", err, { candidateId });
+      return { data: [], error: err };
+    }
+  }
+
+  /**
+   * Replace skills for a candidate (delete then bulk insert).
+   * @param {string} candidateId
+   * @param {array} skills
+   * @returns {Promise<{ data: array | null, error: object | null }>}
+   */
+  async function replaceCandidateSkills(candidateId, skills) {
+    if (!candidateId || typeof candidateId !== "string") {
+      const error = new Error("Missing candidateId");
+      console.error("[Supabase] replaceCandidateSkills:", error, { candidateId });
+      return { data: null, error };
+    }
+    const items = Array.isArray(skills) ? skills : [];
+    try {
+      const { error: deleteError } = await supabase
+        .from("candidate_skills")
+        .delete()
+        .eq("candidate_id", candidateId);
+      if (deleteError) {
+        console.error("[Supabase] replaceCandidateSkills delete error:", deleteError.message || deleteError, {
+          candidateId,
+        });
+        return { data: null, error: deleteError };
+      }
+      if (!items.length) {
+        return { data: [], error: null };
+      }
+      const userId = await getCurrentUserId();
+      const rows = items.map(function (skill) {
+        return {
+          candidate_id: candidateId,
+          skill: skill && skill.skill != null ? skill.skill : null,
+          created_by: userId,
+        };
+      });
+      const { data, error } = await supabase.from("candidate_skills").insert(rows).select();
+      if (error) {
+        console.error("[Supabase] replaceCandidateSkills insert error:", error.message || error, { candidateId });
+        return { data: null, error };
+      }
+      return { data: Array.isArray(data) ? data : [], error: null };
+    } catch (err) {
+      console.error("[Supabase] replaceCandidateSkills exception:", err, { candidateId });
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Fetch languages for a candidate.
+   * @param {string} candidateId
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function getCandidateLanguages(candidateId) {
+    if (!candidateId) {
+      return { data: [], error: null };
+    }
+    try {
+      const { data, error } = await supabase
+        .from("candidate_languages")
+        .select("*")
+        .eq("candidate_id", candidateId)
+        .order("created_at", { ascending: true });
+      if (error) {
+        console.error("[Supabase] getCandidateLanguages error:", error.message || error, { candidateId });
+        return { data: [], error };
+      }
+      return { data: Array.isArray(data) ? data : [], error: null };
+    } catch (err) {
+      console.error("[Supabase] getCandidateLanguages exception:", err, { candidateId });
+      return { data: [], error: err };
+    }
+  }
+
+  /**
+   * Replace languages for a candidate (delete then bulk insert).
+   * @param {string} candidateId
+   * @param {array} languages
+   * @returns {Promise<{ data: array | null, error: object | null }>}
+   */
+  async function replaceCandidateLanguages(candidateId, languages) {
+    if (!candidateId || typeof candidateId !== "string") {
+      const error = new Error("Missing candidateId");
+      console.error("[Supabase] replaceCandidateLanguages:", error, { candidateId });
+      return { data: null, error };
+    }
+    const items = Array.isArray(languages) ? languages : [];
+    try {
+      const { error: deleteError } = await supabase
+        .from("candidate_languages")
+        .delete()
+        .eq("candidate_id", candidateId);
+      if (deleteError) {
+        console.error("[Supabase] replaceCandidateLanguages delete error:", deleteError.message || deleteError, {
+          candidateId,
+        });
+        return { data: null, error: deleteError };
+      }
+      if (!items.length) {
+        return { data: [], error: null };
+      }
+      const userId = await getCurrentUserId();
+      const rows = items.map(function (language) {
+        return Object.assign(
+          {
+            candidate_id: candidateId,
+            created_by: userId,
+          },
+          language || {}
+        );
+      });
+      const { data, error } = await supabase.from("candidate_languages").insert(rows).select();
+      if (error) {
+        console.error("[Supabase] replaceCandidateLanguages insert error:", error.message || error, { candidateId });
+        return { data: null, error };
+      }
+      return { data: Array.isArray(data) ? data : [], error: null };
+    } catch (err) {
+      console.error("[Supabase] replaceCandidateLanguages exception:", err, { candidateId });
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Fetch work experience for a candidate.
+   * @param {string} candidateId
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function getCandidateExperience(candidateId) {
+    if (!candidateId) {
+      return { data: [], error: null };
+    }
+    try {
+      const { data, error } = await supabase
+        .from("candidate_experience")
+        .select("*")
+        .eq("candidate_id", candidateId)
+        .order("created_at", { ascending: true });
+      if (error) {
+        console.error("[Supabase] getCandidateExperience error:", error.message || error, { candidateId });
+        return { data: [], error };
+      }
+      return { data: Array.isArray(data) ? data : [], error: null };
+    } catch (err) {
+      console.error("[Supabase] getCandidateExperience exception:", err, { candidateId });
+      return { data: [], error: err };
+    }
+  }
+
+  /**
+   * Replace work experience entries for a candidate (delete then bulk insert).
+   * @param {string} candidateId
+   * @param {array} experiences
+   * @returns {Promise<{ data: array | null, error: object | null }>}
+   */
+  async function replaceCandidateExperience(candidateId, experiences) {
+    if (!candidateId || typeof candidateId !== "string") {
+      const error = new Error("Missing candidateId");
+      console.error("[Supabase] replaceCandidateExperience:", error, { candidateId });
+      return { data: null, error };
+    }
+    const items = Array.isArray(experiences) ? experiences : [];
+    try {
+      const { error: deleteError } = await supabase
+        .from("candidate_experience")
+        .delete()
+        .eq("candidate_id", candidateId);
+      if (deleteError) {
+        console.error("[Supabase] replaceCandidateExperience delete error:", deleteError.message || deleteError, {
+          candidateId,
+        });
+        return { data: null, error: deleteError };
+      }
+      if (!items.length) {
+        return { data: [], error: null };
+      }
+      const userId = await getCurrentUserId();
+      const rows = items.map(function (experience) {
+        return Object.assign(
+          {
+            candidate_id: candidateId,
+            created_by: userId,
+          },
+          experience || {}
+        );
+      });
+      const { data, error } = await supabase.from("candidate_experience").insert(rows).select();
+      if (error) {
+        console.error("[Supabase] replaceCandidateExperience insert error:", error.message || error, { candidateId });
+        return { data: null, error };
+      }
+      return { data: Array.isArray(data) ? data : [], error: null };
+    } catch (err) {
+      console.error("[Supabase] replaceCandidateExperience exception:", err, { candidateId });
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Fetch education entries for a candidate.
+   * @param {string} candidateId
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function getCandidateEducation(candidateId) {
+    if (!candidateId) {
+      return { data: [], error: null };
+    }
+    try {
+      const { data, error } = await supabase
+        .from("candidate_education")
+        .select("*")
+        .eq("candidate_id", candidateId)
+        .order("created_at", { ascending: true });
+      if (error) {
+        console.error("[Supabase] getCandidateEducation error:", error.message || error, { candidateId });
+        return { data: [], error };
+      }
+      return { data: Array.isArray(data) ? data : [], error: null };
+    } catch (err) {
+      console.error("[Supabase] getCandidateEducation exception:", err, { candidateId });
+      return { data: [], error: err };
+    }
+  }
+
+  /**
+   * Replace education entries for a candidate (delete then bulk insert).
+   * @param {string} candidateId
+   * @param {array} education
+   * @returns {Promise<{ data: array | null, error: object | null }>}
+   */
+  async function replaceCandidateEducation(candidateId, education) {
+    if (!candidateId || typeof candidateId !== "string") {
+      const error = new Error("Missing candidateId");
+      console.error("[Supabase] replaceCandidateEducation:", error, { candidateId });
+      return { data: null, error };
+    }
+    const items = Array.isArray(education) ? education : [];
+    try {
+      const { error: deleteError } = await supabase
+        .from("candidate_education")
+        .delete()
+        .eq("candidate_id", candidateId);
+      if (deleteError) {
+        console.error("[Supabase] replaceCandidateEducation delete error:", deleteError.message || deleteError, {
+          candidateId,
+        });
+        return { data: null, error: deleteError };
+      }
+      if (!items.length) {
+        return { data: [], error: null };
+      }
+      const userId = await getCurrentUserId();
+      const rows = items.map(function (edu) {
+        return Object.assign(
+          {
+            candidate_id: candidateId,
+            created_by: userId,
+          },
+          edu || {}
+        );
+      });
+      const { data, error } = await supabase.from("candidate_education").insert(rows).select();
+      if (error) {
+        console.error("[Supabase] replaceCandidateEducation insert error:", error.message || error, { candidateId });
+        return { data: null, error };
+      }
+      return { data: Array.isArray(data) ? data : [], error: null };
+    } catch (err) {
+      console.error("[Supabase] replaceCandidateEducation exception:", err, { candidateId });
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Fetch certifications for a candidate.
+   * @param {string} candidateId
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function getCandidateCertifications(candidateId) {
+    if (!candidateId) {
+      return { data: [], error: null };
+    }
+    try {
+      const { data, error } = await supabase
+        .from("candidate_certifications")
+        .select("*")
+        .eq("candidate_id", candidateId)
+        .order("created_at", { ascending: true });
+      if (error) {
+        console.error("[Supabase] getCandidateCertifications error:", error.message || error, { candidateId });
+        return { data: [], error };
+      }
+      return { data: Array.isArray(data) ? data : [], error: null };
+    } catch (err) {
+      console.error("[Supabase] getCandidateCertifications exception:", err, { candidateId });
+      return { data: [], error: err };
+    }
+  }
+
+  /**
+   * Replace certifications for a candidate (delete then bulk insert).
+   * @param {string} candidateId
+   * @param {array} certifications
+   * @returns {Promise<{ data: array | null, error: object | null }>}
+   */
+  async function replaceCandidateCertifications(candidateId, certifications) {
+    if (!candidateId || typeof candidateId !== "string") {
+      const error = new Error("Missing candidateId");
+      console.error("[Supabase] replaceCandidateCertifications:", error, { candidateId });
+      return { data: null, error };
+    }
+    const items = Array.isArray(certifications) ? certifications : [];
+    try {
+      const { error: deleteError } = await supabase
+        .from("candidate_certifications")
+        .delete()
+        .eq("candidate_id", candidateId);
+      if (deleteError) {
+        console.error(
+          "[Supabase] replaceCandidateCertifications delete error:",
+          deleteError.message || deleteError,
+          { candidateId }
+        );
+        return { data: null, error: deleteError };
+      }
+      if (!items.length) {
+        return { data: [], error: null };
+      }
+      const userId = await getCurrentUserId();
+      const rows = items.map(function (cert) {
+        return Object.assign(
+          {
+            candidate_id: candidateId,
+            created_by: userId,
+          },
+          cert || {}
+        );
+      });
+      const { data, error } = await supabase.from("candidate_certifications").insert(rows).select();
+      if (error) {
+        console.error(
+          "[Supabase] replaceCandidateCertifications insert error:",
+          error.message || error,
+          { candidateId }
+        );
+        return { data: null, error };
+      }
+      return { data: Array.isArray(data) ? data : [], error: null };
+    } catch (err) {
+      console.error("[Supabase] replaceCandidateCertifications exception:", err, { candidateId });
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Fetch hobbies for a candidate.
+   * @param {string} candidateId
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function getCandidateHobbies(candidateId) {
+    if (!candidateId) {
+      return { data: [], error: null };
+    }
+    try {
+      const { data, error } = await supabase
+        .from("candidate_hobbies")
+        .select("*")
+        .eq("candidate_id", candidateId)
+        .order("created_at", { ascending: true });
+      if (error) {
+        console.error("[Supabase] getCandidateHobbies error:", error.message || error, { candidateId });
+        return { data: [], error };
+      }
+      return { data: Array.isArray(data) ? data : [], error: null };
+    } catch (err) {
+      console.error("[Supabase] getCandidateHobbies exception:", err, { candidateId });
+      return { data: [], error: err };
+    }
+  }
+
+  /**
+   * Replace hobbies for a candidate (delete then bulk insert).
+   * @param {string} candidateId
+   * @param {array} hobbies
+   * @returns {Promise<{ data: array | null, error: object | null }>}
+   */
+  async function replaceCandidateHobbies(candidateId, hobbies) {
+    if (!candidateId || typeof candidateId !== "string") {
+      const error = new Error("Missing candidateId");
+      console.error("[Supabase] replaceCandidateHobbies:", error, { candidateId });
+      return { data: null, error };
+    }
+    const items = Array.isArray(hobbies) ? hobbies : [];
+    try {
+      const { error: deleteError } = await supabase
+        .from("candidate_hobbies")
+        .delete()
+        .eq("candidate_id", candidateId);
+      if (deleteError) {
+        console.error("[Supabase] replaceCandidateHobbies delete error:", deleteError.message || deleteError, {
+          candidateId,
+        });
+        return { data: null, error: deleteError };
+      }
+      if (!items.length) {
+        return { data: [], error: null };
+      }
+      const userId = await getCurrentUserId();
+      const rows = items.map(function (hobby) {
+        return Object.assign(
+          {
+            candidate_id: candidateId,
+            created_by: userId,
+          },
+          hobby || {}
+        );
+      });
+      const { data, error } = await supabase.from("candidate_hobbies").insert(rows).select();
+      if (error) {
+        console.error("[Supabase] replaceCandidateHobbies insert error:", error.message || error, { candidateId });
+        return { data: null, error };
+      }
+      return { data: Array.isArray(data) ? data : [], error: null };
+    } catch (err) {
+      console.error("[Supabase] replaceCandidateHobbies exception:", err, { candidateId });
+      return { data: null, error: err };
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // Activity Logs
   // ---------------------------------------------------------------------------
 
@@ -2789,6 +3257,37 @@
       console.error("[Supabase] fetchLogs exception:", err, { entityType, entityId });
       return { data: { logs: [], hasMore: false }, error: err };
     }
+  }
+
+  /**
+   * Thin wrapper returning a flat array of logs for an entity.
+   * Matches the simpler `{ data: array, error }` shape expected by some views.
+   * @param {"candidate"|"job_offer"|"client"} entityType
+   * @param {string} entityId
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function fetchEntityLogs(entityType, entityId) {
+    const result = await fetchLogs(entityType, entityId, { full: true });
+    const logs = result && result.data && Array.isArray(result.data.logs) ? result.data.logs : [];
+    return {
+      data: logs,
+      error: result ? result.error || null : null,
+    };
+  }
+
+  /**
+   * Thin wrapper to insert a manual note log for an entity.
+   * Ignores payload.event_type and delegates to createLog so event_type stays "manual_note".
+   * @param {{ entity_type: "candidate"|"job_offer"|"client", entity_id: string, event_type?: string, message: string }} payload
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function insertEntityLog(payload) {
+    if (!payload || !payload.entity_type || !payload.entity_id) {
+      const error = new Error("Missing entity_type or entity_id");
+      console.error("[Supabase] insertEntityLog:", error, payload);
+      return { data: null, error };
+    }
+    return createLog(payload.entity_type, payload.entity_id, payload.message);
   }
 
   /**
@@ -3093,6 +3592,18 @@
     fetchMyCandidates,
     fetchCandidatesPaginated,
     searchCandidatesByName,
+    getCandidateSkills,
+    replaceCandidateSkills,
+    getCandidateLanguages,
+    replaceCandidateLanguages,
+    getCandidateExperience,
+    replaceCandidateExperience,
+    getCandidateEducation,
+    replaceCandidateEducation,
+    getCandidateCertifications,
+    replaceCandidateCertifications,
+    getCandidateHobbies,
+    replaceCandidateHobbies,
     uploadCandidateFile,
     createSignedCandidateUrl,
     deleteCandidateFiles,
@@ -3116,6 +3627,8 @@
     searchClientsByName,
     // Activity Logs
     fetchMyActivityLogs,
+    fetchEntityLogs,
+    insertEntityLog,
     createLog,
     fetchLogs,
     updateLog,
