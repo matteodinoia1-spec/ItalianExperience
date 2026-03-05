@@ -651,16 +651,37 @@
     function mapCandidateRow(r) {
       const first_name = r.first_name ?? "";
       const last_name = r.last_name ?? "";
+      var availability = "available";
+      try {
+        if (
+          window.IEQueries &&
+          window.IEQueries.candidates &&
+          typeof window.IEQueries.candidates.deriveAvailabilityFromApplications ===
+            "function"
+        ) {
+          availability =
+            window.IEQueries.candidates.deriveAvailabilityFromApplications(
+              r.candidate_job_associations || []
+            ) || "available";
+        }
+      } catch (e) {
+        // Fallback to default availability on error
+        availability = "available";
+      }
       return {
         id: r.id,
         first_name,
         last_name,
         position: r.position ?? "",
         address: r.address ?? "",
-        status: r.status ?? "new",
+        availability: availability,
         source: r.source ?? "",
         client_name: r.client_name || null,
-        foto_url: r.foto_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent((first_name || "") + "+" + (last_name || "")) + "&background=dbeafe&color=1e40af",
+        foto_url:
+          r.foto_url ||
+          "https://ui-avatars.com/api/?name=" +
+            encodeURIComponent((first_name || "") + "+" + (last_name || "")) +
+            "&background=dbeafe&color=1e40af",
         photo_storage_path: r.photo_url || null,
         cv_url:
           typeof r.cv_url === "string" && r.cv_url.trim().length > 0
@@ -729,12 +750,19 @@
           ? findClientNameForCandidate(row)
           : row.client_name || null;
         const latestAssoc = row.latest_association || null;
-        const effectiveStatus = typeof getEffectiveCandidateStatus === "function"
-          ? getEffectiveCandidateStatus(row)
-          : row.status;
-        const statusBadgeClass = typeof getCandidateStatusBadgeClass === "function"
-          ? getCandidateStatusBadgeClass(effectiveStatus)
-          : "";
+        const availability = row.availability || "available";
+        var availabilityBadgeClass = "";
+        switch (availability) {
+          case "working":
+            availabilityBadgeClass = "badge-hired";
+            break;
+          case "in_process":
+            availabilityBadgeClass = "badge-applied";
+            break;
+          default:
+            availabilityBadgeClass = "badge-open";
+            break;
+        }
         const sourceLabel = (row.source || "").toUpperCase();
         const createdDate = row.created_at
           ? new Date(row.created_at).toLocaleDateString("it-IT")
@@ -801,7 +829,13 @@
             positionCellHtml,
             assignmentHtml,
             (row.address || "—"),
-            '<span class="badge ' + statusBadgeClass + '">' + (window.escapeHtml ? window.escapeHtml(typeof formatCandidateStatusLabel === "function" ? formatCandidateStatusLabel(effectiveStatus) : effectiveStatus) : (typeof formatCandidateStatusLabel === "function" ? formatCandidateStatusLabel(effectiveStatus) : effectiveStatus)) + "</span>",
+            '<span class="badge ' +
+              availabilityBadgeClass +
+              '">' +
+              (window.escapeHtml
+                ? window.escapeHtml(availability)
+                : availability) +
+              "</span>",
             '<span class="text-xs font-medium text-blue-600">' + (window.escapeHtml ? window.escapeHtml(sourceLabel || "—") : (sourceLabel || "—")) + "</span>",
             '<span class="text-gray-400">' + (window.escapeHtml ? window.escapeHtml(createdDate) : createdDate) + "</span>",
             '<div class="text-center">' + viewCvHtml + "</div>",

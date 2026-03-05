@@ -1793,48 +1793,7 @@
   // Candidate–Job associations
   // ---------------------------------------------------------------------------
 
-  /**
-   * Recalculate a candidate's availability_status based on active associations.
-   * A candidate is unavailable if they have ANY association whose status is NOT
-   * in ("rejected", "not_selected"); otherwise they are available.
-   * This helper must NOT call updateCandidateAssociationStatus to avoid loops.
-   * @param {string} candidateId
-   */
-  async function recalculateCandidateAvailability(candidateId) {
-    if (!candidateId) return;
-    try {
-      const { count, error } = await supabase
-        .from("candidate_job_associations")
-        .select("id", { count: "exact", head: true })
-        .eq("candidate_id", candidateId)
-        .not("status", "in", "(rejected,not_selected)");
-
-      if (error) {
-        console.error(
-          "[Supabase] recalculateCandidateAvailability count error:",
-          error.message || error,
-          { candidateId }
-        );
-        return;
-      }
-
-      const hasActiveAssociations = (count ?? 0) > 0;
-      const { error: updateErr } = await supabase
-        .from("candidates")
-        .update({ availability_status: hasActiveAssociations ? "unavailable" : "available" })
-        .eq("id", candidateId);
-
-      if (updateErr) {
-        console.error(
-          "[Supabase] recalculateCandidateAvailability update error:",
-          updateErr.message || updateErr,
-          { candidateId }
-        );
-      }
-    } catch (err) {
-      console.error("[Supabase] recalculateCandidateAvailability exception:", err, { candidateId });
-    }
-  }
+  // recalculateCandidateAvailability is deprecated in favor of derived availability from applications.
 
   /**
    * Search available, non-archived candidates for association.
@@ -2387,8 +2346,8 @@
           .from("candidate_job_associations")
           .update({ status: "not_selected" })
           .eq("job_offer_id", jobOfferId)
-          .not("status", "in", "(hired,rejected)")
-          .select("candidate_id");
+          .not("status", "in", "(hired,rejected,withdrawn)")
+          .select("id,candidate_id");
 
         if (assocUpdateError) {
           console.error(
@@ -2398,6 +2357,26 @@
             { jobOfferId }
           );
         } else if (Array.isArray(updatedAssocs) && updatedAssocs.length > 0) {
+          if (
+            typeof window !== "undefined" &&
+            window.IESupabase &&
+            typeof window.IESupabase.createAutoLog === "function"
+          ) {
+            updatedAssocs.forEach(function (assoc) {
+              if (!assoc || !assoc.id) return;
+              window.IESupabase
+                .createAutoLog("application", assoc.id, {
+                  event_type: "status_changed",
+                  message: "Application status changed to not_selected (job closed)",
+                  metadata: {
+                    job_offer_id: jobOfferId,
+                    new_status: "not_selected",
+                  },
+                })
+                .catch(function () {});
+            });
+          }
+
           const candidateIds = Array.from(
             new Set(
               updatedAssocs
@@ -2413,7 +2392,69 @@
           }
         }
       } else if (hiredCount < required && offer.status === "closed") {
-        await supabase.from("job_offers").update({ status: "active" }).eq("id", jobOfferId);
+        const { error: reopenError } = await supabase
+          .from("job_offers")
+          .update({ status: "active" })
+          .eq("id", jobOfferId);
+        if (reopenError) {
+          console.error(
+            "[Supabase] syncJobOfferStatusFromHired job_offers reopen error:",
+            reopenError.message || reopenError,
+            reopenError,
+            { jobOfferId }
+          );
+          return;
+        }
+
+        const { data: reopenedAssocs, error: reopenedAssocsError } = await supabase
+          .from("candidate_job_associations")
+          .update({ status: "screening" })
+          .eq("job_offer_id", jobOfferId)
+          .eq("status", "not_selected")
+          .select("id,candidate_id");
+
+        if (reopenedAssocsError) {
+          console.error(
+            "[Supabase] syncJobOfferStatusFromHired reopen associations error:",
+            reopenedAssocsError.message || reopenedAssocsError,
+            reopenedAssocsError,
+            { jobOfferId }
+          );
+        } else if (Array.isArray(reopenedAssocs) && reopenedAssocs.length > 0) {
+          if (
+            typeof window !== "undefined" &&
+            window.IESupabase &&
+            typeof window.IESupabase.createAutoLog === "function"
+          ) {
+            reopenedAssocs.forEach(function (assoc) {
+              if (!assoc || !assoc.id) return;
+              window.IESupabase
+                .createAutoLog("application", assoc.id, {
+                  event_type: "status_changed",
+                  message: "Application status changed to screening (job reopened)",
+                  metadata: {
+                    job_offer_id: jobOfferId,
+                    new_status: "screening",
+                  },
+                })
+                .catch(function () {});
+            });
+          }
+
+          const candidateIds = Array.from(
+            new Set(
+              reopenedAssocs
+                .map(function (row) {
+                  return row && row.candidate_id;
+                })
+                .filter(Boolean)
+            )
+          );
+
+          for (const candidateId of candidateIds) {
+            await recalculateCandidateAvailability(candidateId);
+          }
+        }
       }
     } catch (err) {
       console.error("[Supabase] syncJobOfferStatusFromHired exception:", err);

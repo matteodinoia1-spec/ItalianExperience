@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications | Italian Experience Recruitment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/ui.css">
+</head>
+<body class="flex min-h-screen" style="visibility: hidden;">
+
+    <div class="portal-shell">
+        <div id="sidebar"></div>
+
+        <main class="portal-main flex-1 flex flex-col min-w-0">
+        <div id="portal-header"></div>
+
+        <div class="portal-toolbar sticky-toolbar">
+            <div class="page-container toolbar-inner">
+                <div class="toolbar-left">
+                    <div class="portal-toolbar__left">
+                        <div class="portal-toolbar__filters">
+                            <div class="filter-bar">
+                                <div class="filter-group">
+                                    <label class="filter-label">Status</label>
+                                    <select data-filter="application-status" class="filter-select w-full appearance-none cursor-pointer">
+                                        <option value="">All statuses</option>
+                                        <option value="applied">Applied</option>
+                                        <option value="screening">Screening</option>
+                                        <option value="interview">Interview</option>
+                                        <option value="offer">Offer</option>
+                                        <option value="hired">Hired</option>
+                                        <option value="rejected">Rejected</option>
+                                        <option value="withdrawn">Withdrawn</option>
+                                        <option value="not_selected">Not Selected</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Job Offer</label>
+                                    <select data-filter="application-offer" class="filter-select w-full appearance-none cursor-pointer">
+                                        <option value="">All offers</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Client</label>
+                                    <select data-filter="application-client" class="filter-select w-full appearance-none cursor-pointer">
+                                        <option value="">All clients</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group relative">
+                                    <label class="filter-label">Candidate</label>
+                                    <input type="text" placeholder="Search candidate..." data-filter="application-candidate" class="filter-input w-full">
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">From date</label>
+                                    <input type="date" data-filter="application-date-from" class="filter-input w-full">
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">To date</label>
+                                    <input type="date" data-filter="application-date-to" class="filter-input w-full">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="portal-toolbar__center"></div>
+                <div class="toolbar-right">
+                    <div class="portal-toolbar__right">
+                        <div class="portal-toolbar__actions">
+                            <div class="inline-flex rounded-full bg-white/70 border border-gray-200 overflow-hidden text-xs font-semibold">
+                                <button
+                                  type="button"
+                                  class="px-3 py-1 focus:outline-none text-[#1b4332] bg-white"
+                                  data-view-mode="list"
+                                >
+                                  List
+                                </button>
+                                <button
+                                  type="button"
+                                  class="px-3 py-1 focus:outline-none text-gray-600"
+                                  data-view-mode="pipeline"
+                                >
+                                  Pipeline
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-container">
+        <div class="portal-content p-8 space-y-8">
+
+            <div class="glass-card ie-card rounded-2xl p-4" data-ie-applications-pipeline-bar>
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-gray-500">
+                        Pipeline summary
+                    </p>
+                    <div class="flex flex-wrap gap-2" data-ie-applications-pipeline>
+                        <button type="button" class="ie-btn ie-btn-secondary !py-1 !px-3 text-xs" data-pipeline-status="applied">
+                            <span>Applied</span>
+                            <span class="ml-1 font-bold" data-pipeline-count>0</span>
+                        </button>
+                        <button type="button" class="ie-btn ie-btn-secondary !py-1 !px-3 text-xs" data-pipeline-status="screening">
+                            <span>Screening</span>
+                            <span class="ml-1 font-bold" data-pipeline-count>0</span>
+                        </button>
+                        <button type="button" class="ie-btn ie-btn-secondary !py-1 !px-3 text-xs" data-pipeline-status="interview">
+                            <span>Interview</span>
+                            <span class="ml-1 font-bold" data-pipeline-count>0</span>
+                        </button>
+                        <button type="button" class="ie-btn ie-btn-secondary !py-1 !px-3 text-xs" data-pipeline-status="offer">
+                            <span>Offer</span>
+                            <span class="ml-1 font-bold" data-pipeline-count>0</span>
+                        </button>
+                        <button type="button" class="ie-btn ie-btn-secondary !py-1 !px-3 text-xs" data-pipeline-status="hired">
+                            <span>Hired</span>
+                            <span class="ml-1 font-bold" data-pipeline-count>0</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div data-ie-applications-view="list">
+                <div class="glass-card ie-card rounded-2xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="ie-table">
+                            <thead class="bg-gray-50/80 text-gray-500 text-[10px] uppercase tracking-widest">
+                                <tr>
+                                    <th class="px-6 py-5 font-bold">Candidate</th>
+                                    <th class="px-6 py-5 font-bold">Job Offer</th>
+                                    <th class="px-6 py-5 font-bold">Client</th>
+                                    <th class="px-6 py-5 font-bold">Status</th>
+                                    <th class="px-6 py-5 font-bold">Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 text-sm" data-ie-applications-body>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-6 bg-white/50 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-gray-100" data-ie-pagination data-ie-applications-pagination>
+                        <p class="text-xs text-gray-500 font-medium" data-ie-pagination-summary>Showing 0 of 0 results</p>
+                        <div class="flex items-center space-x-2">
+                            <button type="button" data-ie-pagination-prev class="ie-btn ie-btn-secondary disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                            </button>
+                            <span class="text-xs font-bold text-gray-700 px-3 uppercase tracking-titter" data-ie-pagination-pages>Page 1 of 1</span>
+                            <button type="button" data-ie-pagination-next class="ie-btn ie-btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div data-ie-applications-view="pipeline" class="hidden">
+                <div class="glass-card ie-card rounded-2xl overflow-hidden">
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4" data-ie-applications-pipeline-board></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        </div>
+        </main>
+    </div>
+
+    <script>
+      window.pageMeta = {
+        title: "Applications",
+        subtitle: "All candidate applications",
+        breadcrumbs: [
+          { label: "Dashboard", entity: "dashboard" },
+          { label: "Applications" }
+        ]
+      };
+    </script>
+    <script src="shared/header-loader.js"></script>
+    <script src="core/debug.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="core/supabase.js"></script>
+    <script src="queries/applications.queries.js"></script>
+    <script src="queries/jobOffers.queries.js"></script>
+    <script src="queries/clients.queries.js"></script>
+    <script src="core/auth.js"></script>
+    <script src="core/router.js"></script>
+    <script src="components/page-header.js"></script>
+    <script src="core/entity-toolbar.js"></script>
+    <script src="core/lists-runtime.js"></script>
+    <script src="core/session/session.js"></script>
+    <script src="core/ui/modals.js"></script>
+    <script src="core/ui/previews.js"></script>
+    <script src="core/app-shell.js"></script>
+    <script src="features/applications/applications.js"></script>
+</body>
+</html>

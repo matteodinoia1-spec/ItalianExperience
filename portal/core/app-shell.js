@@ -3386,41 +3386,21 @@
     }
   }
 
-  function normalizeAvailabilityStatus(raw) {
-    var s = (raw || "").toString().toLowerCase();
-    if (s === "available") return "available";
-    if (s === "unavailable") return "unavailable";
-    return "";
-  }
-
   function computeCandidateAvailability(candidate) {
     if (!candidate) return "available";
-    var explicit = normalizeAvailabilityStatus(candidate.availability_status);
-    if (explicit) return explicit;
-    var assocStatus =
-      candidate.latest_association && candidate.latest_association.status
-        ? String(candidate.latest_association.status).toLowerCase()
-        : "";
-    if (assocStatus && assocStatus !== "rejected" && assocStatus !== "not_selected") {
-      return "unavailable";
+    if (
+      window.IEQueries &&
+      window.IEQueries.candidates &&
+      typeof window.IEQueries.candidates.deriveAvailabilityFromApplications ===
+        "function"
+    ) {
+      return (
+        window.IEQueries.candidates.deriveAvailabilityFromApplications(
+          candidate.latest_association ? [candidate.latest_association] : []
+        ) || "available"
+      );
     }
     return "available";
-  }
-
-  function getAvailabilityBadgeClass(candidateOrStatus) {
-    var status =
-      typeof candidateOrStatus === "string"
-        ? normalizeAvailabilityStatus(candidateOrStatus)
-        : computeCandidateAvailability(candidateOrStatus);
-    return status === "available" ? "badge-open" : "badge-closed";
-  }
-
-  function formatAvailabilityLabel(candidateOrStatus) {
-    var status =
-      typeof candidateOrStatus === "string"
-        ? normalizeAvailabilityStatus(candidateOrStatus)
-        : computeCandidateAvailability(candidateOrStatus);
-    return status === "available" ? "Available" : "Unavailable";
   }
 
   function isCandidateHired(candidate) {

@@ -142,6 +142,56 @@
                 </div>
             </section>
 
+            <!-- Archived Applications -->
+            <section id="section-applications" class="space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <h2 class="text-xl font-bold serif text-[#1b4332]">Archived applications</h2>
+                    <div class="filter-bar">
+                        <div class="filter-group relative">
+                            <label class="filter-label">Search applications</label>
+                            <div class="relative">
+                                <input type="text" id="search-applications" placeholder="Search applications..." class="filter-input w-full pl-10 pr-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 top-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card ie-card rounded-2xl overflow-hidden min-h-[120px] relative" id="table-applications-container">
+                    <div data-archived-loading="applications" class="hidden absolute inset-0 flex items-center justify-center bg-white/80 z-10">
+                        <div class="loading-spinner"></div>
+                    </div>
+                    <div data-archived-error="applications" class="hidden p-6 text-red-600 text-sm"></div>
+                    <div data-archived-empty="applications" class="hidden p-8 text-center text-gray-500 text-sm">No archived applications.</div>
+                    <div data-archived-table="applications" class="hidden overflow-x-auto">
+                        <table class="ie-table">
+                            <thead class="bg-gray-50/80 text-gray-500 text-[10px] uppercase tracking-widest">
+                                <tr>
+                                    <th class="px-6 py-5 font-bold">Candidate</th>
+                                    <th class="px-6 py-5 font-bold">Job Offer</th>
+                                    <th class="px-6 py-5 font-bold">Client</th>
+                                    <th class="px-6 py-5 font-bold text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 text-sm" data-archived-tbody="applications"></tbody>
+                        </table>
+                    </div>
+                    <div data-archived-pagination="applications" class="hidden p-6 bg-white/50 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-gray-100">
+                        <p class="text-xs text-gray-500 font-medium" data-archived-summary="applications"></p>
+                        <div class="flex items-center space-x-2">
+                            <button type="button" data-archived-prev="applications" class="ie-btn ie-btn-secondary disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                            </button>
+                            <span class="text-xs font-bold text-gray-700 px-3 uppercase tracking-titter" data-archived-pages="applications">Page 1 of 1</span>
+                            <button type="button" data-archived-next="applications" class="ie-btn ie-btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Archived Clients -->
             <section id="section-clients" class="space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -202,6 +252,7 @@
     <script src="core/debug.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script src="core/supabase.js"></script>
+    <script src="queries/applications.queries.js"></script>
     <script src="core/auth.js"></script>
     <script src="core/router.js"></script>
     <script src="components/page-header.js"></script>
