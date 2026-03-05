@@ -40,6 +40,9 @@
         const effectiveStatus = typeof getEffectiveCandidateStatus === "function"
           ? getEffectiveCandidateStatus(item)
           : item.status;
+        if (filters.status === "new") {
+          return effectiveStatus === "new" || effectiveStatus === "applied";
+        }
         return effectiveStatus === filters.status;
       })
       .filter((item) => {
@@ -1169,7 +1172,7 @@
         const associations = associationResults[i]?.data || [];
         const associatedActive = associations.filter(function (a) {
           const s = (a.status || "").toString().toLowerCase();
-          return s !== "rejected" && s !== "not_selected";
+          return s !== "rejected" && s !== "not_selected" && s !== "withdrawn";
         }).length;
         const hiredCount = associations.filter(function (a) {
           const s = (a.status || "").toString().toLowerCase();
@@ -1306,6 +1309,219 @@
     }
 
     renderOffers();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Applications list
+  // ---------------------------------------------------------------------------
+
+  const APPLICATIONS_PAGE_SIZE = 25;
+
+  function initApplicationsPage() {
+    const tbody = document.querySelector("[data-ie-applications-body]");
+    if (!tbody) return;
+
+    const filters = {
+      status: "",
+      job_offer_id: "",
+      client_id: "",
+      candidate_id: "",
+      candidate_name: "",
+      date_from: "",
+      date_to: "",
+    };
+    let currentPage = 1;
+    const limit = APPLICATIONS_PAGE_SIZE;
+
+    const statusSelect = document.querySelector('[data-filter="application-status"]');
+    const offerSelect = document.querySelector('[data-filter="application-offer"]');
+    const clientSelect = document.querySelector('[data-filter="application-client"]');
+    const candidateInput = document.querySelector('[data-filter="application-candidate"]');
+    const dateFromInput = document.querySelector('[data-filter="application-date-from"]');
+    const dateToInput = document.querySelector('[data-filter="application-date-to"]');
+
+    function getApplicationStatusBadgeClass(status) {
+      if (window.IEPortal && typeof window.IEPortal.getApplicationStatusBadgeClass === "function") {
+        return window.IEPortal.getApplicationStatusBadgeClass(status);
+      }
+      return "badge-applied";
+    }
+    function formatApplicationStatusLabel(status) {
+      if (window.IEPortal && typeof window.IEPortal.formatApplicationStatusLabel === "function") {
+        return window.IEPortal.formatApplicationStatusLabel(status);
+      }
+      return status || "Applied";
+    }
+
+    const paginationContainer = tbody.closest(".glass-card") && tbody.closest(".glass-card").querySelector("[data-ie-pagination]");
+    const paginationEl = paginationContainer;
+
+    if (statusSelect) {
+      statusSelect.addEventListener("change", function () {
+        filters.status = this.value || "";
+        currentPage = 1;
+        renderApplications();
+      });
+    }
+    if (offerSelect) {
+      offerSelect.addEventListener("change", function () {
+        filters.job_offer_id = this.value || "";
+        currentPage = 1;
+        renderApplications();
+      });
+    }
+    if (clientSelect) {
+      clientSelect.addEventListener("change", function () {
+        filters.client_id = this.value || "";
+        currentPage = 1;
+        renderApplications();
+      });
+    }
+    if (candidateInput) {
+      candidateInput.addEventListener("input", function () {
+        filters.candidate_name = this.value ? this.value.trim() : "";
+        currentPage = 1;
+        renderApplications();
+      });
+    }
+    if (dateFromInput) {
+      dateFromInput.addEventListener("change", function () {
+        filters.date_from = this.value || "";
+        currentPage = 1;
+        renderApplications();
+      });
+    }
+    if (dateToInput) {
+      dateToInput.addEventListener("change", function () {
+        filters.date_to = this.value || "";
+        currentPage = 1;
+        renderApplications();
+      });
+    }
+
+    function goToPage(page) {
+      currentPage = Math.max(1, page);
+      renderApplications();
+    }
+    if (paginationEl) {
+      const prevBtn = paginationEl.querySelector("[data-ie-pagination-prev]");
+      const nextBtn = paginationEl.querySelector("[data-ie-pagination-next]");
+      if (prevBtn) prevBtn.addEventListener("click", function () { if (!this.disabled) goToPage(currentPage - 1); });
+      if (nextBtn) nextBtn.addEventListener("click", function () { if (!this.disabled) goToPage(currentPage + 1); });
+    }
+
+    if (offerSelect && !offerSelect.dataset.iePopulated) {
+      offerSelect.dataset.iePopulated = "true";
+      const defaultOpt = document.createElement("option");
+      defaultOpt.value = "";
+      defaultOpt.textContent = "All offers";
+      offerSelect.innerHTML = "";
+      offerSelect.appendChild(defaultOpt);
+      if (window.IESupabase && window.IESupabase.fetchJobOffersPaginated) {
+        window.IESupabase.fetchJobOffersPaginated({ filters: { archived: "active" }, page: 1, limit: 500 })
+          .then(function (res) {
+            (res.data || []).forEach(function (offer) {
+              if (offer.is_archived) return;
+              const opt = document.createElement("option");
+              opt.value = offer.id || "";
+              opt.textContent = (offer.title || offer.position || "—").toString();
+              offerSelect.appendChild(opt);
+            });
+          })
+          .catch(function () {});
+      }
+    }
+    if (clientSelect && !clientSelect.dataset.iePopulated) {
+      clientSelect.dataset.iePopulated = "true";
+      const defaultOpt = document.createElement("option");
+      defaultOpt.value = "";
+      defaultOpt.textContent = "All clients";
+      clientSelect.innerHTML = "";
+      clientSelect.appendChild(defaultOpt);
+      if (window.IESupabase && window.IESupabase.fetchClientsPaginated) {
+        window.IESupabase.fetchClientsPaginated({ filters: { archived: "active" }, page: 1, limit: 500 })
+          .then(function (res) {
+            (res.data || []).forEach(function (client) {
+              if (client.is_archived) return;
+              const opt = document.createElement("option");
+              opt.value = client.id || "";
+              opt.textContent = (client.name || "—").toString();
+              clientSelect.appendChild(opt);
+            });
+          })
+          .catch(function () {});
+      }
+    }
+
+    function renderApplications() {
+      if (!window.IESupabase || !window.IESupabase.fetchApplicationsPaginated) {
+        tbody.innerHTML = "<tr><td colspan=\"6\" class=\"px-6 py-8 text-center text-gray-400\">Applications not available.</td></tr>";
+        if (paginationContainer) updatePaginationUI(paginationContainer, 0, 1, limit, 0);
+        return;
+      }
+
+      const filterPayload = {
+        status: filters.status || undefined,
+        job_offer_id: filters.job_offer_id || undefined,
+        client_id: filters.client_id || undefined,
+        candidate_id: filters.candidate_id || undefined,
+        date_from: filters.date_from ? filters.date_from + "T00:00:00Z" : undefined,
+        date_to: filters.date_to ? filters.date_to + "T23:59:59Z" : undefined,
+      };
+
+      tbody.innerHTML = "<tr><td colspan=\"6\" class=\"px-6 py-8 text-center text-gray-400\">Loading...</td></tr>";
+
+      window.IESupabase.fetchApplicationsPaginated(filterPayload, { page: currentPage, limit: limit })
+        .then(function (result) {
+          let rows = result.data || [];
+          const totalCount = result.totalCount ?? 0;
+          const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+          if (currentPage > totalPages && totalPages > 0) {
+            currentPage = totalPages;
+            renderApplications();
+            return;
+          }
+          if (filters.candidate_name) {
+            const term = filters.candidate_name.toLowerCase();
+            rows = rows.filter(function (r) {
+              return (r.candidate_name || "").toLowerCase().indexOf(term) !== -1;
+            });
+          }
+          tbody.innerHTML = "";
+          const candidateViewUrl = window.IEPortal && window.IEPortal.links && typeof window.IEPortal.links.candidateView === "function"
+            ? window.IEPortal.links.candidateView
+            : function (id) { return "candidate.html?id=" + encodeURIComponent(String(id || "")); };
+          const escapeHtml = window.escapeHtml || function (s) { return (s == null ? "" : String(s)).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); };
+
+          if (rows.length === 0) {
+            tbody.innerHTML = "<tr><td colspan=\"6\" class=\"px-6 py-8 text-center text-gray-400\">No applications found.</td></tr>";
+          } else {
+            rows.forEach(function (row) {
+              const tr = document.createElement("tr");
+              tr.className = "clickable-row border-b border-gray-100 hover:bg-gray-50/80";
+              tr.setAttribute("data-entity", "candidate");
+              tr.setAttribute("data-entity-id", row.candidate_id || "");
+              const candidateUrl = candidateViewUrl(row.candidate_id);
+              tr.innerHTML =
+                "<td class=\"px-6 py-4\"><a href=\"" + escapeHtml(candidateUrl) + "\" class=\"text-[#1b4332] font-semibold hover:underline\" data-entity-type=\"candidate\" data-entity-id=\"" + escapeHtml(String(row.candidate_id || "")) + "\">" + escapeHtml(row.candidate_name || "—") + "</a></td>" +
+                "<td class=\"px-6 py-4 text-gray-700\">" + escapeHtml(row.job_offer_title || "—") + "</td>" +
+                "<td class=\"px-6 py-4 text-gray-700\">" + escapeHtml(row.client_name || "—") + "</td>" +
+                "<td class=\"px-6 py-4\"><span class=\"badge " + getApplicationStatusBadgeClass(row.status) + "\">" + escapeHtml(formatApplicationStatusLabel(row.status)) + "</span></td>" +
+                "<td class=\"px-6 py-4 text-gray-500 text-xs\">" + (row.created_at ? new Date(row.created_at).toLocaleDateString("it-IT") : "—") + "</td>" +
+                "<td class=\"px-6 py-4 text-center\"><a href=\"" + escapeHtml(candidateUrl) + "\" class=\"ie-btn ie-btn-secondary text-sm\">View</a></td>";
+              tbody.appendChild(tr);
+            });
+          }
+          updatePaginationUI(paginationContainer, totalCount, currentPage, limit, rows.length);
+        })
+        .catch(function (err) {
+          console.error("[ItalianExperience] fetchApplicationsPaginated error:", err);
+          tbody.innerHTML = "<tr><td colspan=\"6\" class=\"px-6 py-8 text-center text-red-500\">Loading error. Please try again later.</td></tr>";
+          updatePaginationUI(paginationContainer, 0, 1, limit, 0);
+        });
+    }
+
+    renderApplications();
   }
 
   // ---------------------------------------------------------------------------
@@ -1564,6 +1780,7 @@
   window.IEListsRuntime.initCandidatesPage = initCandidatesPage;
   window.IEListsRuntime.initClientsPage = initClientsPage;
   window.IEListsRuntime.initJobOffersPage = initJobOffersPage;
+  window.IEListsRuntime.initApplicationsPage = initApplicationsPage;
   window.IEListsRuntime.applyCandidateFilters = applyCandidateFilters;
   window.IEListsRuntime.applyJobOfferFilters = applyJobOfferFilters;
   window.IEListsRuntime.applyClientFilters = applyClientFilters;

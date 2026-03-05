@@ -516,6 +516,17 @@
     }
   }
 
+  function setDerivedAvailabilityFromAssociations(applications) {
+    var label = "Available";
+    if (window.IEPortal && typeof window.IEPortal.computeDerivedAvailability === "function") {
+      var state = window.IEPortal.computeDerivedAvailability(applications);
+      label = window.IEPortal.formatAvailabilityLabel && typeof window.IEPortal.formatAvailabilityLabel === "function"
+        ? window.IEPortal.formatAvailabilityLabel(state)
+        : (state === "working" ? "Working" : state === "in_process" ? "In process" : "Available");
+    }
+    setField("availability-text", label);
+  }
+
   async function renderAssociatedOffers(candidateId) {
     var listEl = document.querySelector('[data-list="associated-offers"]');
     var emptyEl = document.querySelector('[data-empty="associated-offers"]');
@@ -524,6 +535,7 @@
 
     if (!window.IESupabase || !window.IESupabase.fetchJobHistoryForCandidate) {
       emptyEl.style.display = "";
+      setDerivedAvailabilityFromAssociations([]);
       return;
     }
 
@@ -532,14 +544,22 @@
       if (result.error) {
         console.error("[Candidate] fetchJobHistoryForCandidate error:", result.error);
         emptyEl.style.display = "";
+        setDerivedAvailabilityFromAssociations([]);
         return;
       }
       var rows = (result.data || []).slice();
       if (!rows.length) {
         emptyEl.style.display = "";
+        setDerivedAvailabilityFromAssociations([]);
         return;
       }
       emptyEl.style.display = "none";
+
+      var applications = rows.map(function (row) {
+        var assoc = row.association || row;
+        return { status: assoc && assoc.status ? assoc.status : null };
+      });
+      setDerivedAvailabilityFromAssociations(applications);
 
       rows.forEach(function (row) {
         var assoc = row.association || row; // fallback if already flat
@@ -592,10 +612,16 @@
 
         var tdStatus = document.createElement("td");
         tdStatus.className = "px-4 py-2 align-top";
-        var s = (assoc && assoc.status) || (offer && offer.status) || "";
+        var rawStatus = (assoc && assoc.status) || (offer && offer.status) || "";
         var badge = document.createElement("span");
-        badge.className = getStatusBadgeClasses(s || "new");
-        badge.textContent = s || "new";
+        if (window.IEPortal && typeof window.IEPortal.getApplicationStatusBadgeClass === "function") {
+          var normalized = window.IEPortal.normalizeApplicationStatusForDisplay(rawStatus || "applied");
+          badge.className = "badge " + window.IEPortal.getApplicationStatusBadgeClass(normalized);
+          badge.textContent = window.IEPortal.formatApplicationStatusLabel(normalized);
+        } else {
+          badge.className = getStatusBadgeClasses(rawStatus || "new");
+          badge.textContent = rawStatus || "new";
+        }
         tdStatus.appendChild(badge);
 
         var tdDate = document.createElement("td");

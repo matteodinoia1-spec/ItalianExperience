@@ -253,6 +253,87 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
     });
   }
 
+  async function loadApplications() {
+    const section = SECTIONS.applications;
+    showState(section, "loading");
+    const IE = getIE();
+    if (!IE || !IE.fetchApplicationsPaginated) {
+      showState(section, "error", "Supabase unavailable.");
+      return;
+    }
+    const s = state.applications;
+    const filters = { status: "withdrawn" };
+    try {
+      const result = await IE.fetchApplicationsPaginated(filters, { page: s.page, limit: LIMIT });
+      if (result.error) {
+        showState(section, "error", result.error.message || "Error loading applications.");
+        return;
+      }
+      let data = result.data || [];
+      if ((s.search || "").trim()) {
+        const term = s.search.trim().toLowerCase();
+        data = data.filter(function (row) {
+          return (
+            (row.candidate_name || "").toLowerCase().indexOf(term) !== -1 ||
+            (row.job_offer_title || "").toLowerCase().indexOf(term) !== -1 ||
+            (row.client_name || "").toLowerCase().indexOf(term) !== -1
+          );
+        });
+      }
+      const totalCount = result.totalCount || 0;
+      s.totalCount = totalCount;
+      if (data.length === 0 && totalCount === 0) {
+        showState(section, "empty");
+        return;
+      }
+      renderApplicationsTable(data);
+      updatePaginationUI(section, totalCount, s.page);
+      showState(section, "table");
+    } catch (err) {
+      console.error("[Archived] loadApplications", err);
+      showState(section, "error", err && err.message ? err.message : "Network error.");
+    }
+  }
+
+  function getApplicationStatusBadgeClass(status) {
+    if (window.IEPortal && typeof window.IEPortal.getApplicationStatusBadgeClass === "function") {
+      return window.IEPortal.getApplicationStatusBadgeClass(status);
+    }
+    return "badge-withdrawn";
+  }
+  function formatApplicationStatusLabel(status) {
+    if (window.IEPortal && typeof window.IEPortal.formatApplicationStatusLabel === "function") {
+      return window.IEPortal.formatApplicationStatusLabel(status);
+    }
+    return status || "Withdrawn";
+  }
+
+  function renderApplicationsTable(rows) {
+    const tbody = el("tbody", SECTIONS.applications);
+    if (!tbody) return;
+    tbody.innerHTML = "";
+    const candidateViewUrl = window.IEPortal && window.IEPortal.links && window.IEPortal.links.candidateView
+      ? window.IEPortal.links.candidateView
+      : function (id) { return "candidate.html?id=" + encodeURIComponent(String(id || "")); };
+    rows.forEach(function (row) {
+      const tr = document.createElement("tr");
+      tr.className = "table-row transition hover:bg-[#c5a059]/5";
+      const withdrawnDate = row.created_at ? new Date(row.created_at).toLocaleDateString("it-IT") : "—";
+      tr.innerHTML =
+        '<td class="px-6 py-4"><a href="' + candidateViewUrl(row.candidate_id) + '" class="text-[#1b4332] font-semibold hover:underline">' + escapeHtml(row.candidate_name || "—") + "</a></td>" +
+        '<td class="px-6 py-4 text-gray-600">' + escapeHtml(row.job_offer_title || "—") + "</td>" +
+        '<td class="px-6 py-4 text-gray-600">' + escapeHtml(row.client_name || "—") + "</td>" +
+        '<td class="px-6 py-4"><span class="badge ' + getApplicationStatusBadgeClass(row.status) + '">' + escapeHtml(formatApplicationStatusLabel(row.status)) + "</span></td>" +
+        '<td class="px-6 py-4 text-gray-500 text-xs">' + escapeHtml(withdrawnDate) + "</td>" +
+        '<td class="px-6 py-4 text-right">' +
+        '<div class="flex items-center justify-end space-x-2">' +
+        '<button type="button" data-action="restore-entity" data-entity="application" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-success">Restore</button>' +
+        '<button type="button" data-action="delete-entity-permanent" data-entity="application" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-danger">Delete permanently</button>' +
+        "</div></td>";
+      tbody.appendChild(tr);
+    });
+  }
+
   async function loadClients() {
     const section = SECTIONS.clients;
     showState(section, "loading");
@@ -655,10 +736,10 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
     setupPagination(SECTIONS.candidates);
     setupPagination(SECTIONS.jobs);
     setupPagination(SECTIONS.clients);
+    setupPagination(SECTIONS.applications);
     setupSearch(SECTIONS.candidates);
     setupSearch(SECTIONS.jobs);
     setupSearch(SECTIONS.clients);
-    setupPagination(SECTIONS.applications);
     setupSearch(SECTIONS.applications);
 
     await Promise.all([loadCandidates(), loadJobs(), loadClients(), loadApplications()]);
