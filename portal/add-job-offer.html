@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create job offer | Italian Experience Recruitment</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/ui.css">
+</head>
+<body class="flex min-h-screen" style="visibility: hidden;">
+
+    <div class="portal-shell">
+        <!-- SIDEBAR (loaded dynamically from sidebar.html) -->
+        <div id="sidebar"></div>
+
+        <!-- MAIN CONTENT -->
+        <main class="portal-main flex-1 flex flex-col min-w-0">
+        <div id="portal-header"></div>
+
+        <div class="portal-toolbar sticky-toolbar">
+            <div class="page-container toolbar-inner">
+                <div class="toolbar-left">
+                    <div class="portal-toolbar__left"></div>
+                </div>
+                <div class="portal-toolbar__center">
+                    <div
+                        class="text-xs font-semibold tracking-widest uppercase text-gray-500"
+                        data-entity-mode-indicator="job-offer"
+                    ></div>
+                    <div id="jobOfferHeaderStatus" class="ml-4"></div>
+                </div>
+                <div class="toolbar-right">
+                    <div class="portal-toolbar__right">
+                        <div class="portal-toolbar__actions">
+                            <div id="jobOfferActions" class="flex items-center space-x-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div class="page-container">
+        <div class="portal-content p-8 space-y-8">
+
+            <form id="jobOfferForm" class="space-y-8">
+
+                <!-- Row 1: Job Information & Internal Notes -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                    <!-- Job Information -->
+                    <div class="ie-card glass-card p-8 rounded-3xl">
+                        <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Job Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="form-label">Job Title</label>
+                                <input type="text" name="title" placeholder="e.g. Executive Chef" class="form-input">
+                            </div>
+                            <div>
+                                <label class="form-label">Position</label>
+                                <input type="text" name="position" placeholder="e.g. Kitchen / Management" class="form-input">
+                            </div>
+                            <div class="relative">
+                                <label class="form-label">Client / Company Name</label>
+                                <input type="text" id="clientInput" name="client_name" autocomplete="off" placeholder="Type client name" class="form-input" required>
+                                <input type="hidden" id="clientIdHidden" name="client_id">
+                                <div id="clientSuggestions" class="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-20 hidden"></div>
+                            </div>
+                            <div>
+                                <label class="form-label">Location</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <input type="text" name="city" placeholder="e.g. Venice" class="form-input">
+                                    <input type="text" name="state" placeholder="e.g. VE" class="form-input">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label">Contract Type</label>
+                                <input type="text" name="contract_type" placeholder="e.g. Full-time" class="form-input">
+                            </div>
+                            <div>
+                                <label class="form-label">Open Positions</label>
+                                <input type="number" name="positions" min="1" step="1" placeholder="e.g. 1" class="form-input">
+                            </div>
+                            <div>
+                                <label class="form-label">Salary</label>
+                                <input type="text" name="salary" placeholder="e.g. €45,000 - €55,000" class="form-input">
+                            </div>
+                            <div>
+                                <label class="form-label">Deadline</label>
+                                <input type="date" name="deadline" class="form-input">
+                            </div>
+                            <div class="md:col-span-2 max-w-md">
+                                <label class="form-label">Current Status</label>
+                                <select name="status" class="form-input appearance-none">
+                                    <option value="open">Open</option>
+                                    <option value="inprogress">In Progress</option>
+                                    <option value="closed">Closed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Internal Notes -->
+                    <div class="ie-card glass-card p-8 rounded-3xl">
+                        <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Internal Notes</h3>
+                        <div>
+                            <label class="form-label">Notes</label>
+                            <textarea name="notes" rows="3" placeholder="Additional internal notes..." class="form-input resize-none"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Row 2: Details (full width) -->
+                <div class="ie-card glass-card p-8 rounded-3xl">
+                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Details</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="form-label">Job Description</label>
+                            <textarea name="description" rows="4" placeholder="Describe the role and responsibilities..." class="form-input resize-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="form-label">Requirements</label>
+                            <textarea name="requirements" rows="4" placeholder="Skills, certifications, and required years of experience..." class="form-input resize-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3: Associated Candidates (full width) -->
+                <div class="ie-card glass-card p-8 rounded-3xl">
+                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Associated Candidates</h3>
+                    <div id="associated-candidates-container"></div>
+                </div>
+
+                <!-- Row 4: Activity (full width) -->
+                <div class="ie-card glass-card p-8 rounded-3xl">
+                    <div id="activity-container"></div>
+                </div>
+
+            </form>
+
+        </div>
+        </div>
+        </main>
+    </div>
+
+    <!-- Supabase (auth + data) -->
+    <script src="shared/header-loader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="core/supabase.js"></script>
+    <script src="core/auth.js"></script>
+    <script src="core/router.js"></script>
+    <script src="components/page-header.js"></script>
+    <script src="core/entity-toolbar.js"></script>
+    <script src="core/lists-runtime.js"></script>
+    <script src="core/session/session.js"></script>
+    <script src="core/ui/modals.js"></script>
+    <script src="core/ui/previews.js"></script>
+    <script src="core/app-shell.js"></script>
+    <script src="shared/activity-section.js"></script>
+</body>
+</html>

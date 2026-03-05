@@ -1,0 +1,347 @@
+/* Portal design system: activity log — single source of truth */
+
+.entity-activity {
+  display: block;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.entity-activity__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.entity-activity__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.entity-activity__subtitle {
+  margin: 0;
+  font-size: 0.75rem;
+  color: rgba(107, 114, 128, 0.9);
+  font-style: italic;
+}
+
+.entity-activity__composer {
+  margin-top: 0.75rem;
+}
+
+.entity-activity__textarea {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.9rem;
+  background-color: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(27, 67, 50, 0.12);
+  font-size: 0.875rem;
+  color: #111827;
+  outline: none;
+  resize: vertical;
+  min-height: 64px;
+}
+
+.entity-activity__textarea:focus {
+  border-color: var(--ie-color-accent);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.16);
+}
+
+.entity-activity__composerRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+.entity-activity__addBtn,
+.entity-activity__showAllBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border-radius: 0.85rem;
+  border: 1px solid transparent;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  background-color: var(--ie-color-primary);
+  color: #ffffff;
+  transition: background-color 0.18s ease, transform 0.12s ease, opacity 0.18s ease;
+}
+
+.entity-activity__addBtn:hover,
+.entity-activity__showAllBtn:hover {
+  background-color: var(--ie-color-primary-soft);
+  transform: translateY(-1px);
+}
+
+.entity-activity__addBtn:disabled,
+.entity-activity__showAllBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.entity-activity__error {
+  margin-top: 0.45rem;
+  font-size: 0.75rem;
+  color: #b91c1c;
+  display: none;
+}
+
+.entity-activity__error.is-visible {
+  display: block;
+}
+
+.entity-activity__timeline {
+  position: relative;
+  margin-top: 0.9rem;
+  padding-left: 1.5rem;
+}
+
+.entity-activity__timeline::before {
+  content: "";
+  position: absolute;
+  left: 0.35rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e5e7eb;
+}
+
+.entity-activity__list {
+  position: relative;
+  padding-left: 1.25rem;
+}
+
+.entity-activity__list::before {
+  content: "";
+  position: absolute;
+  left: 0.4rem;
+  top: 0.1rem;
+  bottom: 0.1rem;
+  width: 2px;
+  background: rgba(15, 23, 42, 0.08);
+}
+
+.entity-activity__empty {
+  font-size: 0.875rem;
+  color: rgba(107, 114, 128, 0.9);
+  padding: 0.75rem 0;
+}
+
+.activity-log-loading,
+.activity-log-error {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.entity-activity__footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+
+/* Activity items (timeline entries) */
+.activity-item {
+  display: grid;
+  grid-template-columns: 0.9rem 1fr;
+  column-gap: 0.75rem;
+  padding: 0.55rem 0;
+}
+
+.activity-item__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--ie-color-accent);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.12);
+  margin-top: 0.35rem;
+}
+
+.activity-item__content {
+  min-width: 0;
+}
+
+.activity-item__headerRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.activity-item__who {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.activity-item__timeWrap {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.activity-item__timestamp {
+  font-size: 0.75rem;
+  color: rgba(17, 24, 39, 0.6);
+}
+
+.activity-item__edited {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(17, 24, 39, 0.45);
+}
+
+.activity-item__message {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  color: rgba(17, 24, 39, 0.92);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.activity-item__actions {
+  margin-top: 0.3rem;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.activity-item__actionBtn {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(27, 67, 50, 0.95);
+  cursor: pointer;
+}
+
+.activity-item__actionBtn:hover {
+  text-decoration: underline;
+}
+
+.activity-item__actionBtn--danger {
+  color: #b91c1c;
+}
+
+.activity-item__editTextarea {
+  width: 100%;
+  padding: 0.55rem 0.85rem;
+  border-radius: 0.85rem;
+  background-color: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(27, 67, 50, 0.12);
+  font-size: 0.875rem;
+  outline: none;
+  resize: vertical;
+}
+
+.activity-item__editTextarea:focus {
+  border-color: var(--ie-color-accent);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.16);
+}
+
+/* Entity type badges (profile My Activity) */
+.activity-entity-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  background-color: var(--ie-color-accent-soft);
+  color: var(--ie-color-accent);
+}
+
+.activity-entity-badge--candidate {
+  background-color: rgba(59, 130, 246, 0.08);
+  color: #1d4ed8;
+}
+
+.activity-entity-badge--job-offer {
+  background-color: rgba(16, 185, 129, 0.08);
+  color: #047857;
+}
+
+.activity-entity-badge--client {
+  background-color: rgba(251, 191, 36, 0.08);
+  color: #92400e;
+}
+
+/* Activity type badges */
+.activity-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.activity-badge--status_change {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.activity-badge--salary_update {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.activity-badge--rejection {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.activity-badge--system_event {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+/* Profile activity inline editor */
+.activity-log-editor {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--ie-color-border-subtle);
+}
+
+.activity-log-editor-input {
+  width: 100%;
+  min-height: 70px;
+  resize: vertical;
+  border-radius: 0.75rem;
+  border: 1px solid var(--ie-color-border-subtle);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.activity-log-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.activity-log-editor-error {
+  margin-top: 0.35rem;
+}
+

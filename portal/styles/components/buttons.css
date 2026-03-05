@@ -1,0 +1,69 @@
+/* Portal design system: unified button component (.ie-btn) */
+
+/* Design token for primary (gold) – set in style.css if not present */
+:root {
+  --gold: var(--ie-color-accent, #c5a059);
+  --eli-green: #1b4332;
+}
+
+/* Base button */
+.ie-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px 18px;
+
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+
+  border-radius: 10px;
+  border: 1px solid transparent;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+/* Primary button (gold) */
+.ie-btn-primary {
+  background: var(--gold);
+  color: white;
+}
+
+.ie-btn-primary:hover {
+  filter: brightness(0.95);
+}
+
+/* Secondary button (neutral outline) */
+.ie-btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.ie-btn-secondary:hover {
+  background: rgba(15, 23, 42, 0.04);
+}
+
+/* Danger button */
+.ie-btn-danger {
+  background: transparent;
+  border: 1px solid #e06a6a;
+  color: #c23d3d;
+}
+
+.ie-btn-danger:hover {
+  background: rgba(224, 106, 106, 0.08);
+}
+
+/* Success button (green – e.g. Add Log, Restore, Confirm) */
+.ie-btn-success {
+  background: var(--eli-green);
+  color: white;
+}
+
+.ie-btn-success:hover {
+  filter: brightness(0.95);
+}

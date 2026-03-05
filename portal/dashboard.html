@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,55 +8,38 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/ui.css">
 </head>
 <body class="flex min-h-screen" style="visibility: hidden;">
 
-    <!-- SIDEBAR (loaded dynamically from sidebar.html) -->
-    <aside id="sidebar"></aside>
+    <div class="portal-shell">
+        <!-- SIDEBAR (loaded dynamically from sidebar.html) -->
+        <div id="sidebar"></div>
 
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 flex flex-col min-w-0">
-        <!-- Header -->
-        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-8 sticky top-0 z-40">
-            <div class="flex items-center space-x-4">
-                <button data-toggle="sidebar" class="lg:hidden p-2 rounded-md hover:bg-gray-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
-                <a href="./dashboard.html" class="ie-back-button text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center space-x-1" data-back-button="true">
-                    <span aria-hidden="true">←</span>
-                    <span>Indietro</span>
-                </a>
-                <h1 class="text-2xl font-bold serif text-[#1b4332]">Dashboard Overview</h1>
-            </div>
-            
-            <div class="flex items-center space-x-6">
-                <div class="relative hidden sm:block">
-                    <input type="text" placeholder="Cerca candidati..." class="pl-10 pr-4 py-2 bg-gray-50 border-none rounded-full text-sm focus:ring-1 focus:ring-[#c5a059] w-64 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 top-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+        <!-- MAIN CONTENT -->
+        <main class="portal-main flex-1 flex flex-col min-w-0">
+        <div id="portal-header"></div>
+
+        <div class="portal-toolbar sticky-toolbar">
+            <div class="page-container toolbar-inner">
+                <div class="toolbar-left">
+                    <div class="portal-toolbar__left"></div>
                 </div>
-                <div class="flex items-center space-x-3 border-l pl-6 border-gray-100">
-                    <div class="text-right hidden md:block">
-                        <p class="text-sm font-semibold text-gray-800">Matteo Di Noia</p>
-                        <p class="text-[10px] uppercase tracking-tighter text-[#c5a059] font-bold">Admin</p>
-                    </div>
-                    <div class="w-10 h-10 rounded-full bg-gray-200 border-2 border-[#c5a059] overflow-hidden">
-                        <img src="https://ui-avatars.com/api/?name=Matteo+Di+Noia&background=1b4332&color=fff" alt="User">
-                    </div>
+                <div class="portal-toolbar__center"></div>
+                <div class="toolbar-right">
+                    <div class="portal-toolbar__right"></div>
                 </div>
             </div>
-        </header>
+        </div>
 
         <!-- Page Content -->
-        <div class="p-8 space-y-8 max-w-[1600px] mx-auto w-full">
-            
+        <div class="page-container">
+        <div class="portal-content p-8 space-y-8">
+
             <!-- Statistic Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="glass-card p-6 rounded-2xl">
+                <div class="glass-card ie-card dashboard-metric clickable p-6 rounded-2xl" onclick="IERouter.navigateTo('candidates')" role="button" tabindex="0">
                     <div class="flex justify-between items-start mb-4">
                         <div class="p-3 bg-green-50 rounded-xl text-[#1b4332]">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -65,11 +48,11 @@
                         </div>
                         <span class="dashboard-percentage text-xs font-bold" data-dashboard-percentage="totalCandidates">—</span>
                     </div>
-                    <h3 class="text-gray-500 text-xs uppercase tracking-widest font-semibold mb-1">Totale Candidati</h3>
+                    <h3 class="text-gray-500 text-xs uppercase tracking-widest font-semibold mb-1">Total candidates</h3>
                     <p class="text-3xl font-bold serif text-[#1b4332]" data-dashboard-value="totalCandidates" data-dashboard-loading><span class="dashboard-value">—</span></p>
                 </div>
 
-                <div class="glass-card p-6 rounded-2xl">
+                <div class="glass-card ie-card dashboard-metric clickable p-6 rounded-2xl" onclick="IERouter.navigateTo('jobOffers')" role="button" tabindex="0">
                     <div class="flex justify-between items-start mb-4">
                         <div class="p-3 bg-amber-50 rounded-xl text-[#c5a059]">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -78,11 +61,11 @@
                         </div>
                         <span class="dashboard-percentage text-xs font-bold" data-dashboard-percentage="activeJobOffers">—</span>
                     </div>
-                    <h3 class="text-gray-500 text-xs uppercase tracking-widest font-semibold mb-1">Offerte Attive</h3>
+                    <h3 class="text-gray-500 text-xs uppercase tracking-widest font-semibold mb-1">Active job offers</h3>
                     <p class="text-3xl font-bold serif text-[#1b4332]" data-dashboard-value="activeJobOffers" data-dashboard-loading><span class="dashboard-value">—</span></p>
                 </div>
 
-                <div class="glass-card p-6 rounded-2xl">
+                <div class="glass-card ie-card dashboard-metric clickable p-6 rounded-2xl" onclick="IERouter.navigateTo('candidates', { status: 'new' })" role="button" tabindex="0">
                     <div class="flex justify-between items-start mb-4">
                         <div class="p-3 bg-blue-50 rounded-xl text-blue-600">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -91,11 +74,11 @@
                         </div>
                         <span class="dashboard-percentage text-xs font-bold" data-dashboard-percentage="newCandidatesToday">—</span>
                     </div>
-                    <h3 class="text-gray-500 text-xs uppercase tracking-widest font-semibold mb-1">Nuovi Candidati</h3>
+                    <h3 class="text-gray-500 text-xs uppercase tracking-widest font-semibold mb-1">New candidates</h3>
                     <p class="text-3xl font-bold serif text-[#1b4332]" data-dashboard-value="newCandidatesToday" data-dashboard-loading><span class="dashboard-value">—</span></p>
                 </div>
 
-                <div class="glass-card p-6 rounded-2xl">
+                <div class="glass-card ie-card dashboard-metric clickable p-6 rounded-2xl" onclick="IERouter.navigateTo('candidates', { status: 'hired' })" role="button" tabindex="0">
                     <div class="flex justify-between items-start mb-4">
                         <div class="p-3 bg-purple-50 rounded-xl text-purple-600">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -104,7 +87,7 @@
                         </div>
                         <span class="dashboard-percentage text-xs font-bold" data-dashboard-percentage="hiredThisMonth">—</span>
                     </div>
-                    <h3 class="text-gray-500 text-xs uppercase tracking-widest font-semibold mb-1">Assunti</h3>
+                    <h3 class="text-gray-500 text-xs uppercase tracking-widest font-semibold mb-1">Hired</h3>
                     <p class="text-3xl font-bold serif text-[#1b4332]" data-dashboard-value="hiredThisMonth" data-dashboard-loading><span class="dashboard-value">—</span></p>
                 </div>
             </div>
@@ -113,51 +96,61 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
                 <!-- Recent Candidates Table -->
-                <div class="lg:col-span-2 glass-card rounded-2xl overflow-hidden">
+                <div class="lg:col-span-2 glass-card ie-card rounded-2xl overflow-hidden">
                     <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white/50">
-                        <h2 class="text-xl font-bold serif text-[#1b4332]">Candidati Recenti</h2>
-                        <button data-action="view-all-candidates" class="text-sm text-[#c5a059] font-semibold hover:underline">Vedi Tutti</button>
+                        <h2 class="text-xl font-bold serif text-[#1b4332]">Recent candidates</h2>
+                        <button data-action="view-all-candidates" class="ie-btn ie-btn-primary">View all</button>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left">
+                        <table class="ie-table w-full text-left">
                             <thead class="bg-gray-50/50 text-gray-500 text-[10px] uppercase tracking-widest">
                                 <tr>
-                                    <th class="px-6 py-4 font-bold">Nominativo</th>
-                                    <th class="px-6 py-4 font-bold">Ruolo Desiderato</th>
-                                    <th class="px-6 py-4 font-bold">Data</th>
-                                    <th class="px-6 py-4 font-bold">Stato</th>
+                                    <th class="px-6 py-4 font-bold">Name</th>
+                                    <th class="px-6 py-4 font-bold">Desired role</th>
+                                    <th class="px-6 py-4 font-bold">Date</th>
+                                    <th class="px-6 py-4 font-bold">Status</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100" data-dashboard="recentCandidates">
-                                <tr data-dashboard-placeholder><td colspan="4" class="px-6 py-8 text-center text-gray-400">Caricamento...</td></tr>
+                                <tr data-dashboard-placeholder><td colspan="4" class="px-6 py-8 text-center text-gray-400">Loading...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
                 <!-- Sources Distribution -->
-                <div class="glass-card rounded-2xl p-6">
-                    <h2 class="text-xl font-bold serif text-[#1b4332] mb-6">Candidati per Sorgente</h2>
+                <div class="glass-card ie-card rounded-2xl p-6">
+                    <h2 class="text-xl font-bold serif text-[#1b4332] mb-6">Candidates by source</h2>
                     
                     <div class="space-y-6" data-dashboard="candidatesBySource">
-                        <div data-dashboard-placeholder class="text-gray-400 text-sm py-4">Caricamento...</div>
+                        <div data-dashboard-placeholder class="text-gray-400 text-sm py-4">Loading...</div>
                     </div>
 
                     <div class="mt-8 p-4 bg-[#1b4332] rounded-xl text-white">
                         <p class="text-[10px] uppercase tracking-widest opacity-60 mb-1">Insights</p>
-                        <p class="text-sm font-light">I dati sono aggiornati in tempo reale dal database.</p>
+                        <p class="text-sm font-light">Data is updated in real time from the database.</p>
                     </div>
                 </div>
 
             </div>
 
         </div>
-    </main>
+        </div>
+        </main>
+    </div>
 
     <!-- Supabase (auth + data) -->
+    <script src="shared/header-loader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <script src="supabase.js"></script>
-    <script src="app.js"></script>
-    <script src="dashboard/dashboard.js"></script>
+    <script src="core/supabase.js"></script>
+    <script src="core/auth.js"></script>
+    <script src="core/router.js"></script>
+    <script src="components/page-header.js"></script>
+    <script src="core/entity-toolbar.js"></script>
+    <script src="core/lists-runtime.js"></script>
+    <script src="core/session/session.js"></script>
+    <script src="core/ui/modals.js"></script>
+    <script src="core/ui/previews.js"></script>
+    <script src="core/app-shell.js"></script>
 </body>
 </html>

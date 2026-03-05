@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add candidate | Italian Experience Recruitment</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/ui.css">
+</head>
+<body class="flex min-h-screen" style="visibility: hidden;">
+
+    <div class="portal-shell">
+        <!-- SIDEBAR (loaded dynamically from sidebar.html) -->
+        <div id="sidebar"></div>
+
+        <!-- MAIN CONTENT -->
+        <main class="portal-main flex-1 flex flex-col min-w-0">
+        <div id="portal-header"></div>
+
+        <div class="portal-toolbar sticky-toolbar">
+            <div class="page-container toolbar-inner">
+                <div class="toolbar-left">
+                    <div class="portal-toolbar__left"></div>
+                </div>
+                <div class="portal-toolbar__center">
+                    <div
+                        class="text-xs font-semibold tracking-widest uppercase text-gray-500"
+                        data-entity-mode-indicator="candidate"
+                    ></div>
+                </div>
+                <div class="toolbar-right">
+                    <div class="portal-toolbar__right">
+                        <div class="portal-toolbar__actions">
+                            <div
+                                id="candidateActions"
+                                class="flex items-center justify-end gap-2"
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div class="page-container">
+        <div class="portal-content p-8 space-y-8">
+
+            <form id="candidateForm" class="space-y-8">
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                    <!-- LEFT COLUMN: main information -->
+                    <div class="space-y-8 lg:col-span-2">
+
+                        <!-- Section: Personal Information -->
+                        <div class="ie-card glass-card p-8 rounded-3xl">
+                            <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Personal Information</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" name="first_name" placeholder="e.g. Alessandro" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" name="last_name" placeholder="e.g. Rossi" class="form-input">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="form-label">Address</label>
+                                    <input type="text" name="address" placeholder="e.g. Via Montenapoleone 1, Milan" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="form-label">Date of Birth</label>
+                                    <input type="date" name="date_of_birth" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="form-label">Email</label>
+                                    <input type="email" name="email" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" name="phone" class="form-input">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="form-label">LinkedIn</label>
+                                    <input type="url" name="linkedin_url" class="form-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section: Professional Information (Client Name removed) -->
+                        <div class="ie-card glass-card p-8 rounded-3xl">
+                            <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Professional Information</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="form-label">Position</label>
+                                    <input type="text" name="position" placeholder="e.g. Senior Sommelier" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="form-label">Status</label>
+                                    <select name="status" class="form-input appearance-none">
+                                        <option value="new">New</option>
+                                        <option value="interview">Interview</option>
+                                        <option value="hired">Hired</option>
+                                        <option value="rejected">Rejected</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label">Source</label>
+                                    <select name="source" class="form-input appearance-none">
+                                        <option value="linkedin">LinkedIn</option>
+                                        <option value="email">Email</option>
+                                        <option value="facebook">Facebook</option>
+                                        <option value="website">Website</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section: Professional Summary -->
+                        <div class="ie-card glass-card p-8 rounded-3xl">
+                            <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Professional Summary</h3>
+                            <div>
+                                <label class="form-label">Summary</label>
+                                <textarea name="summary" rows="4" class="form-input resize-none"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Section: Experience -->
+                        <div id="experienceSection" class="ie-card glass-card p-8 rounded-3xl" data-repeatable-section="experience">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Experience</h3>
+                                <button type="button" data-action="add-experience" class="ie-btn ie-btn-secondary">
+                                    Add Experience
+                                </button>
+                            </div>
+                            <div data-items="experience" class="space-y-6"></div>
+                            <p class="text-sm text-gray-400 italic mt-2">No experience added yet</p>
+                            <template id="experienceItemTemplate">
+                                <div class="space-y-4 border border-gray-100 rounded-2xl p-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="form-label">Role Title</label>
+                                            <input type="text" data-field="role_title" class="form-input" placeholder="e.g. Sommelier">
+                                        </div>
+                                        <div>
+                                            <label class="form-label">Company</label>
+                                            <input type="text" data-field="company" class="form-input" placeholder="e.g. Grand Hotel Milano">
+                                        </div>
+                                        <div>
+                                            <label class="form-label">Location</label>
+                                            <input type="text" data-field="location" class="form-input" placeholder="e.g. Milan, Italy">
+                                        </div>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="form-label">Start Date</label>
+                                                <input type="month" data-field="start_date" class="form-input">
+                                            </div>
+                                            <div>
+                                                <label class="form-label">End Date</label>
+                                                <input type="month" data-field="end_date" class="form-input">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Description</label>
+                                        <textarea data-field="description" rows="3" class="form-input resize-none" placeholder="Short description of responsibilities and key achievements..."></textarea>
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button type="button" data-action="remove-experience" class="ie-btn ie-btn-secondary">
+                                            Remove Experience
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Section: Education -->
+                        <div id="educationSection" class="ie-card glass-card p-8 rounded-3xl" data-repeatable-section="education">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Education</h3>
+                                <button type="button" data-action="add-education" class="ie-btn ie-btn-secondary">
+                                    Add Education
+                                </button>
+                            </div>
+                            <div data-items="education" class="space-y-6"></div>
+                            <p class="text-sm text-gray-400 italic mt-2">No education entries added yet</p>
+                            <template id="educationItemTemplate">
+                                <div class="space-y-4 border border-gray-100 rounded-2xl p-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="form-label">Institution</label>
+                                            <input type="text" data-field="institution" class="form-input" placeholder="e.g. University of Milan">
+                                        </div>
+                                        <div>
+                                            <label class="form-label">Degree</label>
+                                            <input type="text" data-field="degree" class="form-input" placeholder="e.g. Degree in Enology">
+                                        </div>
+                                        <div>
+                                            <label class="form-label">Field of Study</label>
+                                            <input type="text" data-field="field_of_study" class="form-input" placeholder="e.g. Hospitality Management">
+                                        </div>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="form-label">Start Year</label>
+                                                <input type="number" data-field="start_year" class="form-input" placeholder="e.g. 2018">
+                                            </div>
+                                            <div>
+                                                <label class="form-label">End Year</label>
+                                                <input type="number" data-field="end_year" class="form-input" placeholder="e.g. 2021">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button type="button" data-action="remove-education" class="ie-btn ie-btn-secondary">
+                                            Remove Education
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Section: Skills -->
+                        <div id="skillsSection" class="ie-card glass-card p-8 rounded-3xl" data-repeatable-section="skills">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Skills</h3>
+                                <button
+                                    type="button"
+                                    data-action="add-skill"
+                                    class="ie-btn ie-btn-secondary"
+                                >
+                                    + Add Skill
+                                </button>
+                            </div>
+                            <div data-items="skills" class="space-y-4"></div>
+                            <p class="empty-state text-sm text-gray-400 italic mt-2">No skills added yet</p>
+                            <template id="skillItemTemplate">
+                                <div class="flex items-center gap-3 mb-3" data-item-section="skills">
+                                    <input
+                                        type="text"
+                                        data-field="skill"
+                                        placeholder="e.g. Wine pairing"
+                                        class="form-input flex-1"
+                                    >
+                                    <button
+                                        type="button"
+                                        data-action="remove-skill"
+                                        class="ie-btn ie-btn-secondary"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Section: Hobbies -->
+                        <div id="hobbiesSection" class="ie-card glass-card p-8 rounded-3xl" data-repeatable-section="hobbies">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Hobbies &amp; Interests</h3>
+                                <button
+                                    type="button"
+                                    data-action="add-hobby"
+                                    class="ie-btn ie-btn-secondary"
+                                >
+                                    + Add Hobby
+                                </button>
+                            </div>
+                            <div data-items="hobbies" class="space-y-4"></div>
+                            <p class="empty-state text-sm text-gray-400 italic mt-2">No hobbies added yet</p>
+                            <template id="hobbyItemTemplate">
+                                <div class="flex items-center gap-3 mb-3" data-item-section="hobbies">
+                                    <input
+                                        type="text"
+                                        data-field="hobby"
+                                        placeholder="e.g. Hiking, photography"
+                                        class="form-input flex-1"
+                                    >
+                                    <button
+                                        type="button"
+                                        data-action="remove-hobby"
+                                        class="ie-btn ie-btn-secondary"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Section: Languages -->
+                        <div id="languagesSection" class="ie-card glass-card p-8 rounded-3xl" data-repeatable-section="languages">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Languages</h3>
+                                <button
+                                    type="button"
+                                    data-action="add-language"
+                                    class="ie-btn ie-btn-secondary"
+                                >
+                                    + Add Language
+                                </button>
+                            </div>
+                            <div data-items="languages" class="space-y-4"></div>
+                            <p class="empty-state text-sm text-gray-400 italic mt-2">No languages added yet</p>
+                            <template id="languageItemTemplate">
+                                <div class="flex items-center gap-3 mb-3 flex-wrap" data-item-section="languages">
+                                    <input
+                                        type="text"
+                                        data-field="language"
+                                        placeholder="e.g. English"
+                                        class="form-input flex-1 min-w-[140px]"
+                                    >
+                                    <input
+                                        type="text"
+                                        data-field="proficiency"
+                                        placeholder="e.g. C1, Native"
+                                        class="form-input w-[140px]"
+                                    >
+                                    <button
+                                        type="button"
+                                        data-action="remove-language"
+                                        class="ie-btn ie-btn-secondary"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Section: Certifications -->
+                        <div id="certificationsSection" class="ie-card glass-card p-8 rounded-3xl" data-repeatable-section="certifications">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Certifications</h3>
+                                <button
+                                    type="button"
+                                    data-action="add-certification"
+                                    class="ie-btn ie-btn-secondary"
+                                >
+                                    + Add Certification
+                                </button>
+                            </div>
+                            <div data-items="certifications" class="space-y-6"></div>
+                            <p class="empty-state text-sm text-gray-400 italic mt-2">No certifications added yet</p>
+                            <template id="certificationItemTemplate">
+                                <div class="flex items-center gap-3 mb-3 flex-wrap" data-item-section="certifications">
+                                    <input
+                                        type="text"
+                                        data-field="name"
+                                        placeholder="e.g. WSET Level 3"
+                                        class="form-input flex-1 min-w-[160px]"
+                                    >
+                                    <input
+                                        type="text"
+                                        data-field="issuer"
+                                        placeholder="e.g. WSET"
+                                        class="form-input flex-1 min-w-[140px]"
+                                    >
+                                    <input
+                                        type="date"
+                                        data-field="issue_date"
+                                        class="form-input w-[150px]"
+                                    >
+                                    <input
+                                        type="date"
+                                        data-field="expiry_date"
+                                        class="form-input w-[150px]"
+                                    >
+                                    <button
+                                        type="button"
+                                        data-action="remove-certification"
+                                        class="ie-btn ie-btn-secondary"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+
+                    </div>
+
+                    <!-- RIGHT COLUMN: documents, notes, activity -->
+                    <div class="space-y-8 lg:col-span-1">
+
+                        <!-- Section: Documents -->
+                        <div id="candidateDocumentsSection" class="ie-card glass-card p-8 rounded-3xl">
+                            <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Documents</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div>
+                                    <label class="form-label">Upload CV (PDF)</label>
+                                    <div class="candidate-file-block" data-file-type="cv">
+                                        <div class="file-state text-xs text-gray-500"></div>
+                                        <div class="file-actions mt-2 flex flex-wrap gap-2"></div>
+                                        <input type="file" name="cv_file" accept=".pdf" class="hidden">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="form-label">Upload Photo</label>
+                                    <div class="candidate-file-block" data-file-type="photo">
+                                        <div class="file-state text-xs text-gray-500"></div>
+                                        <div class="file-actions mt-2 flex flex-wrap gap-2"></div>
+                                        <input type="file" name="foto_file" accept="image/*" class="hidden">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section: Notes -->
+                        <div class="ie-card glass-card p-8 rounded-3xl">
+                            <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Additional Notes</h3>
+                            <div>
+                                <label class="form-label">Notes</label>
+                                <textarea name="notes" rows="4" placeholder="Enter any additional notes about the candidate..." class="form-input resize-none"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Activity placeholder -->
+                        <div id="activity-container"></div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+        </div>
+        </main>
+    </div>
+
+    <!-- Supabase (auth + data) -->
+    <script src="shared/header-loader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="core/supabase.js"></script>
+    <script src="core/auth.js"></script>
+    <script src="core/router.js"></script>
+    <script src="components/page-header.js"></script>
+    <script src="core/entity-toolbar.js"></script>
+    <script src="core/lists-runtime.js"></script>
+    <script src="core/session/session.js"></script>
+    <script src="core/ui/modals.js"></script>
+    <script src="core/ui/previews.js"></script>
+    <script src="core/app-shell.js"></script>
+    <script src="shared/activity-section.js"></script>
+</body>
+</html>

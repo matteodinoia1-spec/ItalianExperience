@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,188 +8,195 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/ui.css">
 </head>
 <body class="flex min-h-screen" style="visibility: hidden;">
 
-    <!-- SIDEBAR (loaded dynamically from sidebar.html) -->
-    <aside id="sidebar"></aside>
+    <div class="portal-shell">
+        <!-- SIDEBAR (loaded dynamically from sidebar.html) -->
+        <div id="sidebar"></div>
 
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 flex flex-col min-w-0">
-        <!-- Header -->
-        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-8 sticky top-0 z-40">
-            <div class="flex items-center space-x-4">
-                <button data-toggle="sidebar" class="lg:hidden p-2 rounded-md hover:bg-gray-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
-                <a href="./dashboard.html" class="ie-back-button text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center space-x-1" data-back-button="true">
-                    <span aria-hidden="true">←</span>
-                    <span>Indietro</span>
-                </a>
-                <h1 class="text-2xl font-bold serif text-[#1b4332]">Candidate Profile</h1>
-            </div>
-            
-            <div class="flex items-center space-x-6">
-                <div class="text-right hidden md:block">
-                    <p class="text-sm font-semibold text-gray-800">Matteo Di Noia</p>
-                    <p class="text-[10px] uppercase tracking-tighter text-[#c5a059] font-bold">Admin</p>
+        <!-- MAIN CONTENT -->
+        <main class="portal-main flex-1 flex flex-col min-w-0">
+        <div id="portal-header"></div>
+
+        <div class="portal-toolbar sticky-toolbar">
+            <div class="page-container toolbar-inner">
+                <div class="toolbar-left">
+                    <div class="portal-toolbar__left"></div>
                 </div>
-                <div class="w-10 h-10 rounded-full bg-gray-200 border-2 border-[#c5a059] overflow-hidden">
-                    <img src="https://ui-avatars.com/api/?name=Matteo+Di+Noia&background=1b4332&color=fff" alt="User">
+                <div class="portal-toolbar__center"></div>
+                <div class="toolbar-right">
+                    <div class="portal-toolbar__right">
+                        <div class="portal-toolbar__actions">
+                            <div id="candidateActions" class="flex items-center gap-2"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </header>
+        </div>
 
         <!-- Page Content -->
-        <div class="p-8 space-y-8 max-w-6xl mx-auto w-full">
+        <div class="page-container">
+        <div class="portal-content p-8 space-y-8">
+
+            <!-- Entity hero -->
+            <section class="ie-card glass-card p-8 rounded-3xl">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                    <div class="flex items-center gap-4">
+                        <div class="candidate-hero-avatar w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden bg-gray-100 border border-gray-200 flex items-center justify-center flex-shrink-0">
+                            <img
+                                src="https://ui-avatars.com/api/?name=Candidate&background=1b4332&color=fff"
+                                alt="Candidate photo"
+                                class="w-full h-full object-cover"
+                                data-doc-photo
+                            >
+                        </div>
+                        <div>
+                            <input type="text" class="form-input field-display serif text-2xl font-bold text-[#1b4332] w-full" data-field="full-name" readonly value="—">
+                            <input type="text" class="form-input field-display text-sm text-gray-500 w-full" data-field="position" readonly value="—">
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-start md:items-end gap-2">
+                        <input
+                            type="text"
+                            class="form-input field-display px-3 py-1 rounded-full text-xs font-semibold w-auto inline-block"
+                            data-field="status-badge"
+                            readonly
+                            value="—"
+                        >
+                        <div class="text-xs text-gray-500">
+                            <span class="font-semibold uppercase tracking-widest mr-2">Availability</span>
+                            <input type="text" class="form-input field-display inline-block w-auto min-w-0 text-xs text-gray-500" data-field="status-text" readonly value="—">
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             <div id="candidateProfileRoot" data-candidate-root class="max-w-6xl mx-auto space-y-8">
 
-                <!-- Candidate Header -->
-                <section class="glass-card p-8 rounded-3xl">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div>
-                            <h2 class="serif text-2xl font-bold text-[#1b4332]" data-field="full-name">—</h2>
-                            <p class="text-sm text-gray-500" data-field="position">—</p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span
-                                class="px-3 py-1 rounded-full text-xs font-semibold border border-gray-200 text-gray-700 bg-gray-50"
-                                data-field="status-badge"
-                            >
-                                —
-                            </span>
-                            <button
-                                type="button"
-                                data-action="edit-candidate"
-                                class="px-4 py-2 rounded-xl bg-[#1b4332] text-white text-sm font-semibold shadow-md hover:bg-[#1b4332]/90 transition"
-                            >
-                                Edit
-                            </button>
-                            <button
-                                type="button"
-                                data-action="back-to-list"
-                                class="px-4 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
-                            >
-                                Back
-                            </button>
-                        </div>
-                    </div>
+                <!-- Row 1: Candidate Information & Internal Notes -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-                    <!-- Core details -->
-                    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Email</p>
-                            <div class="text-gray-800 text-sm break-all" data-field="email">—</div>
-                        </div>
-                        <div>
-                            <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Phone</p>
-                            <div class="text-gray-800 text-sm" data-field="phone">—</div>
-                        </div>
-                        <div>
-                            <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">LinkedIn</p>
-                            <div class="text-gray-800 text-sm break-all" data-field="linkedin_url">—</div>
-                        </div>
-                        <div>
-                            <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Date of Birth</p>
-                            <div class="text-gray-800 text-sm" data-field="date_of_birth">—</div>
-                        </div>
-                        <div>
-                            <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Address</p>
-                            <div class="text-gray-800 text-sm" data-field="address">—</div>
-                        </div>
-                        <div>
-                            <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Status</p>
-                            <div class="text-gray-800 text-sm" data-field="status-text">—</div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Professional Summary -->
-                <section class="glass-card p-8 rounded-3xl">
-                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Professional Summary</h3>
-                    <div class="mt-3 text-gray-800 text-sm leading-relaxed whitespace-pre-line" data-field="summary">—</div>
-                </section>
-
-                <!-- Skills -->
-                <section class="glass-card p-8 rounded-3xl">
-                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Skills</h3>
-                    <ul class="list-disc ml-6 mt-3 space-y-1 text-sm text-gray-800" data-list="skills"></ul>
-                    <p class="text-sm text-gray-400 italic mt-2" data-empty="skills">No skills recorded</p>
-                </section>
-
-                <!-- Languages -->
-                <section class="glass-card p-8 rounded-3xl">
-                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Languages</h3>
-                    <ul class="list-disc ml-6 mt-3 space-y-1 text-sm text-gray-800" data-list="languages"></ul>
-                    <p class="text-sm text-gray-400 italic mt-2" data-empty="languages">No languages recorded</p>
-                </section>
-
-                <!-- Certifications -->
-                <section class="glass-card p-8 rounded-3xl">
-                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Certifications</h3>
-                    <ul class="list-disc ml-6 mt-3 space-y-1 text-sm text-gray-800" data-list="certifications"></ul>
-                    <p class="text-sm text-gray-400 italic mt-2" data-empty="certifications">No certifications recorded</p>
-                </section>
-
-                <!-- Experience -->
-                <section class="glass-card p-8 rounded-3xl">
-                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Experience</h3>
-                    <div class="mt-3 space-y-4" data-list="experience"></div>
-                    <p class="text-sm text-gray-400 italic mt-2" data-empty="experience">No experience recorded</p>
-                </section>
-
-                <!-- Education -->
-                <section class="glass-card p-8 rounded-3xl">
-                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Education</h3>
-                    <div class="mt-3 space-y-4" data-list="education"></div>
-                    <p class="text-sm text-gray-400 italic mt-2" data-empty="education">No education recorded</p>
-                </section>
-
-                <!-- Documents -->
-                <section class="glass-card p-8 rounded-3xl">
-                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Documents</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
-                        <div>
-                            <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Curriculum Vitae</p>
+                    <!-- Candidate Information -->
+                    <section class="glass-card ie-card p-8 rounded-3xl">
+                        <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Candidate Information</h3>
+                        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <a
-                                    href="#"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="hidden inline-flex items-center px-4 py-2 rounded-lg bg-[#1b4332] text-white text-xs font-semibold shadow hover:bg-[#1b4332]/90 transition"
-                                    data-doc-link="cv"
-                                >
-                                    View CV
-                                </a>
-                                <p class="text-sm text-gray-400 italic" data-doc-empty="cv">No CV uploaded</p>
+                                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Email</p>
+                                <input type="text" class="form-input field-display text-gray-800 text-sm break-all w-full" data-field="email" readonly value="—">
+                            </div>
+                            <div>
+                                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Phone</p>
+                                <input type="text" class="form-input field-display text-gray-800 text-sm w-full" data-field="phone" readonly value="—">
+                            </div>
+                            <div>
+                                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">LinkedIn</p>
+                                <input type="text" class="form-input field-display text-gray-800 text-sm break-all w-full" data-field="linkedin_url" readonly value="—">
+                            </div>
+                            <div>
+                                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Date of Birth</p>
+                                <input type="text" class="form-input field-display text-gray-800 text-sm w-full" data-field="date_of_birth" readonly value="—">
+                            </div>
+                            <div>
+                                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Address</p>
+                                <input type="text" class="form-input field-display text-gray-800 text-sm w-full" data-field="address" readonly value="—">
+                            </div>
+                            <div>
+                                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Status</p>
+                                <input type="text" class="form-input field-display text-gray-800 text-sm w-full" data-field="status-text" readonly value="—">
                             </div>
                         </div>
-                        <div>
-                            <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Photo</p>
-                            <div class="flex items-center gap-4 mt-2">
-                                <div class="w-20 h-20 rounded-full overflow-hidden bg-gray-100 border border-gray-200 flex items-center justify-center">
-                                    <img
-                                        src="https://ui-avatars.com/api/?name=Candidato&background=1b4332&color=fff"
-                                        alt="Candidate photo"
-                                        class="w-full h-full object-cover"
-                                        data-doc-photo
+                    </section>
+
+                    <!-- Internal Notes -->
+                    <section class="glass-card ie-card p-8 rounded-3xl">
+                        <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Internal Notes</h3>
+                        <p class="text-sm text-gray-500">
+                            Use the activity section below to capture important updates and context about this candidate.
+                        </p>
+                    </section>
+
+                </div>
+
+                <!-- Row 2: Candidate Details (full width) -->
+                <div class="space-y-8">
+
+                    <!-- Professional Summary -->
+                    <section class="glass-card ie-card p-8 rounded-3xl">
+                        <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Professional Summary</h3>
+                        <textarea class="form-input field-display mt-3 text-gray-800 text-sm leading-relaxed whitespace-pre-line w-full resize-none" data-field="summary" rows="4" readonly>—</textarea>
+                    </section>
+
+                    <!-- Skills -->
+                    <section class="glass-card ie-card p-8 rounded-3xl">
+                        <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Skills</h3>
+                        <ul class="list-disc ml-6 mt-3 space-y-1 text-sm text-gray-800" data-list="skills"></ul>
+                        <p class="text-sm text-gray-400 italic mt-2" data-empty="skills">No skills recorded</p>
+                    </section>
+
+                    <!-- Languages -->
+                    <section class="glass-card ie-card p-8 rounded-3xl">
+                        <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Languages</h3>
+                        <ul class="list-disc ml-6 mt-3 space-y-1 text-sm text-gray-800" data-list="languages"></ul>
+                        <p class="text-sm text-gray-400 italic mt-2" data-empty="languages">No languages recorded</p>
+                    </section>
+
+                    <!-- Certifications -->
+                    <section class="glass-card ie-card p-8 rounded-3xl">
+                        <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Certifications</h3>
+                        <ul class="list-disc ml-6 mt-3 space-y-1 text-sm text-gray-800" data-list="certifications"></ul>
+                        <p class="text-sm text-gray-400 italic mt-2" data-empty="certifications">No certifications recorded</p>
+                    </section>
+
+                    <!-- Experience -->
+                    <section class="glass-card ie-card p-8 rounded-3xl">
+                        <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Experience</h3>
+                        <div class="mt-3 space-y-4" data-list="experience"></div>
+                        <p class="text-sm text-gray-400 italic mt-2" data-empty="experience">No experience recorded</p>
+                    </section>
+
+                    <!-- Education -->
+                    <section class="glass-card ie-card p-8 rounded-3xl">
+                        <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Education</h3>
+                        <div class="mt-3 space-y-4" data-list="education"></div>
+                        <p class="text-sm text-gray-400 italic mt-2" data-empty="education">No education recorded</p>
+                    </section>
+
+                    <!-- Documents -->
+                    <section class="glass-card ie-card p-8 rounded-3xl">
+                        <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Documents</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+                            <div>
+                                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Curriculum Vitae</p>
+                                <div>
+                                    <a
+                                        href="#"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="hidden ie-btn ie-btn-primary"
+                                        data-doc-link="cv"
                                     >
+                                        View CV
+                                    </a>
+                                    <p class="text-sm text-gray-400 italic" data-doc-empty="cv">No CV uploaded</p>
                                 </div>
+                            </div>
+                            <div>
+                                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Photo</p>
                                 <p class="text-sm text-gray-400 italic" data-doc-empty="photo">No photo uploaded</p>
                             </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-                <!-- Associated Offers -->
-                <section class="glass-card p-8 rounded-3xl">
+                </div>
+
+                <!-- Row 3: Associated Job Offers (full width) -->
+                <section class="glass-card ie-card p-8 rounded-3xl">
                     <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Associated Offers</h3>
                     <div class="mt-4 overflow-x-auto">
-                        <table class="min-w-full text-sm">
+                        <table class="ie-table min-w-full text-sm">
                             <thead class="bg-gray-50/80 text-gray-500 text-[10px] uppercase tracking-widest">
                                 <tr>
                                     <th class="px-4 py-3 text-left font-bold">Offer</th>
@@ -204,45 +211,69 @@
                     <p class="text-sm text-gray-400 italic mt-2" data-empty="associated-offers">No associated offers yet</p>
                 </section>
 
-                <!-- Activity Log -->
-                <section id="candidateActivityLog" class="glass-card p-8 rounded-3xl">
+                <!-- Row 4: Activity (full width) -->
+                <section id="candidateActivityLog" class="glass-card ie-card p-8 rounded-3xl">
                     <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Activity Log</h3>
 
-                    <div class="mt-4">
-                        <textarea
-                            id="candidateLogInput"
-                            class="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1b4332]/40 focus:border-[#1b4332]/60"
-                            rows="3"
-                            placeholder="Add a note about this candidate..."
-                        ></textarea>
-                        <div class="mt-2 flex justify-end">
-                            <button
-                                id="candidateAddLogBtn"
-                                type="button"
-                                class="bg-[#1b4332] text-white px-4 py-2 rounded-md text-sm font-semibold shadow hover:bg-[#1b4332]/90 transition"
-                            >
-                                Add Note
-                            </button>
+                    <div class="entity-activity">
+                        <div class="entity-activity__composer mt-4">
+                            <textarea
+                                id="candidateLogInput"
+                                class="entity-activity__textarea w-full border border-gray-200 rounded-lg p-3 text-sm"
+                                rows="3"
+                                placeholder="Add a note about this candidate..."
+                            ></textarea>
+                            <div class="entity-activity__composerRow mt-2 flex justify-end">
+                                <button
+                                    id="candidateAddLogBtn"
+                                    type="button"
+                                    class="ie-btn ie-btn-success entity-activity__addBtn"
+                                >
+                                    Add Note
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                    <div id="candidateLogList" class="mt-4 space-y-3"></div>
+                        <div id="candidateLogList" class="entity-activity__timeline mt-4 space-y-3"></div>
 
-                    <div id="candidateLogEmpty" class="mt-2 text-sm text-gray-500 italic hidden">
-                        No activity yet.
+                        <div id="candidateLogEmpty" class="entity-activity__empty mt-2 hidden">
+                            No activity yet.
+                        </div>
                     </div>
                 </section>
 
             </div>
 
         </div>
-    </main>
+        </div>
+        </main>
+    </div>
 
     <!-- Supabase (auth + data) -->
+    <script>
+      window.pageMeta = {
+        title: "Candidate",
+        subtitle: "Candidate profile",
+        breadcrumbs: [
+          { label: "Dashboard", entity: "dashboard" },
+          { label: "Candidates", entity: "candidates" },
+          { label: "Candidate" }
+        ]
+      };
+    </script>
+    <script src="shared/header-loader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <script src="supabase.js"></script>
-    <script src="app.js"></script>
-    <script src="candidate/candidate.js"></script>
+    <script src="core/supabase.js"></script>
+    <script src="core/auth.js"></script>
+    <script src="core/router.js"></script>
+    <script src="components/page-header.js"></script>
+    <script src="core/entity-toolbar.js"></script>
+    <script src="core/lists-runtime.js"></script>
+    <script src="core/session/session.js"></script>
+    <script src="core/ui/modals.js"></script>
+    <script src="core/ui/previews.js"></script>
+    <script src="core/app-shell.js"></script>
+    <script src="features/candidates/candidate.js"></script>
 </body>
 </html>
 
