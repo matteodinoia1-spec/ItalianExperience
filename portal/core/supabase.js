@@ -166,7 +166,7 @@
   // ---------------------------------------------------------------------------
 
   function assertEntity(entityType, entityId) {
-    const allowed = ["candidate", "job_offer", "client"];
+    const allowed = ["candidate", "job_offer", "client", "application"];
     if (!allowed.includes(entityType)) {
       throw new Error("Invalid entityType");
     }
@@ -644,42 +644,20 @@
   async function getJobOfferById(id) {
     if (!id) return { data: null, error: new Error("Missing id") };
     try {
+      // Use a simple, robust query shape to avoid join or view issues.
       const { data, error } = await supabase
         .from("job_offers")
-        .select(
-          `
-            *,
-            created_by_profile:profiles!job_offers_created_by_profiles_fkey(
-              id,
-              first_name,
-              last_name
-            ),
-            updated_by_profile:profiles!job_offers_updated_by_profiles_fkey(
-              id,
-              first_name,
-              last_name
-            ),
-            clients (
-              id,
-              name,
-              city,
-              state
-            )
-          `
-        )
+        .select("*")
         .eq("id", id)
-        .maybeSingle();
+        .single();
       if (error) {
-        console.error("[Supabase] getJobOfferById error:", error.message, error);
+        console.error("[Supabase] getJobOfferById error:", error);
         return { data: null, error };
       }
-      if (!data) return { data: null, error: null };
-      const client = data.clients || null;
-      const normalized = {
-        ...data,
-        client_name: data.client_name || (client && client.name) || null,
-      };
-      return { data: normalized, error: null };
+      if (!data) {
+        return { data: null, error: null };
+      }
+      return { data, error: null };
     } catch (err) {
       console.error("[Supabase] getJobOfferById exception:", err);
       return { data: null, error: err };
@@ -783,7 +761,7 @@
           .from("candidate_job_associations")
           .update({ status: "not_selected" })
           .eq("job_offer_id", id)
-          .not("status", "in", "(hired,rejected,not_selected)")
+          .not("status", "in", "(hired,rejected,not_selected,withdrawn)")
           .select("candidate_id");
 
         if (assocError) {
@@ -984,6 +962,22 @@
         console.error("[Supabase] fetchCandidatesPaginated data error:", dataError.message);
         return { data: [], totalCount, error: dataError };
       }
+      function computeDerivedAvailabilityFromAssociations(associations) {
+        if (!Array.isArray(associations) || associations.length === 0) return "available";
+        const activeStatuses = ["applied", "screening", "interview", "offer", "new", "offered"];
+        const hasHired = associations.some(function (a) {
+          const s = (a && a.status && String(a.status)).toLowerCase();
+          return s === "hired";
+        });
+        if (hasHired) return "working";
+        const hasActive = associations.some(function (a) {
+          const s = (a && a.status && String(a.status)).toLowerCase();
+          return s === "hired" || activeStatuses.indexOf(s) !== -1;
+        });
+        if (hasActive) return "in_process";
+        return "available";
+      }
+
       const data = (rows || []).map(function (r) {
         let latestAssociation = null;
         if (Array.isArray(r.candidate_job_associations) && r.candidate_job_associations.length > 0) {
@@ -1008,6 +1002,8 @@
 
         const latestAssociationStatus = latestAssociation && latestAssociation.status ? latestAssociation.status : null;
 
+        const derived_availability = computeDerivedAvailabilityFromAssociations(r.candidate_job_associations);
+
         return {
           id: r.id,
           first_name: r.first_name,
@@ -1025,6 +1021,7 @@
             typeof r.cv_url === "string" && r.cv_url.trim().length > 0
               ? r.cv_url
               : null,
+          derived_availability: derived_availability,
           latest_association: latestAssociation
             ? {
                 id: latestAssociation.id,
@@ -1274,48 +1271,18 @@
   async function getClientById(id) {
     if (!id) return { data: null, error: new Error("Missing id") };
     try {
+      // Use a simple, robust query shape to avoid join or view issues.
       const { data, error } = await supabase
         .from("clients")
-        .select(
-          `
-            *,
-            created_by_profile:profiles!clients_created_by_profiles_fkey(
-              id,
-              first_name,
-              last_name
-            ),
-            updated_by_profile:profiles!clients_updated_by_profiles_fkey(
-              id,
-              first_name,
-              last_name
-            )
-          `
-        )
+        .select("*")
         .eq("id", id)
         .single();
       if (error) {
-        console.error("[Supabase] getClientById error:", error.message, error);
+        console.error("[Supabase] getClientById error:", error);
         return { data: null, error };
       }
-      const row = data;
       return {
-        data: row
-          ? {
-              id: row.id,
-              name: row.name,
-              city: row.city,
-              state: row.state,
-              country: row.country,
-              email: row.email,
-              phone: row.phone,
-              notes: row.notes,
-              is_archived: !!row.is_archived,
-              created_at: row.created_at,
-              updated_at: row.updated_at,
-              created_by_profile: row.created_by_profile || null,
-              updated_by_profile: row.updated_by_profile || null,
-            }
-          : null,
+        data: data || null,
         error: null,
       };
     } catch (err) {
@@ -1793,46 +1760,66 @@
   // Candidate–Job associations
   // ---------------------------------------------------------------------------
 
+  // recalculateCandidateAvailability is deprecated in favor of derived availability from applications.
   /**
    * Recalculate a candidate's availability_status based on active associations.
+   * Compatibility layer: availability is now derived from applications in the UI;
+   * this still writes availability_status for backward compatibility and search filters.
    * A candidate is unavailable if they have ANY association whose status is NOT
-   * in ("rejected", "not_selected"); otherwise they are available.
+   * in ("rejected", "not_selected", "withdrawn"); otherwise they are available.
    * This helper must NOT call updateCandidateAssociationStatus to avoid loops.
    * @param {string} candidateId
+   * @returns {Promise<{ data: object | null, error: object | null }>}
    */
   async function recalculateCandidateAvailability(candidateId) {
-    if (!candidateId) return;
+    if (!candidateId) {
+      const error = new Error("Missing candidateId");
+      console.error("[Supabase] recalculateCandidateAvailability:", error);
+      return { data: null, error };
+    }
     try {
-      const { count, error } = await supabase
+      const { data: rows, error } = await supabase
         .from("candidate_job_associations")
-        .select("id", { count: "exact", head: true })
-        .eq("candidate_id", candidateId)
-        .not("status", "in", "(rejected,not_selected)");
-
+        .select("status")
+        .eq("candidate_id", candidateId);
       if (error) {
         console.error(
-          "[Supabase] recalculateCandidateAvailability count error:",
+          "[Supabase] recalculateCandidateAvailability fetch error:",
           error.message || error,
           { candidateId }
         );
-        return;
+        return { data: null, error };
       }
-
-      const hasActiveAssociations = (count ?? 0) > 0;
-      const { error: updateErr } = await supabase
+      const associations = Array.isArray(rows) ? rows : [];
+      const hasActive = associations.some(function (row) {
+        const raw = row && row.status ? String(row.status).toLowerCase() : "";
+        if (!raw) return false;
+        // Treat anything that is not an explicit terminal status as active.
+        return raw !== "rejected" && raw !== "not_selected" && raw !== "withdrawn";
+      });
+      const availability = hasActive ? "unavailable" : "available";
+      const { data: updated, error: updateError } = await supabase
         .from("candidates")
-        .update({ availability_status: hasActiveAssociations ? "unavailable" : "available" })
-        .eq("id", candidateId);
-
-      if (updateErr) {
+        .update({ availability_status: availability })
+        .eq("id", candidateId)
+        .select("id, availability_status")
+        .single();
+      if (updateError) {
         console.error(
           "[Supabase] recalculateCandidateAvailability update error:",
-          updateErr.message || updateErr,
+          updateError.message || updateError,
           { candidateId }
         );
+        return { data: null, error: updateError };
       }
+      return { data: updated || null, error: null };
     } catch (err) {
-      console.error("[Supabase] recalculateCandidateAvailability exception:", err, { candidateId });
+      console.error(
+        "[Supabase] recalculateCandidateAvailability exception:",
+        err,
+        { candidateId }
+      );
+      return { data: null, error: err };
     }
   }
 
@@ -1948,11 +1935,31 @@
         console.error("[Supabase] linkCandidateToJob:", err.message);
         return { data: null, error: err };
       }
+      const jobOfferId = payload.job_offer_id;
+      const { data: existing, error: existingErr } = await supabase
+        .from("candidate_job_associations")
+        .select("id, status")
+        .eq("candidate_id", candidateId)
+        .eq("job_offer_id", jobOfferId)
+        .not("status", "in", "(rejected,withdrawn,not_selected)")
+        .maybeSingle();
+      if (existingErr) {
+        console.error("[Supabase] linkCandidateToJob duplicate check error:", existingErr.message, existingErr);
+        return { data: null, error: existingErr };
+      }
+      if (existing) {
+        const err = new Error("This candidate already has an active application for this job offer.");
+        err.code = "DUPLICATE_APPLICATION";
+        console.warn("[Supabase] linkCandidateToJob duplicate:", candidateId, jobOfferId);
+        return { data: null, error: err };
+      }
       if (typeof window.debugLog === "function") window.debugLog("[Supabase] linkCandidateToJob");
+      const rawStatus = payload.status || "applied";
+      const status = rawStatus === "new" ? "applied" : rawStatus;
       const row = {
         candidate_id: candidateId,
-        job_offer_id: payload.job_offer_id,
-        status: payload.status || "new",
+        job_offer_id: jobOfferId,
+        status: status,
         notes: payload.notes || null,
         created_by: userId,
       };
@@ -2337,6 +2344,120 @@
   }
 
   /**
+   * Fetch applications (candidate_job_associations) paginated with filters.
+   * @param {object} filters - { status?, job_offer_id?, client_id?, candidate_id?, date_from?, date_to? }
+   * @param {object} pagination - { page: number, limit: number }
+   * @returns {Promise<{ data: array, totalCount: number, error: object | null }>}
+   */
+  async function fetchApplicationsPaginated(filters, pagination) {
+    filters = filters || {};
+    const page = Math.max(1, (pagination && pagination.page) || 1);
+    const limit = Math.max(1, Math.min(100, (pagination && pagination.limit) || 25));
+    const offset = (page - 1) * limit;
+
+    try {
+      let query = supabase
+        .from("candidate_job_associations")
+        .select(
+          `
+          id,
+          candidate_id,
+          job_offer_id,
+          status,
+          notes,
+          rejection_reason,
+          created_at,
+          candidates (
+            id,
+            first_name,
+            last_name,
+            position,
+            status,
+            is_archived
+          ),
+          job_offers (
+            id,
+            title,
+            position,
+            status,
+            client_id,
+            clients (
+              id,
+              name
+            )
+          )
+        `,
+          { count: "exact" }
+        );
+
+      if (filters.status) {
+        query = query.eq("status", filters.status);
+      }
+      if (filters.job_offer_id) {
+        query = query.eq("job_offer_id", filters.job_offer_id);
+      }
+      if (filters.candidate_id) {
+        query = query.eq("candidate_id", filters.candidate_id);
+      }
+      if (filters.client_id) {
+        const { data: offerIds } = await supabase
+          .from("job_offers")
+          .select("id")
+          .eq("client_id", filters.client_id);
+        const ids = (offerIds || []).map(function (o) {
+          return o.id;
+        }).filter(Boolean);
+        if (ids.length === 0) {
+          return { data: [], totalCount: 0, error: null };
+        }
+        query = query.in("job_offer_id", ids);
+      }
+      if (filters.date_from) {
+        query = query.gte("created_at", filters.date_from);
+      }
+      if (filters.date_to) {
+        query = query.lte("created_at", filters.date_to);
+      }
+
+      const { data: rows, error, count } = await query
+        .order("created_at", { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (error) {
+        console.error("[Supabase] fetchApplicationsPaginated error:", error.message, error);
+        return { data: [], totalCount: 0, error };
+      }
+
+      const data = (rows || []).map(function (r) {
+        const cand = r.candidates || null;
+        const offer = r.job_offers || null;
+        const client = (offer && offer.clients) || null;
+        return {
+          id: r.id,
+          candidate_id: r.candidate_id,
+          job_offer_id: r.job_offer_id,
+          status: r.status,
+          notes: r.notes,
+          rejection_reason: r.rejection_reason,
+          created_at: r.created_at,
+          candidate_name: cand
+            ? [cand.first_name, cand.last_name].filter(Boolean).join(" ").trim() || "—"
+            : "—",
+          candidate_position: (cand && cand.position) || null,
+          job_offer_title: (offer && (offer.title || offer.position)) || "—",
+          client_name: (client && client.name) || "—",
+          client_id: (offer && offer.client_id) || null,
+        };
+      });
+
+      return { data, totalCount: count ?? 0, error: null };
+    } catch (err) {
+      console.error("[Supabase] fetchApplicationsPaginated exception:", err);
+      return { data: [], totalCount: 0, error: err };
+    }
+  }
+
+  /**
    * Internal helper: sync job_offers.status from hired count (auto-close / auto-reopen).
    * Not exported. When hired_count >= positions_required -> close; when < required and closed -> active.
    * Archived offers are never auto-reopened.
@@ -2387,8 +2508,8 @@
           .from("candidate_job_associations")
           .update({ status: "not_selected" })
           .eq("job_offer_id", jobOfferId)
-          .not("status", "in", "(hired,rejected)")
-          .select("candidate_id");
+          .not("status", "in", "(hired,rejected,withdrawn)")
+          .select("id,candidate_id");
 
         if (assocUpdateError) {
           console.error(
@@ -2398,6 +2519,26 @@
             { jobOfferId }
           );
         } else if (Array.isArray(updatedAssocs) && updatedAssocs.length > 0) {
+          if (
+            typeof window !== "undefined" &&
+            window.IESupabase &&
+            typeof window.IESupabase.createAutoLog === "function"
+          ) {
+            updatedAssocs.forEach(function (assoc) {
+              if (!assoc || !assoc.id) return;
+              window.IESupabase
+                .createAutoLog("application", assoc.id, {
+                  event_type: "status_changed",
+                  message: "Application status changed to not_selected (job closed)",
+                  metadata: {
+                    job_offer_id: jobOfferId,
+                    new_status: "not_selected",
+                  },
+                })
+                .catch(function () {});
+            });
+          }
+
           const candidateIds = Array.from(
             new Set(
               updatedAssocs
@@ -2413,7 +2554,69 @@
           }
         }
       } else if (hiredCount < required && offer.status === "closed") {
-        await supabase.from("job_offers").update({ status: "active" }).eq("id", jobOfferId);
+        const { error: reopenError } = await supabase
+          .from("job_offers")
+          .update({ status: "active" })
+          .eq("id", jobOfferId);
+        if (reopenError) {
+          console.error(
+            "[Supabase] syncJobOfferStatusFromHired job_offers reopen error:",
+            reopenError.message || reopenError,
+            reopenError,
+            { jobOfferId }
+          );
+          return;
+        }
+
+        const { data: reopenedAssocs, error: reopenedAssocsError } = await supabase
+          .from("candidate_job_associations")
+          .update({ status: "screening" })
+          .eq("job_offer_id", jobOfferId)
+          .eq("status", "not_selected")
+          .select("id,candidate_id");
+
+        if (reopenedAssocsError) {
+          console.error(
+            "[Supabase] syncJobOfferStatusFromHired reopen associations error:",
+            reopenedAssocsError.message || reopenedAssocsError,
+            reopenedAssocsError,
+            { jobOfferId }
+          );
+        } else if (Array.isArray(reopenedAssocs) && reopenedAssocs.length > 0) {
+          if (
+            typeof window !== "undefined" &&
+            window.IESupabase &&
+            typeof window.IESupabase.createAutoLog === "function"
+          ) {
+            reopenedAssocs.forEach(function (assoc) {
+              if (!assoc || !assoc.id) return;
+              window.IESupabase
+                .createAutoLog("application", assoc.id, {
+                  event_type: "status_changed",
+                  message: "Application status changed to screening (job reopened)",
+                  metadata: {
+                    job_offer_id: jobOfferId,
+                    new_status: "screening",
+                  },
+                })
+                .catch(function () {});
+            });
+          }
+
+          const candidateIds = Array.from(
+            new Set(
+              reopenedAssocs
+                .map(function (row) {
+                  return row && row.candidate_id;
+                })
+                .filter(Boolean)
+            )
+          );
+
+          for (const candidateId of candidateIds) {
+            await recalculateCandidateAvailability(candidateId);
+          }
+        }
       }
     } catch (err) {
       console.error("[Supabase] syncJobOfferStatusFromHired exception:", err);
@@ -2486,6 +2689,38 @@
         await syncJobOfferStatusFromHired(oldRow.job_offer_id);
       }
 
+      if (oldRow.candidate_id && typeof createAutoLog === "function") {
+        if (status === "rejected") {
+          createAutoLog("candidate", oldRow.candidate_id, {
+            event_type: "rejection",
+            message: "Application rejected",
+            metadata: {
+              association_id: associationId,
+              job_offer_id: oldRow.job_offer_id,
+              rejection_reason: options.rejectionReason ?? null,
+            },
+          }).catch(function (e) {
+            console.warn("[Supabase] createAutoLog rejection:", e && e.message);
+          });
+        } else if (status === "hired") {
+          createAutoLog("candidate", oldRow.candidate_id, {
+            event_type: "status_change",
+            message: "Hired for job offer",
+            metadata: { association_id: associationId, job_offer_id: oldRow.job_offer_id },
+          }).catch(function (e) {
+            console.warn("[Supabase] createAutoLog hired:", e && e.message);
+          });
+        } else if (status === "withdrawn") {
+          createAutoLog("candidate", oldRow.candidate_id, {
+            event_type: "system_event",
+            message: "Application withdrawn",
+            metadata: { association_id: associationId, job_offer_id: oldRow.job_offer_id },
+          }).catch(function (e) {
+            console.warn("[Supabase] createAutoLog withdrawn:", e && e.message);
+          });
+        }
+      }
+
       return { data, error: null };
     } catch (err) {
       console.error("[Supabase] updateCandidateAssociationStatus exception:", err);
@@ -2494,14 +2729,59 @@
   }
 
   /**
-   * Remove a candidate from a job (delete association).
+   * Remove a candidate from a job (logical withdrawal: set status to 'withdrawn').
+   * Does not delete the row; use deleteAssociationPermanently for admin cleanup.
    * @param {string} associationId - candidate_job_associations.id
-   * @returns {Promise<{ data: array | null, error: object | null }>}
+   * @returns {Promise<{ data: object | null, error: object | null }>}
    */
   async function removeCandidateFromJob(associationId) {
     if (!associationId) {
       const err = new Error("Missing association id");
       console.error("[Supabase] removeCandidateFromJob:", err);
+      return { data: null, error: err };
+    }
+    try {
+      const { data: updated, error } = await supabase
+        .from("candidate_job_associations")
+        .update({ status: "withdrawn" })
+        .eq("id", associationId)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] removeCandidateFromJob error:", error.message, error);
+        return { data: null, error };
+      }
+      if (updated && updated.candidate_id) {
+        await recalculateCandidateAvailability(updated.candidate_id);
+      }
+      if (updated && updated.job_offer_id) {
+        await syncJobOfferStatusFromHired(updated.job_offer_id);
+      }
+      if (updated && updated.candidate_id && typeof createAutoLog === "function") {
+        createAutoLog("candidate", updated.candidate_id, {
+          event_type: "system_event",
+          message: "Application withdrawn",
+          metadata: { association_id: associationId, job_offer_id: updated.job_offer_id },
+        }).catch(function (e) {
+          console.warn("[Supabase] createAutoLog withdrawn (remove):", e && e.message);
+        });
+      }
+      return { data: updated, error: null };
+    } catch (err) {
+      console.error("[Supabase] removeCandidateFromJob exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Permanently delete an association (admin only). Use after logical withdrawal when cleanup is required.
+   * @param {string} associationId - candidate_job_associations.id
+   * @returns {Promise<{ data: array | null, error: object | null }>}
+   */
+  async function deleteAssociationPermanently(associationId) {
+    if (!associationId) {
+      const err = new Error("Missing association id");
+      console.error("[Supabase] deleteAssociationPermanently:", err);
       return { data: null, error: err };
     }
     try {
@@ -2511,16 +2791,54 @@
         .eq("id", associationId)
         .select();
       if (error) {
-        console.error("[Supabase] removeCandidateFromJob error:", error.message, error);
+        console.error("[Supabase] deleteAssociationPermanently error:", error.message, error);
         return { data: null, error };
       }
       const deletedRow = Array.isArray(deleted) ? deleted[0] : deleted;
       if (deletedRow && deletedRow.job_offer_id) {
         await syncJobOfferStatusFromHired(deletedRow.job_offer_id);
       }
+      if (deletedRow && deletedRow.candidate_id) {
+        await recalculateCandidateAvailability(deletedRow.candidate_id);
+      }
       return { data: deleted || [], error: null };
     } catch (err) {
-      console.error("[Supabase] removeCandidateFromJob exception:", err);
+      console.error("[Supabase] deleteAssociationPermanently exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Restore a withdrawn application (set status to 'applied').
+   * @param {string} associationId - candidate_job_associations.id
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function restoreApplication(associationId) {
+    if (!associationId) {
+      const err = new Error("Missing association id");
+      console.error("[Supabase] restoreApplication:", err);
+      return { data: null, error: err };
+    }
+    try {
+      const { data: updated, error } = await supabase
+        .from("candidate_job_associations")
+        .update({ status: "applied" })
+        .eq("id", associationId)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] restoreApplication error:", error.message, error);
+        return { data: null, error };
+      }
+      if (updated && updated.candidate_id) {
+        await recalculateCandidateAvailability(updated.candidate_id);
+      }
+      if (updated && updated.job_offer_id) {
+        await syncJobOfferStatusFromHired(updated.job_offer_id);
+      }
+      return { data: updated, error: null };
+    } catch (err) {
+      console.error("[Supabase] restoreApplication exception:", err);
       return { data: null, error: err };
     }
   }
@@ -2809,14 +3127,20 @@
         return { data: [], error: null };
       }
       const userId = await getCurrentUserId();
-      const rows = items.map(function (language) {
-        return Object.assign(
-          {
-            candidate_id: candidateId,
-            created_by: userId,
-          },
-          language || {}
-        );
+      const rows = items.map(function (raw) {
+        var lang = raw || {};
+        return {
+          candidate_id: candidateId,
+          created_by: userId,
+          // DB columns: language, level
+          language: lang.language != null ? String(lang.language).trim() || null : null,
+          level:
+            lang.level != null && String(lang.level).trim() !== ""
+              ? String(lang.level).trim()
+              : lang.proficiency != null && String(lang.proficiency).trim() !== ""
+              ? String(lang.proficiency).trim()
+              : null,
+        };
       });
       const { data, error } = await supabase.from("candidate_languages").insert(rows).select();
       if (error) {
@@ -2842,7 +3166,7 @@
     try {
       const { data, error } = await supabase
         .from("candidate_experience")
-        .select("*")
+        .select("id, candidate_id, title, company, start_date, end_date, description")
         .eq("candidate_id", candidateId)
         .order("created_at", { ascending: true });
       if (error) {
@@ -2858,6 +3182,8 @@
 
   /**
    * Replace work experience entries for a candidate (delete then bulk insert).
+   * Uses the canonical candidate_experience schema:
+   *   candidate_id, title, company, start_date, end_date, description.
    * @param {string} candidateId
    * @param {array} experiences
    * @returns {Promise<{ data: array | null, error: object | null }>}
@@ -2875,32 +3201,50 @@
         .delete()
         .eq("candidate_id", candidateId);
       if (deleteError) {
-        console.error("[Supabase] replaceCandidateExperience delete error:", deleteError.message || deleteError, {
-          candidateId,
-        });
+        console.error(
+          "[Supabase] replaceCandidateExperience delete error:",
+          deleteError.message || deleteError,
+          {
+            candidateId,
+          }
+        );
         return { data: null, error: deleteError };
       }
       if (!items.length) {
         return { data: [], error: null };
       }
-      const userId = await getCurrentUserId();
-      const rows = items.map(function (experience) {
-        return Object.assign(
-          {
-            candidate_id: candidateId,
-            created_by: userId,
-          },
-          experience || {}
-        );
+
+      // Build a sanitized payload that only contains real table columns.
+      // Table public.candidate_experience:
+      // id, candidate_id, title, company, start_date, end_date, description, created_at
+      var rows = items.map(function (raw) {
+        var exp = raw || {};
+        return {
+          candidate_id: candidateId,
+          title: exp.title != null ? String(exp.title).trim() || null : null,
+          company: exp.company != null ? String(exp.company).trim() || null : null,
+          start_date: exp.start_date || null,
+          end_date: exp.end_date || null,
+          description:
+            exp.description != null ? String(exp.description).trim() || null : null,
+        };
       });
-      const { data, error } = await supabase.from("candidate_experience").insert(rows).select();
+
+      const { data, error } = await supabase
+        .from("candidate_experience")
+        .insert(rows)
+        .select();
       if (error) {
-        console.error("[Supabase] replaceCandidateExperience insert error:", error.message || error, { candidateId });
+        console.error("[Supabase] replaceCandidateExperience insert error:", error, {
+          candidateId,
+        });
         return { data: null, error };
       }
       return { data: Array.isArray(data) ? data : [], error: null };
     } catch (err) {
-      console.error("[Supabase] replaceCandidateExperience exception:", err, { candidateId });
+      console.error("[Supabase] replaceCandidateExperience exception:", err, {
+        candidateId,
+      });
       return { data: null, error: err };
     }
   }
@@ -2959,14 +3303,17 @@
         return { data: [], error: null };
       }
       const userId = await getCurrentUserId();
-      const rows = items.map(function (edu) {
-        return Object.assign(
-          {
-            candidate_id: candidateId,
-            created_by: userId,
-          },
-          edu || {}
-        );
+      const rows = items.map(function (raw) {
+        var edu = raw || {};
+        return {
+          candidate_id: candidateId,
+          created_by: userId,
+          institution: edu.institution != null ? String(edu.institution).trim() || null : null,
+          degree: edu.degree != null ? String(edu.degree).trim() || null : null,
+          start_year: edu.start_year != null ? Number(edu.start_year) || null : null,
+          end_year: edu.end_year != null ? Number(edu.end_year) || null : null,
+          description: edu.description != null ? String(edu.description).trim() || null : null,
+        };
       });
       const { data, error } = await supabase.from("candidate_education").insert(rows).select();
       if (error) {
@@ -3036,14 +3383,28 @@
         return { data: [], error: null };
       }
       const userId = await getCurrentUserId();
-      const rows = items.map(function (cert) {
-        return Object.assign(
-          {
-            candidate_id: candidateId,
-            created_by: userId,
-          },
-          cert || {}
-        );
+      const rows = items.map(function (raw) {
+        var cert = raw || {};
+
+        // candidate_certifications columns: id, candidate_id, name, issuer, year, created_at, created_by
+        // Map the UI fields (name, issuer, issue_date/expiry_date) into these columns.
+        var year = null;
+        if (cert.year != null && String(cert.year).trim() !== "") {
+          year = Number(cert.year) || null;
+        } else if (cert.issue_date) {
+          var d = new Date(cert.issue_date);
+          if (!Number.isNaN(d.getTime())) {
+            year = d.getUTCFullYear();
+          }
+        }
+
+        return {
+          candidate_id: candidateId,
+          created_by: userId,
+          name: cert.name != null ? String(cert.name).trim() || null : null,
+          issuer: cert.issuer != null ? String(cert.issuer).trim() || null : null,
+          year: year,
+        };
       });
       const { data, error } = await supabase.from("candidate_certifications").insert(rows).select();
       if (error) {
@@ -3115,14 +3476,14 @@
         return { data: [], error: null };
       }
       const userId = await getCurrentUserId();
-      const rows = items.map(function (hobby) {
-        return Object.assign(
-          {
-            candidate_id: candidateId,
-            created_by: userId,
-          },
-          hobby || {}
-        );
+      const rows = items.map(function (raw) {
+        var hobby = raw || {};
+        return {
+          candidate_id: candidateId,
+          created_by: userId,
+          // Table column is `hobby`; UI uses the same key via data-field="hobby".
+          hobby: hobby.hobby != null ? String(hobby.hobby).trim() || null : null,
+        };
       });
       const { data, error } = await supabase.from("candidate_hobbies").insert(rows).select();
       if (error) {
@@ -3648,8 +4009,12 @@
     searchActiveJobOffersForAssociation,
     fetchJobHistoryForCandidate,
     fetchCandidatesForJobOffer,
+    fetchApplicationsPaginated,
     updateCandidateAssociationStatus,
     removeCandidateFromJob,
+    recalculateCandidateAvailability,
+    restoreApplication,
+    deleteAssociationPermanently,
     // Dashboard
     getTotalCandidates,
     getActiveJobOffers,

@@ -181,18 +181,8 @@
     setField("linkedin_url", candidate.linkedin_url || "");
     setField("address", candidate.address || "");
     setField("summary", candidate.summary || "");
-
-    var status = (candidate.status || "new").toString();
-    setField("status-text", status);
-    var badge = document.querySelector('[data-field="status-badge"]');
-    if (badge) {
-      if ("value" in badge) {
-        badge.value = status;
-      } else {
-        badge.textContent = status;
-      }
-      badge.className = "form-input " + getStatusBadgeClasses(status);
-    }
+    // Internal notes (separate from activity log)
+    setField("notes", candidate.notes || "");
 
     var dobText = candidate.date_of_birth ? formatDate(candidate.date_of_birth) : "";
     setField("date_of_birth", dobText || "");
@@ -221,6 +211,33 @@
       backBtn.addEventListener("click", function () {
         navigateToCandidates();
       });
+    }
+  }
+
+  function applyAvailabilityToHeader(availability) {
+    var value = (availability || "available").toString();
+    var badge = document.querySelector('[data-field="status-badge"]');
+    var textEl = document.querySelector('[data-field="status-text"]');
+    if (badge) {
+      if ("value" in badge) {
+        badge.value = value;
+      } else {
+        badge.textContent = value;
+      }
+      badge.className =
+        "form-input px-3 py-1 rounded-full text-xs font-semibold w-auto inline-block " +
+        (value === "working"
+          ? "bg-emerald-50 text-emerald-800 border border-emerald-100"
+          : value === "in_process"
+          ? "bg-amber-50 text-amber-800 border border-amber-100"
+          : "bg-gray-50 text-gray-700 border border-gray-200");
+    }
+    if (textEl) {
+      if ("value" in textEl) {
+        textEl.value = value;
+      } else {
+        textEl.textContent = value;
+      }
     }
   }
 
@@ -298,18 +315,17 @@
       var certs = (results[2] && results[2].data) || [];
       var experience = (results[3] && results[3].data) || [];
       var education = (results[4] && results[4].data) || [];
-      // hobbies are currently not rendered as a dedicated section in this view,
-      // but they are loaded for future extensions if needed.
+      var hobbies = (results[5] && results[5].data) || [];
 
       renderSimpleList("skills", skills, function (item) {
         return safeString(item.skill || "").trim();
       });
 
       renderSimpleList("languages", languages, function (item) {
-        var lang = safeString(item.language || "").trim();
-        var prof = safeString(item.proficiency || "").trim();
-        if (lang && prof) return lang + " (" + prof + ")";
-        return lang || prof;
+        var name = safeString(item.language || "").trim();
+        var level = safeString(item.level || "").trim();
+        if (name && level) return name + " — " + level;
+        return name || level;
       });
 
       renderSimpleList("certifications", certs, function (item) {
@@ -334,6 +350,9 @@
 
       renderExperience(experience);
       renderEducation(education);
+      renderSimpleList("hobbies", hobbies, function (item) {
+        return safeString(item.hobby || "").trim();
+      });
     } catch (err) {
       console.error("[Candidate] loadCandidateProfileSections exception:", err);
       if (window.IESupabase && window.IESupabase.showError) {
@@ -393,7 +412,7 @@
       var left = document.createElement("div");
       var roleTitle = document.createElement("p");
       roleTitle.className = "font-semibold text-sm text-gray-900";
-      roleTitle.textContent = safeString(item.role_title || "Role").trim();
+      roleTitle.textContent = safeString(item.title || "Role").trim();
       var company = document.createElement("p");
       company.className = "text-xs text-gray-500";
       company.textContent = safeString(item.company || "").trim();
@@ -497,6 +516,17 @@
     }
   }
 
+  function setDerivedAvailabilityFromAssociations(applications) {
+    var label = "Available";
+    if (window.IEPortal && typeof window.IEPortal.computeDerivedAvailability === "function") {
+      var state = window.IEPortal.computeDerivedAvailability(applications);
+      label = window.IEPortal.formatAvailabilityLabel && typeof window.IEPortal.formatAvailabilityLabel === "function"
+        ? window.IEPortal.formatAvailabilityLabel(state)
+        : (state === "working" ? "Working" : state === "in_process" ? "In process" : "Available");
+    }
+    setField("availability-text", label);
+  }
+
   async function renderAssociatedOffers(candidateId) {
     var listEl = document.querySelector('[data-list="associated-offers"]');
     var emptyEl = document.querySelector('[data-empty="associated-offers"]');
@@ -505,6 +535,7 @@
 
     if (!window.IESupabase || !window.IESupabase.fetchJobHistoryForCandidate) {
       emptyEl.style.display = "";
+      setDerivedAvailabilityFromAssociations([]);
       return;
     }
 
@@ -513,21 +544,30 @@
       if (result.error) {
         console.error("[Candidate] fetchJobHistoryForCandidate error:", result.error);
         emptyEl.style.display = "";
+        setDerivedAvailabilityFromAssociations([]);
         return;
       }
       var rows = (result.data || []).slice();
       if (!rows.length) {
         emptyEl.style.display = "";
+        setDerivedAvailabilityFromAssociations([]);
         return;
       }
       emptyEl.style.display = "none";
+
+      var applications = rows.map(function (row) {
+        var assoc = row.association || row;
+        return { status: assoc && assoc.status ? assoc.status : null };
+      });
+      setDerivedAvailabilityFromAssociations(applications);
 
       rows.forEach(function (row) {
         var assoc = row.association || row; // fallback if already flat
         var offer = row.job_offer || null;
 
         var tr = document.createElement("tr");
-        tr.className = "hover:bg-gray-50/70";
+        tr.className = "hover:bg-gray-50/70 cursor-pointer";
+        tr.dataset.associationId = assoc && assoc.id ? String(assoc.id) : "";
 
         var tdOffer = document.createElement("td");
         tdOffer.className = "px-4 py-2 align-top";
@@ -572,10 +612,16 @@
 
         var tdStatus = document.createElement("td");
         tdStatus.className = "px-4 py-2 align-top";
-        var s = (assoc && assoc.status) || (offer && offer.status) || "";
+        var rawStatus = (assoc && assoc.status) || (offer && offer.status) || "";
         var badge = document.createElement("span");
-        badge.className = getStatusBadgeClasses(s || "new");
-        badge.textContent = s || "new";
+        if (window.IEPortal && typeof window.IEPortal.getApplicationStatusBadgeClass === "function") {
+          var normalized = window.IEPortal.normalizeApplicationStatusForDisplay(rawStatus || "applied");
+          badge.className = "badge " + window.IEPortal.getApplicationStatusBadgeClass(normalized);
+          badge.textContent = window.IEPortal.formatApplicationStatusLabel(normalized);
+        } else {
+          badge.className = getStatusBadgeClasses(rawStatus || "new");
+          badge.textContent = rawStatus || "new";
+        }
         tdStatus.appendChild(badge);
 
         var tdDate = document.createElement("td");
@@ -587,6 +633,22 @@
         tr.appendChild(tdClient);
         tr.appendChild(tdStatus);
         tr.appendChild(tdDate);
+
+        tr.addEventListener("click", function (event) {
+          var target = event.target;
+          if (target.closest("a, button")) {
+            return;
+          }
+          var id = tr.dataset.associationId;
+          if (!id) return;
+          var href = "application.html?id=" + encodeURIComponent(id);
+          if (window.IERouter && typeof window.IERouter.navigateTo === "function") {
+            window.IERouter.navigateTo(href);
+          } else {
+            window.location.href = href;
+          }
+        });
+
         listEl.appendChild(tr);
       });
     } catch (err) {
@@ -703,6 +765,44 @@
     }
 
     renderCandidateCore(candidate, candidateId);
+
+    // Load applications for availability and associated offers
+    var applicationsForAvailability = [];
+    try {
+      if (
+        window.IEQueries &&
+        window.IEQueries.applications &&
+        typeof window.IEQueries.applications.getApplicationsByCandidate === "function"
+      ) {
+        var appsResult =
+          await window.IEQueries.applications.getApplicationsByCandidate(candidateId);
+        if (!appsResult.error && Array.isArray(appsResult.data)) {
+          applicationsForAvailability = appsResult.data;
+        }
+      }
+    } catch (err) {
+      console.error("[Candidate] getApplicationsByCandidate exception:", err);
+    }
+
+    try {
+      if (
+        window.IEQueries &&
+        window.IEQueries.candidates &&
+        typeof window.IEQueries.candidates.deriveAvailabilityFromApplications ===
+          "function"
+      ) {
+        var availability =
+          window.IEQueries.candidates.deriveAvailabilityFromApplications(
+            applicationsForAvailability
+          );
+        applyAvailabilityToHeader(availability);
+      } else {
+        applyAvailabilityToHeader("available");
+      }
+    } catch (err2) {
+      console.error("[Candidate] availability derivation exception:", err2);
+      applyAvailabilityToHeader("available");
+    }
 
     // Lifecycle toolbar wiring for candidate profile (view mode only)
     try {
@@ -868,6 +968,184 @@
       bindCandidateActivityLog(candidateId);
     } catch (err) {
       console.error("[Candidate] bindCandidateActivityLog exception:", err);
+    }
+
+    try {
+      var addAppBtn = document.querySelector('[data-action="add-application"]');
+      if (addAppBtn && !addAppBtn._ieBound) {
+        addAppBtn._ieBound = true;
+        addAppBtn.addEventListener("click", function () {
+          if (!window.IEPortal || !window.IEPortal.ui || !window.IEPortal.ui.openModal) {
+            return;
+          }
+          window.IEPortal.ui.openModal({
+            title: "Add Application",
+            render: function (bodyEl) {
+              var container = document.createElement("div");
+              container.className = "space-y-4";
+
+              var help = document.createElement("p");
+              help.className = "text-sm text-gray-600";
+              help.textContent = "Select a job offer to create a new application for this candidate.";
+              container.appendChild(help);
+
+              var selectWrapper = document.createElement("div");
+              selectWrapper.className = "space-y-2";
+              var label = document.createElement("label");
+              label.className = "form-label";
+              label.textContent = "Job Offer";
+              selectWrapper.appendChild(label);
+
+              var select = document.createElement("select");
+              select.className = "form-input";
+              select.innerHTML =
+                '<option value="">Select a job offer...</option>';
+              selectWrapper.appendChild(select);
+              container.appendChild(selectWrapper);
+
+              var errorEl = document.createElement("p");
+              errorEl.className = "text-sm text-red-600 hidden";
+              container.appendChild(errorEl);
+
+              var actions = document.createElement("div");
+              actions.className = "flex justify-end gap-2 pt-4";
+              var cancelBtn = document.createElement("button");
+              cancelBtn.type = "button";
+              cancelBtn.className = "ie-btn ie-btn-secondary";
+              cancelBtn.textContent = "Cancel";
+              cancelBtn.addEventListener("click", function () {
+                if (window.IEPortal && window.IEPortal.ui && window.IEPortal.ui.closeModal) {
+                  window.IEPortal.ui.closeModal();
+                }
+              });
+              var createBtn = document.createElement("button");
+              createBtn.type = "button";
+              createBtn.className = "ie-btn ie-btn-primary";
+              createBtn.textContent = "Create Application";
+              actions.appendChild(cancelBtn);
+              actions.appendChild(createBtn);
+              container.appendChild(actions);
+
+              bodyEl.appendChild(container);
+
+              // Load active offers into the select
+              (async function loadOffers() {
+                try {
+                  if (
+                    window.IESupabase &&
+                    typeof window.IESupabase.searchActiveJobOffersForAssociation ===
+                      "function"
+                  ) {
+                    var res =
+                      await window.IESupabase.searchActiveJobOffersForAssociation(
+                        { term: "", limit: 50 }
+                      );
+                    if (!res.error && Array.isArray(res.data)) {
+                      res.data.forEach(function (offer) {
+                        var opt = document.createElement("option");
+                        opt.value = offer.id;
+                        opt.textContent =
+                          offer.title ||
+                          offer.position ||
+                          "Offer " + String(offer.id);
+                        select.appendChild(opt);
+                      });
+                    }
+                  }
+                } catch (err) {
+                  console.error(
+                    "[Candidate] load offers for Add Application modal error:",
+                    err
+                  );
+                }
+              })();
+
+              createBtn.addEventListener("click", async function () {
+                if (!candidateId) return;
+                var jobOfferId = select.value || "";
+                if (!jobOfferId) {
+                  errorEl.textContent = "Please select a job offer.";
+                  errorEl.classList.remove("hidden");
+                  return;
+                }
+                createBtn.disabled = true;
+                errorEl.classList.add("hidden");
+                try {
+                  if (
+                    !window.IEQueries ||
+                    !window.IEQueries.applications ||
+                    typeof window.IEQueries.applications.createApplication !==
+                      "function"
+                  ) {
+                    throw new Error("Application creation API not available");
+                  }
+                  var result =
+                    await window.IEQueries.applications.createApplication(
+                      candidateId,
+                      jobOfferId,
+                      {}
+                    );
+                  if (result.error) {
+                    var msg =
+                      result.error.code === "DUPLICATE_APPLICATION"
+                        ? "This candidate already has an application for this job offer."
+                        : result.error.message || "Error creating application.";
+                    errorEl.textContent = msg;
+                    errorEl.classList.remove("hidden");
+                    createBtn.disabled = false;
+                    return;
+                  }
+                  if (window.IEPortal && window.IEPortal.ui && window.IEPortal.ui.closeModal) {
+                    window.IEPortal.ui.closeModal();
+                  }
+                  // Reload offers section and availability
+                  await renderAssociatedOffers(candidateId);
+                  // Recompute availability from fresh applications
+                  try {
+                    if (
+                      window.IEQueries &&
+                      window.IEQueries.applications &&
+                      typeof window.IEQueries.applications.getApplicationsByCandidate ===
+                        "function" &&
+                      window.IEQueries.candidates &&
+                      typeof window.IEQueries.candidates.deriveAvailabilityFromApplications ===
+                        "function"
+                    ) {
+                      var apps =
+                        await window.IEQueries.applications.getApplicationsByCandidate(
+                          candidateId
+                        );
+                      if (!apps.error && Array.isArray(apps.data)) {
+                        var availability =
+                          window.IEQueries.candidates.deriveAvailabilityFromApplications(
+                            apps.data
+                          );
+                        applyAvailabilityToHeader(availability);
+                      }
+                    }
+                  } catch (e2) {
+                    console.error(
+                      "[Candidate] availability refresh after application creation error:",
+                      e2
+                    );
+                  }
+                } catch (err) {
+                  console.error(
+                    "[Candidate] createApplication error from modal:",
+                    err
+                  );
+                  errorEl.textContent =
+                    "Error creating application. Please try again.";
+                  errorEl.classList.remove("hidden");
+                  createBtn.disabled = false;
+                }
+              });
+            },
+          });
+        });
+      }
+    } catch (err) {
+      console.error("[Candidate] Add Application button wiring error:", err);
     }
 
     // Reveal the page once data loading has at least been attempted.
