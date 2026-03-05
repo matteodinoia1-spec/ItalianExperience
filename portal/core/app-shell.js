@@ -12,13 +12,15 @@
 (function () {
   "use strict";
 
+  // All pages that require authentication. Guard runs before any data/UI logic.
   var PROTECTED_PAGES = [
+    "candidate",
     "dashboard",
     "candidates",
-    "job-offers",
     "clients",
-    "archived",
+    "job-offers",
     "profile",
+    "archived",
     "add-candidate",
     "add-job-offer",
     "add-client",
@@ -69,25 +71,47 @@
       "&background=1b4332&color=fff"
     );
   }
+  function redirectToLoginFailsafe() {
+    if (window.IEAuth && typeof window.IEAuth.redirectToLogin === "function") {
+      window.IEAuth.redirectToLogin();
+      return;
+    }
+    if (window.IESupabase && typeof window.IESupabase.redirectToLogin === "function") {
+      window.IESupabase.redirectToLogin();
+      return;
+    }
+    var base = "";
+    try {
+      base = new URL(".", window.location.href).href;
+    } catch (e) {}
+    window.location.href = base + "index.html";
+  }
+
   var isProtectedPage = PROTECTED_PAGES.indexOf(pageKey) !== -1;
   if (isProtectedPage) {
     window.__IE_AUTH_GUARD__ = (async function () {
       if (!window.IEAuth || typeof window.IEAuth.checkAuth !== "function") {
-        if (window.IEAuth && typeof window.IEAuth.redirectToLogin === "function") {
-          window.IEAuth.redirectToLogin();
-        } else if (
-          window.IESupabase &&
-          typeof window.IESupabase.redirectToLogin === "function"
-        ) {
-          window.IESupabase.redirectToLogin();
-        }
+        redirectToLoginFailsafe();
+        return false;
+      }
+      if (!window.IESupabase) {
+        redirectToLoginFailsafe();
         return false;
       }
 
-      await ensureSupabaseSessionReady();
+      try {
+        await ensureSupabaseSessionReady();
+      } catch (err) {
+        if (typeof window.debugLog === "function") {
+          window.debugLog("[ItalianExperience] Auth bootstrap failed", err);
+        }
+        redirectToLoginFailsafe();
+        return false;
+      }
 
       var user = await window.IEAuth.checkAuth();
       if (!user) {
+        redirectToLoginFailsafe();
         return false;
       }
 
@@ -105,12 +129,26 @@
 
   // ---------------------------------------------------------------------------
   // Static fallback markup for the sidebar (used when fetch() is unavailable,
-  // e.g. Safari / local file://, or when sidebar.html cannot be loaded).
-  //
-  // IMPORTANT: keep this in sync with portal/sidebar.html.
+  // e.g. Safari / local file://, or when layout/sidebar.html cannot be loaded).
+  // Ensures navigation and logout remain available when the fragment fetch fails.
+  // IMPORTANT: keep in sync with portal/layout/sidebar.html.
   // ---------------------------------------------------------------------------
 
-  var SIDEBAR_FALLBACK_HTML = [];
+  var SIDEBAR_FALLBACK_HTML =
+    '<aside id="sidebar" class="sidebar h-screen flex flex-col text-white fixed lg:static left-0 top-0 shadow-2xl">' +
+    '<div class="p-8"><div class="flex items-center space-x-3 mb-10"><div class="w-10 h-10 bg-[#c5a059] rounded-full flex items-center justify-center text-white font-bold text-xl serif italic" aria-hidden="true">IE</div>' +
+    '<div><h2 class="text-lg font-bold serif leading-tight">Italian</h2><p class="text-[10px] uppercase tracking-widest opacity-60">Experience Portal</p></div></div>' +
+    '<nav class="space-y-2" aria-label="Portal navigation">' +
+    '<a href="dashboard.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg"><span class="text-sm font-medium">Dashboard</span></a>' +
+    '<a href="candidates.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg"><span class="text-sm font-medium">Candidates</span></a>' +
+    '<a href="job-offers.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg"><span class="text-sm font-medium">Job offers</span></a>' +
+    '<a href="clients.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg"><span class="text-sm font-medium">Clients</span></a>' +
+    '<a href="archived.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg"><span class="text-sm font-medium">Archived</span></a>' +
+    '</nav></div>' +
+    '<div class="mt-auto p-8 border-t border-white/10 sidebar-footer">' +
+    '<a href="profile.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg mb-2"><span class="text-sm font-medium">Profile</span></a>' +
+    '<a href="index.html" class="flex items-center space-x-4 py-3 px-4 text-red-400 hover:text-red-300 transition"><span class="text-sm font-medium">Logout</span></a>' +
+    '</div></aside>';
 
   document.addEventListener("DOMContentLoaded", async function () {
     var guard = window.__IE_AUTH_GUARD__;
@@ -127,7 +165,11 @@
     }
 
     ensureSidebarLoaded()
-      .then(function () {
+      .then(async function () {
+        if (isProtectedPage && window.IEAuth && typeof window.IEAuth.checkAuth === "function") {
+          var user = await window.IEAuth.checkAuth();
+          if (!user) return;
+        }
         initLayout();
         initNavigation();
         initBackButton();
@@ -138,8 +180,14 @@
         ensureHeaderAvatarLinksToProfile();
         updateHeaderUserBlock();
       })
-      .catch(function (error) {
-        console.error("[ItalianExperience] Sidebar loading failed", error);
+      .catch(async function (error) {
+        if (typeof window.debugLog === "function") {
+          window.debugLog("[ItalianExperience] Sidebar loading failed", error);
+        }
+        if (isProtectedPage && window.IEAuth && typeof window.IEAuth.checkAuth === "function") {
+          var user = await window.IEAuth.checkAuth();
+          if (!user) return;
+        }
         initBackButton();
         initButtons();
         initForms();
@@ -259,7 +307,10 @@
         applySidebarHtml(container, html);
       })
       .catch(function (error) {
-        console.error("[ItalianExperience] Unable to load sidebar fragment", error);
+        if (typeof window.debugLog === "function") {
+          window.debugLog("[ItalianExperience] Unable to load sidebar fragment", error);
+        }
+        applySidebarHtml(container, SIDEBAR_FALLBACK_HTML);
       });
   }
 
@@ -729,6 +780,12 @@
     }
   }
 
+  window.IEPortal = window.IEPortal || {};
+  window.IEPortal.clearSessionState = function () {
+    IE_CURRENT_PROFILE = null;
+    if (typeof window !== "undefined") window.__IE_AUTH_USER__ = null;
+  };
+
   function initLogoutLink() {
     const logoutLink = document.querySelector('.sidebar a[href="index.html"], .sidebar-footer a[href="index.html"], #sidebar a[href*="index.html"]');
     const links = document.querySelectorAll('#sidebar a, .sidebar a');
@@ -745,6 +802,10 @@
       if (!window.IEAuth) return;
       e.preventDefault();
       await window.IEAuth.logout();
+      if (window.IEPortal && typeof window.IEPortal.clearSessionState === "function") {
+        window.IEPortal.clearSessionState();
+      }
+      window.__IE_AUTH_USER__ = null;
       window.IEAuth.redirectToLogin();
     });
   }
@@ -2150,7 +2211,7 @@
         return;
       }
       IE_CURRENT_PROFILE = data || null;
-      console.log("[Profile] Loaded profile:", IE_CURRENT_PROFILE);
+      if (typeof window.debugLog === "function") window.debugLog("[Profile] Loaded profile");
     } catch (e) {
       console.error("[Profile] loadCurrentUserProfile exception:", e);
       IE_CURRENT_PROFILE = null;
@@ -2703,9 +2764,9 @@
    * Customize this to point to your REST API, GraphQL endpoint, or back-end.
    */
   function connectToDatabase() {
-    console.info(
-      "[ItalianExperience] connectToDatabase() called – configure your API client here."
-    );
+    if (typeof window.debugLog === "function") {
+      window.debugLog("[ItalianExperience] connectToDatabase() – configure your API client here.");
+    }
     // Example (pseudo-code):
     // return createApiClient({ baseUrl: 'https://api.italianexperience.it' });
     return null;
@@ -2790,7 +2851,7 @@
   }
 
   function fetchClients(filters) {
-    console.info("[ItalianExperience] fetchClients() – filters:", filters || {});
+    if (typeof window.debugLog === "function") window.debugLog("[ItalianExperience] fetchClients() – filters");
     const base = IE_STORE.clients.filter((c) => !c._deleted);
     if (window.IEListsRuntime && typeof IEListsRuntime.applyClientFilters === "function") {
       return Promise.resolve(IEListsRuntime.applyClientFilters(base, filters || {}));
@@ -2946,7 +3007,7 @@
         .replace(/[^a-z0-9-]/g, "") || candidate.id;
 
     IE_STORE.candidates.push(candidate);
-    console.info("[ItalianExperience] saveCandidate() – in-memory:", candidate);
+    if (typeof window.debugLog === "function") window.debugLog("[ItalianExperience] saveCandidate() – in-memory");
     alert("Candidato salvato con successo (simulazione)");
     if (candidate.id) {
       IERouter.redirectToEntityView("candidate", candidate.id);
@@ -3059,7 +3120,7 @@
       is_archived: false,
     };
     IE_STORE.jobOffers.push(jobOffer);
-    console.info("[ItalianExperience] saveJobOffer() – in-memory:", jobOffer);
+    if (typeof window.debugLog === "function") window.debugLog("[ItalianExperience] saveJobOffer() – in-memory");
     alert("Job offer created successfully (simulation)");
     if (jobOffer.id) {
       IERouter.redirectToEntityView("job-offer", jobOffer.id);
@@ -3124,7 +3185,7 @@
       is_archived: false,
     };
     IE_STORE.clients.push(client);
-    console.info("[ItalianExperience] saveClient() – in-memory:", client);
+    if (typeof window.debugLog === "function") window.debugLog("[ItalianExperience] saveClient() – in-memory");
     alert("Client created successfully (simulation)");
     if (client.id) {
       IERouter.redirectToEntityView("client", client.id);
@@ -7073,7 +7134,7 @@
             limit,
           })
           .then(function (result) {
-            console.log("[ItalianExperience] fetchClientsPaginated result:", result);
+            if (typeof window.debugLog === "function") window.debugLog("[ItalianExperience] fetchClientsPaginated result");
             const rows = result.data || [];
             const totalCount = result.totalCount ?? 0;
             const totalPages = Math.max(1, Math.ceil(totalCount / limit));

@@ -72,8 +72,16 @@
 
   /**
    * Load profile for the current user.
+   * Defense in depth: re-validate auth before loading any data.
    */
   async function requireAuthAndLoadProfile() {
+    if (window.IEAuth && typeof window.IEAuth.checkAuth === "function") {
+      const user = await window.IEAuth.checkAuth();
+      if (!user) return;
+    } else if (window.IESupabase && typeof window.IESupabase.requireAuth === "function") {
+      const user = await window.IESupabase.requireAuth();
+      if (!user) return;
+    }
     const api = window.IESupabase;
     setPageLoading(true);
     const { data, error } = await api.getProfile();

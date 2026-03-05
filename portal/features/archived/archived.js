@@ -1,4 +1,4 @@
-console.log("ARCHIVED JS ACTIVE - VERSION 1");
+if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE - VERSION 1");
 /**
  * Archived page – Supabase integration
  * Loads archived candidates, job offers, and clients with pagination, search, and restore.
@@ -28,7 +28,7 @@ console.log("ARCHIVED JS ACTIVE - VERSION 1");
     if (typeof alert === "function") {
       alert(message);
     } else {
-      console.log("[Archived] Success:", message);
+      if (typeof window.debugLog === "function") window.debugLog("[Archived] Success:", message);
     }
   }
 

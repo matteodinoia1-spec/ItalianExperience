@@ -3,7 +3,14 @@
 // ----------------------------------------------------------------------------
 // Load this AFTER the Supabase CDN script:
 //   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-// Uses publishable (anon) key only. RLS must be configured in Supabase.
+// Uses publishable (anon) key only.
+//
+// SECURITY – RLS is mandatory:
+// - All table access is subject to Row Level Security (RLS) in Supabase.
+// - Authorization must use auth.uid() (or equivalent); do not rely on
+//   client-supplied user ids for access control.
+// - Do not run Supabase data queries before authentication; the portal
+//   runs the auth guard before any data or UI logic.
 //
 // Expected table/column names (adjust if your DB differs):
 //   profiles: id (uuid, = auth.users.id), email, first_name, last_name, role
@@ -79,11 +86,8 @@
         console.error("[Supabase Auth] Login error:", error.message, error);
         return { data: null, error };
       }
-      // Auth success: log user id so we can verify auth.uid() will be non-null on queries.
-      if (data?.user?.id) {
-        console.log("[Supabase Auth] Login success. User id:", data.user.id);
-      } else {
-        console.log("[Supabase Auth] Login success but user object missing.");
+      if (typeof window.debugLog === "function") {
+        window.debugLog("[Supabase Auth] Login success.");
       }
       return { data, error: null };
     } catch (err) {
@@ -121,11 +125,8 @@
         console.error("[Supabase Auth] getSession error:", error.message, error);
         return { data: { session: null, user: null }, error };
       }
-      if (session?.user?.id) {
-        // Session restored on page load (or still valid): useful to confirm persistence across navigation.
-        console.log("[Supabase Auth] Session restored for user id:", session.user.id);
-      } else {
-        console.log("[Supabase Auth] No active session found.");
+      if (typeof window.debugLog === "function") {
+        window.debugLog("[Supabase Auth] Session", session?.user ? "restored" : "none");
       }
       return { data: { session, user: session?.user ?? null }, error: null };
     } catch (err) {
@@ -273,7 +274,7 @@
       const first_name = (user.user_metadata?.first_name || "").trim() || derivedFirst;
       const last_name = (user.user_metadata?.last_name || "").trim() || derivedLast;
 
-      console.log("[Profile] Creating profile for user:", user.id);
+      if (typeof window.debugLog === "function") window.debugLog("[Profile] Creating profile");
 
       const { error: insertError } = await supabase
         .from("profiles")
@@ -328,16 +329,14 @@
         return { data: null, error };
       }
       if (!data) {
-        console.log("[Profile] No profile found for user, ensuring profile exists:", userId);
+        if (typeof window.debugLog === "function") window.debugLog("[Profile] No profile found, ensuring profile");
         const { data: ensured, error: ensureError } = await ensureProfile(user);
         if (ensureError) {
           console.error("[Supabase] getProfile ensureProfile error:", ensureError.message || ensureError, ensureError);
           return { data: null, error: ensureError };
         }
-        console.log("[Profile] Loaded profile:", ensured);
         return { data: ensured || null, error: null };
       }
-      console.log("[Profile] Loaded profile:", data);
       return { data, error: null };
     } catch (err) {
       console.error("[Supabase] getProfile exception:", err);
@@ -359,7 +358,7 @@
       return { data: null, error: err };
     }
     try {
-      console.log("[Profile] Updating profile for user:", userId, "payload:", payload);
+      if (typeof window.debugLog === "function") window.debugLog("[Profile] Updating profile");
       const updates = {
         updated_at: new Date().toISOString(),
       };
@@ -407,7 +406,7 @@
       return { data: null, error: err };
     }
     try {
-      console.log("[Supabase] insertCandidate as user id:", userId);
+      if (typeof window.debugLog === "function") window.debugLog("[Supabase] insertCandidate");
       const row = {
         created_by: userId,
         first_name: payload.first_name || "",
@@ -540,7 +539,7 @@
     const userId = sessionData?.user?.id;
     if (!userId) return { data: [], error: null };
     try {
-      console.log("[Supabase] fetchMyCandidates for user id:", userId);
+      if (typeof window.debugLog === "function") window.debugLog("[Supabase] fetchMyCandidates");
       const { data, error } = await supabase
         .from("candidates")
         .select(
@@ -607,7 +606,7 @@
       return { data: null, error: err };
     }
     try {
-      console.log("[Supabase] insertJobOffer as user id:", userId);
+      if (typeof window.debugLog === "function") window.debugLog("[Supabase] insertJobOffer");
       const row = {
         created_by: userId,
         client_id: payload.client_id || null,
@@ -1243,7 +1242,7 @@
       return { data: null, error: err };
     }
     try {
-      console.log("[Supabase] insertClient as user id:", userId);
+      if (typeof window.debugLog === "function") window.debugLog("[Supabase] insertClient");
       const row = {
         created_by: userId,
         name: payload.name || "",
@@ -1949,7 +1948,7 @@
         console.error("[Supabase] linkCandidateToJob:", err.message);
         return { data: null, error: err };
       }
-      console.log("[Supabase] linkCandidateToJob as user id:", userId, "candidate:", candidateId, "job_offer:", payload.job_offer_id);
+      if (typeof window.debugLog === "function") window.debugLog("[Supabase] linkCandidateToJob");
       const row = {
         candidate_id: candidateId,
         job_offer_id: payload.job_offer_id,
@@ -3565,7 +3564,7 @@
   }
 
   function showSuccess(message) {
-    console.log("[Supabase] Success:", message);
+    if (typeof window.debugLog === "function") window.debugLog("[Supabase] Success:", message);
   }
 
   // ---------------------------------------------------------------------------

@@ -260,7 +260,7 @@
                 return;
             }
 
-            console.log('[Login] Tentativo di login per:', email);
+            if (typeof window.debugLog === "function") window.debugLog("[Login] Sign-in attempt");
             const { data, error } = await window.IESupabase.login(email, password);
             if (error) {
                 console.error('[Login] Errore di autenticazione:', error);
@@ -274,13 +274,13 @@
                 return;
             }
 
-            console.log('[Login] Utente autenticato, id:', data.user.id);
+            if (typeof window.debugLog === "function") window.debugLog("[Login] User authenticated");
 
             // Dopo il login, creiamo/aggiorniamo il profilo e poi
             // reindirizziamo SEMPRE alla dashboard (nessun fallback anonimo).
             try {
                 await window.IESupabase.ensureProfile(data.user);
-                console.log('[Login] Profilo verificato/creato per user id:', data.user.id);
+                if (typeof window.debugLog === "function") window.debugLog("[Login] Profile ensured");
             } catch (profileError) {
                 console.error('[Login] Errore durante ensureProfile:', profileError);
             }
@@ -298,6 +298,7 @@
         }
     </script>
     <!-- Supabase JS v2 (publishable key only) -->
+    <script src="core/debug.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="core/supabase.js"></script>
     <script src="core/auth.js"></script>

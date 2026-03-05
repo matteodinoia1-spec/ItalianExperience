@@ -11,6 +11,8 @@
 
   function initInactivityTimer() {
     if (!window.IEAuth) return;
+    if (window.__IE_INACTIVITY_INIT__) return;
+    window.__IE_INACTIVITY_INIT__ = true;
 
     var logoutTimer = null;
     var warningTimer = null;
@@ -84,9 +86,17 @@
       }
       window.IEAuth.logout()
         .then(function () {
+          if (window.IEPortal && typeof window.IEPortal.clearSessionState === "function") {
+            window.IEPortal.clearSessionState();
+          }
+          window.__IE_AUTH_USER__ = null;
           window.IEAuth.redirectToLogin();
         })
         .catch(function () {
+          if (window.IEPortal && typeof window.IEPortal.clearSessionState === "function") {
+            window.IEPortal.clearSessionState();
+          }
+          window.__IE_AUTH_USER__ = null;
           window.IEAuth.redirectToLogin();
         });
     }

@@ -1388,7 +1388,7 @@
             limit,
           })
           .then(function (result) {
-            console.log("[ItalianExperience] fetchClientsPaginated result:", result);
+            if (typeof window.debugLog === "function") window.debugLog("[ItalianExperience] fetchClientsPaginated result");
             const rows = result.data || [];
             const totalCount = result.totalCount ?? 0;
             const totalPages = Math.max(1, Math.ceil(totalCount / limit));
