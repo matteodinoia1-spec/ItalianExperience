@@ -255,23 +255,27 @@
     }
 
     function getApplicationStatusBadgeClass(status) {
-      switch (status) {
+      var s = (status || "").toString().toLowerCase();
+      if (s === "new") s = "applied";
+      if (s === "offered") s = "offer";
+      switch (s) {
         case "applied":
-          return "badge badge-neutral";
+          return "badge-applied";
         case "screening":
-          return "badge badge-info";
+          return "badge-screening";
         case "interview":
-          return "badge badge-warning";
+          return "badge-interview";
         case "offer":
-          return "badge badge-accent";
+          return "badge-offered";
         case "hired":
-          return "badge badge-success";
+          return "badge-hired";
         case "rejected":
+          return "badge-rejected";
         case "withdrawn":
         case "not_selected":
-          return "badge badge-muted";
+          return "badge-neutral";
         default:
-          return "badge badge-neutral";
+          return "badge-applied";
       }
     }
 
@@ -309,8 +313,9 @@
         if (app.job_offer_id) {
           var oLink = document.createElement("a");
           oLink.href =
-            "job-offer.html?id=" +
-            encodeURIComponent(String(app.job_offer_id));
+            "add-job-offer.html?id=" +
+            encodeURIComponent(String(app.job_offer_id)) +
+            "&mode=view";
           oLink.className =
             "text-[#1b4332] font-semibold hover:underline";
           oLink.textContent = jobTitle;
@@ -325,8 +330,9 @@
         if (app.client_id) {
           var clLink = document.createElement("a");
           clLink.href =
-            "client.html?id=" +
-            encodeURIComponent(String(app.client_id));
+            "add-client.html?id=" +
+            encodeURIComponent(String(app.client_id)) +
+            "&mode=view";
           clLink.className =
             "text-gray-800 font-medium hover:underline";
           clLink.textContent = clientName;
@@ -339,7 +345,8 @@
         tdStatus.className = "px-6 py-4 align-top";
         var currentStatus = (app.status || "applied").toLowerCase();
         var badgeSpan = document.createElement("span");
-        badgeSpan.className = getApplicationStatusBadgeClass(currentStatus);
+        badgeSpan.className =
+          "badge " + getApplicationStatusBadgeClass(currentStatus);
         badgeSpan.textContent = currentStatus;
         tdStatus.appendChild(badgeSpan);
 

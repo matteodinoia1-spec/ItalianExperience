@@ -73,16 +73,33 @@
           .join(" ")
           .trim() || null,
       candidate_position: candidate.position || null,
+      candidate_location: candidate.address || null,
+      candidate_position: candidate.position || null,
+      candidate_notes: candidate.notes || null,
       job_offer_id: row.job_offer_id,
       job_offer_title: job.title || null,
       job_offer_position: job.position || null,
+      job_offer_notes: job.notes || null,
       client_id: client.id || null,
       client_name: client.name || null,
+      client_notes: client.notes || null,
       status: normalizeStatus(row.status),
       notes: row.notes || null,
       rejection_reason: row.rejection_reason || null,
       created_at: row.created_at || null,
       updated_at: row.updated_at || null,
+      candidate_experience:
+        Array.isArray(candidate.candidate_experience)
+          ? candidate.candidate_experience
+          : [],
+      candidate_skills:
+        Array.isArray(candidate.candidate_skills)
+          ? candidate.candidate_skills
+          : [],
+      candidate_languages:
+        Array.isArray(candidate.candidate_languages)
+          ? candidate.candidate_languages
+          : [],
     };
   }
 
@@ -105,8 +122,8 @@
             "rejection_reason",
             "created_at",
             "updated_at",
-            "candidates ( id, first_name, last_name, position )",
-            "job_offers ( id, title, position, clients ( id, name ) )",
+            "candidates ( id, first_name, last_name, position, address, notes )",
+            "job_offers ( id, title, position, notes, clients ( id, name, notes ) )",
           ].join(",")
         );
 
@@ -181,7 +198,7 @@
             "rejection_reason",
             "created_at",
             "updated_at",
-            "candidates ( id, first_name, last_name, position )",
+            "candidates ( id, first_name, last_name, position, address )",
             "job_offers ( id, title, position, clients ( id, name ) )",
           ].join(",")
         )
@@ -226,7 +243,7 @@
             "rejection_reason",
             "created_at",
             "updated_at",
-            "candidates ( id, first_name, last_name, position )",
+            "candidates ( id, first_name, last_name, position, address )",
             "job_offers ( id, title, position, clients ( id, name ) )",
           ].join(",")
         )
@@ -271,8 +288,8 @@
             "rejection_reason",
             "created_at",
             "updated_at",
-            "candidates ( id, first_name, last_name, position, status )",
-            "job_offers ( id, title, position, city, state, positions_required, clients ( id, name, city, state ) )",
+            "candidates ( id, first_name, last_name, position, address, status, notes, candidate_experience ( id, candidate_id, title, company, start_date, end_date ), candidate_skills ( id, candidate_id, skill ), candidate_languages ( id, candidate_id, language, level ) )",
+            "job_offers ( id, title, position, city, state, positions_required, notes, clients ( id, name, city, state, notes ) )",
           ].join(",")
         )
         .eq("id", id)

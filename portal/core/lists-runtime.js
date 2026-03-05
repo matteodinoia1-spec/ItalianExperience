@@ -1200,7 +1200,10 @@
           (window.escapeHtml ? window.escapeHtml(String(hiredCount)) : String(hiredCount)) + " / " + (window.escapeHtml ? window.escapeHtml(String(positions)) : String(positions)) +
           "</span>";
 
-        var jobTitleViewUrl = "job-offer.html?id=" + encodeURIComponent(String(row.id));
+        var jobTitleViewUrl =
+          "add-job-offer.html?id=" +
+          encodeURIComponent(String(row.id)) +
+          "&mode=view";
         var clientCellHtml = row.client_id
           ? '<span class="entity-link" data-entity-type="client" data-entity-id="' + (window.escapeHtml ? window.escapeHtml(String(row.client_id)) : String(row.client_id)) + '">' + (window.escapeHtml ? window.escapeHtml(clientValue) : clientValue) + "</span>"
           : (window.escapeHtml ? window.escapeHtml(clientValue) : clientValue);
@@ -1455,7 +1458,10 @@
               const tr = renderEntityRow({
                 entityType: "client",
                 id: row.id,
-                viewUrl: "client.html?id=" + encodeURIComponent(row.id),
+                viewUrl:
+                  "add-client.html?id=" +
+                  encodeURIComponent(row.id) +
+                  "&mode=view",
                 editUrl: "add-client.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
                 title: row.name || "—",
                 isArchived: row.is_archived,
@@ -1519,7 +1525,10 @@
             const tr = renderEntityRow({
               entityType: "client",
               id: row.id,
-              viewUrl: "client.html?id=" + encodeURIComponent(row.id),
+              viewUrl:
+                "add-client.html?id=" +
+                encodeURIComponent(row.id) +
+                "&mode=view",
               editUrl: "add-client.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
               title: row.name || "—",
               isArchived: row.is_archived,

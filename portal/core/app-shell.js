@@ -17,6 +17,8 @@
     "candidate",
     "dashboard",
     "candidates",
+    "applications",
+    "application",
     "clients",
     "job-offers",
     "profile",
@@ -455,6 +457,7 @@
     var pathMap = {
       dashboard: "dashboard.html",
       candidates: "candidates.html",
+      applications: "applications.html",
       clients: "clients.html",
       "job-offers": "job-offers.html",
       archived: "archived.html",
@@ -502,6 +505,8 @@
         return [{ label: "Dashboard" }];
       case "candidates":
         return [dashboard, { label: "Candidates" }];
+      case "applications":
+        return [dashboard, { label: "Applications" }];
       case "clients":
         return [dashboard, { label: "Clients" }];
       case "job-offers":
@@ -608,6 +613,10 @@
         return "dashboard";
       case "candidates.html":
         return "candidates";
+      case "applications.html":
+        return "applications";
+      case "application.html":
+        return "application";
       case "job-offers.html":
         return "job-offers";
       case "clients.html":
@@ -635,6 +644,7 @@
         // Fallback: try to infer from segment without extension
         if (lastSegment.includes("dashboard")) return "dashboard";
         if (lastSegment.includes("candidates")) return "candidates";
+        if (lastSegment.includes("applications")) return "applications";
         if (lastSegment.includes("job-offers")) return "job-offers";
         if (lastSegment.includes("archived")) return "archived";
         if (lastSegment.includes("profile")) return "profile";
@@ -6900,7 +6910,10 @@
           escapeHtml(String(hiredCount)) + " / " + escapeHtml(String(positions)) +
           "</span>";
 
-        const offerViewUrl = "job-offer.html?id=" + encodeURIComponent(String(row.id));
+        const offerViewUrl =
+          "add-job-offer.html?id=" +
+          encodeURIComponent(String(row.id)) +
+          "&mode=view";
         const clientCellHtml = row.client_id
           ? '<span class="entity-link" data-entity-type="client" data-entity-id="' + escapeHtml(String(row.client_id)) + '">' + escapeHtml(clientValue) + "</span>"
           : escapeHtml(clientValue);
@@ -7144,7 +7157,10 @@
                   ? '<button type="button" data-action="view-client-offers" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-secondary !py-1 !px-2 min-w-0 font-semibold">' + escapeHtml(String(activeOffersCount)) + "</button>"
                   : "0";
 
-              const clientViewUrl = "client.html?id=" + encodeURIComponent(String(row.id));
+        const clientViewUrl =
+          "add-client.html?id=" +
+          encodeURIComponent(String(row.id)) +
+          "&mode=view";
               const tr = renderEntityRow({
                 entityType: "client",
                 id: row.id,
@@ -7209,7 +7225,10 @@
               ? '<button type="button" data-action="view-client-offers" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-secondary !py-1 !px-2 min-w-0 font-semibold">' + escapeHtml(String(activeOffersCount)) + "</button>"
               : "0";
 
-          const clientViewUrl = "client.html?id=" + encodeURIComponent(String(row.id));
+          const clientViewUrl =
+            "add-client.html?id=" +
+            encodeURIComponent(String(row.id)) +
+            "&mode=view";
           const tr = renderEntityRow({
             entityType: "client",
             id: row.id,

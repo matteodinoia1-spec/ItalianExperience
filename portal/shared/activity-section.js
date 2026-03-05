@@ -2,7 +2,12 @@
   "use strict";
 
   function isAllowedEntityType(entityType) {
-    return entityType === "candidate" || entityType === "job_offer" || entityType === "client";
+    return (
+      entityType === "candidate" ||
+      entityType === "job_offer" ||
+      entityType === "client" ||
+      entityType === "application"
+    );
   }
 
   function escapeText(value) {

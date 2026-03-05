@@ -166,7 +166,7 @@
   // ---------------------------------------------------------------------------
 
   function assertEntity(entityType, entityId) {
-    const allowed = ["candidate", "job_offer", "client"];
+    const allowed = ["candidate", "job_offer", "client", "application"];
     if (!allowed.includes(entityType)) {
       throw new Error("Invalid entityType");
     }
@@ -644,42 +644,20 @@
   async function getJobOfferById(id) {
     if (!id) return { data: null, error: new Error("Missing id") };
     try {
+      // Use a simple, robust query shape to avoid join or view issues.
       const { data, error } = await supabase
         .from("job_offers")
-        .select(
-          `
-            *,
-            created_by_profile:profiles!job_offers_created_by_profiles_fkey(
-              id,
-              first_name,
-              last_name
-            ),
-            updated_by_profile:profiles!job_offers_updated_by_profiles_fkey(
-              id,
-              first_name,
-              last_name
-            ),
-            clients (
-              id,
-              name,
-              city,
-              state
-            )
-          `
-        )
+        .select("*")
         .eq("id", id)
-        .maybeSingle();
+        .single();
       if (error) {
-        console.error("[Supabase] getJobOfferById error:", error.message, error);
+        console.error("[Supabase] getJobOfferById error:", error);
         return { data: null, error };
       }
-      if (!data) return { data: null, error: null };
-      const client = data.clients || null;
-      const normalized = {
-        ...data,
-        client_name: data.client_name || (client && client.name) || null,
-      };
-      return { data: normalized, error: null };
+      if (!data) {
+        return { data: null, error: null };
+      }
+      return { data, error: null };
     } catch (err) {
       console.error("[Supabase] getJobOfferById exception:", err);
       return { data: null, error: err };
@@ -1274,48 +1252,18 @@
   async function getClientById(id) {
     if (!id) return { data: null, error: new Error("Missing id") };
     try {
+      // Use a simple, robust query shape to avoid join or view issues.
       const { data, error } = await supabase
         .from("clients")
-        .select(
-          `
-            *,
-            created_by_profile:profiles!clients_created_by_profiles_fkey(
-              id,
-              first_name,
-              last_name
-            ),
-            updated_by_profile:profiles!clients_updated_by_profiles_fkey(
-              id,
-              first_name,
-              last_name
-            )
-          `
-        )
+        .select("*")
         .eq("id", id)
         .single();
       if (error) {
-        console.error("[Supabase] getClientById error:", error.message, error);
+        console.error("[Supabase] getClientById error:", error);
         return { data: null, error };
       }
-      const row = data;
       return {
-        data: row
-          ? {
-              id: row.id,
-              name: row.name,
-              city: row.city,
-              state: row.state,
-              country: row.country,
-              email: row.email,
-              phone: row.phone,
-              notes: row.notes,
-              is_archived: !!row.is_archived,
-              created_at: row.created_at,
-              updated_at: row.updated_at,
-              created_by_profile: row.created_by_profile || null,
-              updated_by_profile: row.updated_by_profile || null,
-            }
-          : null,
+        data: data || null,
         error: null,
       };
     } catch (err) {
@@ -1794,6 +1742,66 @@
   // ---------------------------------------------------------------------------
 
   // recalculateCandidateAvailability is deprecated in favor of derived availability from applications.
+  /**
+   * Recalculate candidates.availability_status from candidate_job_associations.
+   * Rule (see STATUS-AUDIT.md):
+   * - availability_status = 'unavailable' if the candidate has at least one association
+   *   with status NOT IN ('rejected','not_selected')
+   * - otherwise availability_status = 'available'.
+   * @param {string} candidateId
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function recalculateCandidateAvailability(candidateId) {
+    if (!candidateId) {
+      const error = new Error("Missing candidateId");
+      console.error("[Supabase] recalculateCandidateAvailability:", error);
+      return { data: null, error };
+    }
+    try {
+      const { data: rows, error } = await supabase
+        .from("candidate_job_associations")
+        .select("status")
+        .eq("candidate_id", candidateId);
+      if (error) {
+        console.error(
+          "[Supabase] recalculateCandidateAvailability fetch error:",
+          error.message || error,
+          { candidateId }
+        );
+        return { data: null, error };
+      }
+      const associations = Array.isArray(rows) ? rows : [];
+      const hasActive = associations.some(function (row) {
+        const raw = row && row.status ? String(row.status).toLowerCase() : "";
+        if (!raw) return false;
+        // Treat anything that is not an explicit terminal status as active.
+        return raw !== "rejected" && raw !== "not_selected";
+      });
+      const availability = hasActive ? "unavailable" : "available";
+      const { data: updated, error: updateError } = await supabase
+        .from("candidates")
+        .update({ availability_status: availability })
+        .eq("id", candidateId)
+        .select("id, availability_status")
+        .single();
+      if (updateError) {
+        console.error(
+          "[Supabase] recalculateCandidateAvailability update error:",
+          updateError.message || updateError,
+          { candidateId }
+        );
+        return { data: null, error: updateError };
+      }
+      return { data: updated || null, error: null };
+    } catch (err) {
+      console.error(
+        "[Supabase] recalculateCandidateAvailability exception:",
+        err,
+        { candidateId }
+      );
+      return { data: null, error: err };
+    }
+  }
 
   /**
    * Search available, non-archived candidates for association.
@@ -2850,14 +2858,20 @@
         return { data: [], error: null };
       }
       const userId = await getCurrentUserId();
-      const rows = items.map(function (language) {
-        return Object.assign(
-          {
-            candidate_id: candidateId,
-            created_by: userId,
-          },
-          language || {}
-        );
+      const rows = items.map(function (raw) {
+        var lang = raw || {};
+        return {
+          candidate_id: candidateId,
+          created_by: userId,
+          // DB columns: language, level
+          language: lang.language != null ? String(lang.language).trim() || null : null,
+          level:
+            lang.level != null && String(lang.level).trim() !== ""
+              ? String(lang.level).trim()
+              : lang.proficiency != null && String(lang.proficiency).trim() !== ""
+              ? String(lang.proficiency).trim()
+              : null,
+        };
       });
       const { data, error } = await supabase.from("candidate_languages").insert(rows).select();
       if (error) {
@@ -2883,7 +2897,7 @@
     try {
       const { data, error } = await supabase
         .from("candidate_experience")
-        .select("*")
+        .select("id, candidate_id, title, company, start_date, end_date, description")
         .eq("candidate_id", candidateId)
         .order("created_at", { ascending: true });
       if (error) {
@@ -2899,6 +2913,8 @@
 
   /**
    * Replace work experience entries for a candidate (delete then bulk insert).
+   * Uses the canonical candidate_experience schema:
+   *   candidate_id, title, company, start_date, end_date, description.
    * @param {string} candidateId
    * @param {array} experiences
    * @returns {Promise<{ data: array | null, error: object | null }>}
@@ -2916,32 +2932,50 @@
         .delete()
         .eq("candidate_id", candidateId);
       if (deleteError) {
-        console.error("[Supabase] replaceCandidateExperience delete error:", deleteError.message || deleteError, {
-          candidateId,
-        });
+        console.error(
+          "[Supabase] replaceCandidateExperience delete error:",
+          deleteError.message || deleteError,
+          {
+            candidateId,
+          }
+        );
         return { data: null, error: deleteError };
       }
       if (!items.length) {
         return { data: [], error: null };
       }
-      const userId = await getCurrentUserId();
-      const rows = items.map(function (experience) {
-        return Object.assign(
-          {
-            candidate_id: candidateId,
-            created_by: userId,
-          },
-          experience || {}
-        );
+
+      // Build a sanitized payload that only contains real table columns.
+      // Table public.candidate_experience:
+      // id, candidate_id, title, company, start_date, end_date, description, created_at
+      var rows = items.map(function (raw) {
+        var exp = raw || {};
+        return {
+          candidate_id: candidateId,
+          title: exp.title != null ? String(exp.title).trim() || null : null,
+          company: exp.company != null ? String(exp.company).trim() || null : null,
+          start_date: exp.start_date || null,
+          end_date: exp.end_date || null,
+          description:
+            exp.description != null ? String(exp.description).trim() || null : null,
+        };
       });
-      const { data, error } = await supabase.from("candidate_experience").insert(rows).select();
+
+      const { data, error } = await supabase
+        .from("candidate_experience")
+        .insert(rows)
+        .select();
       if (error) {
-        console.error("[Supabase] replaceCandidateExperience insert error:", error.message || error, { candidateId });
+        console.error("[Supabase] replaceCandidateExperience insert error:", error, {
+          candidateId,
+        });
         return { data: null, error };
       }
       return { data: Array.isArray(data) ? data : [], error: null };
     } catch (err) {
-      console.error("[Supabase] replaceCandidateExperience exception:", err, { candidateId });
+      console.error("[Supabase] replaceCandidateExperience exception:", err, {
+        candidateId,
+      });
       return { data: null, error: err };
     }
   }
@@ -3000,14 +3034,17 @@
         return { data: [], error: null };
       }
       const userId = await getCurrentUserId();
-      const rows = items.map(function (edu) {
-        return Object.assign(
-          {
-            candidate_id: candidateId,
-            created_by: userId,
-          },
-          edu || {}
-        );
+      const rows = items.map(function (raw) {
+        var edu = raw || {};
+        return {
+          candidate_id: candidateId,
+          created_by: userId,
+          institution: edu.institution != null ? String(edu.institution).trim() || null : null,
+          degree: edu.degree != null ? String(edu.degree).trim() || null : null,
+          start_year: edu.start_year != null ? Number(edu.start_year) || null : null,
+          end_year: edu.end_year != null ? Number(edu.end_year) || null : null,
+          description: edu.description != null ? String(edu.description).trim() || null : null,
+        };
       });
       const { data, error } = await supabase.from("candidate_education").insert(rows).select();
       if (error) {
@@ -3077,14 +3114,28 @@
         return { data: [], error: null };
       }
       const userId = await getCurrentUserId();
-      const rows = items.map(function (cert) {
-        return Object.assign(
-          {
-            candidate_id: candidateId,
-            created_by: userId,
-          },
-          cert || {}
-        );
+      const rows = items.map(function (raw) {
+        var cert = raw || {};
+
+        // candidate_certifications columns: id, candidate_id, name, issuer, year, created_at, created_by
+        // Map the UI fields (name, issuer, issue_date/expiry_date) into these columns.
+        var year = null;
+        if (cert.year != null && String(cert.year).trim() !== "") {
+          year = Number(cert.year) || null;
+        } else if (cert.issue_date) {
+          var d = new Date(cert.issue_date);
+          if (!Number.isNaN(d.getTime())) {
+            year = d.getUTCFullYear();
+          }
+        }
+
+        return {
+          candidate_id: candidateId,
+          created_by: userId,
+          name: cert.name != null ? String(cert.name).trim() || null : null,
+          issuer: cert.issuer != null ? String(cert.issuer).trim() || null : null,
+          year: year,
+        };
       });
       const { data, error } = await supabase.from("candidate_certifications").insert(rows).select();
       if (error) {
@@ -3156,14 +3207,14 @@
         return { data: [], error: null };
       }
       const userId = await getCurrentUserId();
-      const rows = items.map(function (hobby) {
-        return Object.assign(
-          {
-            candidate_id: candidateId,
-            created_by: userId,
-          },
-          hobby || {}
-        );
+      const rows = items.map(function (raw) {
+        var hobby = raw || {};
+        return {
+          candidate_id: candidateId,
+          created_by: userId,
+          // Table column is `hobby`; UI uses the same key via data-field="hobby".
+          hobby: hobby.hobby != null ? String(hobby.hobby).trim() || null : null,
+        };
       });
       const { data, error } = await supabase.from("candidate_hobbies").insert(rows).select();
       if (error) {
@@ -3691,6 +3742,7 @@
     fetchCandidatesForJobOffer,
     updateCandidateAssociationStatus,
     removeCandidateFromJob,
+    recalculateCandidateAvailability,
     // Dashboard
     getTotalCandidates,
     getActiveJobOffers,

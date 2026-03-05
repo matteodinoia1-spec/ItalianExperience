@@ -181,6 +181,8 @@
     setField("linkedin_url", candidate.linkedin_url || "");
     setField("address", candidate.address || "");
     setField("summary", candidate.summary || "");
+    // Internal notes (separate from activity log)
+    setField("notes", candidate.notes || "");
 
     var dobText = candidate.date_of_birth ? formatDate(candidate.date_of_birth) : "";
     setField("date_of_birth", dobText || "");
@@ -313,18 +315,17 @@
       var certs = (results[2] && results[2].data) || [];
       var experience = (results[3] && results[3].data) || [];
       var education = (results[4] && results[4].data) || [];
-      // hobbies are currently not rendered as a dedicated section in this view,
-      // but they are loaded for future extensions if needed.
+      var hobbies = (results[5] && results[5].data) || [];
 
       renderSimpleList("skills", skills, function (item) {
         return safeString(item.skill || "").trim();
       });
 
       renderSimpleList("languages", languages, function (item) {
-        var lang = safeString(item.language || "").trim();
-        var prof = safeString(item.proficiency || "").trim();
-        if (lang && prof) return lang + " (" + prof + ")";
-        return lang || prof;
+        var name = safeString(item.language || "").trim();
+        var level = safeString(item.level || "").trim();
+        if (name && level) return name + " — " + level;
+        return name || level;
       });
 
       renderSimpleList("certifications", certs, function (item) {
@@ -349,6 +350,9 @@
 
       renderExperience(experience);
       renderEducation(education);
+      renderSimpleList("hobbies", hobbies, function (item) {
+        return safeString(item.hobby || "").trim();
+      });
     } catch (err) {
       console.error("[Candidate] loadCandidateProfileSections exception:", err);
       if (window.IESupabase && window.IESupabase.showError) {
@@ -408,7 +412,7 @@
       var left = document.createElement("div");
       var roleTitle = document.createElement("p");
       roleTitle.className = "font-semibold text-sm text-gray-900";
-      roleTitle.textContent = safeString(item.role_title || "Role").trim();
+      roleTitle.textContent = safeString(item.title || "Role").trim();
       var company = document.createElement("p");
       company.className = "text-xs text-gray-500";
       company.textContent = safeString(item.company || "").trim();
