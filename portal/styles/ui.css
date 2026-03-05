@@ -1,0 +1,33 @@
+/**
+ * Portal UI design system
+ * Imports component CSS in dependency order. Load after style.css.
+ *
+ * Order:
+ * - layout
+ * - page-header
+ * - toolbar
+ * - buttons
+ * - cards
+ * - tables
+ * - badges
+ * - filters
+ * - activity-log
+ */
+@import url('./components/layout.css');
+@import url('./components/page-header.css');
+@import url('./components/toolbar.css');
+@import url('./components/buttons.css');
+@import url('./components/cards.css');
+@import url('./components/tables.css');
+@import url('./components/badges.css');
+@import url('./components/filters.css');
+@import url('./components/activity-log.css');
+
+.portal-header {
+  flex-shrink: 0;
+}
+
+.portal-breadcrumb {
+  max-width: 100%;
+}
+

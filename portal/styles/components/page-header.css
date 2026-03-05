@@ -1,0 +1,32 @@
+ .ie-page-header {
+   display: flex;
+   align-items: flex-start;
+   justify-content: space-between;
+   gap: 24px;
+   margin-bottom: 24px;
+ }
+
+ .ie-page-header__text {
+   display: flex;
+   flex-direction: column;
+   gap: 4px;
+ }
+
+ .ie-page-header__title {
+   font-family: 'Playfair Display', serif;
+   font-size: 26px;
+   font-weight: 600;
+   color: #1b4332;
+ }
+
+ .ie-page-header__subtitle {
+   font-size: 14px;
+   color: #6b7280;
+ }
+
+ .ie-page-header__actions {
+   display: flex;
+   align-items: center;
+   gap: 12px;
+ }
+

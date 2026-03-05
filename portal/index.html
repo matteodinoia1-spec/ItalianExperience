@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -8,7 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Playfair Display for headers, Montserrat for body -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/ui.css">
     <style>
         :root {
             --primary-green: #1b4332;
@@ -27,7 +28,7 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Mobile: layout compatto e riquadro adattato allo schermo */
+        /* Mobile: compact layout and viewport-fit card */
         @media (max-width: 767px) {
             body {
                 background-attachment: scroll;
@@ -132,7 +133,7 @@
             border-bottom: 2px solid var(--gold-accent);
         }
 
-        /* Animazione per il caricamento */
+        /* Loading animation */
         .fade-in {
             animation: fadeIn 1s ease-in-out;
         }
@@ -145,15 +146,15 @@
 </head>
 <body class="min-h-screen min-h-[100dvh] flex flex-col md:flex-row items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]">
 
-    <!-- Wrapper per l'effetto glass globale (su mobile scrollabile) -->
+    <!-- Wrapper for global glass effect (scrollable on mobile) -->
     <div class="login-card max-w-5xl w-full rounded-2xl overflow-hidden flex flex-col md:flex-row glass-container fade-in flex-shrink-0 md:my-0 my-2 sm:my-6">
         
-        <!-- Colonna Sinistra: Immagine e Benvenuto -->
+        <!-- Left column: image + welcome -->
         <div class="login-left md:w-1/2 bg-italian-overlay p-8 md:p-12 text-white flex flex-col justify-between min-h-[220px] md:min-h-[600px]">
             <div class="backdrop-brightness-90 p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-                <h2 class="text-3xl lg:text-4xl font-bold italic mb-4 serif">Benvenuto</h2>
+                <h2 class="text-3xl lg:text-4xl font-bold italic mb-4 serif">Welcome</h2>
                 <p class="text-lg font-light opacity-95 leading-relaxed">
-                    Accedi per continuare il tuo viaggio attraverso le meraviglie, i sapori e l'arte dell'Italia.
+                    Log in to continue your journey through Italy’s wonders, flavors, and art.
                 </p>
             </div>
             <div class="mt-auto">
@@ -161,20 +162,20 @@
             </div>
         </div>
 
-        <!-- Colonna Destra: Modulo Login -->
+        <!-- Right column: login form -->
         <div class="login-right md:w-1/2 p-8 lg:p-16 flex flex-col justify-center">
             <div class="login-header mb-10 text-center md:text-left">
-                <h1 class="text-4xl font-bold mb-2 serif">Accesso</h1>
-                <p class="text-gray-600 text-sm italic">Area riservata ai membri della community.</p>
+                <h1 class="text-4xl font-bold mb-2 serif">Sign in</h1>
+                <p class="text-gray-600 text-sm italic">Restricted area for community members.</p>
             </div>
 
             <form id="loginForm" class="login-form space-y-4 md:space-y-6">
                 <!-- Email/Username -->
                 <div class="relative">
-                    <label for="email" class="block text-xs uppercase tracking-wider font-semibold text-gray-500 mb-1">Email o Nome Utente</label>
+                    <label for="email" class="block text-xs uppercase tracking-wider font-semibold text-gray-500 mb-1">Email or username</label>
                     <input type="text" id="email" name="email" required
                         class="w-full py-3 px-4 rounded-t-lg input-field text-gray-800 placeholder-gray-400"
-                        placeholder="esempio@esperienza.it">
+                        placeholder="example@experience.it">
                 </div>
 
                 <!-- Password -->
@@ -183,7 +184,7 @@
                     <input type="password" id="password" name="password" required
                         class="w-full py-3 px-4 rounded-t-lg input-field text-gray-800 placeholder-gray-400"
                         placeholder="••••••••">
-                    <button type="button" onclick="togglePassword()" class="absolute right-4 bottom-3 text-gray-400 hover:text-gold-accent">
+                    <button type="button" onclick="togglePassword()" class="ie-btn ie-btn-secondary absolute right-4 bottom-3 !py-2 !px-2 min-w-0 text-gray-400 hover:text-gold-accent">
                         <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -191,30 +192,30 @@
                     </button>
                 </div>
 
-                <!-- Opzioni Extra -->
+                <!-- Extra options -->
                 <div class="flex items-center justify-between text-sm">
                     <label class="flex items-center space-x-2 cursor-pointer">
                         <input type="checkbox" class="rounded border-gray-300 text-[#c5a059] focus:ring-[#c5a059] bg-white/50">
-                        <span class="text-gray-600">Ricordami</span>
+                        <span class="text-gray-600">Remember me</span>
                     </label>
-                    <a href="forgot-password.html" class="text-[#c5a059] hover:underline transition font-medium">Password dimenticata?</a>
+                    <a href="forgot-password.html" class="text-[#c5a059] hover:underline transition font-medium">Forgot password?</a>
                 </div>
 
-                <!-- Bottone Submit -->
-                <button type="submit" class="btn-submit w-full py-4 rounded-md btn-gold font-semibold uppercase tracking-widest text-sm shadow-lg mt-4">
-                    Accedi ora
+                <!-- Submit button -->
+                <button type="submit" class="ie-btn ie-btn-primary w-full mt-4">
+                    Sign in
                 </button>
             </form>
 
-            <!-- Footer del form -->
+            <!-- Form footer -->
             <div class="login-footer mt-12 text-center">
                 <p class="text-gray-500 text-xs uppercase tracking-widest font-medium">
-                    L'accesso è consentito solo su invito.
+                    Access is by invitation only.
                 </p>
                 
                 <div class="divider flex items-center justify-center space-x-4 mt-8 opacity-40">
                     <div class="h-px w-8 bg-gray-400"></div>
-                    <span class="text-xs uppercase tracking-tighter">Esplora l'Italia</span>
+                    <span class="text-xs uppercase tracking-tighter">Explore Italy</span>
                     <div class="h-px w-8 bg-gray-400"></div>
                 </div>
             </div>
@@ -249,13 +250,13 @@
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             if (!email || !password) {
-                showMessage('Inserisci email e password.', 'error');
+                showMessage('Enter email and password.', 'error');
                 return;
             }
-            showMessage('Accesso in corso...', 'success');
+            showMessage('Signing in...', 'success');
             if (!window.IESupabase) {
                 console.error('[Login] IESupabase non è disponibile. Il client Supabase non è stato caricato.');
-                showMessage('Errore interno. Riprova più tardi.', 'error');
+                showMessage('Internal error. Please try again later.', 'error');
                 return;
             }
 
@@ -263,13 +264,13 @@
             const { data, error } = await window.IESupabase.login(email, password);
             if (error) {
                 console.error('[Login] Errore di autenticazione:', error);
-                showMessage(error.message || 'Accesso fallito. Controlla email e password.', 'error');
+                showMessage(error.message || 'Sign-in failed. Check email and password.', 'error');
                 return;
             }
 
             if (!data || !data.user) {
                 console.error('[Login] Risposta di login senza utente valido:', data);
-                showMessage('Accesso non riuscito. Riprova.', 'error');
+                showMessage('Sign-in failed. Please try again.', 'error');
                 return;
             }
 
@@ -284,7 +285,7 @@
                 console.error('[Login] Errore durante ensureProfile:', profileError);
             }
 
-            showMessage('Ben tornato! Reindirizzamento...', 'success');
+            showMessage('Welcome back! Redirecting...', 'success');
             window.IESupabase.redirectToDashboard();
         });
 
@@ -298,7 +299,8 @@
     </script>
     <!-- Supabase JS v2 (publishable key only) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase.js"></script>
+    <script src="core/supabase.js"></script>
+    <script src="core/auth.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             if (window.IESupabase) {
@@ -313,6 +315,5 @@
             }
         });
     </script>
-    <script src="app.js"></script>
 </body>
 </html>

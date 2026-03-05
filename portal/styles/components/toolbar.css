@@ -1,0 +1,35 @@
+/* Portal design system: toolbar (base in layout.css; sticky via .sticky-toolbar) */
+/* Avoid will-change/transform on sticky toolbar so parent overflow does not break stickiness. */
+
+.toolbar-left .portal-toolbar__filters,
+.portal-toolbar__left {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.portal-toolbar__center {
+  flex: 0 0 auto;
+  text-align: left;
+}
+
+.toolbar-right .portal-toolbar__actions,
+.portal-toolbar__right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.portal-toolbar__actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .toolbar-left,
+  .toolbar-right {
+    flex: 0 0 auto;
+  }
+}
+

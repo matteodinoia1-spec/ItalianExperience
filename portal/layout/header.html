@@ -1,0 +1,29 @@
+<header class="portal-header h-[72px] bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between">
+  <div class="page-container portal-header__inner">
+    <div class="portal-header__left">
+      <button data-toggle="sidebar"
+        class="ie-btn ie-btn-secondary lg:hidden">
+        <svg xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6 text-gray-600"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      <div id="portal-header-page-info" class="header-page-info"></div>
+    </div>
+    <div class="portal-header__right portal-header-user" data-user-block>
+      <div class="text-right hidden md:block">
+        <p class="text-sm font-semibold text-gray-800" data-user-name>—</p>
+        <p class="text-[10px] uppercase tracking-tighter text-[#c5a059] font-bold portal-header-user-role" data-user-role>—</p>
+      </div>
+      <div class="w-10 h-10 rounded-full bg-gray-200 border-2 border-[#c5a059] overflow-hidden">
+        <img src="https://ui-avatars.com/api/?name=User&background=1b4332&color=fff" alt="User avatar" data-user-avatar>
+      </div>
+    </div>
+  </div>
+</header>

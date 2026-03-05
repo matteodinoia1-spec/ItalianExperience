@@ -1,0 +1,82 @@
+/* Portal design system: badges */
+
+/* Base badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+/* Status modifiers */
+.badge-applied {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.badge-screening {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge-interview {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.badge-trial {
+  background: #fce7f3;
+  color: #9d174d;
+}
+
+.badge-offered {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-hired {
+  background: #bbf7d0;
+  color: #065f46;
+}
+
+.badge-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-neutral {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.badge-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.badge-new {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-open {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-inprogress {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.badge-closed {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
