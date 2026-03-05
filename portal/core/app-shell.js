@@ -19,6 +19,7 @@
     "candidates",
     "clients",
     "job-offers",
+    "applications",
     "profile",
     "archived",
     "add-candidate",
@@ -226,7 +227,7 @@
 
     backButtons.forEach(function (backButton) {
       var pageKey = getCurrentPageKey();
-      var listingPages = ["dashboard", "candidates", "job-offers", "clients", "archived"];
+      var listingPages = ["dashboard", "candidates", "job-offers", "applications", "clients", "archived"];
       var searchParams = new URLSearchParams(window.location.search || "");
       var hasIdParam = searchParams.has("id");
 
@@ -266,6 +267,7 @@
           if (pageKey === "candidates") return "candidates.html";
           if (pageKey === "clients") return "clients.html";
           if (pageKey === "job-offers") return "job-offers.html";
+          if (pageKey === "applications") return "applications.html";
           if (pageKey === "archived") return "archived.html";
           if (pageKey === "dashboard") return "dashboard.html";
 
@@ -422,6 +424,7 @@
       candidates: "Candidates",
       clients: "Clients",
       "job-offers": "Job Offers",
+      applications: "Applications",
       archived: "Archived",
       profile: "User Profile",
       "add-candidate": "Add New Candidate",
@@ -439,6 +442,7 @@
       candidates: "Manage and track talent in your exclusive network.",
       clients: "Manage your network of companies and partners.",
       "job-offers": "Manage open positions for clients in your network.",
+      applications: "All candidate applications.",
       archived: "Review archived candidates, job offers, and clients.",
       profile: "Manage your personal information and your role in the portal.",
       "add-candidate": "Fill in the fields below to add a new candidate to the database.",
@@ -457,6 +461,7 @@
       candidates: "candidates.html",
       clients: "clients.html",
       "job-offers": "job-offers.html",
+      applications: "applications.html",
       archived: "archived.html",
       profile: "profile.html",
     };
@@ -506,6 +511,8 @@
         return [dashboard, { label: "Clients" }];
       case "job-offers":
         return [dashboard, { label: "Job Offers" }];
+      case "applications":
+        return [dashboard, { label: "Applications" }];
       case "archived":
         return [dashboard, { label: "Archived" }];
       case "add-candidate":
@@ -610,6 +617,8 @@
         return "candidates";
       case "job-offers.html":
         return "job-offers";
+      case "applications.html":
+        return "applications";
       case "clients.html":
         return "clients";
       case "archived.html":
@@ -636,6 +645,7 @@
         if (lastSegment.includes("dashboard")) return "dashboard";
         if (lastSegment.includes("candidates")) return "candidates";
         if (lastSegment.includes("job-offers")) return "job-offers";
+        if (lastSegment.includes("applications")) return "applications";
         if (lastSegment.includes("archived")) return "archived";
         if (lastSegment.includes("profile")) return "profile";
         if (lastSegment.includes("settings")) return "settings";
@@ -3225,6 +3235,10 @@
       if (window.IEListsRuntime && typeof IEListsRuntime.initJobOffersPage === "function") {
         IEListsRuntime.initJobOffersPage();
       }
+    } else if (pageKey === "applications") {
+      if (window.IEListsRuntime && typeof IEListsRuntime.initApplicationsPage === "function") {
+        IEListsRuntime.initApplicationsPage();
+      }
     } else if (pageKey === "clients") {
       if (window.IEListsRuntime && typeof IEListsRuntime.initClientsPage === "function") {
         IEListsRuntime.initClientsPage();
@@ -3245,32 +3259,57 @@
   var jobOfferOriginalStatus = null;
 
   function getCandidateStatusBadgeClass(status) {
-    switch (status) {
+    var s = status && typeof status === "string" ? status.trim().toLowerCase() : "";
+    switch (s) {
       case "new":
         return "badge-new";
+      case "applied":
+        return "badge-applied";
+      case "screening":
+        return "badge-screening";
       case "interview":
         return "badge-interview";
+      case "offer":
+      case "offered":
+        return "badge-offered";
       case "hired":
         return "badge-hired";
       case "rejected":
         return "badge-rejected";
+      case "withdrawn":
+        return "badge-withdrawn";
+      case "not_selected":
+        return "badge-neutral";
       default:
         return "badge-new";
     }
   }
 
   function formatCandidateStatusLabel(status) {
-    switch (status) {
+    var s = status && typeof status === "string" ? status.trim() : "";
+    if (!s) return "New";
+    if (s === "offered") return "Offer";
+    switch (s) {
       case "new":
         return "New";
+      case "applied":
+        return "Applied";
+      case "screening":
+        return "Screening";
       case "interview":
         return "Interview";
+      case "offer":
+        return "Offer";
       case "hired":
         return "Hired";
       case "rejected":
         return "Rejected";
+      case "withdrawn":
+        return "Withdrawn";
+      case "not_selected":
+        return "Not Selected";
       default:
-        return status || "New";
+        return s;
     }
   }
 
@@ -3290,22 +3329,48 @@
     return "new";
   }
 
+  /** Canonical application statuses (ATS). Legacy: new→applied, offered→offer. */
+  var APPLICATION_STATUS_CANONICAL = [
+    "applied",
+    "screening",
+    "interview",
+    "offer",
+    "hired",
+    "rejected",
+    "withdrawn",
+    "not_selected"
+  ];
+
+  /**
+   * Normalize stored status to canonical for display/UI.
+   * @param {string} status - raw value from candidate_job_associations.status
+   * @returns {string} canonical status
+   */
+  function normalizeApplicationStatusForDisplay(status) {
+    if (!status || typeof status !== "string") return "applied";
+    var s = status.trim().toLowerCase();
+    if (s === "new") return "applied";
+    if (s === "offered") return "offer";
+    return s;
+  }
+
   function getApplicationStatusBadgeClass(status) {
-    switch (status) {
-      case "new":
-        return "badge-new";
+    var s = normalizeApplicationStatusForDisplay(status);
+    switch (s) {
       case "applied":
         return "badge-applied";
       case "screening":
         return "badge-screening";
       case "interview":
         return "badge-interview";
-      case "offered":
+      case "offer":
         return "badge-offered";
       case "hired":
         return "badge-hired";
       case "rejected":
         return "badge-rejected";
+      case "withdrawn":
+        return "badge-withdrawn";
       case "not_selected":
         return "badge-neutral";
       default:
@@ -3314,25 +3379,26 @@
   }
 
   function formatApplicationStatusLabel(status) {
-    switch (status) {
-      case "new":
-        return "New";
+    var s = normalizeApplicationStatusForDisplay(status);
+    switch (s) {
       case "applied":
         return "Applied";
       case "screening":
         return "Screening";
       case "interview":
         return "Interview";
-      case "offered":
-        return "Offered";
+      case "offer":
+        return "Offer";
       case "hired":
         return "Hired";
       case "rejected":
         return "Rejected";
+      case "withdrawn":
+        return "Withdrawn";
       case "not_selected":
         return "Not Selected";
       default:
-        return status || "Applied";
+        return "Applied";
     }
   }
 
@@ -3393,16 +3459,44 @@
     return "";
   }
 
+  /**
+   * Tri-state derived availability from applications (never stored in DB).
+   * working = any application hired; in_process = any in applied/screening/interview/offer; else available.
+   */
+  function computeDerivedAvailability(applications) {
+    if (!applications || !Array.isArray(applications) || applications.length === 0) return "available";
+    var activeStatuses = ["applied", "screening", "interview", "offer", "new", "offered"];
+    var hasHired = applications.some(function (a) {
+      var s = (a && a.status && String(a.status)).toLowerCase();
+      return s === "hired";
+    });
+    if (hasHired) return "working";
+    var hasActive = applications.some(function (a) {
+      var s = (a && a.status && String(a.status)).toLowerCase();
+      return activeStatuses.indexOf(s) !== -1;
+    });
+    if (hasActive) return "in_process";
+    return "available";
+  }
+
   function computeCandidateAvailability(candidate) {
     if (!candidate) return "available";
+    if (candidate.derived_availability) {
+      return candidate.derived_availability;
+    }
+    if (candidate.candidate_job_associations && Array.isArray(candidate.candidate_job_associations)) {
+      return computeDerivedAvailability(candidate.candidate_job_associations);
+    }
     var explicit = normalizeAvailabilityStatus(candidate.availability_status);
-    if (explicit) return explicit;
+    if (explicit) {
+      return explicit === "unavailable" ? "in_process" : "available";
+    }
     var assocStatus =
       candidate.latest_association && candidate.latest_association.status
         ? String(candidate.latest_association.status).toLowerCase()
         : "";
-    if (assocStatus && assocStatus !== "rejected" && assocStatus !== "not_selected") {
-      return "unavailable";
+    if (assocStatus && assocStatus !== "rejected" && assocStatus !== "not_selected" && assocStatus !== "withdrawn") {
+      return "in_process";
     }
     return "available";
   }
@@ -3410,17 +3504,23 @@
   function getAvailabilityBadgeClass(candidateOrStatus) {
     var status =
       typeof candidateOrStatus === "string"
-        ? normalizeAvailabilityStatus(candidateOrStatus)
+        ? candidateOrStatus
         : computeCandidateAvailability(candidateOrStatus);
-    return status === "available" ? "badge-open" : "badge-closed";
+    if (status === "working") return "badge-hired";
+    if (status === "in_process") return "badge-inprogress";
+    if (status === "unavailable") return "badge-closed";
+    return "badge-open";
   }
 
   function formatAvailabilityLabel(candidateOrStatus) {
     var status =
       typeof candidateOrStatus === "string"
-        ? normalizeAvailabilityStatus(candidateOrStatus)
+        ? candidateOrStatus
         : computeCandidateAvailability(candidateOrStatus);
-    return status === "available" ? "Available" : "Unavailable";
+    if (status === "working") return "Working";
+    if (status === "in_process") return "In process";
+    if (status === "unavailable") return "Unavailable";
+    return "Available";
   }
 
   function isCandidateHired(candidate) {
@@ -5398,16 +5498,7 @@
       el.innerHTML = "<span class=\"" + badgeClass + "\">" + escapeHtml(label) + "</span>";
     }
 
-    var STATUS_OPTIONS = [
-      "new",
-      "applied",
-      "screening",
-      "interview",
-      "offered",
-      "hired",
-      "rejected",
-      "not_selected"
-    ];
+    var STATUS_OPTIONS = APPLICATION_STATUS_CANONICAL;
 
     async function renderAssociatedCandidates(jobOfferId, offer) {
       if (!window.IESupabase || !window.IESupabase.fetchCandidatesForJobOffer) return;
@@ -5468,7 +5559,7 @@
           var candidateId = c && c.id ? c.id : null;
           var name = [c.first_name, c.last_name].filter(Boolean).join(" ") || "—";
           var position = (c.position && c.position.toString()) || "—";
-          var status = (item.status && item.status.toString()) || "—";
+          var status = normalizeApplicationStatusForDisplay((item.status && item.status.toString()) || "applied");
           var rejectionReason = item.rejection_reason || null;
           var tr = document.createElement("tr");
           tr.className = "border-b border-gray-100";
@@ -5505,7 +5596,7 @@
           STATUS_OPTIONS.forEach(function (opt) {
             var option = document.createElement("option");
             option.value = opt;
-            option.textContent = opt;
+            option.textContent = formatApplicationStatusLabel(opt);
             if (opt === status) option.selected = true;
             select.appendChild(option);
           });
@@ -6889,7 +6980,7 @@
         const associations = associationResults[i]?.data || [];
         const associatedActive = associations.filter(function (a) {
           const s = (a.status || "").toString().toLowerCase();
-          return s !== "rejected" && s !== "not_selected";
+          return s !== "rejected" && s !== "not_selected" && s !== "withdrawn";
         }).length;
         const hiredCount = associations.filter(function (a) {
           const s = (a.status || "").toString().toLowerCase();
@@ -7449,6 +7540,10 @@
       }
       }
 
+      if (entity === "application" && typeof window.IESupabase.restoreApplication === "function") {
+        await window.IESupabase.restoreApplication(id);
+      }
+
       location.reload();
       return;
     }
@@ -7458,6 +7553,12 @@
       if (!window.IESupabase) return;
 
       if (!confirm("Sei sicuro? Questa azione è irreversibile.")) return;
+
+      if (entity === "application" && typeof window.IESupabase.deleteAssociationPermanently === "function") {
+        await window.IESupabase.deleteAssociationPermanently(id);
+        location.reload();
+        return;
+      }
 
       const tableMap = {
         candidate: "candidates",
@@ -7530,6 +7631,11 @@
   window.IEPortal.navigateTo = navigateTo;
   window.IEPortal.setPageBreadcrumbs = setPageBreadcrumbs;
   window.IEPortal.mountPageHeader = mountPageHeader;
+  window.IEPortal.getApplicationStatusBadgeClass = getApplicationStatusBadgeClass;
+  window.IEPortal.formatApplicationStatusLabel = formatApplicationStatusLabel;
+  window.IEPortal.normalizeApplicationStatusForDisplay = normalizeApplicationStatusForDisplay;
+  window.IEPortal.computeDerivedAvailability = computeDerivedAvailability;
+  window.IEPortal.formatAvailabilityLabel = formatAvailabilityLabel;
   window.IEPortal.renderEntityRow =
     window.IEListsRuntime && typeof IEListsRuntime.renderEntityRow === "function"
       ? IEListsRuntime.renderEntityRow
