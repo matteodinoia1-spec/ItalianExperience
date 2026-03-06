@@ -37,9 +37,10 @@
       })
       .filter((item) => {
         if (!filters.status) return true;
-        const effectiveStatus = typeof getEffectiveCandidateStatus === "function"
-          ? getEffectiveCandidateStatus(item)
-          : item.status;
+        const effectiveStatus =
+          window.IEStatusRuntime && typeof window.IEStatusRuntime.getEffectiveCandidateStatus === "function"
+            ? window.IEStatusRuntime.getEffectiveCandidateStatus(item)
+            : item.status;
         if (filters.status === "new") {
           return effectiveStatus === "new" || effectiveStatus === "applied";
         }
@@ -266,8 +267,14 @@
       var createdDate = row.created_at
         ? new Date(row.created_at).toLocaleDateString("it-IT")
         : "";
-      var statusClass = getDashboardCandidateStatusBadgeClass(row.status);
-      var statusLabel = formatDashboardCandidateStatusLabel(row.status);
+      var statusClass =
+        window.IEStatusRuntime && typeof window.IEStatusRuntime.getDashboardCandidateStatusBadgeClass === "function"
+          ? window.IEStatusRuntime.getDashboardCandidateStatusBadgeClass(row.status)
+          : "badge-new";
+      var statusLabel =
+        window.IEStatusRuntime && typeof window.IEStatusRuntime.formatDashboardCandidateStatusLabel === "function"
+          ? window.IEStatusRuntime.formatDashboardCandidateStatusLabel(row.status)
+          : (row.status ? String(row.status) : "New");
       tr.innerHTML =
         "<td class=\"px-6 py-4\">" +
         "<a href=\"" + candidateHref + "\" data-action=\"dashboard-open-candidate\" data-id=\"" + (window.escapeHtml ? window.escapeHtml(String(row.id || "")) : String(row.id || "")) + "\" class=\"text-[#1b4332] font-semibold hover:underline\">" +
@@ -332,26 +339,6 @@
         "</div>";
       container.appendChild(div);
     });
-  }
-
-  function getDashboardCandidateStatusBadgeClass(status) {
-    switch (status) {
-      case "new": return "badge-new";
-      case "interview": return "badge-interview";
-      case "hired": return "badge-hired";
-      case "rejected": return "badge-rejected";
-      default: return "badge-new";
-    }
-  }
-
-  function formatDashboardCandidateStatusLabel(status) {
-    switch (status) {
-      case "new": return "New";
-      case "interview": return "Interview";
-      case "hired": return "Hired";
-      case "rejected": return "Rejected";
-      default: return status ? String(status) : "New";
-    }
   }
 
   // ---------------------------------------------------------------------------
@@ -1185,8 +1172,14 @@
         const createdAtValue = row.created_at
           ? new Date(row.created_at).toLocaleDateString("it-IT")
           : "—";
-        const badgeClass = getOfferStatusBadgeClass(row.status);
-        const statusLabel = formatOfferStatusLabel(row.status);
+        const badgeClass =
+          window.IEStatusRuntime && typeof window.IEStatusRuntime.getOfferStatusBadgeClassForList === "function"
+            ? window.IEStatusRuntime.getOfferStatusBadgeClassForList(row.status)
+            : "badge-open";
+        const statusLabel =
+          window.IEStatusRuntime && typeof window.IEStatusRuntime.formatOfferStatusLabelForList === "function"
+            ? window.IEStatusRuntime.formatOfferStatusLabelForList(row.status)
+            : (row.status || "Open");
 
         const associatedCellHtml =
           '<button type="button" data-action="view-offer-candidates" data-id="' +
@@ -1279,35 +1272,6 @@
       }
     }
 
-    function getOfferStatusBadgeClass(status) {
-      switch ((status || "").toString().toLowerCase()) {
-        case "open":
-        case "active":
-          return "badge-open";
-        case "inprogress":
-          return "badge-inprogress";
-        case "closed":
-          return "badge-closed";
-        default:
-          return "badge-open";
-      }
-    }
-
-    function formatOfferStatusLabel(status) {
-      switch ((status || "").toString().toLowerCase()) {
-        case "open":
-          return "Open";
-        case "active":
-          return "Active";
-        case "inprogress":
-          return "In Progress";
-        case "closed":
-          return "Closed";
-        default:
-          return status || "Open";
-      }
-    }
-
     renderOffers();
   }
 
@@ -1341,12 +1305,18 @@
     const dateToInput = document.querySelector('[data-filter="application-date-to"]');
 
     function getApplicationStatusBadgeClass(status) {
+      if (window.IEStatusRuntime && typeof window.IEStatusRuntime.getApplicationStatusBadgeClass === "function") {
+        return window.IEStatusRuntime.getApplicationStatusBadgeClass(status);
+      }
       if (window.IEPortal && typeof window.IEPortal.getApplicationStatusBadgeClass === "function") {
         return window.IEPortal.getApplicationStatusBadgeClass(status);
       }
       return "badge-applied";
     }
     function formatApplicationStatusLabel(status) {
+      if (window.IEStatusRuntime && typeof window.IEStatusRuntime.formatApplicationStatusLabel === "function") {
+        return window.IEStatusRuntime.formatApplicationStatusLabel(status);
+      }
       if (window.IEPortal && typeof window.IEPortal.formatApplicationStatusLabel === "function") {
         return window.IEPortal.formatApplicationStatusLabel(status);
       }
@@ -1499,8 +1469,8 @@
             rows.forEach(function (row) {
               const tr = document.createElement("tr");
               tr.className = "clickable-row border-b border-gray-100 hover:bg-gray-50/80";
-              tr.setAttribute("data-entity", "candidate");
-              tr.setAttribute("data-entity-id", row.candidate_id || "");
+              tr.setAttribute("data-entity", "application");
+              tr.setAttribute("data-id", String(row.id || ""));
               const candidateUrl = candidateViewUrl(row.candidate_id);
               tr.innerHTML =
                 "<td class=\"px-6 py-4\"><a href=\"" + escapeHtml(candidateUrl) + "\" class=\"text-[#1b4332] font-semibold hover:underline\" data-entity-type=\"candidate\" data-entity-id=\"" + escapeHtml(String(row.candidate_id || "")) + "\">" + escapeHtml(row.candidate_name || "—") + "</a></td>" +

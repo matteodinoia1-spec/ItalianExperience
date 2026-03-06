@@ -128,6 +128,11 @@ function getEntityViewUrl(entityType, entityId) {
           "&mode=view"
       : "clients.html";
   }
+  if (type === "application") {
+    return hasId
+      ? "application.html?id=" + encodeURIComponent(String(entityId))
+      : "applications.html";
+  }
 
   return null;
 }
