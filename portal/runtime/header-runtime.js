@@ -192,9 +192,10 @@
     headerListenerBound = true;
 
     document.addEventListener("ie:header-loaded", function () {
-      var sidebar = document.getElementById("sidebar");
+      // Re-run initLayout so the header-injected sidebar toggle gets bound.
+      // initLayout is idempotent: only new toggle buttons are bound; no duplicate
+      // document/window/overlay listeners or MutationObserver.
       if (
-        sidebar &&
         window.IELayoutRuntime &&
         typeof window.IELayoutRuntime.initLayout === "function"
       ) {

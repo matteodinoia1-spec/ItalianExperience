@@ -236,12 +236,18 @@
         await window.IESidebarRuntime.ensureSidebarLoaded();
 
         // Extra defense-in-depth: re-validate auth for protected pages.
+        // Reuse cached session when available to avoid duplicate getSession().
         if (
           isProtectedPage &&
           window.IEAuth &&
           typeof window.IEAuth.checkAuth === "function"
         ) {
-          var user = await window.IEAuth.checkAuth();
+          var cachedSession =
+            window.IESessionReady &&
+            typeof window.IESessionReady.getSessionReady === "function"
+              ? await window.IESessionReady.getSessionReady()
+              : undefined;
+          var user = await window.IEAuth.checkAuth(cachedSession);
           if (!user) return;
         }
 
@@ -276,7 +282,12 @@
           window.IEAuth &&
           typeof window.IEAuth.checkAuth === "function"
         ) {
-          var userAfterError = await window.IEAuth.checkAuth();
+          var cachedAfterError =
+            window.IESessionReady &&
+            typeof window.IESessionReady.getSessionReady === "function"
+              ? await window.IESessionReady.getSessionReady()
+              : undefined;
+          var userAfterError = await window.IEAuth.checkAuth(cachedAfterError);
           if (!userAfterError) return;
         }
 
@@ -298,7 +309,12 @@
         window.IEAuth &&
         typeof window.IEAuth.checkAuth === "function"
       ) {
-        var userNoSidebar = await window.IEAuth.checkAuth();
+        var cachedNoSidebar =
+          window.IESessionReady &&
+          typeof window.IESessionReady.getSessionReady === "function"
+            ? await window.IESessionReady.getSessionReady()
+            : undefined;
+        var userNoSidebar = await window.IEAuth.checkAuth(cachedNoSidebar);
         if (!userNoSidebar) return;
       }
       if (

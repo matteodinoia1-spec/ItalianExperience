@@ -70,7 +70,28 @@
       }
 
       try {
-        await ensureSupabaseSessionReady();
+        var sessionResult = null;
+        if (
+          window.IESessionReady &&
+          typeof window.IESessionReady.getSessionReady === "function"
+        ) {
+          sessionResult = await window.IESessionReady.getSessionReady();
+        } else {
+          await ensureSupabaseSessionReady();
+        }
+        var user = await window.IEAuth.checkAuth(sessionResult || undefined);
+        if (!user) {
+          redirectToLoginFailsafe();
+          return false;
+        }
+
+        window.__IE_AUTH_USER__ = user;
+
+        if (document && document.body) {
+          document.body.style.visibility = "visible";
+        }
+
+        return true;
       } catch (err) {
         if (typeof window.debugLog === "function") {
           window.debugLog("[ItalianExperience] Auth bootstrap failed", err);
@@ -78,20 +99,6 @@
         redirectToLoginFailsafe();
         return false;
       }
-
-      var user = await window.IEAuth.checkAuth();
-      if (!user) {
-        redirectToLoginFailsafe();
-        return false;
-      }
-
-      window.__IE_AUTH_USER__ = user;
-
-      if (document && document.body) {
-        document.body.style.visibility = "visible";
-      }
-
-      return true;
     })();
   } else {
     window.__IE_AUTH_GUARD__ = Promise.resolve(true);
