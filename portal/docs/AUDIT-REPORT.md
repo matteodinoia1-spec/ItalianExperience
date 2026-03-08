@@ -4,6 +4,8 @@
 **Scope:** Portal (HTML, Tailwind, Vanilla JS, Supabase)  
 **Goal:** Consistency, responsiveness, access control – audit only (no UI design changes).
 
+**Note (post header-first refactor, Phase 6):** Layout has changed. Header is now primary navigation on desktop; sidebar is mobile fallback only. Desktop no longer reserves sidebar width. Footer holds breadcrumbs. See `BOOTSTRAP-AND-SCRIPTS.md` and `LAYOUT-AUDIT.md` for current architecture.
+
 ---
 
 ## 1. Sidebar Check
@@ -33,14 +35,14 @@
 
 ## 2. Layout Consistency
 
-### 2.1 Structure (Sidebar → Header → Main content) — **PASS**
+### 2.1 Structure (Header-first, post refactor) — **PASS**
 
 All portal pages follow:
 
-1. Sidebar: `<aside id="sidebar"></aside>`
-2. Main: `<main class="flex-1 flex flex-col min-w-0 ...">`
-3. Header inside main: `<header class="h-20 ...">`
-4. Content area: e.g. `<div class="p-8 space-y-8 max-w-[1600px] mx-auto w-full">`
+1. Header: `#portal-header` (primary nav, user menu)
+2. Main: `<main class="portal-main ...">` with toolbar and content
+3. Footer: `#portal-footer` (breadcrumbs)
+4. Sidebar: `<aside id="sidebar"></aside>` (mobile fallback only)
 
 ### 2.2 Inconsistencies
 
@@ -70,9 +72,9 @@ All portal pages follow:
 - Toggle: `[data-toggle="sidebar"]` and `.portal-header-toggle` are shown on small viewports and hidden at `min-width: 1024px`.
 - Tables are wrapped in `overflow-x-auto` on candidati, offerte, clienti, dashboard, archiviati, so horizontal scroll is contained.
 
-### 3.2 Sidebar behavior — **PASS**
+### 3.2 Sidebar behavior — **PASS** *(updated for header-first)*
 
-- **Desktop:** Sidebar is fixed (style.css `#sidebar.sidebar`), main has `margin-left: var(--ie-sidebar-width)`.
+- **Desktop:** Header is primary navigation; sidebar is mobile fallback only. Desktop layout does **not** reserve sidebar width.
 - **Mobile:** Sidebar hidden by default; overlay and toggle open/close it; ESC and backdrop close it (handled in **app.js**).
 
 ### 3.3 Gaps / risks

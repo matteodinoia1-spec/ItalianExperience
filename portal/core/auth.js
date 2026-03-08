@@ -16,11 +16,22 @@
 
   /**
    * Check authentication for the current user.
-   * Delegates to IESupabase.requireAuth(), which enforces a redirect when needed.
+   * If optionalCachedSession is provided and has a valid user, returns that user
+   * without calling requireAuth (reduces duplicate session fetches during boot).
+   * Otherwise delegates to IESupabase.requireAuth().
+   * @param {{ data?: { session?: object, user?: object }, error?: object } | undefined} optionalCachedSession - result from IESessionReady.getSessionReady()
    * @returns {Promise<object|undefined>} authenticated user or undefined if redirecting
    */
-  async function checkAuth() {
+  async function checkAuth(optionalCachedSession) {
     try {
+      if (
+        optionalCachedSession &&
+        optionalCachedSession.data &&
+        optionalCachedSession.data.session &&
+        optionalCachedSession.data.user
+      ) {
+        return optionalCachedSession.data.user;
+      }
       if (typeof window.IESupabase.requireAuth === "function") {
         return await window.IESupabase.requireAuth();
       }

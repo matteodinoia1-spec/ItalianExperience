@@ -37,7 +37,16 @@
   async function loadCurrentUserProfile() {
     if (!window.IEAuth) return;
     try {
-      var sessionResult = await window.IEAuth.getSession();
+      var sessionResult = null;
+      if (
+        window.IESessionReady &&
+        typeof window.IESessionReady.getSessionReady === "function"
+      ) {
+        sessionResult = await window.IESessionReady.getSessionReady();
+      }
+      if (!sessionResult && typeof window.IEAuth.getSession === "function") {
+        sessionResult = await window.IEAuth.getSession();
+      }
       var user = (sessionResult && sessionResult.data && sessionResult.data.user) || null;
       window.IE_CURRENT_USER_EMAIL = (user && user.email) || null;
 

@@ -50,6 +50,8 @@
     return el;
   }
 
+  var layoutInitialized = false;
+
   function initLayout() {
     var sidebar = document.getElementById("sidebar");
     var headerToggleButtons = document.querySelectorAll(
@@ -57,6 +59,19 @@
     );
 
     if (!sidebar) return;
+
+    // When already initialized, only bind any new toggle buttons (e.g. in header
+    // injected after bootstrap). Avoids duplicate document/window/overlay listeners.
+    if (layoutInitialized) {
+      headerToggleButtons.forEach(function (btn) {
+        if (btn.__ieSidebarToggleBound) return;
+        btn.__ieSidebarToggleBound = true;
+        btn.addEventListener("click", function () {
+          toggleSidebar(sidebar);
+        });
+      });
+      return;
+    }
 
     var overlay = ensureSidebarOverlay();
 
@@ -107,6 +122,8 @@
       syncBodyWithSidebar(sidebar);
     });
     mo.observe(sidebar, { attributes: true, attributeFilter: ["class"] });
+
+    layoutInitialized = true;
   }
 
   function toggleSidebarPublic() {

@@ -1,28 +1,58 @@
 <header class="portal-header h-[72px] bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between">
-  <div class="page-container portal-header__inner">
+  <div class="portal-header__inner">
     <div class="portal-header__left">
-      <button data-toggle="sidebar"
-        class="ie-btn ie-btn-secondary lg:hidden">
+      <button type="button"
+        data-toggle="sidebar"
+        class="portal-header-toggle ie-btn ie-btn-secondary lg:hidden"
+        aria-label="Toggle sidebar">
         <svg xmlns="http://www.w3.org/2000/svg"
           class="h-6 w-6 text-gray-600"
           fill="none"
           viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 6h16M4 12h16M4 18h16" />
+          stroke="currentColor"
+          aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
-      <div id="portal-header-page-info" class="header-page-info"></div>
+      <nav class="portal-header-nav hidden lg:flex items-center" aria-label="Primary navigation">
+        <a href="dashboard.html" class="portal-header-nav__link" data-nav-group="dashboard">Dashboard</a>
+        <div class="portal-header-nav__item-with-sub">
+          <a href="candidates.html" class="portal-header-nav__link" data-nav-group="candidates">Candidates</a>
+          <ul class="portal-header-nav__sub" aria-label="Candidates submenu">
+            <li><a href="add-candidate.html" class="portal-header-nav__sublink">Add Candidate</a></li>
+          </ul>
+        </div>
+        <div class="portal-header-nav__item-with-sub">
+          <a href="job-offers.html" class="portal-header-nav__link" data-nav-group="job-offers">Job Offers</a>
+          <ul class="portal-header-nav__sub" aria-label="Job offers submenu">
+            <li><a href="add-job-offer.html" class="portal-header-nav__sublink">Add Job Offer</a></li>
+          </ul>
+        </div>
+        <a href="applications.html" class="portal-header-nav__link" data-nav-group="applications">Applications</a>
+        <div class="portal-header-nav__item-with-sub">
+          <a href="clients.html" class="portal-header-nav__link" data-nav-group="clients">Clients</a>
+          <ul class="portal-header-nav__sub" aria-label="Clients submenu">
+            <li><a href="add-client.html" class="portal-header-nav__sublink">Add Client</a></li>
+          </ul>
+        </div>
+        <a href="archived.html" class="portal-header-nav__link" data-nav-group="archived">Archived</a>
+      </nav>
     </div>
-    <div class="portal-header__right portal-header-user" data-user-block>
-      <div class="text-right hidden md:block">
-        <p class="text-sm font-semibold text-gray-800" data-user-name>—</p>
-        <p class="text-[10px] uppercase tracking-tighter text-[#c5a059] font-bold portal-header-user-role" data-user-role>—</p>
-      </div>
-      <div class="w-10 h-10 rounded-full bg-gray-200 border-2 border-[#c5a059] overflow-hidden">
-        <img src="https://ui-avatars.com/api/?name=User&background=1b4332&color=fff" alt="User avatar" data-user-avatar>
+    <div class="portal-header__right">
+      <div class="portal-header-user-area">
+        <div class="portal-header-user" data-user-block data-user-menu-trigger role="button" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-label="User menu">
+          <div class="text-right hidden md:block">
+            <p class="text-sm font-semibold text-gray-800" data-user-name>—</p>
+            <p class="text-[10px] uppercase tracking-tighter text-[#c5a059] font-bold portal-header-user-role" data-user-role>—</p>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-gray-200 border-2 border-[#c5a059] overflow-hidden">
+            <img src="https://ui-avatars.com/api/?name=User&background=1b4332&color=fff" alt="User avatar" data-user-avatar>
+          </div>
+        </div>
+        <div class="portal-header-user-menu" aria-label="User menu">
+          <a href="profile.html" class="portal-header-user-menu__item">Settings</a>
+          <a href="#" data-action="logout" class="portal-header-user-menu__item">Logout</a>
+        </div>
       </div>
     </div>
   </div>

@@ -15,15 +15,15 @@
     '<div class="p-8"><div class="flex items-center space-x-3 mb-10"><div class="w-10 h-10 bg-[#c5a059] rounded-full flex items-center justify-center text-white font-bold text-xl serif italic" aria-hidden="true">IE</div>' +
     '<div><h2 class="text-lg font-bold serif leading-tight">Italian</h2><p class="text-[10px] uppercase tracking-widest opacity-60">Experience Portal</p></div></div>' +
     '<nav class="space-y-2" aria-label="Portal navigation">' +
-    '<a href="dashboard.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg"><span class="text-sm font-medium">Dashboard</span></a>' +
-    '<a href="candidates.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg"><span class="text-sm font-medium">Candidates</span></a>' +
-    '<a href="job-offers.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg"><span class="text-sm font-medium">Job offers</span></a>' +
-    '<a href="clients.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg"><span class="text-sm font-medium">Clients</span></a>' +
-    '<a href="archived.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg"><span class="text-sm font-medium">Archived</span></a>' +
+    '<a href="/ItalianExperience/portal/dashboard.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg"><span class="text-sm font-medium">Dashboard</span></a>' +
+    '<a href="/ItalianExperience/portal/candidates.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg"><span class="text-sm font-medium">Candidates</span></a>' +
+    '<a href="/ItalianExperience/portal/job-offers.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg"><span class="text-sm font-medium">Job offers</span></a>' +
+    '<a href="/ItalianExperience/portal/clients.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg"><span class="text-sm font-medium">Clients</span></a>' +
+    '<a href="/ItalianExperience/portal/archived.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg"><span class="text-sm font-medium">Archived</span></a>' +
     '</nav></div>' +
     '<div class="mt-auto p-8 border-t border-white/10 sidebar-footer">' +
-    '<a href="profile.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg mb-2"><span class="text-sm font-medium">Profile</span></a>' +
-    '<a href="index.html" class="flex items-center space-x-4 py-3 px-4 text-red-400 hover:text-red-300 transition"><span class="text-sm font-medium">Logout</span></a>' +
+    '<a href="/ItalianExperience/portal/profile.html" class="nav-link flex items-center space-x-4 py-3 px-4 rounded-r-lg mb-2"><span class="text-sm font-medium">Profile</span></a>' +
+    '<a href="/ItalianExperience/portal/index.html" class="flex items-center space-x-4 py-3 px-4 text-red-400 hover:text-red-300 transition"><span class="text-sm font-medium">Logout</span></a>' +
     '</div></aside>';
 
   function applySidebarHtml(container, html) {

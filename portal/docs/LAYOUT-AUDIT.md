@@ -1,11 +1,33 @@
 # Portal layout audit — global page header refactor
 
-## Phase 1 — Layout audit
+## Current architecture (post header-first refactor, Phase 6)
 
-### DOM structure (intended)
+### Shared shell
+
+- **Header** (`#portal-header`) — Primary global navigation. Filled by `shared/header-loader.js` with `layout/header.html`. Contains: left = primary nav (desktop) + hamburger toggle (mobile); right = user area (Settings, Logout). Does **not** contain page title, subtitle, or breadcrumbs.
+- **Footer** (`#portal-footer`) — Thin fixed glass-style footer with breadcrumbs only. Filled by `header-loader.js` with `layout/footer.html`. Contains `#page-breadcrumbs`; `header-runtime.js` renders breadcrumbs into it on `ie:header-loaded` and when `mountPageHeader()` is called.
+- **Sidebar** — Mobile/technical fallback only. Off-canvas via hamburger on small viewports. Desktop layout does **not** reserve sidebar width.
+- **Page titles** — Not part of the shared shell; will be repositioned later.
+
+### Navigation model
+
+- **Desktop:** Header-first navigation; submenus open on hover.
+- **Mobile:** Off-canvas sidebar via hamburger; sidebar is fallback only.
+
+### DOM structure
+
+- **portal-header** → **portal-toolbar** → **portal-content**. Footer is appended to `portal-main` by `header-loader.js` if not present.
+- **portal-toolbar** (`.portal-toolbar`) — Page actions (filters, Add X, entity Edit/Save/Cancel). Static HTML per page.
+- **portal-content** (`.portal-content`) — Tables, cards, forms.
+
+---
+
+## Phase 1 — Layout audit (historical)
+
+### DOM structure (intended at time of audit)
 
 - **portal-header** (`#portal-header`) — Global navigation. Filled by `shared/header-loader.js` with `layout/header.html`. Contains sidebar toggle, user block. Does **not** contain `.page-title` or `.page-subtitle` (no placeholders in `header.html`).
-- **portal-page-header** (`#portal-page-header`) — Title + breadcrumbs. Should be the **only** place for page title and breadcrumbs. Filled by the shell via `mountPageHeader()` using `renderPageHeader(meta)` from `components/page-header.js`.
+- **portal-page-header** (`#portal-page-header`) — *(Superseded: current architecture uses footer for breadcrumbs; page titles not in shared shell.)*
 - **portal-toolbar** (`.portal-toolbar`) — Page actions (filters, Add X, entity Edit/Save/Cancel). Rendered by each page’s HTML or by entity scripts into `.portal-toolbar__actions`.
 - **portal-content** (`.portal-content`) — Tables, cards, forms. Must **not** contain its own page header block.
 
@@ -41,13 +63,12 @@
      - **Removes** `.ie-page-header` from the DOM.
 - **Result:** The in-content title and subtitle are removed and never shown anywhere (global header has no placeholders). So on all pages that **don’t** set `window.pageMeta` (dashboard, candidates, clients, job-offers, archived, profile, add-*), the user sees **no page title** in the shell. Only the candidate profile page shows a title (after it sets `pageMeta` and calls `mountPageHeader()`).
 
-### Breadcrumbs timing
+### Breadcrumbs timing (current)
 
-- **setPageBreadcrumbs(segments)** (app-shell.js 415–431) writes into `#page-breadcrumbs`.
-- `#page-breadcrumbs` is created only inside the HTML returned by `renderPageHeader(meta)` (page-header.js), which is injected into `#portal-page-header` by `mountPageHeader()`.
-- If `mountPageHeader()` runs with no `meta`, `renderPageHeader(meta)` returns `""`, so `#portal-page-header` is empty and **there is no `#page-breadcrumbs`** in the DOM.
-- On `ie:header-loaded`, the order is: `mountPageHeader()` then `setPageBreadcrumbs(getDefaultBreadcrumbs())`. So if the first `mountPageHeader()` still had no `meta`, the container is empty and `setPageBreadcrumbs` finds no element; breadcrumbs never appear on static pages.
-- **getDefaultBreadcrumbs()** is used for all pages; **window.pageMeta.breadcrumbs** is never read, so entity-specific breadcrumbs (e.g. candidate name) are not applied even when set.
+- **setPageBreadcrumbs(segments)** in `header-runtime.js` writes into `#page-breadcrumbs`.
+- `#page-breadcrumbs` lives in the **footer** (`layout/footer.html`), which is loaded by `header-loader.js` together with the header.
+- On `ie:header-loaded`, header-runtime runs `mountPageHeader()` which calls `setPageBreadcrumbs()` with defaults or `window.pageMeta.breadcrumbs` when set.
+- Entity pages (e.g. candidate profile) can call `IEPortal.mountPageHeader()` after setting `window.pageMeta` to update breadcrumbs.
 
 ### Summary: DOM order, lifecycle, duplications
 
@@ -74,13 +95,13 @@ The layout broke because:
 
 ---
 
-## Phase 3–4 (implementation)
+## Phase 3–4 (implementation, historical)
 
-See code changes: shell owns the single hierarchy; `mountPageHeader()` always renders a header (with fallback title/breadcrumbs when `pageMeta` is absent); `movePageHeaderToHeader()` removed; pages no longer contain `.ie-page-header`; list primary actions moved into toolbar markup; breadcrumbs use `pageMeta.breadcrumbs` when present.
+Shell owns the single hierarchy; `mountPageHeader()` renders breadcrumbs into the footer; `movePageHeaderToHeader()` removed; list primary actions moved into toolbar markup; breadcrumbs use `pageMeta.breadcrumbs` when present. Page titles are not in the shared shell (to be repositioned later).
 
 ---
 
-## Phase 5 — Verification checklist
+## Phase 5 — Verification checklist (historical)
 
 - [ ] Dashboard: one page header (title + breadcrumbs), no duplicate, toolbar stable.
 - [ ] Candidates: same; “Add Candidate” in toolbar; breadcrumbs clickable.
