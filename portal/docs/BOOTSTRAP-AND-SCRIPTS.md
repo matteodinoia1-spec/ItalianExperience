@@ -4,7 +4,18 @@ This document describes how protected pages start up, which scripts they must lo
 
 ---
 
-## 1. Protected page boot sequence
+## 1. Portal shell architecture (header-first)
+
+- **Header** — Primary global navigation. Contains: left = primary nav (desktop) + hamburger toggle (mobile); right = user area (Settings, Logout). Does **not** contain page title, subtitle, or breadcrumbs.
+- **Footer** — Thin fixed glass-style footer with breadcrumbs only (`#page-breadcrumbs`). Loaded by `header-loader.js` together with the header.
+- **Sidebar** — Mobile/technical fallback only. Off-canvas via hamburger on small viewports. Desktop layout does **not** reserve sidebar width; header is the primary navigation.
+- **Page titles** — Not part of the shared shell; will be repositioned later.
+
+`header-loader.js` mounts both header and footer fragments; when both are injected it dispatches `ie:header-loaded`.
+
+---
+
+## 2. Protected page boot sequence
 
 1. **Parse time (script execution order)**  
    Scripts run in HTML order. Early scripts set up:
@@ -25,22 +36,22 @@ This document describes how protected pages start up, which scripts they must lo
    - On failure: redirect to login and resolve with `false`.
 
 3. **DOMContentLoaded**  
-   - `header-loader.js`’s listener runs `loadPortalHeader()` (fetches `layout/header.html`; on completion dispatches `ie:header-loaded`).
+   - `header-loader.js`’s listener runs `loadPortalHeader()` (fetches `layout/header.html` and `layout/footer.html`; on completion dispatches `ie:header-loaded`).
    - `app-shell.js`’s listener runs `IEPageBootstrap.init(currentPageKey)`.
 
 4. **Page bootstrap (`runtime/page-bootstrap.js`)**  
    - `initGlobalModals()`, `IEEntityActionsRuntime.init()`.
    - **Await** `__IE_AUTH_GUARD__`; if not allowed, return.
    - **Protected pages:** `loadCurrentUserProfile()` (uses `getSessionReady()` when available), then `initInactivityTimer()`.
-   - **Then:** `ensureSidebarLoaded()` (fetch `layout/sidebar.html`).
+   - **Then:** `ensureSidebarLoaded()` (fetch `layout/sidebar.html` — required for mobile off-canvas fallback).
    - After sidebar: optional re-check of auth (using cached session when available), then **once only** `IELayoutRuntime.initLayout()`, then `IEHeaderRuntime.initHeader(pageKey)`, then `runPageInitializers(pageKey)` (back button, buttons, forms, page controllers, data views).
 
-5. **Header loaded**  
-   When `ie:header-loaded` fires (after header HTML is injected), header-runtime calls `initLayout()` again so the header-injected sidebar toggle button gets bound, then updates page header and profile blocks. `initLayout()` is idempotent: when already initialized it only binds any new toggle buttons and does not add duplicate document/window/overlay listeners or MutationObserver.
+5. **Header loaded (`ie:header-loaded`)**  
+   Fires when header and footer fragments have finished mounting. **header-runtime** reacts by: rendering breadcrumbs into the footer (`#page-breadcrumbs`), updating profile/avatar blocks, and initializing header nav behavior (active state, user menu, logout). **header-runtime does not re-initialize layout**; `IELayoutRuntime.initLayout()` is called only from page-bootstrap. `IEPageBootstrap` is the single owner of layout initialization.
 
 ---
 
-## 2. Required script baseline for protected pages
+## 3. Required script baseline for protected pages
 
 Every protected page must include the following scripts in this order. Page-specific scripts (queries, feature JS) are noted where they differ.
 
@@ -87,7 +98,7 @@ dashboard, candidates, candidate, applications, application, job-offers, clients
 
 ---
 
-## 3. Page-specific scripts
+## 4. Page-specific scripts
 
 - **application.html / archived.html:** `queries/applications.queries.js` before auth; `shared/activity-section.js` and feature script after app-shell.
 - **applications.html:** `queries/applications.queries.js`, `queries/jobOffers.queries.js`, `queries/clients.queries.js` before auth; `features/applications/applications.js` after app-shell.
@@ -98,7 +109,7 @@ dashboard, candidates, candidate, applications, application, job-offers, clients
 
 ---
 
-## 4. Session-ready abstraction
+## 5. Session-ready abstraction
 
 - **Purpose:** One resolved session per page load so boot code does not call `getSession()` (or equivalent) repeatedly.
 - **API:** `window.IESessionReady.getSessionReady()` returns a promise that resolves to `{ data: { session, user }, error }` (same shape as `IESupabase.getSession()`). The first call performs the fetch; later calls in the same load return the same promise.
@@ -110,17 +121,15 @@ dashboard, candidates, candidate, applications, application, job-offers, clients
 
 ---
 
-## 5. Why duplicate layout init was risky
+## 6. Layout initialization (single owner)
 
-- **What was wrong:** `initLayout()` was invoked (1) from page-bootstrap after sidebar load, and (2) from the `ie:header-loaded` listener in header-runtime. Layout runtime was not idempotent: each run added document click, keydown, resize listeners and a new MutationObserver on the sidebar. So every load registered duplicate global listeners and a second observer.
-- **Fix applied:**  
-  - `initLayout()` is now idempotent (module-level guard). When already initialized, it only binds any new toggle buttons (e.g. in the header, which is injected after bootstrap) and returns without re-adding listeners or observer.  
-  - The `ie:header-loaded` listener still calls `initLayout()` so the header hamburger toggle gets bound when the header fragment loads; the second call is safe because of the idempotency behavior above.
-- **Result:** Full layout setup runs once from page-bootstrap; a second call from `ie:header-loaded` only binds new toggle buttons. No duplicate listeners or observers.
+- **Owner:** `IEPageBootstrap` is the single owner of layout initialization. `IELayoutRuntime.initLayout()` is called **only** from page-bootstrap (after `ensureSidebarLoaded()`).
+- **header-runtime** does **not** call `initLayout()` on `ie:header-loaded`. Phase 6 sidebar cleanup removed that call; header-runtime now only handles breadcrumb rendering (to footer), profile/avatar updates, and header nav behavior (active state, user menu, logout).
+- **initLayout** is idempotent (module-level guard) so that if called again it would only bind any new toggle buttons and not add duplicate listeners; the single call site remains page-bootstrap.
 
 ---
 
-## 6. How to keep new pages aligned
+## 7. How to keep new pages aligned
 
 - Add a new HTML file for a **protected** page only if it needs a distinct shell (e.g. different layout or feature set). Prefer reusing an existing page with routing if possible.
 - When adding a new protected page:
@@ -133,9 +142,10 @@ dashboard, candidates, candidate, applications, application, job-offers, clients
 
 ---
 
-## 7. Quick reference
+## 8. Quick reference
 
 - **Entry:** Protected app entry is the corresponding HTML file; JS entry is script order → app-shell → DOMContentLoaded → `IEPageBootstrap.init(pageKey)`.
 - **Auth:** One session fetch per load via `IESessionReady.getSessionReady()`; guard and bootstrap use it so protected pages do not repeat getSession/checkAuth unnecessarily.
-- **Layout:** Initialized once from page-bootstrap after sidebar; idempotent if called again.
-- **Script baseline:** See Section 2; no protected page should omit header-runtime or entity-actions-runtime.
+- **Layout:** Initialized once from page-bootstrap after sidebar; `IELayoutRuntime.initLayout()` is the single call site.
+- **Shell:** Header = primary nav + user menu; footer = breadcrumbs; sidebar = mobile fallback only.
+- **Script baseline:** See Section 3; no protected page should omit header-runtime or entity-actions-runtime.

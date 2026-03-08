@@ -4,6 +4,8 @@
 **Scope:** `portal/` — modular vanilla JavaScript web application with Supabase backend  
 **Goal:** Evaluate performance, architectural quality, maintainability, and developer comprehensibility. No code was modified.
 
+**Note (post header-first refactor, Phase 6):** Shell architecture has changed. Header is now primary navigation (desktop); footer holds breadcrumbs; sidebar is mobile fallback only. `initLayout()` is called only from page-bootstrap; header-runtime does not re-initialize layout on `ie:header-loaded`.
+
 ---
 
 ## SECTION 1 — Runtime performance
@@ -34,11 +36,10 @@
 
 ### Potential duplicate listeners
 
-- **initLayout called twice:**  
-  - Once in `page-bootstrap.js` (line 252) after `ensureSidebarLoaded()`.  
-  - Again when `ie:header-loaded` fires: `runtime/header-runtime.js` binds a listener (lines 194–217) that calls `IELayoutRuntime.initLayout()`.  
-  `layout-runtime.js`’s `initLayout()` (lines 53–109) is **not idempotent**: it adds a click listener on the overlay, a document-level click listener, a document-level keydown listener, a window resize listener, and a `MutationObserver` on the sidebar. Only toggle buttons are guarded with `__ieSidebarToggleBound`. So on every load, **duplicate document/window listeners and a second MutationObserver** are registered.  
-  **Files:** `portal/runtime/layout-runtime.js`, `portal/runtime/header-runtime.js`, `portal/runtime/page-bootstrap.js`, `portal/shared/header-loader.js`.
+- **initLayout (resolved):**
+  `initLayout()` is called **only** from `page-bootstrap.js` (after `ensureSidebarLoaded()`). header-runtime does **not** call `initLayout()` on `ie:header-loaded` (Phase 6 sidebar cleanup removed that call).
+  `layout-runtime.js`’s `initLayout()` (lines 53–109) is idempotent (module-level guard).  
+  **Files:** `portal/runtime/layout-runtime.js`, `portal/runtime/header-runtime.js`, `portal/runtime/page-bootstrap.js`.
 
 - **initGlobalModals:** Called once from page-bootstrap; `hasInitializedGlobalModals` in `modals-runtime.js` is set but the flag is not used to short-circuit. Confirmed single call path; no duplicate if bootstrap runs once.
 
@@ -81,7 +82,7 @@
 
 - No strict circular **module load** (script A loads B, B loads A) because everything is script tags and there are no ES modules. There are, however, **logical circles**:  
   - app-shell registers `IEPageBootstrapHelpers` which include `initBackButton`, `initButtons`, `initDataViews`; page-bootstrap calls these and also calls runtime inits; runtimes and features use `IEPortal.*` and other globals defined in app-shell. So: app-shell → page-bootstrap → runtimes → (often) app-shell globals.  
-  - `IEHeaderRuntime.initHeader` is called from page-bootstrap; header-runtime’s listener calls `IELayoutRuntime.initLayout`. Layout is also called directly from page-bootstrap. So layout is invoked from two places (bootstrap and header event), which is a form of duplicated dependency rather than a classic circle but increases coupling.
+  - `IEHeaderRuntime.initHeader` is called from page-bootstrap; header-runtime’s listener on `ie:header-loaded` updates breadcrumbs and header nav but does not call `IELayoutRuntime.initLayout`. Layout is invoked only from page-bootstrap.
 
 ### Oversized modules
 
@@ -153,7 +154,7 @@ Areas where future changes could break architecture or behavior:
    Renaming or removing a `window.IE*` global (e.g. `IEPageBootstrapHelpers`, `IELayoutRuntime`) can break any module that references it. There is no single manifest of “who uses which global”; refactors are error-prone.
 
 3. **initLayout and “ie:header-loaded”**  
-   If someone makes `initLayout` idempotent or moves it to a single call site, they must remove the duplicate call (either from page-bootstrap or from the header-runtime listener). If they add more logic to `initLayout` without guarding duplicate runs, listener and observer buildup will worsen.
+   `initLayout()` is called only from page-bootstrap; header-runtime does not call it on `ie:header-loaded`. `ie:header-loaded` means header and footer fragments have finished mounting; header-runtime reacts by rendering breadcrumbs, updating profile blocks, and initializing header nav behavior.
 
 4. **Session/auth usage**  
    Adding new features that call `getSession()` or `checkAuth()` will increase redundant network/calls unless a shared “session ready” abstraction is introduced. Changing how or when the auth guard runs could break assumptions in page-bootstrap or in features that assume “user is already loaded.”
@@ -176,8 +177,8 @@ Areas where future changes could break architecture or behavior:
 
 ### High impact
 
-1. **Fix duplicate initLayout and header-loaded**  
-   Make `initLayout()` in `runtime/layout-runtime.js` idempotent (e.g. guard with a module-level “initialized” flag and skip re-binding document/window/overlay listeners and second MutationObserver), **or** call `initLayout()` from only one place: either page-bootstrap (after sidebar) or from the `ie:header-loaded` listener in `runtime/header-runtime.js`, not both. Removes duplicate listeners and clarifies ownership.  
+1. **initLayout single owner (done)**  
+   `initLayout()` is called only from page-bootstrap; header-runtime does not call it on `ie:header-loaded`. Layout init is idempotent.   
    **Files:** `portal/runtime/layout-runtime.js`, `portal/runtime/header-runtime.js`, `portal/runtime/page-bootstrap.js`.
 
 2. **Add missing scripts to candidate.html**  

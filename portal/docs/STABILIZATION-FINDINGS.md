@@ -3,6 +3,8 @@
 **Date:** March 7, 2025  
 **Scope:** Duplicate layout init, protected-page scripts, candidate.html, session checks, documentation.
 
+**Note (post Phase 6):** The layout fix below (header-runtime does not call initLayout on ie:header-loaded) remains the current state. Phase 6 sidebar cleanup confirmed this; layout init is solely from page-bootstrap.
+
 ---
 
 ## A. Findings summary
