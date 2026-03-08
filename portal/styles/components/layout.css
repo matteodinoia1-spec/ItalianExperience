@@ -1,6 +1,6 @@
-/* Portal design system: layout (header-first shell, sticky header + toolbar, bottom nav on mobile) */
+/* Portal design system: layout (header-first shell, sticky header, bottom nav on mobile) */
 
-/* Design tokens for portal header/toolbar (used by toolbar.css) */
+/* Design tokens for portal header */
 :root {
   --portal-bg: var(--ie-color-bg, #fdfcf8);
   --border-subtle: var(--ie-color-border-subtle, rgba(15, 23, 42, 0.08));
@@ -15,11 +15,10 @@
   /* Safe area insets for iOS/notched devices (used in layout.css only) */
   --portal-safe-top: env(safe-area-inset-top, 0px);
   --portal-safe-bottom: env(safe-area-inset-bottom, 0px);
-  --portal-toolbar-height: 52px;
   --page-filters-column-width: 280px;
 }
 
-/* Shared page container: centers UI and aligns header, toolbar, content — consistent left/right spacing */
+/* Shared page container: centers UI and aligns header, content — consistent left/right spacing */
 .page-container {
   max-width: var(--portal-shell-max-width);
   margin: 0 auto;
@@ -31,19 +30,6 @@
 
 @media (min-width: 769px) {
   .page-container {
-    padding-left: var(--portal-padding-x-desktop);
-    padding-right: var(--portal-padding-x-desktop);
-  }
-}
-
-/* Toolbar: ensure left padding is always applied (header + filters row) */
-.portal-toolbar .page-container {
-  padding-left: var(--portal-padding-x);
-  padding-right: var(--portal-padding-x);
-}
-
-@media (min-width: 769px) {
-  .portal-toolbar .page-container {
     padding-left: var(--portal-padding-x-desktop);
     padding-right: var(--portal-padding-x-desktop);
   }
@@ -248,7 +234,7 @@
   text-decoration: none;
 }
 
-/* Main shell: full viewport height. Do not add overflow (auto/scroll/hidden) here or on portal-page/portal-layout — sticky toolbar requires no scroll container between it and the viewport. */
+/* Main shell: full viewport height. Do not add overflow (auto/scroll/hidden) here or on portal-page/portal-layout — body is the scroll container for sticky layout. */
 .portal-main {
   min-height: 100vh;
   min-height: 100dvh;
@@ -429,16 +415,6 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: left;
-}
-
-/* Toolbar: full width bar below sticky header; sticks at header height so content is not overlapped */
-.portal-toolbar {
-  width: 100%;
-  background: white;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-  position: sticky;
-  top: calc(var(--portal-header-height) + var(--portal-safe-top));
-  z-index: 20;
 }
 
 .portal-footer {
@@ -655,33 +631,6 @@ body {
   }
 }
 
-.toolbar-inner {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 16px 0;
-  gap: 1rem;
-  box-sizing: border-box;
-}
-
-.toolbar-left {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex: 1;
-  min-width: 0;
-  justify-content: flex-start;
-}
-
-.toolbar-right {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
-  margin-left: auto;
-  margin-right: 1rem;
-}
-
 /* --------------------------------------------------------------------------
    Page layout with filters (pilot: clients.html)
    Desktop/tablet: left sticky filter column + right main content
@@ -706,7 +655,7 @@ body {
   border: 1px solid var(--border-subtle);
   border-radius: var(--ie-radius-lg, 1rem);
   position: sticky;
-  top: calc(var(--portal-header-height) + var(--portal-safe-top) + var(--portal-toolbar-height));
+  top: calc(var(--portal-header-height) + var(--portal-safe-top));
   align-self: flex-start;
   box-sizing: border-box;
 }
@@ -845,5 +794,60 @@ body {
     opacity: 1;
     pointer-events: auto;
   }
+}
+
+/* --------------------------------------------------------------------------
+   Content action rows (Phase 3: toolbar actions moved into content)
+   Detail pages: right-aligned actions in/near entity hero/header.
+   Form pages: left = mode/status, right = action buttons.
+   -------------------------------------------------------------------------- */
+
+.page-detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.page-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.page-form-actions__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.page-form-actions__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted, #6b7280);
+}
+
+.page-form-actions__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* List pages: primary CTA at top of main column (no toolbar) */
+.page-list-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
 }
 

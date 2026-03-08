@@ -10,6 +10,7 @@ This document describes how protected pages start up, which scripts they must lo
 - **Bottom nav** — Mobile only. Fixed bar; primary items: Dashboard, Candidates, Job Offers, Applications, More. “More” panel contains: Clients, Archived, Settings, Logout. Loaded by `header-loader.js` with header and footer.
 - **Footer** — Desktop/tablet only. Full width; uses the same shell padding as the header. Breadcrumbs only (`#page-breadcrumbs`), left aligned, vertically centered in the footer bar; align with header navigation start. On mobile the footer is completely hidden; breadcrumbs are not shown.
 - **No sidebar** — Sidebar and hamburger have been removed. Mobile uses bottom nav + More; no off-canvas sidebar.
+- **No top toolbar** — The old top toolbar has been fully removed. Page actions and filters live in the content area (e.g. `.page-list-actions`, `.page-detail-actions`, `.page-form-actions`, `.page-filters-column`).
 - **Page titles** — Not part of the shared shell for now.
 
 `header-loader.js` mounts header, then gets/creates footer and bottom-nav containers, fetches `layout/footer.html` and `layout/bottom-nav.html`, injects them (DOM order: …content, `#portal-bottom-nav`, `#portal-footer`), then dispatches `ie:header-loaded`. One event when the full shell (header + bottom nav + footer) is ready.
@@ -124,9 +125,10 @@ dashboard, candidates, candidate, applications, application, job-offers, clients
 
 ## 6. Shell initialization
 
-- **Owner:** `IEPageBootstrap` owns shell and page initialization. It runs header init, page initializers (forms, data views), then loads and initializes the bottom-nav runtime. There is no layout-runtime or sidebar-runtime; those were removed in the bottom-nav refactor.
-- **header-runtime** on `ie:header-loaded`: breadcrumb rendering (to footer), profile/avatar updates, header nav behavior (active state, user menu, logout). It does not initialize layout or sidebar.
+- **Owner:** `IEPageBootstrap` owns shell and page initialization. It runs header init, page initializers (forms, data views), then loads and initializes the bottom-nav runtime. There is no layout-runtime, sidebar-runtime, or toolbar runtime; those were removed.
+- **header-runtime** on `ie:header-loaded`: breadcrumb rendering (to footer), profile/avatar updates, header nav behavior (active state, user menu, logout). It does not initialize layout, sidebar, or toolbar.
 - **bottom-nav-runtime** is loaded dynamically by page-bootstrap and runs `initBottomNav(pageKey)`: it sets bottom-nav active state, normalizes links, and handles More panel open/close and mobile logout.
+- **forms-runtime** `initEditToolbars()` only sets the text on `[data-entity-mode-indicator]` (e.g. "Editing Candidate") from URL state; it does not query any toolbar DOM.
 
 ---
 
@@ -147,16 +149,17 @@ dashboard, candidates, candidate, applications, application, job-offers, clients
 
 - **Entry:** Protected app entry is the corresponding HTML file; JS entry is script order → app-shell → DOMContentLoaded → `IEPageBootstrap.init(pageKey)`.
 - **Auth:** One session fetch per load via `IESessionReady.getSessionReady()`; guard and bootstrap use it so protected pages do not repeat getSession/checkAuth unnecessarily.
-- **Shell:** Header (primary nav + user menu), bottom nav (mobile), footer (breadcrumbs, desktop/tablet only; hidden on mobile). No sidebar or hamburger. Bottom-nav runtime is loaded dynamically by page-bootstrap.
-- **Script baseline:** See Section 3; no protected page should omit header-runtime or entity-actions-runtime. Do not add layout-runtime or sidebar-runtime (removed).
+- **Shell:** Header (primary nav + user menu), bottom nav (mobile), footer (breadcrumbs, desktop/tablet only; hidden on mobile). No sidebar, hamburger, or top toolbar; page actions and filters are in content. Bottom-nav runtime is loaded dynamically by page-bootstrap.
+- **Script baseline:** See Section 3; no protected page should omit header-runtime or entity-actions-runtime. Do not add layout-runtime, sidebar-runtime, or toolbar runtime (removed).
 
 ---
 
-## 9. Final shell architecture summary (post bottom-nav refactor)
+## 9. Final shell architecture summary (post bottom-nav and toolbar removal)
 
-- **Shared shell:** Header (primary global nav), bottom nav (mobile), footer (breadcrumbs, desktop/tablet only). No sidebar; no hamburger.
+- **Shared shell:** Header (primary global nav), bottom nav (mobile), footer (breadcrumbs, desktop/tablet only). No sidebar, no hamburger, no top toolbar.
 - **Desktop/tablet:** Header nav and user menu; footer shows breadcrumbs (full width, shell padding; breadcrumbs left aligned, vertically centered).
 - **Mobile:** Header shows page title. Bottom nav is primary navigation; More panel contains Clients, Archived, Settings, Logout. Footer is hidden; breadcrumbs are not shown.
+- **Page layout:** Actions and filters live in content. List pages: `.page-layout-with-filters` with left sticky `.page-filters-column` and `.page-main-column`; primary CTAs in `.page-list-actions`. Detail pages: `.page-detail-actions`. Form pages: `.page-form-actions` and `[data-entity-mode-indicator]`. Sticky filter column uses `top: calc(var(--portal-header-height) + var(--portal-safe-top))`; no `toolbar.css` or `--portal-toolbar-height`.
 - **Loader:** `header-loader.js` mounts header, bottom nav, and footer; dispatches `ie:header-loaded` once when all are in place.
 - **Bootstrap:** `IEPageBootstrap.init()` runs auth guard → profile + inactivity → header init → page initializers → dynamic load of `bottom-nav-runtime.js` → `initBottomNav(pageKey)`. Bottom-nav runtime owns active state, link normalization, More open/close, and mobile logout.
-- **Layout/styling:** No sidebar width. On mobile, footer is hidden; bottom nav is primary. Spacing uses design tokens; iOS/safe-area insets applied (`--portal-safe-*`). Page titles are not part of the shared shell for now.
+- **Layout/styling:** No sidebar or toolbar CSS. On mobile, footer is hidden; bottom nav is primary. Spacing uses design tokens; iOS/safe-area insets applied (`--portal-safe-*`). Page titles are not part of the shared shell for now.

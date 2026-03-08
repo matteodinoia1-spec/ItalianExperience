@@ -1,6 +1,6 @@
 # Portal layout audit — global page header refactor
 
-## Current architecture (post bottom-nav refactor)
+## Current architecture (post bottom-nav and toolbar removal)
 
 ### Shared shell
 
@@ -8,6 +8,7 @@
 - **Bottom nav** (`#portal-bottom-nav`) — Mobile only. Filled by `header-loader.js` with `layout/bottom-nav.html`. Fixed bar; primary items: Dashboard, Candidates, Job Offers, Applications, More. More panel contains: Clients, Archived, Settings, Logout. `bottom-nav-runtime.js` handles active state, link normalization, More open/close, and mobile logout.
 - **Footer** (`#portal-footer`) — Desktop/tablet only. Full width; uses the same shell padding as the header. `.portal-footer__inner` is full width (no max-width, no margin auto). Fixed glass-style footer with breadcrumbs only. Contains `#page-breadcrumbs`; breadcrumbs are left aligned and vertically centered in the footer bar; they align with the header navigation start line. `header-runtime.js` renders breadcrumbs on `ie:header-loaded` and when `mountPageHeader()` is called. **On mobile the footer is completely hidden;** breadcrumbs are not shown; the page title appears in the header instead.
 - **No sidebar** — Sidebar and hamburger have been removed. No `#sidebar`, no off-canvas overlay.
+- **No top toolbar** — The top toolbar has been fully removed. Page actions and filters live in the content area.
 - **Page titles** — Not part of the shared shell for now.
 
 ### Navigation model
@@ -17,14 +18,13 @@
 
 ### DOM structure
 
-- **portal-header** → **portal-toolbar** → **portal-content** → **portal-bottom-nav** → **portal-footer**. Footer and bottom-nav containers are get-or-create by `header-loader.js` inside `.portal-main`; DOM order is content, then `#portal-bottom-nav`, then `#portal-footer`. On mobile the footer is hidden (not displayed); main padding reserves space for bottom nav only.
-- **portal-toolbar** (`.portal-toolbar`) — Page actions (filters, Add X, entity Edit/Save/Cancel). Static HTML per page.
-- **portal-content** (`.portal-content`) — Tables, cards, forms.
-- Layout spacing: header, toolbar, content, bottom nav (mobile), and footer (desktop/tablet) use design tokens; iOS/safe-area insets applied (e.g. `--portal-safe-top`, `--portal-safe-bottom`). Main padding-bottom reserves space for footer on desktop/tablet and for bottom nav on mobile.
+- **portal-header** → **portal-content** → **portal-bottom-nav** → **portal-footer**. Footer and bottom-nav containers are get-or-create by `header-loader.js` inside `.portal-main`; DOM order is content, then `#portal-bottom-nav`, then `#portal-footer`. On mobile the footer is hidden (not displayed); main padding reserves space for bottom nav only.
+- **portal-content** (`.portal-content`) — Tables, cards, forms, and all page-specific layout (filter columns, action rows). List pages use `.page-layout-with-filters` with `.page-filters-column` (sticky left) and `.page-main-column`; primary CTAs in `.page-list-actions`. Detail pages use `.page-detail-actions`; form pages use `.page-form-actions` and `[data-entity-mode-indicator]`.
+- Layout spacing: header, content, bottom nav (mobile), and footer (desktop/tablet) use design tokens; iOS/safe-area insets applied (e.g. `--portal-safe-top`, `--portal-safe-bottom`). Sticky filter column uses `top: calc(var(--portal-header-height) + var(--portal-safe-top))`. No `toolbar.css` or `--portal-toolbar-height`. Main padding-bottom reserves space for footer on desktop/tablet and for bottom nav on mobile.
 
 ---
 
-## Phase 1 — Layout audit (historical)
+## Phase 1 — Layout audit (historical; pre–toolbar removal)
 
 ### DOM structure (intended at time of audit)
 
@@ -46,9 +46,9 @@
 2. **Second run** — On `ie:header-loaded` (after `loadPortalHeader()` finishes and injects `layout/header.html` into `#portal-header`). Same `window.pageMeta` issue: still undefined on most static pages.
 3. **Extra run** — On candidate profile, `features/candidates/candidate.js` sets `window.pageMeta` and then calls `IEPortal.mountPageHeader()` after data load. Only then does `#portal-page-header` get title + breadcrumbs on that page.
 
-### When the toolbar renders
+### When the toolbar rendered (obsolete)
 
-- The toolbar is **static HTML** in each page (e.g. `dashboard.html`, `candidates.html`): a `<div class="portal-toolbar">` with inner structure and empty `.portal-toolbar__actions` (or with buttons). No separate “mount” step; it’s already in the DOM. Entity toolbars (Edit/Save/Cancel) are rendered by `entity-toolbar.js` into a container identified by `config.containerId` (e.g. `candidateActions`).
+- *(Historical.)* The toolbar was static HTML per page; entity actions were rendered by `entity-toolbar.js` into a container by `config.containerId`. The toolbar has been removed; actions now live in content (e.g. `.page-detail-actions`, `.page-form-actions`).
 
 ### When page content renders
 
@@ -61,7 +61,7 @@
   2. **Legacy:** Each page still has `.ie-page-header` inside `.portal-content`. On `ie:header-loaded`, **movePageHeaderToHeader()** runs (app-shell.js 440–470):
      - Finds `.ie-page-header` in the document.
      - Tries to copy title/subtitle into `header.portal-header` using `.page-title` and `.page-subtitle` — but **layout/header.html** does not contain those elements, so the copy does nothing.
-     - Moves `.ie-page-header__actions` into `.portal-toolbar .portal-toolbar__actions` (this part works).
+     - *(Historical.)* Moved `.ie-page-header__actions` into the toolbar; toolbar has been removed.
      - **Removes** `.ie-page-header` from the DOM.
 - **Result:** The in-content title and subtitle are removed and never shown anywhere (global header has no placeholders). So on all pages that **don’t** set `window.pageMeta` (dashboard, candidates, clients, job-offers, archived, profile, add-*), the user sees **no page title** in the shell. Only the candidate profile page shows a title (after it sets `pageMeta` and calls `mountPageHeader()`).
 
@@ -76,7 +76,7 @@
 
 | Issue | Detail |
 |-------|--------|
-| **DOM order** | Correct in HTML: `portal-header` → `portal-page-header` → `portal-toolbar` → `portal-content`. But `.portal-content` still starts with `.ie-page-header`, which is then removed. |
+| **DOM order** | *(Historical.)* Was: `portal-header` → `portal-page-header` → `portal-toolbar` → `portal-content`. Current: no toolbar; content contains page layout and actions. |
 | **Lifecycle** | `mountPageHeader()` runs before `window.pageMeta` is set on most pages, and before the breadcrumb container exists when meta is absent. `movePageHeaderToHeader()` runs on `ie:header-loaded` and removes the only visible header (`.ie-page-header`) without putting title/subtitle anywhere. |
 | **Duplicated containers** | Every page has both (1) `#portal-page-header` (shell, often empty) and (2) `.ie-page-header` inside content (legacy). The legacy one is removed; the shell one stays empty unless the page sets `pageMeta` later. |
 | **Pages not respecting shell** | All pages still render their own `.ie-page-header` inside `.portal-content`. They do not “rely on the shell” for the header; they rely on the old move logic, which no longer works for title/subtitle because the global header has no placeholders. |
@@ -103,12 +103,7 @@ Shell owns the single hierarchy; `mountPageHeader()` renders breadcrumbs into th
 
 ---
 
-## Phase 5 — Verification checklist (historical)
+## Phase 5 — Verification checklist (historical; toolbar removed)
 
-- [ ] Dashboard: one page header (title + breadcrumbs), no duplicate, toolbar stable.
-- [ ] Candidates: same; “Add Candidate” in toolbar; breadcrumbs clickable.
-- [ ] Candidate profile: dynamic title and breadcrumbs from `pageMeta`, toolbar stable.
-- [ ] Clients: same as candidates.
-- [ ] Job offers: same.
-- [ ] Add forms (candidate, client, job offer): correct title/breadcrumbs, toolbar with Cancel/Save.
+- *(Historical.)* Toolbar no longer exists. Current checks: list pages use `.page-list-actions` and `.page-filters-column`; detail/form pages use `.page-detail-actions` / `.page-form-actions`; breadcrumbs in footer (desktop/tablet); mobile: footer hidden, bottom nav primary.
 - [ ] Archived: header and toolbar correct.

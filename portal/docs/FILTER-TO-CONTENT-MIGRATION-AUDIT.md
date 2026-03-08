@@ -2,6 +2,8 @@
 
 **Goal:** Gradually remove the old top toolbar-based filter layout and move filters into the page content area (desktop: left column; mobile: TBD). This document is **audit + plan only** — no implementation.
 
+**Post-migration state (current):** The top toolbar has been fully removed. Filters live in content: list pages use `.page-layout-with-filters` with left sticky `.page-filters-column` and `.page-main-column`; mobile uses a filter drawer. Primary CTAs are in `.page-list-actions`; detail pages use `.page-detail-actions`; form pages use `.page-form-actions` and `[data-entity-mode-indicator]`. There is no `toolbar.css` or `--portal-toolbar-height`; sticky filter column uses `top: calc(var(--portal-header-height) + var(--portal-safe-top))`. `forms-runtime.js` only sets the label on `[data-entity-mode-indicator]` from URL state; it does not query any toolbar DOM.
+
 ---
 
 ## 1. Pages audited
@@ -97,8 +99,7 @@
 
 ### E. archived.html (reference — filters already in content)
 
-- Toolbar: `.portal-toolbar__filters` is empty.
-- Filters live **in content** per section: `#search-candidates`, `#search-jobs`, `#search-clients` (no `data-filter`). Wired in `features/archived/archived.js` by id and `state.*.search`.
+- *(Historical.)* Toolbar no longer exists. Filters live **in content** per section: `#search-candidates`, `#search-jobs`, `#search-clients` (no `data-filter`). Wired in `features/archived/archived.js` by id and `state.*.search`.
 
 ---
 
@@ -106,7 +107,7 @@
 
 - **Filter wiring:** All list pages use **document-level** `document.querySelector('[data-filter="..."]')` in `core/lists-runtime.js`. There is **no** dependency on the toolbar DOM hierarchy. Moving the same elements into a left column (or a drawer) and keeping the `data-filter` attributes will work without changing JS.
 - **Actions:** Buttons use `data-action` and are handled by entity-actions and app-shell; they are bound by delegation or by selector on the document. As long as the buttons remain in the DOM (e.g. in a slim toolbar or in content), behavior is unchanged.
-- **Forms / entity toolbars:** `runtime/forms-runtime.js` uses `document.querySelectorAll(".portal-toolbar")` in `initEditToolbars()` to find cancel/save and entity-mode-indicator. That only requires **a** `.portal-toolbar` to exist on entity pages; it does not require filters to be inside it. So a reduced toolbar (actions only) still works.
+- **Forms / entity toolbars:** *(Updated.)* `runtime/forms-runtime.js` `initEditToolbars()` only sets the text on `[data-entity-mode-indicator]` from URL state; it does not query `.portal-toolbar`. Actions live in content; no toolbar DOM.
 - **Applications view toggle:** `features/applications/applications.js` uses `document.querySelector("[data-view-mode]")` and view containers; no dependency on toolbar structure.
 
 **Conclusion:** No JS changes are strictly required for moving filter markup from toolbar to content, as long as `data-filter` and `data-action` attributes and element ids are preserved. Optional: scope selectors to a container (e.g. `contentArea.querySelector(...)`) for robustness if multiple instances ever exist.
@@ -115,11 +116,11 @@
 
 ## 4. Shared styles and layout
 
-- **Toolbar:** `styles/components/toolbar.css` (flex for left/center/right, gaps). `styles/components/layout.css`: `.portal-toolbar` (sticky, `top: calc(header-height + safe-top)`), `.toolbar-inner` (flex, padding), `.toolbar-left` / `.toolbar-right`.
+- **Toolbar:** *(Removed.)* `toolbar.css` has been deleted; `.portal-toolbar`, `.toolbar-inner`, `.toolbar-left` / `.toolbar-right`, and `--portal-toolbar-height` have been removed from layout.css.
 - **Filters:** `styles/components/filters.css`: `.filter-bar` (flex, wrap), `.filter-group`, `.filter-label`, `.filter-input`, `.filter-select`. Mobile: column layout, full width.
-- **Content:** `.portal-content` (padding), `.page-container` (max-width, horizontal padding). Content is full width of container; no existing “sidebar + main” layout.
+- **Content:** `.portal-content` (padding), `.page-container` (max-width, horizontal padding). List pages use `.page-layout-with-filters`, `.page-filters-column` (sticky), `.page-main-column`; action rows: `.page-list-actions`, `.page-detail-actions`, `.page-form-actions`.
 
-Important: **Sticky** is on `.portal-toolbar` relative to viewport (body scroll). The layout doc notes: avoid overflow/transform on the sticky element so stickiness is not broken. Any new sticky filter column must live in a scroll context that does not clip it (e.g. main content area with overflow visible or body as scroll container).
+Important: **Sticky** filter column uses `top: calc(var(--portal-header-height) + var(--portal-safe-top))`; no toolbar offset. Body is the scroll container; no overflow on ancestors that would clip the sticky column.
 
 ---
 
@@ -137,7 +138,7 @@ Important: **Sticky** is on `.portal-toolbar` relative to viewport (body scroll)
   - `.portal-content-with-filters` or `.page-layout-with-sidebar` wrapping:
     - `.page-filters-column` (left, fixed width, sticky)
     - `.page-main-column` (flex: 1, min-width: 0)
-- **Sticky:** Apply `position: sticky; top: calc(var(--portal-header-height) + var(--portal-safe-top) + 0px);` (or a small offset if you keep a slim toolbar) to `.page-filters-column`. Ensure no ancestor between this column and the viewport has `overflow: hidden` or `overflow: auto` that would create a scroll container and break stickiness. Currently `portal-main` and body are set up so the viewport is the scroll container; the new layout should stay within that (e.g. content area is not a separate scroll region).
+- **Sticky:** Apply `position: sticky; top: calc(var(--portal-header-height) + var(--portal-safe-top));` to `.page-filters-column` (no toolbar offset). Ensure no ancestor between this column and the viewport has `overflow: hidden` or `overflow: auto` that would create a scroll container and break stickiness. Currently `portal-main` and body are set up so the viewport is the scroll container; the new layout should stay within that (e.g. content area is not a separate scroll region).
 - **Width:** Left column `flex: 0 0 280px` (or similar); right `flex: 1 1 0; min-width: 0`. Use a single shared class so every list page uses the same layout.
 - **Visual separation:** Light background (e.g. `bg-gray-50/80` or `glass-card`), border-right, padding, optional “Filters” heading. Reuse `.filter-bar` and `.filter-group` inside this column (stack vertically instead of horizontal wrap if desired).
 
@@ -238,18 +239,20 @@ Important: **Sticky** is on `.portal-toolbar` relative to viewport (body scroll)
 - Desktop: filters in left column; sticky while scrolling; list and pagination update on change.
 - Mobile: no fixed left column; filters in drawer or collapsible; list full width.
 - All four list pages: candidates, job-offers, applications, clients — same behavior as today, only layout changed.
-- Entity pages: toolbar still works for Edit/Save/Cancel and lifecycle actions.
-- Forms runtime: `initEditToolbars()` still finds `.portal-toolbar` on add-* and entity view pages.
+- Entity pages: actions in content (`.page-detail-actions`, `.page-form-actions`) work for Edit/Save/Cancel and lifecycle actions.
+- Forms runtime: `initEditToolbars()` only sets `[data-entity-mode-indicator]` label; no toolbar DOM.
 
 ---
 
 ## Summary
 
+*(Migration complete. Table below describes the pre-migration state; current state is in the post-migration note at the top of this document.)*
+
 | Item | Result |
 |------|--------|
-| **Pages with toolbar filters** | candidates, job-offers, applications, clients |
+| **Pages that had toolbar filters** | candidates, job-offers, applications, clients (now in content) |
 | **Filter wiring** | `data-filter` + `document.querySelector` in `core/lists-runtime.js`; no toolbar DOM dependency |
-| **Actions** | `data-action` in toolbar right; can stay in toolbar or move to content |
+| **Actions** | `data-action`; now in content (`.page-list-actions`, `.page-detail-actions`, `.page-form-actions`) |
 | **Desktop pattern** | Left filter column (sticky) + right main content; shared CSS classes |
 | **Mobile pattern** | Filter drawer/sheet (recommended); no fixed left column |
 | **Phases** | 1: clients pilot → 2: shared layout + candidates/job-offers → 3: applications + mobile drawer → 4: toolbar slim/removal on list pages |

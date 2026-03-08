@@ -3,7 +3,7 @@
 **Date:** March 7, 2025  
 **Scope:** Duplicate layout init, protected-page scripts, candidate.html, session checks, documentation.
 
-**Note (post bottom-nav refactor):** The layout/sidebar runtimes have been removed. The shell is now header + bottom nav + footer; `header-loader.js` mounts all three and dispatches `ie:header-loaded`. `page-bootstrap.js` runs header init, page initializers, then dynamically loads and runs `bottom-nav-runtime.js`. There is no `layout-runtime.js`, `sidebar-runtime.js`, or `ensureSidebarLoaded()`. The findings and change report below are historical; the current script baseline is in `BOOTSTRAP-AND-SCRIPTS.md` (no layout-runtime or sidebar-runtime in the list).
+**Note (post bottom-nav and toolbar removal):** The layout/sidebar runtimes have been removed. The top toolbar has also been fully removed; page actions and filters live in content. The shell is header + bottom nav + footer; `header-loader.js` mounts all three and dispatches `ie:header-loaded`. `page-bootstrap.js` runs header init, page initializers, then dynamically loads and runs `bottom-nav-runtime.js`. There is no `layout-runtime.js`, `sidebar-runtime.js`, toolbar runtime, `toolbar.css`, or `--portal-toolbar-height`. The findings and change report below are historical; the current script baseline is in `BOOTSTRAP-AND-SCRIPTS.md` (no layout-runtime or sidebar-runtime in the list).
 
 ---
 

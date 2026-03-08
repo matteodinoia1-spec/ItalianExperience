@@ -23,7 +23,7 @@
 All portal pages follow:
 
 1. Header: `#portal-header` (full width; primary nav, user menu)
-2. Main: `<main class="portal-main ...">` with toolbar, content, then `#portal-bottom-nav` (mobile), then `#portal-footer` (desktop/tablet only; breadcrumbs)
+2. Main: `<main class="portal-main ...">` with content, then `#portal-bottom-nav` (mobile), then `#portal-footer` (desktop/tablet only; breadcrumbs). No top toolbar; actions and filters are in content.
 3. No sidebar (removed)
 
 ### 2.2 Inconsistencies
@@ -123,7 +123,7 @@ All portal pages follow:
 
 ### 6.1 Duplicate layout code — **ISSUES**
 
-- **profile.html**: If it still contains inline layout/sidebar-related styles that duplicate **style.css** or **layout.css**, prefer a single source. (Sidebar has been removed; any remaining sidebar rules are obsolete.)
+- **profile.html**: If it still contains inline layout/sidebar-related styles that duplicate **style.css** or **layout.css**, prefer a single source. (Sidebar and toolbar have been removed; any remaining sidebar/toolbar rules are obsolete.)
 - Sidebar and SIDEBAR_FALLBACK_HTML have been removed; no action needed.
 
 ### 6.2 Unused / redundant HTML — **MINOR**
@@ -132,7 +132,7 @@ All portal pages follow:
 
 ### 6.3 Structural pattern — **PASS**
 
-- All portal pages (except index) use the same pattern: header, main (toolbar, content, bottom-nav container, footer). Script order is documented in BOOTSTRAP-AND-SCRIPTS.md.
+- All portal pages (except index) use the same pattern: header, main (content, bottom-nav container, footer). No top toolbar; script order is documented in BOOTSTRAP-AND-SCRIPTS.md.
 
 **Suggestions:**
 

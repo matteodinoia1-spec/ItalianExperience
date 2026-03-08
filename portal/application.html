@@ -12,26 +12,8 @@
 <body class="flex min-h-screen" style="visibility: hidden;">
 
     <div class="portal-shell">
-        <main class="portal-main flex-1 flex flex-col min-w-0">
+        <main class="portal-main portal-main--no-toolbar flex-1 flex flex-col min-w-0">
         <div id="portal-header"></div>
-
-        <div class="portal-toolbar sticky-toolbar">
-            <div class="page-container toolbar-inner">
-                <div class="toolbar-left">
-                    <div class="portal-toolbar__left">
-                        <div class="portal-toolbar__filters"></div>
-                    </div>
-                </div>
-                <div class="portal-toolbar__center"></div>
-                <div class="toolbar-right">
-                    <div class="portal-toolbar__right">
-                        <div class="portal-toolbar__actions">
-                            <div id="applicationActions" class="flex items-center gap-2"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div class="page-container">
         <div class="portal-content p-8 space-y-8" id="applicationDetailRoot">
@@ -61,6 +43,7 @@
                             <option value="not_selected">Not selected</option>
                         </select>
                         <p class="text-xs text-red-600 hidden" data-app-status-error></p>
+                        <div id="applicationActions" class="page-detail-actions mt-2"></div>
                     </div>
                 </div>
             </section>

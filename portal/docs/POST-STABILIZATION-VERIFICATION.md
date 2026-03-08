@@ -3,7 +3,7 @@
 **Date:** March 7, 2025  
 **Scope:** Strict verification of the frontend stabilization pass; no refactor.
 
-**Note (post bottom-nav refactor):** The shell no longer uses layout or sidebar. `header-loader.js` mounts header, bottom nav, and footer; `ie:header-loaded` fires when all three are in place. Page-bootstrap runs header init, page initializers, then dynamically loads and runs `bottom-nav-runtime.js`. There is no `layout-runtime.js` or `sidebar-runtime.js`. Bottom-nav-runtime is loaded by page-bootstrap, not in the static script baseline.
+**Note (post bottom-nav and toolbar removal):** The shell no longer uses layout, sidebar, or top toolbar. `header-loader.js` mounts header, bottom nav, and footer; `ie:header-loaded` fires when all three are in place. Page-bootstrap runs header init, page initializers, then dynamically loads and runs `bottom-nav-runtime.js`. There is no `layout-runtime.js`, `sidebar-runtime.js`, or toolbar runtime; no `toolbar.css` or `--portal-toolbar-height`. Page actions and filters live in content. Bottom-nav-runtime is loaded by page-bootstrap, not in the static script baseline.
 
 ---
 
