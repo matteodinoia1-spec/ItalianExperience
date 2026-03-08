@@ -132,13 +132,11 @@
   content: "";
   position: absolute;
   left: 0;
-  right: 0;
-  bottom: 0;
+  bottom: -4px;
+  width: 0;
   height: 2px;
   background: var(--ie-color-accent, #c5a059);
-  transform: scaleX(0);
-  transform-origin: center;
-  transition: transform 0.2s ease;
+  transition: width 0.18s ease;
 }
 
 .portal-header-nav__link:hover {
@@ -146,7 +144,7 @@
 }
 
 .portal-header-nav__link:hover::after {
-  transform: scaleX(1);
+  width: 100%;
 }
 
 .portal-header-nav__item-with-sub {
@@ -201,7 +199,7 @@
 }
 
 .portal-header-nav__link--active::after {
-  transform: scaleX(1);
+  width: 100%;
 }
 
 /* User area: dropdown trigger + menu (desktop) */
@@ -567,11 +565,13 @@ body {
     color: var(--ie-color-fg, #374151);
     font-size: 11px;
     -webkit-tap-highlight-color: transparent;
+    transition: color 0.15s ease, transform 0.15s ease, background-color 0.15s ease;
   }
 
   .portal-bottom-nav__item--active {
     color: var(--text-main, #1b4332);
     font-weight: 600;
+    transform: translateY(-1px);
   }
 
   .portal-bottom-nav__icon {
@@ -580,10 +580,12 @@ body {
     flex-shrink: 0;
     border-radius: 999px;
     background: rgba(15, 23, 42, 0.06);
+    transition: background-color 0.15s ease, transform 0.15s ease;
   }
 
   .portal-bottom-nav__item--active .portal-bottom-nav__icon {
     background: var(--ie-color-accent, #c5a059);
+    transform: scale(1.05);
   }
 
   .portal-bottom-nav__label {
@@ -613,6 +615,14 @@ body {
     z-index: 46;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+
+  .portal-bottom-nav--more-open .portal-bottom-nav__more {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .portal-bottom-nav__more a {
