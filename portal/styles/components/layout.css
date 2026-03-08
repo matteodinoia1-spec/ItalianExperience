@@ -1,4 +1,4 @@
-/* Portal design system: layout (shell, header scrolls out, sticky toolbar, sidebar) */
+/* Portal design system: layout (header-first shell, sticky header + toolbar, sidebar mobile-only) */
 
 /* Design tokens for portal header/toolbar (used by toolbar.css) */
 :root {
@@ -6,6 +6,8 @@
   --border-subtle: var(--ie-color-border-subtle, rgba(15, 23, 42, 0.08));
   --portal-padding-x: 40px;
   --portal-padding-x-desktop: 48px;
+  --portal-header-height: 72px;
+  --portal-footer-height: 40px;
 }
 
 /* Shared page container: centers UI and aligns header, toolbar, content — consistent left/right spacing */
@@ -38,28 +40,23 @@
   }
 }
 
-/* Desktop: only the main content (cards, etc.) is slightly shifted from the sidebar; header and toolbar stay as is */
-@media (min-width: 1025px) {
-  .portal-main > .page-container {
-    padding-left: 64px;
-  }
-}
-
-/* Main portal header: scrolls out naturally with the page (not sticky). Horizontal padding comes from inner .page-container. */
+/* Main portal header: fixed at top with subtle glass; main shell navigation on desktop/tablet */
 .portal-header {
-  height: 72px;
-  position: relative;
+  height: var(--portal-header-height);
+  min-height: var(--portal-header-height);
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-subtle);
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  will-change: transform;
-  transition: transform 0.25s ease;
+  overflow: visible;
 }
 
 /* Mobile: when sidebar is open, header stays behind sidebar (z-index lower). Content of header shifts right so hamburger + title + user appear to the right of the sidebar — no band on top of the dashboard. */
@@ -94,7 +91,7 @@
   }
 }
 
-/* Desktop: user at right edge (window limit) with min margin; left content slightly spaced from sidebar */
+/* Desktop: full-width header inner; user at right edge with min margin */
 @media (min-width: 1025px) {
   .portal-header__inner {
     max-width: none;
@@ -111,6 +108,7 @@
   gap: 1rem;
   flex: 0 1 auto;
   min-width: 0;
+  overflow: visible;
 }
 
 .portal-header__right {
@@ -121,10 +119,159 @@
   gap: 1.5rem;
 }
 
+/* Phase 1/2: primary nav in header — desktop only; submenus open via --open */
+/* overflow: visible so dropdown submenus are not clipped (nav is hidden on mobile) */
+.portal-header-nav {
+  min-width: 0;
+  overflow: visible;
+  gap: 1.5rem;
+}
+
+.portal-header-nav__link {
+  display: inline-block;
+  padding: 0.5rem 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ie-color-fg, #374151);
+  text-decoration: none;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.portal-header-nav__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--ie-color-accent, #c5a059);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.2s ease;
+}
+
+.portal-header-nav__link:hover {
+  color: var(--ie-color-primary, #1b4332);
+}
+
+.portal-header-nav__link:hover::after {
+  transform: scaleX(1);
+}
+
+.portal-header-nav__item-with-sub {
+  position: relative;
+}
+
+.portal-header-nav__sub {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 180px;
+  margin: 0;
+  padding: 0.5rem 0;
+  list-style: none;
+  background: white;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 50;
+}
+
+.portal-header-nav__item-with-sub--open .portal-header-nav__sub {
+  display: block;
+}
+
+@media (min-width: 1024px) {
+  .portal-header-nav__item-with-sub:hover .portal-header-nav__sub {
+    display: block;
+  }
+}
+
+.portal-header-nav__sub li {
+  margin: 0;
+}
+
+.portal-header-nav__sublink {
+  display: block;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: var(--ie-color-fg, #374151);
+  text-decoration: none;
+}
+
+.portal-header-nav__sublink:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.portal-header-nav__link--active {
+  font-weight: 600;
+  color: var(--text-main, #1b4332);
+}
+
+.portal-header-nav__link--active::after {
+  transform: scaleX(1);
+}
+
+/* User area: dropdown trigger + menu (desktop) */
+.portal-header-user-area {
+  position: relative;
+}
+
+.portal-header-user[data-user-menu-trigger] {
+  cursor: pointer;
+}
+
+.portal-header-user-menu {
+  display: none;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  max-width: min(200px, calc(100vw - 2rem));
+  padding: 0.5rem 0;
+  background: white;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 50;
+}
+
+.portal-header-user-area--open .portal-header-user-menu {
+  display: flex;
+}
+
+.portal-header-user-menu__item {
+  display: block;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: var(--ie-color-fg, #374151);
+  text-decoration: none;
+}
+
+.portal-header-user-menu__item:hover {
+  background: rgba(0, 0, 0, 0.04);
+  text-decoration: none;
+}
+
 /* Main shell: full viewport height. Do not add overflow (auto/scroll/hidden) here or on portal-page/portal-layout — sticky toolbar requires no scroll container between it and the viewport. */
 .portal-main {
   min-height: 100vh;
   display: block;
+  overflow: visible;
+  padding-top: var(--portal-header-height);
+  padding-bottom: var(--portal-footer-height);
+}
+
+/* Header wrapper: ensure sticky header is not constrained by flex stretch; no overflow that would break stickiness */
+#portal-header {
+  overflow: visible;
+  flex-shrink: 0;
+  align-self: flex-start;
 }
 
 /* Content area: no fixed header offset — header is in flow */
@@ -138,9 +285,10 @@
 
 /* Responsive foundation */
 
-/* Prevent horizontal page scroll */
+/* Prevent horizontal page scroll. overflow-y: auto ensures body is the scroll container so sticky header works. */
 body {
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Improve mobile spacing for cards */
@@ -287,14 +435,45 @@ body {
   }
 }
 
-/* Toolbar: full width bar; inner content aligned with page-container */
+/* Toolbar: full width bar below sticky header; sticks at header height so content is not overlapped */
 .portal-toolbar {
   width: 100%;
   background: white;
   border-bottom: 1px solid rgba(0,0,0,0.05);
   position: sticky;
-  top: 0;
+  top: var(--portal-header-height);
   z-index: 20;
+}
+
+.portal-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--portal-footer-height);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border-subtle);
+  z-index: 40;
+}
+
+.portal-footer__inner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+  width: 100%;
+  padding-left: var(--portal-padding-x);
+  padding-right: var(--portal-padding-x);
+  box-sizing: border-box;
+}
+
+@media (min-width: 769px) {
+  .portal-footer__inner {
+    padding-left: var(--portal-padding-x-desktop);
+    padding-right: var(--portal-padding-x-desktop);
+  }
 }
 
 .toolbar-inner {

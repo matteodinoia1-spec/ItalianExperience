@@ -164,9 +164,6 @@
 
   function mountPageHeader() {
     var meta = window.pageMeta;
-    var headerPageInfo = document.getElementById("portal-header-page-info");
-    if (!headerPageInfo) return;
-    if (typeof renderHeaderPageInfo !== "function") return;
     var effectiveMeta = {
       title: (meta && meta.title) || getDefaultTitle(),
       subtitle: (meta && meta.subtitle) || getDefaultSubtitle(),
@@ -177,12 +174,178 @@
           ? meta.breadcrumbs
           : getDefaultBreadcrumbs(),
     };
-    headerPageInfo.innerHTML = renderHeaderPageInfo(effectiveMeta);
     var segments =
       Array.isArray(effectiveMeta.breadcrumbs) && effectiveMeta.breadcrumbs.length
         ? normalizeBreadcrumbs(effectiveMeta.breadcrumbs)
         : getDefaultBreadcrumbs();
     setPageBreadcrumbs(segments);
+  }
+
+  // -------------------------------------------------------------------------
+  // Phase 2: active nav state, desktop submenus, user menu, logout
+  // -------------------------------------------------------------------------
+
+  /** Page key -> nav group for header active state. profile and unknown -> null. */
+  var PAGE_KEY_TO_NAV_GROUP = {
+    dashboard: "dashboard",
+    candidates: "candidates",
+    candidate: "candidates",
+    "add-candidate": "candidates",
+    "job-offers": "job-offers",
+    "add-job-offer": "job-offers",
+    applications: "applications",
+    application: "applications",
+    clients: "clients",
+    "add-client": "clients",
+    archived: "archived",
+  };
+
+  function getNavGroupForPageKey(pageKey) {
+    return PAGE_KEY_TO_NAV_GROUP[pageKey] || null;
+  }
+
+  function applyHeaderActiveState() {
+    var pageKey =
+      window.IERouterRuntime && typeof window.IERouterRuntime.getPageKey === "function"
+        ? window.IERouterRuntime.getPageKey()
+        : "dashboard";
+    var group = getNavGroupForPageKey(pageKey);
+    var links = document.querySelectorAll(".portal-header-nav__link[data-nav-group]");
+    links.forEach(function (link) {
+      var linkGroup = link.getAttribute("data-nav-group");
+      if (linkGroup && linkGroup === group) {
+        link.classList.add("portal-header-nav__link--active");
+        link.setAttribute("aria-current", "page");
+      } else {
+        link.classList.remove("portal-header-nav__link--active");
+        link.removeAttribute("aria-current");
+      }
+    });
+  }
+
+  function normalizeHeaderLinks() {
+    if (!window.IERouter || typeof window.IERouter.derivePortalBasePath !== "function") return;
+    var base = window.IERouter.derivePortalBasePath();
+    var header = document.querySelector(".portal-header");
+    if (!header) return;
+    var linkMap = {
+      "dashboard.html": "dashboard.html",
+      "candidates.html": "candidates.html",
+      "add-candidate.html": "add-candidate.html",
+      "job-offers.html": "job-offers.html",
+      "add-job-offer.html": "add-job-offer.html",
+      "applications.html": "applications.html",
+      "clients.html": "clients.html",
+      "add-client.html": "add-client.html",
+      "archived.html": "archived.html",
+      "profile.html": "profile.html",
+    };
+    header.querySelectorAll("a[href]").forEach(function (a) {
+      var href = (a.getAttribute("href") || "").trim();
+      if (a.hasAttribute("data-action") && a.getAttribute("data-action") === "logout") return;
+      var path = href.split("/").pop() || href;
+      var target = linkMap[path] || (path.indexOf(".html") !== -1 ? path : null);
+      if (target) a.setAttribute("href", base + target);
+    });
+  }
+
+  function closeUserMenu() {
+    var area = document.querySelector(".portal-header-user-area--open");
+    if (area) {
+      area.classList.remove("portal-header-user-area--open");
+      var trigger = area.querySelector("[data-user-menu-trigger]");
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+    }
+  }
+
+  function closeAllMenus() {
+    closeUserMenu();
+  }
+
+  var headerNavGlobalListenersBound = false;
+
+  function ensureGlobalMenuListeners() {
+    if (headerNavGlobalListenersBound) return;
+    headerNavGlobalListenersBound = true;
+
+    document.addEventListener("click", function (e) {
+      if (!e.target || !e.target.closest) return;
+      var insideHeader = e.target.closest(".portal-header");
+      var insideUserArea = e.target.closest(".portal-header-user-area");
+      if (!insideHeader) {
+        closeAllMenus();
+        return;
+      }
+      if (insideUserArea) return;
+      closeAllMenus();
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeAllMenus();
+    });
+
+    window.addEventListener("resize", function () {
+      if (window.matchMedia && !window.matchMedia("(min-width: 1024px)").matches) {
+        closeUserMenu();
+      }
+    });
+  }
+
+  function initUserMenu() {
+    var header = document.querySelector(".portal-header");
+    if (!header) return;
+    var trigger = header.querySelector("[data-user-menu-trigger]");
+    var area = header.querySelector(".portal-header-user-area");
+    if (!trigger || !area) return;
+
+    function toggleUserMenu() {
+      var open = area.classList.toggle("portal-header-user-area--open");
+      trigger.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
+    trigger.addEventListener("click", function (e) {
+      e.preventDefault();
+      toggleUserMenu();
+    });
+    trigger.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleUserMenu();
+      }
+    });
+  }
+
+  function initHeaderLogout() {
+    var header = document.querySelector(".portal-header");
+    if (!header) return;
+    var logoutLink = header.querySelector('[data-action="logout"]');
+    if (!logoutLink) return;
+
+    logoutLink.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (!window.IEAuth) return;
+      (function doLogout() {
+        var logoutPromise =
+          typeof window.IEAuth.logout === "function" ? window.IEAuth.logout() : Promise.resolve();
+        Promise.resolve(logoutPromise).then(function () {
+          if (window.IEPortal && typeof window.IEPortal.clearSessionState === "function") {
+            window.IEPortal.clearSessionState();
+          }
+          if (typeof window !== "undefined") window.__IE_AUTH_USER__ = null;
+          if (typeof window.IEAuth.redirectToLogin === "function") {
+            window.IEAuth.redirectToLogin();
+          }
+        });
+      })();
+    });
+  }
+
+  function initHeaderNavBehavior() {
+    normalizeHeaderLinks();
+    applyHeaderActiveState();
+    initUserMenu();
+    initHeaderLogout();
+    ensureGlobalMenuListeners();
   }
 
   var headerListenerBound = false;
@@ -192,15 +355,6 @@
     headerListenerBound = true;
 
     document.addEventListener("ie:header-loaded", function () {
-      // Re-run initLayout so the header-injected sidebar toggle gets bound.
-      // initLayout is idempotent: only new toggle buttons are bound; no duplicate
-      // document/window/overlay listeners or MutationObserver.
-      if (
-        window.IELayoutRuntime &&
-        typeof window.IELayoutRuntime.initLayout === "function"
-      ) {
-        window.IELayoutRuntime.initLayout();
-      }
       mountPageHeader();
 
       if (
@@ -216,6 +370,8 @@
       ) {
         window.IEProfileRuntime.updateHeaderUserBlock();
       }
+
+      initHeaderNavBehavior();
     });
   }
 
@@ -261,6 +417,11 @@
     getDefaultTitle: getDefaultTitle,
     getDefaultSubtitle: getDefaultSubtitle,
     getDefaultBreadcrumbs: getDefaultBreadcrumbs,
+    applyHeaderActiveState: applyHeaderActiveState,
   };
+
+  // Ensure header behavior is wired even when the header
+  // is loaded early via header-loader before initHeader runs.
+  bindHeaderLoadedListener();
 })();
 
