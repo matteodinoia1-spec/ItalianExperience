@@ -17,82 +17,83 @@
 
         <div class="portal-toolbar sticky-toolbar">
             <div class="page-container toolbar-inner">
-                <div class="toolbar-left">
-                    <div class="portal-toolbar__left">
-                        <div class="portal-toolbar__filters">
-                            <div class="filter-bar">
-                                <div class="filter-group">
-                                    <label class="filter-label">Status</label>
-                                    <select data-filter="application-status" class="filter-select w-full appearance-none cursor-pointer">
-                                        <option value="">All statuses</option>
-                                        <option value="applied">Applied</option>
-                                        <option value="screening">Screening</option>
-                                        <option value="interview">Interview</option>
-                                        <option value="offer">Offer</option>
-                                        <option value="hired">Hired</option>
-                                        <option value="rejected">Rejected</option>
-                                        <option value="withdrawn">Withdrawn</option>
-                                        <option value="not_selected">Not Selected</option>
-                                    </select>
-                                </div>
-                                <div class="filter-group">
-                                    <label class="filter-label">Job Offer</label>
-                                    <select data-filter="application-offer" class="filter-select w-full appearance-none cursor-pointer">
-                                        <option value="">All offers</option>
-                                    </select>
-                                </div>
-                                <div class="filter-group">
-                                    <label class="filter-label">Client</label>
-                                    <select data-filter="application-client" class="filter-select w-full appearance-none cursor-pointer">
-                                        <option value="">All clients</option>
-                                    </select>
-                                </div>
-                                <div class="filter-group relative">
-                                    <label class="filter-label">Candidate</label>
-                                    <input type="text" placeholder="Search candidate..." data-filter="application-candidate" class="filter-input w-full">
-                                </div>
-                                <div class="filter-group">
-                                    <label class="filter-label">From date</label>
-                                    <input type="date" data-filter="application-date-from" class="filter-input w-full">
-                                </div>
-                                <div class="filter-group">
-                                    <label class="filter-label">To date</label>
-                                    <input type="date" data-filter="application-date-to" class="filter-input w-full">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div class="toolbar-left"></div>
                 <div class="portal-toolbar__center"></div>
-                <div class="toolbar-right">
-                    <div class="portal-toolbar__right">
-                        <div class="portal-toolbar__actions">
-                            <div class="inline-flex rounded-full bg-white/70 border border-gray-200 overflow-hidden text-xs font-semibold">
-                                <button
-                                  type="button"
-                                  class="px-3 py-1 focus:outline-none text-[#1b4332] bg-white"
-                                  data-view-mode="list"
-                                >
-                                  List
-                                </button>
-                                <button
-                                  type="button"
-                                  class="px-3 py-1 focus:outline-none text-gray-600"
-                                  data-view-mode="pipeline"
-                                >
-                                  Pipeline
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div class="toolbar-right"></div>
             </div>
         </div>
 
         <div class="page-container">
         <div class="portal-content p-8 space-y-8">
-
-            <div class="glass-card ie-card rounded-2xl p-4" data-ie-applications-pipeline-bar>
+            <div class="page-layout-with-filters">
+                <div class="page-filters-drawer-backdrop" data-close-filter-drawer aria-hidden="true"></div>
+                <aside class="page-filters-column">
+                    <div class="page-filters-column__mobile-header">
+                        <span class="page-filters-column__mobile-title">Filters</span>
+                        <button type="button" class="page-filters-drawer-close" data-close-filter-drawer aria-label="Close filters">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="page-filters-column__view-toggle">
+                        <span class="filter-label">View</span>
+                        <div class="inline-flex rounded-full bg-white/70 border border-gray-200 overflow-hidden text-xs font-semibold">
+                            <button type="button" class="px-3 py-1 focus:outline-none text-[#1b4332] bg-white" data-view-mode="list">List</button>
+                            <button type="button" class="px-3 py-1 focus:outline-none text-gray-600" data-view-mode="pipeline">Pipeline</button>
+                        </div>
+                    </div>
+                    <div class="filter-bar page-filters-column__bar">
+                        <div class="filter-group">
+                            <label class="filter-label">Status</label>
+                            <select data-filter="application-status" class="filter-select w-full appearance-none cursor-pointer">
+                                <option value="">All statuses</option>
+                                <option value="applied">Applied</option>
+                                <option value="screening">Screening</option>
+                                <option value="interview">Interview</option>
+                                <option value="offer">Offer</option>
+                                <option value="hired">Hired</option>
+                                <option value="rejected">Rejected</option>
+                                <option value="withdrawn">Withdrawn</option>
+                                <option value="not_selected">Not Selected</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Job Offer</label>
+                            <select data-filter="application-offer" class="filter-select w-full appearance-none cursor-pointer">
+                                <option value="">All offers</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Client</label>
+                            <select data-filter="application-client" class="filter-select w-full appearance-none cursor-pointer">
+                                <option value="">All clients</option>
+                            </select>
+                        </div>
+                        <div class="filter-group relative">
+                            <label class="filter-label">Candidate</label>
+                            <input type="text" placeholder="Search candidate..." data-filter="application-candidate" class="filter-input w-full">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">From date</label>
+                            <input type="date" data-filter="application-date-from" class="filter-input w-full">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">To date</label>
+                            <input type="date" data-filter="application-date-to" class="filter-input w-full">
+                        </div>
+                    </div>
+                </aside>
+                <div class="page-main-column">
+                    <div class="page-filters-trigger-wrap">
+                        <button type="button" class="page-filters-trigger" data-toggle-filter-drawer aria-label="Open filters">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                            </svg>
+                            <span>Filters</span>
+                        </button>
+                    </div>
+                    <div class="glass-card ie-card rounded-2xl p-4" data-ie-applications-pipeline-bar>
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <p class="text-xs font-semibold uppercase tracking-widest text-gray-500">
                         Pipeline summary
@@ -162,6 +163,9 @@
                 </div>
             </div>
 
+                </div>
+            </div>
+
         </div>
         </div>
         </main>
@@ -206,6 +210,7 @@
     <script src="core/session/session.js"></script>
     <script src="core/ui/modals.js"></script>
     <script src="core/ui/previews.js"></script>
+    <script src="runtime/filter-drawer-runtime.js"></script>
     <script src="core/app-shell.js"></script>
     <script src="features/applications/applications.js"></script>
 </body>

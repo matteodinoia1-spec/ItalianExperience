@@ -15,6 +15,8 @@
   /* Safe area insets for iOS/notched devices (used in layout.css only) */
   --portal-safe-top: env(safe-area-inset-top, 0px);
   --portal-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --portal-toolbar-height: 52px;
+  --page-filters-column-width: 280px;
 }
 
 /* Shared page container: centers UI and aligns header, toolbar, content — consistent left/right spacing */
@@ -678,5 +680,170 @@ body {
   flex-shrink: 0;
   margin-left: auto;
   margin-right: 1rem;
+}
+
+/* --------------------------------------------------------------------------
+   Page layout with filters (pilot: clients.html)
+   Desktop/tablet: left sticky filter column + right main content
+   Mobile: filter drawer opened by trigger; same filter fields, same data-filter
+   -------------------------------------------------------------------------- */
+
+.page-layout-with-filters {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1.5rem;
+  width: 100%;
+  position: relative;
+}
+
+.page-filters-column {
+  flex: 0 0 var(--page-filters-column-width);
+  width: var(--page-filters-column-width);
+  min-width: 0;
+  padding: 1.25rem;
+  background: var(--ie-color-surface, #fff);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--ie-radius-lg, 1rem);
+  position: sticky;
+  top: calc(var(--portal-header-height) + var(--portal-safe-top) + var(--portal-toolbar-height));
+  align-self: flex-start;
+  box-sizing: border-box;
+}
+
+.page-filters-column__mobile-header {
+  display: none;
+}
+
+.page-filters-column__view-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.page-filters-column__view-toggle .filter-label {
+  margin: 0;
+}
+
+.page-filters-column__bar {
+  margin-bottom: 0;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.page-filters-column__bar .filter-group {
+  width: 100%;
+}
+
+.page-main-column {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.page-filters-trigger-wrap {
+  display: none;
+}
+
+/* Mobile: hide filter column as sidebar; show as drawer */
+@media (max-width: 768px) {
+  .page-layout-with-filters {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .page-filters-column {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(320px, 85vw);
+    max-width: 100%;
+    z-index: 60;
+    border-radius: 0;
+    border-right: 1px solid var(--border-subtle);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-top: calc(var(--portal-header-height) + var(--portal-safe-top) + 16px);
+  }
+
+  .page-layout-with-filters.filter-drawer-open .page-filters-column {
+    transform: translateX(0);
+  }
+
+  .page-filters-column__mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 1rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .page-filters-column__mobile-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main, #1b4332);
+  }
+
+  .page-filters-drawer-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    margin: -0.5rem -0.5rem -0.5rem 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ie-color-fg, #374151);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .page-filters-drawer-close:hover {
+    color: var(--text-main, #1b4332);
+  }
+
+  .page-filters-trigger-wrap {
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .page-filters-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--ie-color-fg, #374151);
+    background: var(--ie-color-surface, #fff);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .page-filters-trigger:hover {
+    border-color: var(--ie-color-accent, #c5a059);
+    color: var(--text-main, #1b4332);
+  }
+
+  .page-filters-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 55;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .page-layout-with-filters.filter-drawer-open .page-filters-drawer-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
