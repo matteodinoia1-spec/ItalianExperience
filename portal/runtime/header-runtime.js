@@ -179,6 +179,9 @@
         ? normalizeBreadcrumbs(effectiveMeta.breadcrumbs)
         : getDefaultBreadcrumbs();
     setPageBreadcrumbs(segments);
+
+    var titleEl = document.getElementById("portal-header-page-title");
+    if (titleEl) titleEl.textContent = effectiveMeta.title;
   }
 
   // -------------------------------------------------------------------------

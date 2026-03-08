@@ -2,7 +2,7 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
 /**
  * Archived page – Supabase integration
  * Loads archived candidates, job offers, and clients with pagination, search, and restore.
- * Requires: Supabase CDN, supabase.js, app.js (auth + sidebar).
+ * Requires: Supabase CDN, supabase.js, app.js (auth).
  */
 (function () {
   "use strict";

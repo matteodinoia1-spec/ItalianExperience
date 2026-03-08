@@ -60,7 +60,7 @@
       box.className = "ie-card glass-card rounded-2xl p-6";
       box.innerHTML =
         '<div class="text-sm font-semibold text-gray-700 mb-1">Form non disponibile in modalità file locale.</div>' +
-        '<p class="text-xs text-gray-500">Apri la pagina completa tramite la sidebar o il pulsante principale per utilizzare questo form.</p>';
+        '<p class="text-xs text-gray-500">Apri la pagina completa tramite il menu o il pulsante principale per utilizzare questo form.</p>';
       return box;
     }
 

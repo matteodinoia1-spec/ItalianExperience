@@ -4,14 +4,15 @@ This document describes how protected pages start up, which scripts they must lo
 
 ---
 
-## 1. Portal shell architecture (header-first)
+## 1. Portal shell architecture (header + bottom-nav)
 
-- **Header** — Primary global navigation. Contains: left = primary nav (desktop) + hamburger toggle (mobile); right = user area (Settings, Logout). Does **not** contain page title, subtitle, or breadcrumbs.
-- **Footer** — Thin fixed glass-style footer with breadcrumbs only (`#page-breadcrumbs`). Loaded by `header-loader.js` together with the header.
-- **Sidebar** — Mobile/technical fallback only. Off-canvas via hamburger on small viewports. Desktop layout does **not** reserve sidebar width; header is the primary navigation.
-- **Page titles** — Not part of the shared shell; will be repositioned later.
+- **Header** — Full-width; nav left (shell padding), user/profile right. Primary global navigation. Desktop/tablet: primary nav and user area in header; no page title in header. On mobile, page title is displayed in the header.
+- **Bottom nav** — Mobile only. Fixed bar; primary items: Dashboard, Candidates, Job Offers, Applications, More. “More” panel contains: Clients, Archived, Settings, Logout. Loaded by `header-loader.js` with header and footer.
+- **Footer** — Desktop/tablet only. Full width; uses the same shell padding as the header. Breadcrumbs only (`#page-breadcrumbs`), left aligned, vertically centered in the footer bar; align with header navigation start. On mobile the footer is completely hidden; breadcrumbs are not shown.
+- **No sidebar** — Sidebar and hamburger have been removed. Mobile uses bottom nav + More; no off-canvas sidebar.
+- **Page titles** — Not part of the shared shell for now.
 
-`header-loader.js` mounts both header and footer fragments; when both are injected it dispatches `ie:header-loaded`.
+`header-loader.js` mounts header, then gets/creates footer and bottom-nav containers, fetches `layout/footer.html` and `layout/bottom-nav.html`, injects them (DOM order: …content, `#portal-bottom-nav`, `#portal-footer`), then dispatches `ie:header-loaded`. One event when the full shell (header + bottom nav + footer) is ready.
 
 ---
 
@@ -43,11 +44,11 @@ This document describes how protected pages start up, which scripts they must lo
    - `initGlobalModals()`, `IEEntityActionsRuntime.init()`.
    - **Await** `__IE_AUTH_GUARD__`; if not allowed, return.
    - **Protected pages:** `loadCurrentUserProfile()` (uses `getSessionReady()` when available), then `initInactivityTimer()`.
-   - **Then:** `ensureSidebarLoaded()` (fetch `layout/sidebar.html` — required for mobile off-canvas fallback).
-   - After sidebar: optional re-check of auth (using cached session when available), then **once only** `IELayoutRuntime.initLayout()`, then `IEHeaderRuntime.initHeader(pageKey)`, then `runPageInitializers(pageKey)` (back button, buttons, forms, page controllers, data views).
+   - **Then:** `IEHeaderRuntime.initHeader(pageKey)`, then `runPageInitializers(pageKey)` (back button, buttons, forms, page controllers, data views).
+   - **Finally:** `ensureBottomNavRuntimeLoaded()` (dynamically loads `runtime/bottom-nav-runtime.js` if not present), then `IEBottomNavRuntime.initBottomNav(pageKey)` (active state, link normalization, More open/close, mobile logout in More).
 
 5. **Header loaded (`ie:header-loaded`)**  
-   Fires when header and footer fragments have finished mounting. **header-runtime** reacts by: rendering breadcrumbs into the footer (`#page-breadcrumbs`), updating profile/avatar blocks, and initializing header nav behavior (active state, user menu, logout). **header-runtime does not re-initialize layout**; `IELayoutRuntime.initLayout()` is called only from page-bootstrap. `IEPageBootstrap` is the single owner of layout initialization.
+   Fires when header, bottom nav, and footer fragments have finished mounting (single “shell ready” event). **header-runtime** reacts by: rendering breadcrumbs into the footer (`#page-breadcrumbs`), updating profile/avatar blocks, and initializing header nav behavior (active state, user menu, logout). **Bottom-nav-runtime** binds after bootstrap loads it and runs `initBottomNav(pageKey)`; it listens for `ie:header-loaded` to normalize links and set active state. `IEPageBootstrap` owns shell/page initialization; it does not call any layout or sidebar runtime (those were removed).
 
 ---
 
@@ -66,28 +67,28 @@ Every protected page must include the following scripts in this order. Page-spec
 | 7 | `core/session-ready.js` | Single cached session per load; used by guard and bootstrap |
 | 8 | `core/router.js` | |
 | 9 | `runtime/router-runtime.js` | |
-| 10 | `runtime/layout-runtime.js` | |
-| 11 | `runtime/sidebar-runtime.js` | |
-| 12 | `runtime/forms-runtime.js` | |
-| 13 | `runtime/modals-runtime.js` | |
-| 14 | `runtime/profile-runtime.js` | |
-| 15 | `runtime/status-runtime.js` | |
-| 16 | `runtime/associations-runtime.js` | |
-| 17 | `runtime/candidate-profile-runtime.js` | |
-| 18 | `runtime/candidate-runtime.js` | |
-| 19 | `runtime/client-runtime.js` | |
-| 20 | `runtime/job-offer-runtime.js` | |
-| 21 | **`runtime/header-runtime.js`** | Required for header and breadcrumbs |
-| 22 | **`runtime/entity-actions-runtime.js`** | Required for entity action buttons and delegation |
-| 23 | `runtime/page-bootstrap.js` | |
-| 24 | `components/page-header.js` | |
-| 25 | `core/entity-toolbar.js` | |
-| 26 | `core/lists-runtime.js` | |
-| 27 | `core/session/session.js` | Inactivity timer |
-| 28 | `core/ui/modals.js` | |
-| 29 | `core/ui/previews.js` | |
-| 30 | `core/app-shell.js` | Must be last core script; triggers DOMContentLoaded bootstrap |
-| 31+ | *(page-specific)* | e.g. `shared/activity-section.js`, `features/*/…` |
+| 10 | `runtime/forms-runtime.js` | |
+| 11 | `runtime/modals-runtime.js` | |
+| 12 | `runtime/profile-runtime.js` | |
+| 13 | `runtime/status-runtime.js` | |
+| 14 | `runtime/associations-runtime.js` | |
+| 15 | `runtime/candidate-profile-runtime.js` | |
+| 16 | `runtime/candidate-runtime.js` | |
+| 17 | `runtime/client-runtime.js` | |
+| 18 | `runtime/job-offer-runtime.js` | |
+| 19 | **`runtime/header-runtime.js`** | Required for header and breadcrumbs |
+| 20 | **`runtime/entity-actions-runtime.js`** | Required for entity action buttons and delegation |
+| 21 | `runtime/page-bootstrap.js` | Loads bottom-nav-runtime dynamically; must be after header-runtime |
+| 22 | `components/page-header.js` | |
+| 23 | `core/entity-toolbar.js` | |
+| 24 | `core/lists-runtime.js` | |
+| 25 | `core/session/session.js` | Inactivity timer |
+| 26 | `core/ui/modals.js` | |
+| 27 | `core/ui/previews.js` | |
+| 28 | `core/app-shell.js` | Must be last core script; triggers DOMContentLoaded bootstrap |
+| 29+ | *(page-specific)* | e.g. `shared/activity-section.js`, `features/*/…` |
+
+**Note:** `runtime/bottom-nav-runtime.js` is **not** in the static script list; `page-bootstrap.js` loads it dynamically and then calls `IEBottomNavRuntime.initBottomNav(pageKey)`.
 
 **Pages that must match this baseline:**  
 dashboard, candidates, candidate, applications, application, job-offers, clients, add-candidate, add-job-offer, add-client, profile, archived.
@@ -115,17 +116,17 @@ dashboard, candidates, candidate, applications, application, job-offers, clients
 - **API:** `window.IESessionReady.getSessionReady()` returns a promise that resolves to `{ data: { session, user }, error }` (same shape as `IESupabase.getSession()`). The first call performs the fetch; later calls in the same load return the same promise.
 - **Used by:**  
   - **app-shell** guard: awaits `getSessionReady()`, then `checkAuth(cachedSession)` so no second session fetch.  
-  - **page-bootstrap:** re-validation after sidebar (and in error/fallback paths) uses `getSessionReady()` and passes the result to `checkAuth()` so no extra getSession.  
+  - **page-bootstrap:** re-validation (when used) uses `getSessionReady()` and passes the result to `checkAuth()` so no extra getSession.  
   - **profile-runtime:** `loadCurrentUserProfile()` uses `getSessionReady()` when available instead of calling `IEAuth.getSession()` again.
 - **Compatibility:** If `session-ready.js` is not loaded (e.g. legacy or public page), guard falls back to `ensureSupabaseSessionReady()` and `checkAuth()` with no argument; profile falls back to `IEAuth.getSession()`.
 
 ---
 
-## 6. Layout initialization (single owner)
+## 6. Shell initialization
 
-- **Owner:** `IEPageBootstrap` is the single owner of layout initialization. `IELayoutRuntime.initLayout()` is called **only** from page-bootstrap (after `ensureSidebarLoaded()`).
-- **header-runtime** does **not** call `initLayout()` on `ie:header-loaded`. Phase 6 sidebar cleanup removed that call; header-runtime now only handles breadcrumb rendering (to footer), profile/avatar updates, and header nav behavior (active state, user menu, logout).
-- **initLayout** is idempotent (module-level guard) so that if called again it would only bind any new toggle buttons and not add duplicate listeners; the single call site remains page-bootstrap.
+- **Owner:** `IEPageBootstrap` owns shell and page initialization. It runs header init, page initializers (forms, data views), then loads and initializes the bottom-nav runtime. There is no layout-runtime or sidebar-runtime; those were removed in the bottom-nav refactor.
+- **header-runtime** on `ie:header-loaded`: breadcrumb rendering (to footer), profile/avatar updates, header nav behavior (active state, user menu, logout). It does not initialize layout or sidebar.
+- **bottom-nav-runtime** is loaded dynamically by page-bootstrap and runs `initBottomNav(pageKey)`: it sets bottom-nav active state, normalizes links, and handles More panel open/close and mobile logout.
 
 ---
 
@@ -146,6 +147,16 @@ dashboard, candidates, candidate, applications, application, job-offers, clients
 
 - **Entry:** Protected app entry is the corresponding HTML file; JS entry is script order → app-shell → DOMContentLoaded → `IEPageBootstrap.init(pageKey)`.
 - **Auth:** One session fetch per load via `IESessionReady.getSessionReady()`; guard and bootstrap use it so protected pages do not repeat getSession/checkAuth unnecessarily.
-- **Layout:** Initialized once from page-bootstrap after sidebar; `IELayoutRuntime.initLayout()` is the single call site.
-- **Shell:** Header = primary nav + user menu; footer = breadcrumbs; sidebar = mobile fallback only.
-- **Script baseline:** See Section 3; no protected page should omit header-runtime or entity-actions-runtime.
+- **Shell:** Header (primary nav + user menu), bottom nav (mobile), footer (breadcrumbs, desktop/tablet only; hidden on mobile). No sidebar or hamburger. Bottom-nav runtime is loaded dynamically by page-bootstrap.
+- **Script baseline:** See Section 3; no protected page should omit header-runtime or entity-actions-runtime. Do not add layout-runtime or sidebar-runtime (removed).
+
+---
+
+## 9. Final shell architecture summary (post bottom-nav refactor)
+
+- **Shared shell:** Header (primary global nav), bottom nav (mobile), footer (breadcrumbs, desktop/tablet only). No sidebar; no hamburger.
+- **Desktop/tablet:** Header nav and user menu; footer shows breadcrumbs (full width, shell padding; breadcrumbs left aligned, vertically centered).
+- **Mobile:** Header shows page title. Bottom nav is primary navigation; More panel contains Clients, Archived, Settings, Logout. Footer is hidden; breadcrumbs are not shown.
+- **Loader:** `header-loader.js` mounts header, bottom nav, and footer; dispatches `ie:header-loaded` once when all are in place.
+- **Bootstrap:** `IEPageBootstrap.init()` runs auth guard → profile + inactivity → header init → page initializers → dynamic load of `bottom-nav-runtime.js` → `initBottomNav(pageKey)`. Bottom-nav runtime owns active state, link normalization, More open/close, and mobile logout.
+- **Layout/styling:** No sidebar width. On mobile, footer is hidden; bottom nav is primary. Spacing uses design tokens; iOS/safe-area insets applied (`--portal-safe-*`). Page titles are not part of the shared shell for now.

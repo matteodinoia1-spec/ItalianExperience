@@ -4,7 +4,7 @@
 // Centralizes the portal startup pipeline:
 // - Auth guard completion
 // - Session inactivity wiring (protected pages only)
-// - Layout + sidebar initialization
+// - Header and bottom-nav initialization
 // - Page-specific initialization (lists, forms, buttons, profile header)
 //
 // NOTE:
@@ -171,6 +171,57 @@
   }
 
   /**
+   * Ensure bottom-nav runtime script is loaded once before initialization.
+   * Loaded dynamically so existing HTML script lists do not need to change.
+   * @returns {Promise<any>}
+   */
+  function ensureBottomNavRuntimeLoaded() {
+    if (
+      window.IEBottomNavRuntime &&
+      typeof window.IEBottomNavRuntime.initBottomNav === "function"
+    ) {
+      return Promise.resolve(window.IEBottomNavRuntime);
+    }
+
+    return new Promise(function (resolve) {
+      var existing = document.querySelector(
+        'script[data-ie-bottom-nav-runtime="true"]'
+      );
+      if (existing) {
+        var markReadyAndResolve = function () {
+          existing.setAttribute("data-ie-bottom-nav-ready", "true");
+          resolve(window.IEBottomNavRuntime || null);
+        };
+        if (existing.getAttribute("data-ie-bottom-nav-ready") === "true") {
+          resolve(window.IEBottomNavRuntime || null);
+          return;
+        }
+        existing.addEventListener("load", markReadyAndResolve);
+        existing.addEventListener("error", function () {
+          resolve(null);
+        });
+        return;
+      }
+
+      var script = document.createElement("script");
+      script.src = "runtime/bottom-nav-runtime.js";
+      script.async = false;
+      script.setAttribute("data-ie-bottom-nav-runtime", "true");
+      script.addEventListener("load", function () {
+        script.setAttribute("data-ie-bottom-nav-ready", "true");
+        resolve(window.IEBottomNavRuntime || null);
+      });
+      script.addEventListener("error", function () {
+        resolve(null);
+      });
+
+      var target =
+        document.head || document.body || document.documentElement;
+      target.appendChild(script);
+    });
+  }
+
+  /**
    * Main bootstrap entrypoint.
    * @param {string} pageKey - Normalized page key from IERouterRuntime.getPageKey().
    */
@@ -226,104 +277,30 @@
     }
 
     // -----------------------------------------------------------------------
-    // Step C – Layout & Sidebar initialization
+    // Step C – Header initialization
     // -----------------------------------------------------------------------
     if (
-      window.IESidebarRuntime &&
-      typeof window.IESidebarRuntime.ensureSidebarLoaded === "function"
+      window.IEHeaderRuntime &&
+      typeof window.IEHeaderRuntime.initHeader === "function"
     ) {
-      try {
-        await window.IESidebarRuntime.ensureSidebarLoaded();
+      window.IEHeaderRuntime.initHeader(pageKey);
+    }
 
-        // Extra defense-in-depth: re-validate auth for protected pages.
-        // Reuse cached session when available to avoid duplicate getSession().
-        if (
-          isProtectedPage &&
-          window.IEAuth &&
-          typeof window.IEAuth.checkAuth === "function"
-        ) {
-          var cachedSession =
-            window.IESessionReady &&
-            typeof window.IESessionReady.getSessionReady === "function"
-              ? await window.IESessionReady.getSessionReady()
-              : undefined;
-          var user = await window.IEAuth.checkAuth(cachedSession);
-          if (!user) return;
-        }
+    // -----------------------------------------------------------------------
+    // Step F – Page initialization (data views, forms, buttons) before bottom nav
+    // So Supabase data loading is not gated on the dynamic bottom-nav script.
+    // -----------------------------------------------------------------------
+    runPageInitializers(pageKey);
 
-        if (
-          window.IELayoutRuntime &&
-          typeof window.IELayoutRuntime.initLayout === "function"
-        ) {
-          window.IELayoutRuntime.initLayout();
-        }
-
-        if (
-          window.IEHeaderRuntime &&
-          typeof window.IEHeaderRuntime.initHeader === "function"
-        ) {
-          window.IEHeaderRuntime.initHeader(pageKey);
-        }
-
-        // -------------------------------------------------------------------
-        // Step F – Page initialization (then branch)
-        // -------------------------------------------------------------------
-        runPageInitializers(pageKey);
-      } catch (error) {
-        if (typeof window.debugLog === "function") {
-          window.debugLog(
-            "[ItalianExperience] Sidebar loading failed",
-            error
-          );
-        }
-
-        if (
-          isProtectedPage &&
-          window.IEAuth &&
-          typeof window.IEAuth.checkAuth === "function"
-        ) {
-          var cachedAfterError =
-            window.IESessionReady &&
-            typeof window.IESessionReady.getSessionReady === "function"
-              ? await window.IESessionReady.getSessionReady()
-              : undefined;
-          var userAfterError = await window.IEAuth.checkAuth(cachedAfterError);
-          if (!userAfterError) return;
-        }
-
-        // Fallback: run header + page initializers even if sidebar loading
-        // failed. (Matches previous .catch() behavior in app-shell).
-        if (
-          window.IEHeaderRuntime &&
-          typeof window.IEHeaderRuntime.initHeader === "function"
-        ) {
-          window.IEHeaderRuntime.initHeader(pageKey);
-        }
-        runPageInitializers(pageKey);
-      }
-    } else {
-      // No sidebar runtime available: keep behavior safe by running
-      // header + initializers after an optional auth re-check.
-      if (
-        isProtectedPage &&
-        window.IEAuth &&
-        typeof window.IEAuth.checkAuth === "function"
-      ) {
-        var cachedNoSidebar =
-          window.IESessionReady &&
-          typeof window.IESessionReady.getSessionReady === "function"
-            ? await window.IESessionReady.getSessionReady()
-            : undefined;
-        var userNoSidebar = await window.IEAuth.checkAuth(cachedNoSidebar);
-        if (!userNoSidebar) return;
-      }
-      if (
-        window.IEHeaderRuntime &&
-        typeof window.IEHeaderRuntime.initHeader === "function"
-      ) {
-        window.IEHeaderRuntime.initHeader(pageKey);
-      }
-      runPageInitializers(pageKey);
+    // -----------------------------------------------------------------------
+    // Step C (continued) – Bottom nav (load script then init)
+    // -----------------------------------------------------------------------
+    var bottomNavRuntime = await ensureBottomNavRuntimeLoaded();
+    if (
+      bottomNavRuntime &&
+      typeof bottomNavRuntime.initBottomNav === "function"
+    ) {
+      bottomNavRuntime.initBottomNav(pageKey);
     }
   }
 

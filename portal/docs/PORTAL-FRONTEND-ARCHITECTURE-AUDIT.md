@@ -4,7 +4,7 @@
 **Scope:** `portal/` — modular vanilla JavaScript web application with Supabase backend  
 **Goal:** Evaluate performance, architectural quality, maintainability, and developer comprehensibility. No code was modified.
 
-**Note (post header-first refactor, Phase 6):** Shell architecture has changed. Header is now primary navigation (desktop); footer holds breadcrumbs; sidebar is mobile fallback only. `initLayout()` is called only from page-bootstrap; header-runtime does not re-initialize layout on `ie:header-loaded`.
+**Note (post bottom-nav refactor):** Shell architecture: header = full width, nav left (shell padding), user right; desktop/tablet = header nav + user menu, footer with breadcrumbs (full width, shell padding; breadcrumbs left aligned, vertically centered); mobile = header shows page title, bottom nav primary, footer hidden (no breadcrumbs). No sidebar or hamburger. `header-loader.js` mounts header, bottom nav, and footer; dispatches `ie:header-loaded` once. `page-bootstrap.js` runs header init, page initializers, then dynamically loads and initializes `bottom-nav-runtime.js`. No `layout-runtime.js` or `sidebar-runtime.js` (removed).
 
 ---
 
@@ -28,18 +28,16 @@
 3. **Page bootstrap (`runtime/page-bootstrap.js`):**  
    - Calls `IEModalsRuntime.initGlobalModals()` and `IEEntityActionsRuntime.init()`.  
    - Awaits `__IE_AUTH_GUARD__`.  
-   - For protected pages: `IEProfileRuntime.loadCurrentUserProfile()` (which calls `IEAuth.getSession()`), then `initInactivityTimer()`.  
-   - Then `IESidebarRuntime.ensureSidebarLoaded()` (fetch of `sidebar.html`).  
-   - After sidebar: optionally `IEAuth.checkAuth()` again, then `IELayoutRuntime.initLayout()`, then `IEHeaderRuntime.initHeader(pageKey)`, then `runPageInitializers(pageKey)` (back button, buttons, forms, page controllers, data views).
+   - For protected pages: `IEProfileRuntime.loadCurrentUserProfile()` (uses `getSessionReady()` when available), then `initInactivityTimer()`.  
+   - Then `IEHeaderRuntime.initHeader(pageKey)`, then `runPageInitializers(pageKey)` (back button, buttons, forms, page controllers, data views).  
+   - Finally `ensureBottomNavRuntimeLoaded()` (dynamically loads `runtime/bottom-nav-runtime.js`), then `IEBottomNavRuntime.initBottomNav(pageKey)`.
 
-**Observation:** Session/auth is touched multiple times before first paint: in guard (`getSession` + `checkAuth`), then in bootstrap (`loadCurrentUserProfile` → `getSession`), and again in bootstrap’s optional `checkAuth()` after sidebar. No single “session ready” abstraction; multiple code paths call `getSession`/`checkAuth` across the codebase.
+**Observation:** Session/auth is consolidated via `IESessionReady.getSessionReady()`; guard and bootstrap reuse it. Shell no longer loads sidebar or layout runtime; bootstrap runs header init then bottom-nav init.
 
 ### Potential duplicate listeners
 
-- **initLayout (resolved):**
-  `initLayout()` is called **only** from `page-bootstrap.js` (after `ensureSidebarLoaded()`). header-runtime does **not** call `initLayout()` on `ie:header-loaded` (Phase 6 sidebar cleanup removed that call).
-  `layout-runtime.js`’s `initLayout()` (lines 53–109) is idempotent (module-level guard).  
-  **Files:** `portal/runtime/layout-runtime.js`, `portal/runtime/header-runtime.js`, `portal/runtime/page-bootstrap.js`.
+- **Layout/sidebar (removed):** `layout-runtime.js` and `sidebar-runtime.js` no longer exist. Shell initialization is: header-loader mounts header + bottom nav + footer → `ie:header-loaded`; page-bootstrap runs header init, page initializers, then loads and runs bottom-nav-runtime. No duplicate layout or sidebar init.  
+  **Files:** `portal/shared/header-loader.js`, `portal/runtime/page-bootstrap.js`, `portal/runtime/bottom-nav-runtime.js`.
 
 - **initGlobalModals:** Called once from page-bootstrap; `hasInitializedGlobalModals` in `modals-runtime.js` is set but the flag is not used to short-circuit. Confirmed single call path; no duplicate if bootstrap runs once.
 
@@ -56,7 +54,7 @@
 ### Possible slow operations
 
 - **Synchronous script chain:** 25+ scripts block parsing/execution. Largest files include `core/supabase.js` (~4,032 lines), `core/lists-runtime.js` (~1,759 lines), `features/applications/application-detail.js` (~1,126 lines), `features/candidates/candidate.js` (~1,219 lines), `runtime/associations-runtime.js` (~1,245 lines). No lazy loading; all run on every full page load.
-- **Sequential async bootstrap:** After DOMContentLoaded, bootstrap awaits auth guard → profile load → sidebar fetch → then layout/header/page init. Header is loaded separately via `loadPortalHeader()`; sidebar via `ensureSidebarLoaded()`. Two network requests (header + sidebar) plus auth/session work delay “ready” state.
+- **Sequential async bootstrap:** After DOMContentLoaded, `loadPortalHeader()` fetches header, footer, and bottom-nav HTML and dispatches `ie:header-loaded`. Bootstrap awaits auth guard → profile load → header init → page initializers → then dynamically loads bottom-nav-runtime and runs `initBottomNav()`. Shell is one loader (header + footer + bottom-nav); no separate sidebar fetch.
 - **Heavy DOM in lists:** `lists-runtime.js` builds table rows with inline HTML strings and many `querySelector`/`querySelectorAll` calls; no virtual list or pagination at the data layer for very large result sets (pagination is UI-only with fixed page sizes).
 - **No caching:** Supabase responses are not cached in memory; revisiting the same list or dashboard refetches everything.
 
@@ -82,7 +80,7 @@
 
 - No strict circular **module load** (script A loads B, B loads A) because everything is script tags and there are no ES modules. There are, however, **logical circles**:  
   - app-shell registers `IEPageBootstrapHelpers` which include `initBackButton`, `initButtons`, `initDataViews`; page-bootstrap calls these and also calls runtime inits; runtimes and features use `IEPortal.*` and other globals defined in app-shell. So: app-shell → page-bootstrap → runtimes → (often) app-shell globals.  
-  - `IEHeaderRuntime.initHeader` is called from page-bootstrap; header-runtime’s listener on `ie:header-loaded` updates breadcrumbs and header nav but does not call `IELayoutRuntime.initLayout`. Layout is invoked only from page-bootstrap.
+  - `IEHeaderRuntime.initHeader` is called from page-bootstrap; header-runtime’s listener on `ie:header-loaded` updates breadcrumbs and header nav. Page-bootstrap then loads bottom-nav-runtime and runs initBottomNav(); no layout or sidebar runtime.
 
 ### Oversized modules
 
@@ -93,7 +91,7 @@
 - **features/candidates/candidate.js** — ~1,219 lines. Candidate detail page behavior.  
 - **features/applications/application-detail.js** — ~1,126 lines. Application detail page behavior.
 
-Small, focused modules: `router-runtime.js`, `layout-runtime.js`, `auth.js`, `router.js`, `page-bootstrap.js`, `debug.js`.
+Small, focused modules: `router-runtime.js`, `auth.js`, `router.js`, `page-bootstrap.js`, `bottom-nav-runtime.js`, `debug.js`.
 
 ### Missing abstractions
 
@@ -153,8 +151,8 @@ Areas where future changes could break architecture or behavior:
 2. **Global namespace**  
    Renaming or removing a `window.IE*` global (e.g. `IEPageBootstrapHelpers`, `IELayoutRuntime`) can break any module that references it. There is no single manifest of “who uses which global”; refactors are error-prone.
 
-3. **initLayout and “ie:header-loaded”**  
-   `initLayout()` is called only from page-bootstrap; header-runtime does not call it on `ie:header-loaded`. `ie:header-loaded` means header and footer fragments have finished mounting; header-runtime reacts by rendering breadcrumbs, updating profile blocks, and initializing header nav behavior.
+3. **Shell and “ie:header-loaded”**  
+   `ie:header-loaded` fires when header, bottom nav, and footer fragments have finished mounting (one “shell ready” event). Header-runtime reacts with breadcrumbs, profile, and header nav. Bottom-nav-runtime is loaded by page-bootstrap and runs `initBottomNav(pageKey)` after page initializers; it listens for `ie:header-loaded` for link normalization and active state. No layout or sidebar runtime.
 
 4. **Session/auth usage**  
    Adding new features that call `getSession()` or `checkAuth()` will increase redundant network/calls unless a shared “session ready” abstraction is introduced. Changing how or when the auth guard runs could break assumptions in page-bootstrap or in features that assume “user is already loaded.”
@@ -177,9 +175,9 @@ Areas where future changes could break architecture or behavior:
 
 ### High impact
 
-1. **initLayout single owner (done)**  
-   `initLayout()` is called only from page-bootstrap; header-runtime does not call it on `ie:header-loaded`. Layout init is idempotent.   
-   **Files:** `portal/runtime/layout-runtime.js`, `portal/runtime/header-runtime.js`, `portal/runtime/page-bootstrap.js`.
+1. **Shell single owner (current)**  
+   `header-loader.js` mounts header, bottom nav, and footer; `page-bootstrap.js` owns header init, page initializers, and bottom-nav runtime load/init. No layout or sidebar runtime.  
+   **Files:** `portal/shared/header-loader.js`, `portal/runtime/page-bootstrap.js`, `portal/runtime/bottom-nav-runtime.js`.
 
 2. **Add missing scripts to candidate.html**  
    Include `runtime/header-runtime.js` and `runtime/entity-actions-runtime.js` in `candidate.html` in the same relative order as in `candidates.html` (e.g. after `runtime/job-offer-runtime.js`, before `runtime/page-bootstrap.js`). Restores header and entity actions on the candidate detail page.  

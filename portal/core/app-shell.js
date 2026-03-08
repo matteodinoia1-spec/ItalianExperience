@@ -2,9 +2,9 @@
 // Italian Experience Recruitment Portal - Global App Logic
 // ----------------------------------------------------------------------------
 // Responsibilities:
-// - Navigation between pages (sidebar + key CTA buttons)
+// - Navigation between pages (header nav + key CTA buttons)
 // - Active menu highlighting based on current URL
-// - Shared sidebar toggle behaviour (desktop + mobile)
+// - Shared shell behaviour (header + bottom nav on mobile)
 // - Basic form interactions
 // - Placeholder functions for future database/API integration
 // ============================================================================

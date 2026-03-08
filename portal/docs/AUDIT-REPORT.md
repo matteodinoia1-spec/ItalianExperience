@@ -4,32 +4,15 @@
 **Scope:** Portal (HTML, Tailwind, Vanilla JS, Supabase)  
 **Goal:** Consistency, responsiveness, access control – audit only (no UI design changes).
 
-**Note (post header-first refactor, Phase 6):** Layout has changed. Header is now primary navigation on desktop; sidebar is mobile fallback only. Desktop no longer reserves sidebar width. Footer holds breadcrumbs. See `BOOTSTRAP-AND-SCRIPTS.md` and `LAYOUT-AUDIT.md` for current architecture.
+**Note (post bottom-nav refactor):** The shell is header + bottom nav + footer. No sidebar or hamburger. Header: full width; nav left (shell padding), user right. Desktop/tablet: header nav and user menu; footer full width with shell padding, breadcrumbs left aligned and vertically centered. Mobile: header shows page title; bottom nav primary; footer hidden (breadcrumbs not shown). See `BOOTSTRAP-AND-SCRIPTS.md` and `LAYOUT-AUDIT.md` for current architecture.
 
 ---
 
-## 1. Sidebar Check
+## 1. Shell and bottom nav (post refactor)
 
-### 1.1 Single sidebar per page — **PASS**
-
-- Every portal page has **exactly one** sidebar container: `<aside id="sidebar"></aside>`.
-- No page contains static sidebar markup **and** dynamic injection; the container is empty and filled by `app.js` via `ensureSidebarLoaded()` (fetch of `sidebar.html` or `SIDEBAR_FALLBACK_HTML`).
-- **No duplicate sidebars** were found on any page.
-
-### 1.2 Dynamic loading — **PASS**
-
-- **dashboard.html**, **candidati.html**, **offerte.html**, **clienti.html**, **archiviati.html**, **profile.html**, **add-candidato.html**, **add-offerta.html**: all use the same pattern — empty `<aside id="sidebar"></aside>` and load `sidebar.html` via `app.js`.
-- **index.html** (login): correctly has **no** sidebar.
-- Sidebar HTML is **not** hardcoded in any page; the only copy is in `sidebar.html` and, for fallback (e.g. `file://` or failed fetch), in `app.js` as `SIDEBAR_FALLBACK_HTML`.
-
-### 1.3 Minor inconsistency
-
-- **archiviati.html** is the only page that omits the comment `<!-- SIDEBAR (loaded dynamically from sidebar.html) -->` above `<aside id="sidebar"></aside>`. All other portal pages include it.
-
-**Suggestions:**
-
-- Add the same sidebar comment to **archiviati.html** for consistency.
-- Keep a single source of truth for sidebar markup (`sidebar.html` + fallback in `app.js`); no change required.
+- **Header** (`#portal-header`), **bottom nav** (`#portal-bottom-nav`), and **footer** (`#portal-footer`) are mounted by `header-loader.js` (layout/header.html, layout/bottom-nav.html, layout/footer.html). DOM order inside `.portal-main`: content, then `#portal-bottom-nav`, then `#portal-footer`. Header is full width (nav left with shell padding, user right). Footer is full width with shell padding; breadcrumbs left aligned, vertically centered; on mobile the footer is hidden and the page title is shown in the header.
+- **No sidebar:** There is no `#sidebar`, `layout/sidebar.html`, or `sidebar-runtime.js`. Mobile navigation is the bottom nav and the More panel.
+- **index.html** (login): no portal shell (header/footer/bottom-nav are for protected app pages).
 
 ---
 
@@ -39,10 +22,9 @@
 
 All portal pages follow:
 
-1. Header: `#portal-header` (primary nav, user menu)
-2. Main: `<main class="portal-main ...">` with toolbar and content
-3. Footer: `#portal-footer` (breadcrumbs)
-4. Sidebar: `<aside id="sidebar"></aside>` (mobile fallback only)
+1. Header: `#portal-header` (full width; primary nav, user menu)
+2. Main: `<main class="portal-main ...">` with toolbar, content, then `#portal-bottom-nav` (mobile), then `#portal-footer` (desktop/tablet only; breadcrumbs)
+3. No sidebar (removed)
 
 ### 2.2 Inconsistencies
 
@@ -66,26 +48,19 @@ All portal pages follow:
 
 ### 3.1 Desktop / tablet / mobile — **PASS in principle**
 
-- **style.css** and **profile.html** (inline) use `@media (max-width: 1024px)` so that:
-  - Sidebar is off-canvas (`transform: translateX(-100%)`), and shows when `.open` or `body.ie-sidebar-open`.
-  - Main content is full width (`margin-left: 0`, `width: 100%`).
-- Toggle: `[data-toggle="sidebar"]` and `.portal-header-toggle` are shown on small viewports and hidden at `min-width: 1024px`.
-- Tables are wrapped in `overflow-x-auto` on candidati, offerte, clienti, dashboard, archiviati, so horizontal scroll is contained.
+- **Desktop/tablet (e.g. ≥ 1025px):** Header is primary navigation; footer shows breadcrumbs (full width, shell padding). Bottom nav is hidden. Full-width main content.
+- **Mobile:** Footer is hidden; page title in header. Bottom nav is visible (fixed); `layout.css` uses `@media (max-width: 768px)` to show `#portal-bottom-nav`. More panel opens above the bottom nav; safe-area insets applied (e.g. `--portal-safe-bottom`).
+- Tables are wrapped in `overflow-x-auto` so horizontal scroll is contained.
 
-### 3.2 Sidebar behavior — **PASS** *(updated for header-first)*
+### 3.2 Navigation — **PASS** *(post bottom-nav refactor)*
 
-- **Desktop:** Header is primary navigation; sidebar is mobile fallback only. Desktop layout does **not** reserve sidebar width.
-- **Mobile:** Sidebar hidden by default; overlay and toggle open/close it; ESC and backdrop close it (handled in **app.js**).
+- **Desktop/tablet:** Header nav and user menu; no sidebar.
+- **Mobile:** Bottom nav (Dashboard, Candidates, Job Offers, Applications, More); More contains Clients, Archived, Settings, Logout. No hamburger or off-canvas sidebar.
 
 ### 3.3 Gaps / risks
 
-- **profile.html** redefines sidebar width and mobile behavior in a `<style>` block (e.g. `--sidebar-width`, `.sidebar` transform / `.sidebar.open`). This duplicates **style.css** and can diverge. Prefer a single source (e.g. style.css only).
-- Tables use `overflow-x-auto` but no responsive table pattern (e.g. card layout on small screens). On very small viewports, many columns remain and horizontal scroll is the only option; acceptable but not optimized for touch.
+- Tables use `overflow-x-auto` but no responsive table pattern (e.g. card layout on small screens). Acceptable; consider card layout in a future iteration.
 
-**Suggestions:**
-
-- Remove duplicate sidebar-related rules from **profile.html** and rely on **style.css** (and, if needed, one extra class on profile layout).
-- Optionally add a note in comments or docs: “Tables are scrollable on small screens; consider card layout in a future iteration.”
 
 ---
 
@@ -122,7 +97,7 @@ All portal pages follow:
   - `getCurrentPageKey()` maps:
     - `clienti.html` and `clients.html` → `"clients"`,
     - other filenames (dashboard, candidati, offerte, archiviati, add-candidato, add-offerta, profile) to the same keys as in `protectedPages`.
-- On **DOMContentLoaded**, for any of these keys, `window.IESupabase.requireAuth()` is called **before** `ensureSidebarLoaded()` and the rest of the UI init. If the user is not authenticated, **supabase.js**’s `requireAuth()` calls `redirectToLogin()` (index.html), so protected content and sidebar are not shown.
+- On **DOMContentLoaded**, for any of these keys, `window.IESupabase.requireAuth()` is called **before** shell load and bootstrap. If the user is not authenticated, **supabase.js**’s `requireAuth()` calls `redirectToLogin()` (index.html), so protected content is not shown.
 
 ### 5.2 Login page — **PASS**
 
@@ -130,7 +105,7 @@ All portal pages follow:
 
 ### 5.3 Auth before content — **PASS**
 
-- Protected flow is: `requireAuth()` → then `loadCurrentUserProfile()` → then `ensureSidebarLoaded()` and the rest. Redirect happens inside `requireAuth()` when there is no session, so page content is not rendered for unauthenticated users.
+- Protected flow is: auth guard (session check) → then `loadCurrentUserProfile()` and `initInactivityTimer()` → then header init and page initializers → then bottom-nav load/init. Redirect happens when there is no session, so page content is not rendered for unauthenticated users.
 
 ### 5.4 Sensitive data in HTML — **CAUTION**
 
@@ -148,8 +123,8 @@ All portal pages follow:
 
 ### 6.1 Duplicate layout code — **ISSUES**
 
-- **profile.html**: Inline `<style>` duplicates sidebar width, background, transform, and `.open` state already defined in **style.css**. This is redundant and can get out of sync.
-- **app.js**: `SIDEBAR_FALLBACK_HTML` is a full copy of the sidebar markup (kept in sync with **sidebar.html** per comment). Acceptable for fallback; ensure it’s updated whenever **sidebar.html** changes.
+- **profile.html**: If it still contains inline layout/sidebar-related styles that duplicate **style.css** or **layout.css**, prefer a single source. (Sidebar has been removed; any remaining sidebar rules are obsolete.)
+- Sidebar and SIDEBAR_FALLBACK_HTML have been removed; no action needed.
 
 ### 6.2 Unused / redundant HTML — **MINOR**
 
@@ -157,12 +132,11 @@ All portal pages follow:
 
 ### 6.3 Structural pattern — **PASS**
 
-- All portal pages (except index) use the same pattern: one sidebar container, one main, header inside main, content wrapper. Script order is consistent: Supabase CDN → supabase.js → app.js → page-specific JS.
+- All portal pages (except index) use the same pattern: header, main (toolbar, content, bottom-nav container, footer). Script order is documented in BOOTSTRAP-AND-SCRIPTS.md.
 
 **Suggestions:**
 
-- Remove or reduce duplicate sidebar styling in **profile.html** and use **style.css** only.
-- Keep a single place (e.g. README or AUDIT-REPORT) that says “when editing sidebar.html, update SIDEBAR_FALLBACK_HTML in app.js.”
+- Remove or reduce duplicate layout styling in **profile.html** and use **style.css** only.
 
 ---
 
@@ -172,25 +146,24 @@ All portal pages follow:
 
 | Category | Pages |
 |----------|--------|
-| **Duplicate / redundant sidebar styling** | profile.html (inline styles duplicate style.css) |
+| **Duplicate / redundant layout styling** | profile.html (if inline styles duplicate style.css/layout.css) |
 | **Layout / structure inconsistency** | archiviati.html (main overflow; empty header user block) |
 | **Typo** | clienti.html (tracking-titter) |
-| **Missing comment** | archiviati.html (sidebar load comment) |
 
-### 7.2 No duplicate sidebars
+### 7.2 Shell (post refactor)
 
-- No page has more than one sidebar or a mix of static + dynamic sidebar markup.
+- Shell is header + bottom nav + footer; no sidebar. Desktop: header nav + user menu, footer breadcrumbs (full width, shell padding). Mobile: header page title, bottom nav, no footer.
 
 ### 7.3 Layout inconsistencies (recap)
 
 - **archiviati.html**: `main` has `overflow-y-auto`; header user block empty.
-- **profile.html**: Duplicate sidebar CSS in page.
+- **profile.html**: Duplicate layout CSS in page (if any; sidebar removed).
 - **clienti.html**: Typo in pagination span class.
 - **profile / add-* pages**: Different content max-width (1000px vs 1600px) — document if intentional.
 
 ### 7.4 Mobile responsiveness (recap)
 
-- Sidebar and main layout behave correctly at 1024px breakpoint.
+- Bottom nav and main layout behave correctly on mobile; header on desktop/tablet.
 - Tables scroll horizontally; no horizontal scroll on body.
 - **archiviati.html**: Header/avatar not shown (empty user block).
 - Touch targets not explicitly sized to 44px minimum.
@@ -202,21 +175,19 @@ All portal pages follow:
 ### 7.6 Suggested fix list (no UI design change)
 
 1. **archiviati.html**
-   - Add comment: `<!-- SIDEBAR (loaded dynamically from sidebar.html) -->` above `<aside id="sidebar"></aside>`.
-   - Replace empty `<div data-ie-header-user></div>` with the same header user block structure as dashboard/candidati (e.g. `.text-right` + name + avatar `img`) so `updateHeaderUserBlock()` and `ensureHeaderAvatarLinksToProfile()` apply.
+   - Replace empty `<div data-ie-header-user></div>` with the same header user block structure as dashboard/candidati so the header shows user name and avatar.
    - Consider removing `overflow-y-auto` from `<main>` unless required for scroll behavior (and add a comment if kept).
 
 2. **clienti.html**
    - Fix class: `tracking-titter` → `tracking-tighter` on the pagination text span.
 
 3. **profile.html**
-   - Remove inline sidebar rules (`:root { --sidebar-width }`, `.sidebar { ... }`, `@media (max-width: 1024px) { .sidebar ... }`) and rely on **style.css** for sidebar layout and mobile behavior.
+   - Remove any obsolete inline sidebar/layout rules and rely on **style.css** / **layout.css**.
 
 4. **Optional (mobile)**
-   - Add minimum touch target size (e.g. 44px) for sidebar toggle, pagination buttons, and primary form buttons in **style.css** or Tailwind classes.
+   - Add minimum touch target size (e.g. 44px) for bottom-nav items, pagination buttons, and primary form buttons in **style.css** or Tailwind classes.
 
 5. **Optional (documentation)**
-   - Short note: when updating **sidebar.html**, update **app.js** `SIDEBAR_FALLBACK_HTML`.
    - Short note: list/dashboard pages use `max-w-[1600px]`, form/profile pages use `max-w-[1000px]`.
 
 ---

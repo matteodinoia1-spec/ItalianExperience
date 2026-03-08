@@ -1,19 +1,7 @@
 <header class="portal-header h-[72px] bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between">
   <div class="portal-header__inner">
     <div class="portal-header__left">
-      <button type="button"
-        data-toggle="sidebar"
-        class="portal-header-toggle ie-btn ie-btn-secondary lg:hidden"
-        aria-label="Toggle sidebar">
-        <svg xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6 text-gray-600"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
+      <span class="portal-header__page-title" id="portal-header-page-title" aria-hidden="true"></span>
       <nav class="portal-header-nav hidden lg:flex items-center" aria-label="Primary navigation">
         <a href="dashboard.html" class="portal-header-nav__link" data-nav-group="dashboard">Dashboard</a>
         <div class="portal-header-nav__item-with-sub">
