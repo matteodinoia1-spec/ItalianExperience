@@ -276,13 +276,13 @@
           ? window.IEStatusRuntime.formatDashboardCandidateStatusLabel(row.status)
           : (row.status ? String(row.status) : "New");
       tr.innerHTML =
-        "<td class=\"ie-table-cell\">" +
-        "<a href=\"" + candidateHref + "\" data-action=\"dashboard-open-candidate\" data-id=\"" + (window.escapeHtml ? window.escapeHtml(String(row.id || "")) : String(row.id || "")) + "\" class=\"text-[#1b4332] font-semibold hover:underline\">" +
+        "<td class=\"ie-table-cell ie-table-cell--primary\">" +
+        "<a href=\"" + candidateHref + "\" data-action=\"dashboard-open-candidate\" data-id=\"" + (window.escapeHtml ? window.escapeHtml(String(row.id || "")) : String(row.id || "")) + "\" class=\"table-link\">" +
         (window.escapeHtml ? window.escapeHtml(fullName) : fullName) +
         "</a>" +
         "</td>" +
-        "<td class=\"ie-table-cell text-gray-600\">" + (window.escapeHtml ? window.escapeHtml(row.position || "—") : (row.position || "—")) + "</td>" +
-        "<td class=\"ie-table-cell text-gray-500 text-sm\">" + (window.escapeHtml ? window.escapeHtml(createdDate) : createdDate) + "</td>" +
+        "<td class=\"ie-table-cell ie-table-cell--secondary\">" + (window.escapeHtml ? window.escapeHtml(row.position || "—") : (row.position || "—")) + "</td>" +
+        "<td class=\"ie-table-cell ie-table-cell--date\">" + (window.escapeHtml ? window.escapeHtml(createdDate) : createdDate) + "</td>" +
         "<td class=\"ie-table-cell\"><span class=\"badge " + statusClass + "\">" + (window.escapeHtml ? window.escapeHtml(statusLabel) : statusLabel) + "</span></td>";
       tbody.appendChild(tr);
     });
@@ -330,7 +330,7 @@
       var div = document.createElement("div");
       div.className = "space-y-2";
       div.innerHTML =
-        "<div class=\"flex justify-between text-xs font-bold uppercase tracking-titter\">" +
+        "<div class=\"flex justify-between text-xs font-bold uppercase tracking-tight\">" +
         "<span class=\"text-gray-500\">" + (window.escapeHtml ? window.escapeHtml(label) : label) + "</span>" +
         "<span class=\"text-[#1b4332]\">" + (item.percentage || 0) + "%</span>" +
         "</div>" +
@@ -419,7 +419,7 @@
     if (rowEntity) tr.setAttribute("data-entity", rowEntity);
 
     var titleTd = document.createElement("td");
-    titleTd.className = "ie-table-cell " + (entityType === "candidate" ? "font-semibold text-[#1b4332]" : "font-semibold text-gray-800");
+    titleTd.className = "ie-table-cell ie-table-cell--primary";
     titleTd.textContent = title != null && title !== "" ? title : "—";
 
     leadingCells.forEach(function (cellHtml) {
@@ -781,24 +781,24 @@
         var positionCellHtml;
         if (latestAssoc && latestAssoc.job_offer_id) {
           var posText = (window.escapeHtml ? window.escapeHtml(row.position || "—") : (row.position || "—"));
-          positionCellHtml = '<span class="entity-link" data-entity-type="job-offer" data-entity-id="' + (window.escapeHtml ? window.escapeHtml(String(latestAssoc.job_offer_id)) : String(latestAssoc.job_offer_id)) + '">' + posText + "</span>";
+          positionCellHtml = '<span class="entity-link ie-table-cell--secondary" data-entity-type="job-offer" data-entity-id="' + (window.escapeHtml ? window.escapeHtml(String(latestAssoc.job_offer_id)) : String(latestAssoc.job_offer_id)) + '">' + posText + "</span>";
         } else {
-          positionCellHtml = (window.escapeHtml ? window.escapeHtml(row.position || "—") : (row.position || "—"));
+          positionCellHtml = '<span class="ie-text-muted">' + (window.escapeHtml ? window.escapeHtml(row.position || "—") : (row.position || "—")) + "</span>";
         }
         var assignmentHtml;
         if (latestAssoc && latestAssoc.client_name) {
           if (latestAssoc.client_id) {
             var clientText = (window.escapeHtml ? window.escapeHtml(latestAssoc.client_name) : latestAssoc.client_name);
-            assignmentHtml = '<span class="entity-link text-gray-800 font-medium" data-entity-type="client" data-entity-id="' + (window.escapeHtml ? window.escapeHtml(String(latestAssoc.client_id)) : String(latestAssoc.client_id)) + '">' + clientText + "</span>";
+            assignmentHtml = '<span class="entity-link ie-text-muted" data-entity-type="client" data-entity-id="' + (window.escapeHtml ? window.escapeHtml(String(latestAssoc.client_id)) : String(latestAssoc.client_id)) + '">' + clientText + "</span>";
           } else {
             assignmentHtml =
-              '<div class="text-gray-800 font-medium">' +
+              '<div class="ie-text-muted">' +
               (window.escapeHtml ? window.escapeHtml(latestAssoc.client_name) : latestAssoc.client_name) +
               "</div>";
           }
         } else {
           assignmentHtml =
-            '<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold">Non assegnato</span>';
+            '<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-100 ie-text-muted text-xs font-semibold">Non assegnato</span>';
         }
         let initialPhotoUrl = "";
         const fallbackAvatarUrl =
@@ -840,8 +840,8 @@
                 ? window.escapeHtml(availability)
                 : availability) +
               "</span>",
-            '<span class="text-xs font-medium text-blue-600">' + (window.escapeHtml ? window.escapeHtml(sourceLabel || "—") : (sourceLabel || "—")) + "</span>",
-            '<span class="text-gray-400">' + (window.escapeHtml ? window.escapeHtml(createdDate) : createdDate) + "</span>",
+            '<span class="ie-text-muted text-xs font-medium">' + (window.escapeHtml ? window.escapeHtml(sourceLabel || "—") : (sourceLabel || "—")) + "</span>",
+            '<span class="ie-table-cell--date">' + (window.escapeHtml ? window.escapeHtml(createdDate) : createdDate) + "</span>",
           ],
           rowTitle: typeof formatLastUpdatedMeta === "function" ? formatLastUpdatedMeta(row) : "",
         });
@@ -1214,8 +1214,8 @@
           encodeURIComponent(String(row.id)) +
           "&mode=view";
         var clientCellHtml = row.client_id
-          ? '<span class="entity-link" data-entity-type="client" data-entity-id="' + (window.escapeHtml ? window.escapeHtml(String(row.client_id)) : String(row.client_id)) + '">' + (window.escapeHtml ? window.escapeHtml(clientValue) : clientValue) + "</span>"
-          : (window.escapeHtml ? window.escapeHtml(clientValue) : clientValue);
+          ? '<span class="entity-link ie-text-muted" data-entity-type="client" data-entity-id="' + (window.escapeHtml ? window.escapeHtml(String(row.client_id)) : String(row.client_id)) + '">' + (window.escapeHtml ? window.escapeHtml(clientValue) : clientValue) + "</span>"
+          : '<span class="ie-text-muted">' + (window.escapeHtml ? window.escapeHtml(clientValue) : clientValue) + "</span>";
         const tr = renderEntityRow({
           entityType: "job_offer",
           id: row.id,
@@ -1227,13 +1227,13 @@
           actionCellOpts: { showPreviewButton: false, editTitle: "Edit job offer", archiveTitle: "Archive job offer" },
           leadingCells: [],
           middleCells: [
-            (window.escapeHtml ? window.escapeHtml(row.position || "—") : (row.position || "—")),
+            '<span class="ie-text-muted">' + (window.escapeHtml ? window.escapeHtml(row.position || "—") : (row.position || "—")) + "</span>",
             clientCellHtml,
-            (window.escapeHtml ? window.escapeHtml(locationValue) : locationValue),
+            '<span class="ie-text-muted">' + (window.escapeHtml ? window.escapeHtml(locationValue) : locationValue) + "</span>",
             '<span class="badge ' + badgeClass + '">' + (window.escapeHtml ? window.escapeHtml(statusLabel) : statusLabel) + "</span>",
             associatedCellHtml,
             requiredCellHtml,
-            '<span class="text-gray-400">' + (window.escapeHtml ? window.escapeHtml(createdAtValue) : createdAtValue) + "</span>",
+            '<span class="ie-table-cell--date">' + (window.escapeHtml ? window.escapeHtml(createdAtValue) : createdAtValue) + "</span>",
           ],
           rowTitle: typeof formatLastUpdatedMeta === "function" ? formatLastUpdatedMeta(row) : "",
         });
@@ -1487,11 +1487,11 @@
               tr.setAttribute("data-id", String(row.id || ""));
               const candidateUrl = candidateViewUrl(row.candidate_id);
               tr.innerHTML =
-                "<td class=\"ie-table-cell\"><a href=\"" + escapeHtml(candidateUrl) + "\" class=\"text-[#1b4332] font-semibold hover:underline\" data-entity-type=\"candidate\" data-entity-id=\"" + escapeHtml(String(row.candidate_id || "")) + "\">" + escapeHtml(row.candidate_name || "—") + "</a></td>" +
-                "<td class=\"ie-table-cell text-gray-700\">" + escapeHtml(row.job_offer_title || "—") + "</td>" +
-                "<td class=\"ie-table-cell text-gray-700\">" + escapeHtml(row.client_name || "—") + "</td>" +
+                "<td class=\"ie-table-cell ie-table-cell--primary\"><a href=\"" + escapeHtml(candidateUrl) + "\" class=\"table-link\" data-entity-type=\"candidate\" data-entity-id=\"" + escapeHtml(String(row.candidate_id || "")) + "\">" + escapeHtml(row.candidate_name || "—") + "</a></td>" +
+                "<td class=\"ie-table-cell ie-table-cell--secondary\">" + escapeHtml(row.job_offer_title || "—") + "</td>" +
+                "<td class=\"ie-table-cell ie-table-cell--secondary\">" + escapeHtml(row.client_name || "—") + "</td>" +
                 "<td class=\"ie-table-cell\"><span class=\"badge " + getApplicationStatusBadgeClass(row.status) + "\">" + escapeHtml(formatApplicationStatusLabel(row.status)) + "</span></td>" +
-                "<td class=\"ie-table-cell text-gray-500 text-xs\">" + (row.created_at ? new Date(row.created_at).toLocaleDateString("it-IT") : "—") + "</td>";
+                "<td class=\"ie-table-cell ie-table-cell--date\">" + (row.created_at ? new Date(row.created_at).toLocaleDateString("it-IT") : "—") + "</td>";
               tbody.appendChild(tr);
             });
           }
@@ -1668,10 +1668,10 @@ const tr = renderEntityRow({
           actionCellOpts: { showPreviewButton: false, editTitle: "Edit client", archiveTitle: "Archive client" },
           leadingCells: [],
           middleCells: [
-            (window.escapeHtml ? window.escapeHtml(row.city || "—") : (row.city || "—")),
+            '<span class="ie-text-muted">' + (window.escapeHtml ? window.escapeHtml(row.city || "—") : (row.city || "—")) + "</span>",
             activeOffersHtml,
-            (window.escapeHtml ? window.escapeHtml(row.email || "—") : (row.email || "—")),
-            (window.escapeHtml ? window.escapeHtml(row.phone || "—") : (row.phone || "—")),
+            '<span class="ie-text-muted">' + (window.escapeHtml ? window.escapeHtml(row.email || "—") : (row.email || "—")) + "</span>",
+            '<span class="ie-text-muted">' + (window.escapeHtml ? window.escapeHtml(row.phone || "—") : (row.phone || "—")) + "</span>",
           ],
           rowTitle: typeof formatLastUpdatedMeta === "function" ? formatLastUpdatedMeta(row) : "",
         });
@@ -1736,10 +1736,10 @@ const tr = renderEntityRow({
               actionCellOpts: { showPreviewButton: false, editTitle: "Edit client", archiveTitle: "Archive client" },
               leadingCells: [],
               middleCells: [
-                (window.escapeHtml ? window.escapeHtml(row.city || "—") : (row.city || "—")),
+                '<span class="ie-text-muted">' + (window.escapeHtml ? window.escapeHtml(row.city || "—") : (row.city || "—")) + "</span>",
                 activeOffersHtml,
-                (window.escapeHtml ? window.escapeHtml(row.email || "—") : (row.email || "—")),
-                (window.escapeHtml ? window.escapeHtml(row.phone || "—") : (row.phone || "—")),
+                '<span class="ie-text-muted">' + (window.escapeHtml ? window.escapeHtml(row.email || "—") : (row.email || "—")) + "</span>",
+                '<span class="ie-text-muted">' + (window.escapeHtml ? window.escapeHtml(row.phone || "—") : (row.phone || "—")) + "</span>",
               ],
               rowTitle: typeof formatLastUpdatedMeta === "function" ? formatLastUpdatedMeta(row) : "",
             });

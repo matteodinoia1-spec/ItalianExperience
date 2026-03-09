@@ -18,7 +18,17 @@
 .ie-card-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary, #111827);
+  line-height: 1.35;
+}
+
+/* Section titles (e.g. "Recent candidates", "Archived candidates") – serif, primary */
+.ie-section-title {
+  font-family: "Playfair Display", serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ie-color-primary);
+  line-height: 1.3;
 }
 
 .ie-card-body {

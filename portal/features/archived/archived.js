@@ -145,8 +145,8 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
           actionCellOpts: { showPreviewButton: false },
           leadingCells: [],
           middleCells: [
-            '<span class="text-gray-600">' + escapeHtml(position) + "</span>",
-            '<span class="text-gray-600">' + escapeHtml(status) + "</span>",
+            '<span class="ie-text-muted">' + escapeHtml(position) + "</span>",
+            '<span class="ie-text-muted">' + escapeHtml(status) + "</span>",
           ],
           rowClass: "table-row transition hover:bg-[#c5a059]/5",
         });
@@ -157,9 +157,9 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
         tr.setAttribute("data-entity", "candidate");
         tr.setAttribute("data-id", String(row.id || ""));
         tr.innerHTML =
-          '<td class="ie-table-cell font-semibold text-gray-800">' + escapeHtml(name) + "</td>" +
-          '<td class="ie-table-cell text-gray-600">' + escapeHtml(position) + "</td>" +
-          '<td class="ie-table-cell text-gray-600">' + escapeHtml(status) + "</td>" +
+          '<td class="ie-table-cell ie-table-cell--primary">' + escapeHtml(name) + "</td>" +
+          '<td class="ie-table-cell"><span class="ie-text-muted">' + escapeHtml(position) + "</span></td>" +
+          '<td class="ie-table-cell"><span class="ie-text-muted">' + escapeHtml(status) + "</span></td>" +
           '<td class="ie-table-cell ie-table-actions"><div class="flex items-center justify-end gap-2">' +
           '<button type="button" data-action="restore-entity" data-entity="candidate" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-success" title="Restore candidate">Ripristina</button>' +
           '<button type="button" data-action="delete-entity-permanent" data-entity="candidate" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-danger" title="Elimina definitivamente">Elimina definitivamente</button>' +
@@ -236,8 +236,8 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
           actionCellOpts: { showPreviewButton: false },
           leadingCells: [],
           middleCells: [
-            '<span class="text-gray-600">' + escapeHtml(client) + "</span>",
-            '<span class="text-gray-600">' + escapeHtml(location) + "</span>",
+            '<span class="ie-text-muted">' + escapeHtml(client) + "</span>",
+            '<span class="ie-text-muted">' + escapeHtml(location) + "</span>",
           ],
           rowClass: "table-row transition hover:bg-[#c5a059]/5",
         });
@@ -248,9 +248,9 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
         tr.setAttribute("data-entity", "jobOffer");
         tr.setAttribute("data-id", String(row.id || ""));
         tr.innerHTML =
-          '<td class="ie-table-cell font-semibold text-gray-800">' + escapeHtml(title) + "</td>" +
-          '<td class="ie-table-cell text-gray-600">' + escapeHtml(client) + "</td>" +
-          '<td class="ie-table-cell text-gray-600">' + escapeHtml(location) + "</td>" +
+          '<td class="ie-table-cell ie-table-cell--primary">' + escapeHtml(title) + "</td>" +
+          '<td class="ie-table-cell"><span class="ie-text-muted">' + escapeHtml(client) + "</span></td>" +
+          '<td class="ie-table-cell"><span class="ie-text-muted">' + escapeHtml(location) + "</span></td>" +
           '<td class="ie-table-cell ie-table-actions"><div class="flex items-center justify-end gap-2">' +
           '<button type="button" data-action="restore-entity" data-entity="job_offer" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-success" title="Restore job offer">Ripristina</button>' +
           '<button type="button" data-action="delete-entity-permanent" data-entity="job_offer" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-danger" title="Elimina definitivamente">Elimina definitivamente</button>' +
@@ -329,11 +329,11 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
       tr.setAttribute("data-id", String(row.id || ""));
       const withdrawnDate = row.created_at ? new Date(row.created_at).toLocaleDateString("it-IT") : "—";
       tr.innerHTML =
-        '<td class="ie-table-cell"><a href="' + candidateViewUrl(row.candidate_id) + '" class="text-[#1b4332] font-semibold hover:underline">' + escapeHtml(row.candidate_name || "—") + "</a></td>" +
-        '<td class="ie-table-cell text-gray-600">' + escapeHtml(row.job_offer_title || "—") + "</td>" +
-        '<td class="ie-table-cell text-gray-600">' + escapeHtml(row.client_name || "—") + "</td>" +
+        '<td class="ie-table-cell ie-table-cell--primary"><a href="' + candidateViewUrl(row.candidate_id) + '" class="table-link">' + escapeHtml(row.candidate_name || "—") + "</a></td>" +
+        '<td class="ie-table-cell ie-table-cell--secondary">' + escapeHtml(row.job_offer_title || "—") + "</td>" +
+        '<td class="ie-table-cell ie-table-cell--secondary">' + escapeHtml(row.client_name || "—") + "</td>" +
         '<td class="ie-table-cell"><span class="badge ' + getApplicationStatusBadgeClass(row.status) + '">' + escapeHtml(formatApplicationStatusLabel(row.status)) + "</span></td>" +
-        '<td class="ie-table-cell text-gray-500 text-xs">' + escapeHtml(withdrawnDate) + "</td>" +
+        '<td class="ie-table-cell ie-table-cell--date">' + escapeHtml(withdrawnDate) + "</td>" +
         '<td class="ie-table-cell ie-table-actions"><div class="flex items-center justify-end gap-2">' +
         '<button type="button" data-action="restore-entity" data-entity="application" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-success" title="Restore application">Ripristina</button>' +
         '<button type="button" data-action="delete-entity-permanent" data-entity="application" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-danger" title="Elimina definitivamente">Elimina definitivamente</button>' +
@@ -405,9 +405,9 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
           actionCellOpts: { showPreviewButton: false },
           leadingCells: [],
           middleCells: [
-            '<span class="text-gray-600">' + escapeHtml(city) + "</span>",
-            '<span class="text-gray-600">' + escapeHtml(stateName) + "</span>",
-            '<span class="text-gray-600">' + escapeHtml(email) + "</span>",
+            '<span class="ie-text-muted">' + escapeHtml(city) + "</span>",
+            '<span class="ie-text-muted">' + escapeHtml(stateName) + "</span>",
+            '<span class="ie-text-muted">' + escapeHtml(email) + "</span>",
           ],
           rowClass: "table-row transition hover:bg-[#c5a059]/5",
         });
@@ -418,10 +418,10 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
         tr.setAttribute("data-entity", "client");
         tr.setAttribute("data-id", String(row.id || ""));
         tr.innerHTML =
-          '<td class="ie-table-cell font-semibold text-gray-800">' + escapeHtml(name) + "</td>" +
-          '<td class="ie-table-cell text-gray-600">' + escapeHtml(city) + "</td>" +
-          '<td class="ie-table-cell text-gray-600">' + escapeHtml(stateName) + "</td>" +
-          '<td class="ie-table-cell text-gray-600">' + escapeHtml(email) + "</td>" +
+          '<td class="ie-table-cell ie-table-cell--primary">' + escapeHtml(name) + "</td>" +
+          '<td class="ie-table-cell"><span class="ie-text-muted">' + escapeHtml(city) + "</span></td>" +
+          '<td class="ie-table-cell"><span class="ie-text-muted">' + escapeHtml(stateName) + "</span></td>" +
+          '<td class="ie-table-cell"><span class="ie-text-muted">' + escapeHtml(email) + "</span></td>" +
           '<td class="ie-table-cell ie-table-actions"><div class="flex items-center justify-end gap-2">' +
           '<button type="button" data-action="restore-entity" data-entity="client" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-success" title="Restore client">Ripristina</button>' +
           '<button type="button" data-action="delete-entity-permanent" data-entity="client" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-danger" title="Elimina definitivamente">Elimina definitivamente</button>' +
@@ -493,13 +493,13 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
       tr.setAttribute("data-entity", "application");
       tr.setAttribute("data-id", String(row.id || ""));
       tr.innerHTML =
-        '<td class="ie-table-cell">' +
+        '<td class="ie-table-cell ie-table-cell--primary">' +
         escapeHtml(candidateName) +
         "</td>" +
-        '<td class="ie-table-cell text-gray-600">' +
+        '<td class="ie-table-cell ie-table-cell--secondary">' +
         escapeHtml(offerTitle) +
         "</td>" +
-        '<td class="ie-table-cell text-gray-600">' +
+        '<td class="ie-table-cell ie-table-cell--secondary">' +
         escapeHtml(clientName) +
         "</td>" +
         '<td class="ie-table-cell ie-table-actions"><div class="flex items-center justify-end gap-2">' +
