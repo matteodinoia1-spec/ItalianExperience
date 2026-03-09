@@ -20,82 +20,174 @@
   <link rel="stylesheet" href="/ItalianExperience/assets/css/tailwind.css" />
   <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+  <style>
+    .hero-narrative{
+      width:100%;
+      min-height:100vh;
+      min-height:100dvh;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero-bg{
+      position:absolute;inset:0;z-index:0;
+      background:url('/ItalianExperience/assets/img/recruitment/recruitment-bg-employer.jpg') no-repeat center center;
+      background-size:cover;
+      filter:brightness(0.35);
+      transform:scale(1.02);
+    }
+    .hero-overlay{
+      position:absolute;inset:0;z-index:1;
+      background:linear-gradient(to bottom,rgba(8,8,8,0) 0%,var(--brand-obsidian) 100%);
+    }
+    .hero-content{
+      position:relative;z-index:10;
+      text-align:center;
+      max-width:1100px;
+      padding:0 2rem;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+
+    .services-horizontal{
+      width:100%;
+      height:min(850px, 85vh);
+      display:flex;
+      flex-direction:row;
+      background:var(--brand-obsidian);
+      border-top:none;
+    }
+    .service-panel{
+      position:relative;
+      flex:1;
+      height:100%;
+      overflow:hidden;
+      border-radius:0 !important;
+      border:none !important;
+      box-shadow:none !important;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      padding:6rem 3.5rem;
+      text-decoration:none;
+      transition:transform 0.6s cubic-bezier(0.16,1,0.3,1);
+      border-right:none !important;
+      will-change:transform;
+    }
+    .service-panel:last-child{border-right:none}
+
+    .panel-bg{
+      position:absolute;inset:0;z-index:0;
+      transition:transform 1.2s cubic-bezier(0.16,1,0.3,1),filter 0.8s ease;
+      filter:grayscale(100%) brightness(0.2);
+    }
+    .panel-bg img{width:100%;height:100%;object-fit:cover}
+    .service-panel:hover .panel-bg{transform:scale(1.1);filter:grayscale(0%) brightness(0.4)}
+
+    .panel-content{
+      position:relative;
+      z-index:10;
+      pointer-events:none;
+      transition:transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    .service-panel:hover .panel-content{transform:translateY(-15px)}
+    .gold-line{width:40px;height:2px;background:var(--brand-gold);margin-bottom:2rem;transition:width 0.6s ease}
+    .service-panel:hover .gold-line{width:80px}
+
+    .btn-panel{
+      display:inline-block;
+      margin-top:3rem;
+      padding:1.2rem 2.5rem;
+      border:1px solid var(--brand-gold);
+      color:var(--brand-gold);
+      font-size:0.7rem;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:0.25em;
+      transition:all 0.25s ease;
+      background:transparent;
+      pointer-events:auto;
+    }
+    .service-panel:hover .btn-panel{
+      background:var(--brand-gold);
+      color:var(--brand-obsidian);
+      box-shadow:0 10px 30px rgba(197,160,89,0.3);
+    }
+
+    @media (max-width:1024px){
+      .services-horizontal{flex-direction:column;height:auto}
+      .service-panel{
+        height:68vh;
+        width:100%;
+        border-right:none;
+        border-bottom:none !important;
+      }
+    }
+    @media (hover:none){
+      .service-panel{transition:none}
+      .panel-bg{transition:filter 0.4s ease}
+      .service-panel:hover{flex:1}
+      .service-panel:hover .panel-bg{transform:none}
+    }
+  </style>
 </head>
 
 <body>
   <div id="site-header"></div>
 
   <main>
-    <section class="ie-hero-shell recruitment-portal" aria-label="Recruitment portal hero">
-      <h1 class="sr-only">Recruitment Hub</h1>
+    <header class="hero-narrative ie-hero-shell ie-hero-offset ie-hero--hub" aria-label="Hero Recruitment">
+      <div class="hero-bg ie-hero-bg-layer" aria-hidden="true"></div>
+      <div class="hero-overlay ie-hero-overlay-layer" aria-hidden="true"></div>
 
-      <div class="recruitment-portal-bg" aria-hidden="true"></div>
-
-      <div class="recruitment-portal-inner">
-        <div class="portal-grid">
-          <a
-            class="portal-card portal-card--employer ie-reveal"
-            data-delay="1"
-            href="/ItalianExperience/recruitment/employer/"
-          >
-            <div class="portal-image">
-              <img src="/ItalianExperience/assets/img/recruitment/recruitment-bg-employer.jpg" alt="Employer" />
-            </div>
-
-            <div class="portal-overlay"></div>
-
-            <div class="portal-card-inner">
-              <div class="portal-card-header">
-                <span class="portal-label">For Employers</span>
-                <h3 class="portal-title">Build a world-class Italian team</h3>
-                <p class="portal-copy">
-                  Strategic staffing for hotels, restaurants, and hospitality groups seeking authentic Italian excellence
-                  and long-term partnership.
-                </p>
-              </div>
-              <ul class="portal-list">
-                <li>Structured talent pipeline from Italy and EU</li>
-                <li>Rigorous multi-step screening and reference checks</li>
-                <li>Visa, relocation, and onboarding coordination</li>
-              </ul>
-              <div class="portal-cta">
-                <span class="cta-button ie-btn-primary">Explore Employer Solutions</span>
-              </div>
-            </div>
-          </a>
-
-          <a
-            class="portal-card portal-card--candidate ie-reveal"
-            data-delay="2"
-            href="/ItalianExperience/recruitment/candidate/"
-          >
-            <div class="portal-image">
-              <img src="/ItalianExperience/assets/img/recruitment/recruitment-bg-candidate.jpg" alt="Candidate" />
-            </div>
-
-            <div class="portal-overlay"></div>
-
-            <div class="portal-card-inner">
-              <div class="portal-card-header">
-                <span class="portal-label">For Candidates</span>
-                <h3 class="portal-title">Turn your craft into a career</h3>
-                <p class="portal-copy">
-                  Tailored paths for chefs, front-of-house, and hospitality talent ready to grow in premium destinations
-                  worldwide.
-                </p>
-              </div>
-              <ul class="portal-list">
-                <li>Guided selection and profile positioning</li>
-                <li>Placement in USA, Europe, and key hubs</li>
-                <li>Ongoing support, visas, and career evolution</li>
-              </ul>
-              <div class="portal-cta">
-                <span class="cta-button ie-btn-primary">Discover Candidate Journey</span>
-              </div>
-            </div>
-          </a>
-        </div>
+      <div class="hero-content ie-hero-content-layer ie-hero-lockup">
+        <h3 class="ie-hero-eyebrow mb-6">Recruitment</h3>
+        <h1 class="ie-hero-title mb-8">
+          Recruitment<br><span class="italic font-light">Hub.</span>
+        </h1>
+        <div class="w-24 h-px bg-[#c5a059] opacity-40 mx-auto mb-8"></div>
+        <p class="ie-hero-lead max-w-2xl mx-auto">
+          Strategic staffing for hotels, restaurants, and hospitality groups seeking authentic Italian excellence and long-term partnership.
+        </p>
       </div>
+
+      <a href="#services" class="explore-indicator" aria-label="Go to services">
+        <span>Explore Services</span>
+        <div class="scroll-track" aria-hidden="true"><div class="scroll-dot"></div></div>
+      </a>
+    </header>
+
+    <section class="services-horizontal ie-hub-rail" id="services" aria-label="Recruitment services">
+      <a href="/ItalianExperience/recruitment/employer/" class="service-panel ie-hub-card">
+        <div class="panel-bg ie-hub-card-bg" aria-hidden="true">
+          <img src="/ItalianExperience/assets/img/recruitment/recruitment-bg-employer.jpg" alt="Employer" loading="eager" decoding="async">
+        </div>
+        <div class="panel-content ie-hub-card-body ie-reveal">
+          <div class="gold-line"></div>
+          <span class="text-[#c5a059] text-[0.65rem] uppercase tracking-[0.4em] mb-3 block font-bold">For Employers</span>
+          <h2 class="text-4xl md:text-5xl brand-font italic text-white mb-6">Build a world-class Italian team</h2>
+          <p class="text-slate-400 text-sm font-light leading-relaxed max-w-sm">Strategic staffing for hotels, restaurants, and hospitality groups seeking authentic Italian excellence and long-term partnership.</p>
+          <div class="btn-panel ie-hub-card-cta">Explore Employer Solutions</div>
+        </div>
+      </a>
+
+      <a href="/ItalianExperience/recruitment/candidate/" class="service-panel ie-hub-card">
+        <div class="panel-bg ie-hub-card-bg" aria-hidden="true">
+          <img src="/ItalianExperience/assets/img/recruitment/recruitment-bg-candidate.jpg" alt="Candidate" loading="lazy" decoding="async">
+        </div>
+        <div class="panel-content ie-hub-card-body ie-reveal" data-delay="1">
+          <div class="gold-line"></div>
+          <span class="text-[#c5a059] text-[0.65rem] uppercase tracking-[0.4em] mb-3 block font-bold">For Candidates</span>
+          <h2 class="text-4xl md:text-5xl brand-font italic text-white mb-6">Turn your craft into a career</h2>
+          <p class="text-slate-400 text-sm font-light leading-relaxed max-w-sm">Tailored paths for chefs, front-of-house, and hospitality talent ready to grow in premium destinations worldwide.</p>
+          <div class="btn-panel ie-hub-card-cta">Discover Candidate Journey</div>
+        </div>
+      </a>
     </section>
   </main>
 

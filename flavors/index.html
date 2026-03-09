@@ -28,149 +28,117 @@
   <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
 
   <style>
-    .hub-grid{
+    .hero-narrative{
       width:100%;
-      background:#000;
-    }
-
-    .hero--flavors.hub-grid{
-      height:100dvh;
+      min-height:100vh;
       min-height:100dvh;
       display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero-bg{
+      position:absolute;inset:0;z-index:0;
+      background:url('/ItalianExperience/assets/img/flavors/flavors-home.jpg') no-repeat center center;
+      background-size:cover;
+      filter:brightness(0.35);
+      transform:scale(1.02);
+    }
+    .hero-overlay{
+      position:absolute;inset:0;z-index:1;
+      background:linear-gradient(to bottom,rgba(8,8,8,0) 0%,var(--brand-obsidian) 100%);
+    }
+    .hero-content{
+      position:relative;z-index:10;
+      text-align:center;
+      max-width:1100px;
+      padding:0 2rem;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
     }
 
-    .hero--flavors .ie-hero-content-layer{
+    .services-horizontal{
+      width:100%;
+      height:min(850px, 85vh);
+      display:flex;
+      flex-direction:row;
+      background:var(--brand-obsidian);
+      border-top:none;
+    }
+    .service-panel{
+      position:relative;
+      flex:1;
+      height:100%;
+      overflow:hidden;
+      border-radius:0 !important;
+      border:none !important;
+      box-shadow:none !important;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      padding:6rem 3.5rem;
+      text-decoration:none;
+      transition:transform 0.6s cubic-bezier(0.16,1,0.3,1);
+      border-right:none !important;
+      will-change:transform;
+    }
+    .service-panel:last-child{border-right:none}
+
+    .panel-bg{
+      position:absolute;inset:0;z-index:0;
+      transition:transform 1.2s cubic-bezier(0.16,1,0.3,1),filter 0.8s ease;
+      filter:grayscale(100%) brightness(0.2);
+    }
+    .panel-bg img{width:100%;height:100%;object-fit:cover}
+    .service-panel:hover .panel-bg{transform:scale(1.1);filter:grayscale(0%) brightness(0.4)}
+
+    .panel-content{
       position:relative;
       z-index:10;
-      flex:1;
-      display:flex;
-      height:100%;
+      pointer-events:none;
+      transition:transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    .service-panel:hover .panel-content{transform:translateY(-15px)}
+    .gold-line{width:40px;height:2px;background:var(--brand-gold);margin-bottom:2rem;transition:width 0.6s ease}
+    .service-panel:hover .gold-line{width:80px}
+
+    .btn-panel{
+      display:inline-block;
+      margin-top:3rem;
+      padding:1.2rem 2.5rem;
+      border:1px solid var(--brand-gold);
+      color:var(--brand-gold);
+      font-size:0.7rem;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:0.25em;
+      transition:all 0.25s ease;
+      background:transparent;
+      pointer-events:auto;
+    }
+    .service-panel:hover .btn-panel{
+      background:var(--brand-gold);
+      color:var(--brand-obsidian);
+      box-shadow:0 10px 30px rgba(197,160,89,0.3);
     }
 
-    .hero--flavors .ie-hero-content-layer.hero-layout--split{
-      flex-direction:row;
-      height:100%;
-      align-items:stretch;
-    }
-
-    /* PANEL */
-
-    .hero--flavors .hub-panel{
-      flex:1;
-      position:relative;
-      height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-      border:none;
-      text-decoration:none;
-      cursor:pointer;
-    }
-
-    @media (min-width:1025px){
-      .hub-panel:not(:last-child){
-        box-shadow:inset -1px 0 0 rgba(255,255,255,0.04);
+    @media (max-width:1024px){
+      .services-horizontal{flex-direction:column;height:auto}
+      .service-panel{
+        height:68vh;
+        width:100%;
+        border-right:none;
+        border-bottom:none !important;
       }
     }
-
-    /* IMAGE */
-
-    .hero--flavors .hub-bg{
-      position:absolute;
-      inset:0;
-      background-size:cover;
-      background-position:center;
-      filter:brightness(0.35) contrast(1.08);
-      transition:transform 1.4s cubic-bezier(0.23,1,0.32,1), filter 0.8s ease;
-      z-index:0;
-    }
-
-    .hub-panel:hover .hub-bg{
-      transform:scale(1.06);
-      filter:brightness(0.42);
-    }
-
-    /* OVERLAY */
-
-    .hub-gradient{
-      position:absolute;
-      inset:0;
-      background:linear-gradient(to bottom, rgba(0,0,0,0.15), rgba(0,0,0,0.85));
-      z-index:1;
-    }
-
-    /* CONTENT */
-
-    .hub-content{
-      position:relative;
-      z-index:2;
-      width:100%;
-      max-width:420px;
-      text-align:center;
-    }
-
-    /* GLASS CARD */
-
-    .hub-glass-card{
-      padding:3rem 2rem;
-      border-radius:var(--radius-premium);
-      background:linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-      backdrop-filter:blur(18px);
-      border:1px solid rgba(255,255,255,0.12);
-      box-shadow:0 40px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
-      transition:transform 0.6s cubic-bezier(0.23,1,0.32,1), border-color 0.4s ease;
-    }
-
-    .hub-panel:hover .hub-glass-card{
-      transform:translateY(-12px);
-      border-color:var(--brand-gold);
-    }
-
-    /* TEXT */
-
-    .hub-kicker{
-      font-size:0.85rem;
-      letter-spacing:0.45em;
-      text-transform:uppercase;
-      font-weight:600;
-      color:var(--brand-gold);
-      margin-bottom:1.2rem;
-    }
-
-    .hub-title{
-      font-family:'Playfair Display',serif;
-      font-size:clamp(2.4rem,4vw,3.2rem);
-      line-height:1.1;
-      font-weight:500;
-      letter-spacing:-0.02em;
-      margin-bottom:1rem;
-    }
-
-    .hub-title::after{
-      content:"";
-      display:block;
-      width:40px;
-      height:1px;
-      background:var(--brand-gold);
-      margin:1.4rem auto 0;
-      opacity:0.6;
-    }
-
-    .hub-sub{
-      font-size:0.8rem;
-      letter-spacing:0.25em;
-      text-transform:uppercase;
-      color:rgba(255,255,255,0.6);
-      margin-top:1rem;
-    }
-
-    .hub-disclaimer{
-      font-size:0.7rem;
-      color:rgba(255,255,255,0.45);
-      margin-top:1.4rem;
-      line-height:1.6;
-      font-style:italic;
+    @media (hover:none){
+      .service-panel{transition:none}
+      .panel-bg{transition:filter 0.4s ease}
+      .service-panel:hover{flex:1}
+      .service-panel:hover .panel-bg{transform:none}
     }
 
     .split-content{position:relative}
@@ -222,44 +190,6 @@
       inset:0 !important;
       clip-path:none !important;
     }
-
-    /* Disable shimmer glow on hero hub panels for this page */
-    .hub-grid .hub-panel::after{
-      content:none !important;
-      display:none !important;
-    }
-
-    @media (hover:none){
-      .hub-panel{transition:none}
-      .hub-bg{transition:filter 0.4s ease}
-      .hub-panel:hover .hub-bg{transform:scale(1.02)}
-    }
-
-    @media (max-width:1024px){
-      /* Allow hero to grow naturally on mobile */
-      .hero--flavors.hub-grid{
-        height:auto;
-        min-height:auto;
-        flex-direction:column;
-      }
-
-      /* Stack panels vertically */
-      .hero--flavors .ie-hero-content-layer.hero-layout--split{
-        flex-direction:column;
-        height:auto;
-      }
-
-      /* Each panel takes full viewport height */
-      .hero--flavors .hub-panel{
-        height:100dvh;
-        min-height:100dvh;
-      }
-
-      /* Reduce content vertical offset for smaller screens */
-      .hero--flavors .hub-content{
-        transform:translateY(0);
-      }
-    }
   </style>
 </head>
 
@@ -269,60 +199,67 @@
 
   <main>
 
-    <section class="hub-grid ie-hero-shell hero--flavors" aria-label="Flavors hub navigation">
+    <header class="hero-narrative ie-hero-shell ie-hero-offset ie-hero--hub" aria-label="Hero Flavors">
+      <div class="hero-bg ie-hero-bg-layer" aria-hidden="true"></div>
+      <div class="hero-overlay ie-hero-overlay-layer" aria-hidden="true"></div>
 
-      <div class="ie-hero-content-layer hero-layout--split">
-
-        <!-- PANEL 1 -->
-        <a href="/ItalianExperience/flavors/for-your-home/" class="hub-panel">
-          <div class="hub-bg" style="background-image:url('/ItalianExperience/assets/img/flavors/flavors-home.jpg');" aria-hidden="true"></div>
-          <div class="hub-gradient" aria-hidden="true"></div>
-          <div class="hub-content">
-            <div class="hub-glass-card">
-              <p class="hub-kicker">Gourmet Experience</p>
-              <div class="hub-line"></div>
-              <h2 class="hub-title">For Your Home</h2>
-              <p class="hub-sub">E-Commerce Store</p>
-            </div>
-          </div>
-        </a>
-
-        <!-- PANEL 2 -->
-        <a href="/ItalianExperience/flavors/for-your-business/" class="hub-panel">
-          <div class="hub-bg" style="background-image:url('/ItalianExperience/assets/img/flavors/flavors-business.jpg');" aria-hidden="true"></div>
-          <div class="hub-gradient" aria-hidden="true"></div>
-
-          <div class="hub-content">
-            <div class="hub-glass-card">
-              <p class="hub-kicker">Professional Supply</p>
-              <div class="hub-line"></div>
-              <h2 class="hub-title">For Your Business</h2>
-              <p class="hub-sub">Wholesale</p>
-            </div>
-          </div>
-        </a>
-
-        <!-- PANEL 3 -->
-        <a href="/ItalianExperience/flavors/aziende-italiane/" class="hub-panel">
-          <div class="hub-bg" style="background-image:url('/ItalianExperience/assets/img/flavors/flavors-italian-companies.jpg');" aria-hidden="true"></div>
-          <div class="hub-gradient" aria-hidden="true"></div>
-
-          <div class="hub-content">
-            <div class="hub-glass-card">
-              <p class="hub-kicker">Expansion Advisory</p>
-              <div class="hub-line"></div>
-              <h2 class="hub-title">Italian Companies</h2>
-              <p class="hub-sub">Export to USA Market</p>
-
-              <p class="hub-disclaimer">
-                This specific service is available exclusively for the Italian market. Content is provided in Italian.
-              </p>
-            </div>
-          </div>
-        </a>
-
+      <div class="hero-content ie-hero-content-layer ie-hero-lockup">
+        <h3 class="ie-hero-eyebrow mb-6">Gourmet Experience</h3>
+        <h1 class="ie-hero-title mb-8">
+          The Italian<br><span class="italic font-light">Flavors.</span>
+        </h1>
+        <div class="w-24 h-px bg-[#c5a059] opacity-40 mx-auto mb-8"></div>
+        <p class="ie-hero-lead max-w-2xl mx-auto">
+          Curated gourmet experiences, wholesale supply, and export advisory for Italian food excellence.
+        </p>
       </div>
 
+      <a href="#services" class="explore-indicator" aria-label="Go to services">
+        <span>Explore Services</span>
+        <div class="scroll-track" aria-hidden="true"><div class="scroll-dot"></div></div>
+      </a>
+    </header>
+
+    <section class="services-horizontal ie-hub-rail" id="services" aria-label="Flavors hub navigation">
+      <a href="/ItalianExperience/flavors/for-your-home/" class="service-panel ie-hub-card">
+        <div class="panel-bg ie-hub-card-bg" aria-hidden="true">
+          <img src="/ItalianExperience/assets/img/flavors/flavors-home.jpg" alt="For Your Home" loading="eager" decoding="async">
+        </div>
+        <div class="panel-content ie-hub-card-body ie-reveal">
+          <div class="gold-line"></div>
+          <span class="text-[#c5a059] text-[0.65rem] uppercase tracking-[0.4em] mb-3 block font-bold">Gourmet Experience</span>
+          <h2 class="text-4xl md:text-5xl brand-font italic text-white mb-6">For Your Home</h2>
+          <p class="text-slate-400 text-sm font-light leading-relaxed max-w-sm">E-Commerce Store</p>
+          <div class="btn-panel ie-hub-card-cta">For Your Home</div>
+        </div>
+      </a>
+
+      <a href="/ItalianExperience/flavors/for-your-business/" class="service-panel ie-hub-card">
+        <div class="panel-bg ie-hub-card-bg" aria-hidden="true">
+          <img src="/ItalianExperience/assets/img/flavors/flavors-business.jpg" alt="For Your Business" loading="lazy" decoding="async">
+        </div>
+        <div class="panel-content ie-hub-card-body ie-reveal" data-delay="1">
+          <div class="gold-line"></div>
+          <span class="text-[#c5a059] text-[0.65rem] uppercase tracking-[0.4em] mb-3 block font-bold">Professional Supply</span>
+          <h2 class="text-4xl md:text-5xl brand-font italic text-white mb-6">For Your Business</h2>
+          <p class="text-slate-400 text-sm font-light leading-relaxed max-w-sm">Wholesale</p>
+          <div class="btn-panel ie-hub-card-cta">For Your Business</div>
+        </div>
+      </a>
+
+      <a href="/ItalianExperience/flavors/aziende-italiane/" class="service-panel ie-hub-card">
+        <div class="panel-bg ie-hub-card-bg" aria-hidden="true">
+          <img src="/ItalianExperience/assets/img/flavors/flavors-italian-companies.jpg" alt="Italian Companies" loading="lazy" decoding="async">
+        </div>
+        <div class="panel-content ie-hub-card-body ie-reveal" data-delay="2">
+          <div class="gold-line"></div>
+          <span class="text-[#c5a059] text-[0.65rem] uppercase tracking-[0.4em] mb-3 block font-bold">Expansion Advisory</span>
+          <h2 class="text-4xl md:text-5xl brand-font italic text-white mb-6">Italian Companies</h2>
+          <p class="text-slate-400 text-sm font-light leading-relaxed max-w-sm">Export to USA Market</p>
+          <p class="text-slate-500 text-xs font-light leading-relaxed max-w-sm mt-4 italic">This specific service is available exclusively for the Italian market. Content is provided in Italian.</p>
+          <div class="btn-panel ie-hub-card-cta">Italian Companies</div>
+        </div>
+      </a>
     </section>
 
     <section class="py-32 px-8 flex items-center justify-center bg-[#080808]">
@@ -358,7 +295,7 @@
             </span>
 
             <p class="text-slate-500 text-xl md:text-2xl leading-relaxed font-light italic">
-              We don’t just manage shipments; we curate <span class="text-slate-300 font-normal italic">stories of excellence.</span>
+              We don't just manage shipments; we curate <span class="text-slate-300 font-normal italic">stories of excellence.</span>
               From local craftsmanship to international tables, every stage of the value chain is designed to bring authentic Italian flavor to the world.
             </p>
           </div>
