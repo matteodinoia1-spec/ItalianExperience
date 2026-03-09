@@ -27,8 +27,6 @@
   <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
 
   <style>
-    .brand-font{font-family:'Playfair Display',serif}
-
     .hero-coming{
       width:100%;
       height:100vh;
@@ -201,61 +199,6 @@
       transform:translateY(-3px);
     }
 
-    @keyframes scrollLine{
-      0%{transform:translateY(-18px);opacity:0}
-      30%{opacity:1}
-      100%{transform:translateY(52px);opacity:0}
-    }
-
-    .explore-indicator{
-      position:absolute;
-      bottom:46px;
-      left:50%;
-      transform:translateX(-50%);
-      z-index:20;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:14px;
-      text-decoration:none;
-      opacity:0.82;
-      transition:opacity 0.2s ease,transform 0.2s ease;
-      pointer-events:auto;
-    }
-
-    .explore-indicator:hover{
-      opacity:1;
-      transform:translateX(-50%) translateY(3px);
-    }
-
-    .explore-indicator span{
-      font-size:0.65rem;
-      text-transform:uppercase;
-      letter-spacing:0.55em;
-      color:rgba(255,255,255,0.78);
-      padding-left:0.55em;
-      white-space:nowrap;
-      text-shadow:0 8px 18px rgba(0,0,0,0.7);
-    }
-
-    .scroll-track{
-      width:1px;
-      height:54px;
-      background:rgba(255,255,255,0.25);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .scroll-dot{
-      width:100%;
-      height:16px;
-      background:var(--brand-gold);
-      position:absolute;
-      top:0;
-      left:0;
-      animation:scrollLine 1.6s infinite ease-in-out;
-    }
-
     @media (max-width:768px){
       .coming-actions{gap:10px}
       .btn-gold,
@@ -354,37 +297,7 @@
 
   <div id="site-footer"></div>
 
-  <script>
-    (function () {
-      const base = "/ItalianExperience";
-      const headerMount = document.getElementById("site-header");
-      const footerMount = document.getElementById("site-footer");
-
-      function inject(el, html) { if (el) el.innerHTML = html; }
-
-      function loadScript(src) {
-        return new Promise((resolve, reject) => {
-          const s = document.createElement("script");
-          s.src = src;
-          s.defer = true;
-          s.onload = resolve;
-          s.onerror = reject;
-          document.head.appendChild(s);
-        });
-      }
-
-      Promise.all([
-        fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
-        fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
-      ]).then(async ([h, f]) => {
-        inject(headerMount, h);
-        inject(footerMount, f);
-
-        await loadScript(base + "/assets/js/site.js");
-        if (window.IEInit) window.IEInit(document);
-      }).catch(err => console.error(err));
-    })();
-  </script>
+  <script src="/ItalianExperience/assets/js/bootstrap.js"></script>
 
 </body>
 </html>

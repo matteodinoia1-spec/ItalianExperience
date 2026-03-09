@@ -28,8 +28,6 @@
   <script defer src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.2/build/js/intlTelInput.min.js"></script>
 
   <style>
-    .brand-font{font-family:'Playfair Display',serif}
-
     .business-hero{
       width:100%;
       height:100vh;
@@ -69,69 +67,12 @@
       pointer-events:none;
     }
 
-    @keyframes scrollLine{
-      0%{transform:translateY(-18px);opacity:0}
-      30%{opacity:1}
-      100%{transform:translateY(52px);opacity:0}
-    }
-
-    .explore-indicator{
-      position:absolute;
-      bottom:46px;
-      left:50%;
-      transform:translateX(-50%);
-      z-index:20;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:14px;
-      text-decoration:none;
-      opacity:0.82;
-      transition:opacity 0.2s ease,transform 0.2s ease;
-      pointer-events:auto;
-    }
-
-    .explore-indicator:hover{
-      opacity:1;
-      transform:translateX(-50%) translateY(3px);
-    }
-
-    .explore-indicator span{
-      font-size:0.65rem;
-      text-transform:uppercase;
-      letter-spacing:0.55em;
-      color:rgba(255,255,255,0.78);
-      padding-left:0.55em;
-      white-space:nowrap;
-      text-shadow:0 8px 18px rgba(0,0,0,0.7);
-    }
-
-    .scroll-track{
-      width:1px;
-      height:54px;
-      background:rgba(255,255,255,0.25);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .scroll-dot{
-      width:100%;
-      height:16px;
-      background:var(--brand-gold);
-      position:absolute;
-      top:0;
-      left:0;
-      animation:scrollLine 1.6s infinite ease-in-out;
-    }
-
     .feature-card{
-      border-left:1px solid rgba(197,160,89,0.18);
       padding:0.6rem 0 1.1rem 2rem;
       min-height:170px;
       display:flex;
       flex-direction:column;
       justify-content:flex-start;
-      transition:all 0.35s ease;
     }
 
     .feature-card h4{
@@ -143,11 +84,6 @@
       line-height:1.8 !important;
       color:rgba(226,232,240,0.9) !important;
       font-size:0.95rem !important;
-    }
-
-    .feature-card:hover{
-      border-left-color:var(--brand-gold);
-      transform:translateX(10px);
     }
 
     .category-card{
@@ -195,65 +131,12 @@
       width:60px;
     }
 
-    .hero-form-cta{
-      margin-top:1.5rem;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      border:1px solid rgba(197,160,89,0.8);
-      color:#f8f3e8;
-      text-transform:uppercase;
-      letter-spacing:0.24em;
-      font-size:0.62rem;
-      font-weight:700;
-      padding:0.9rem 1.1rem;
-      transition:all .25s ease;
-      pointer-events:auto;
-      background:rgba(0,0,0,0.22);
-    }
-
-    .hero-form-cta:hover{background:var(--brand-gold); color:#080808; transform:translateY(-1px)}
-
-    .service-contact{position:relative; padding:6.5rem 1.25rem 7rem; background:radial-gradient(circle at 10% 10%, rgba(197,160,89,0.12), transparent 40%), #080808; border-top:1px solid rgba(197,160,89,0.15)}
-    .service-contact-shell{max-width:980px; margin:0 auto; display:grid; grid-template-columns:0.9fr 1.1fr; gap:2.25rem; align-items:start}
-    .service-contact-meta{padding-right:1rem; border-right:1px solid rgba(197,160,89,0.2)}
-    .service-contact-card{background:rgba(255,255,255,0.02); border:1px solid rgba(197,160,89,0.18); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:4px; padding:1.5rem; box-shadow:0 20px 40px rgba(0,0,0,0.35)}
-    .service-grid{display:grid; grid-template-columns:1fr 1fr; gap:1rem}
-    .service-full{grid-column:1 / -1}
-    .service-label{display:block; margin-bottom:0.45rem; font-size:0.64rem; letter-spacing:0.24em; text-transform:uppercase; color:#9ca3af; font-weight:600}
-    .service-label.is-required::after{content:"\00a0*"; color:var(--brand-gold); letter-spacing:0.1em}
-    .service-field{width:100%; padding:0.95rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.16); border-radius:2px; color:#fff; font-size:0.95rem; outline:none; transition:border-color .2s ease, box-shadow .2s ease, background .2s ease}
-    .service-field:focus{border-color:rgba(197,160,89,0.85); box-shadow:0 0 0 1px rgba(197,160,89,0.15); background:rgba(255,255,255,0.06)}
-    .service-field::placeholder{color:rgba(255,255,255,0.45)}
-    .service-intl .iti{width:100%}
-    .service-intl .iti__selected-country{height:100%; padding:0 0.55rem 0 0.6rem; background:rgba(255,255,255,0.03); border-right:1px solid rgba(255,255,255,0.14)}
-    .service-intl .iti__selected-country-primary{height:100%; display:flex; align-items:center; gap:0.45rem}
-    .service-intl .iti__selected-dial-code{margin-left:0; font-size:0.98rem; color:rgba(255,255,255,0.95)}
-    .service-intl .iti__arrow{margin-left:0.25rem}
-    .service-intl .iti__country-list{background:#111; border:1px solid rgba(197,160,89,0.24); color:#fff}
-    .service-intl .iti__country.iti__highlight{background:rgba(197,160,89,0.18)}
-    .service-textarea{min-height:145px; resize:vertical; line-height:1.6}
-    .service-btn{width:100%; margin-top:0.25rem; border:1px solid var(--brand-gold); color:var(--brand-gold); background:transparent; text-transform:uppercase; letter-spacing:0.3em; font-size:0.68rem; font-weight:700; padding:1rem 1.1rem; transition:all .3s ease; cursor:pointer}
-    .service-btn:hover{background:var(--brand-gold); color:#080808; transform:translateY(-1px)}
-    .service-success{display:none; margin-top:0.8rem; border:1px solid rgba(197,160,89,0.35); background:rgba(197,160,89,0.08); color:#f8f3e8; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; padding:0.9rem 1rem; text-align:center}
-    .service-success.is-visible{display:block}
-
     @media (max-width:768px){
       .category-overlay{
         padding:2rem;
       }
     }
 
-    @media (max-width:1024px){
-      .service-contact-shell{grid-template-columns:1fr; gap:1.5rem}
-      .service-contact-meta{border-right:none; padding-right:0; text-align:center}
-    }
-
-    @media (max-width:640px){
-      .service-contact{padding:4.75rem 1rem 5rem}
-      .service-contact-card{padding:1rem}
-      .service-grid{grid-template-columns:1fr; gap:0.85rem}
-    }
   </style>
 </head>
 
@@ -302,21 +185,21 @@
             </h2>
 
             <div class="space-y-12">
-              <div class="feature-card">
+              <div class="feature-card ie-card-panel ie-card-panel-hover">
                 <h4 class="text-white uppercase tracking-[0.2em] text-xs font-bold mb-4">Curated Selection</h4>
                 <p class="text-slate-400 text-sm leading-relaxed font-light">
                   We work with artisanal Italian producers who deliver an uncompromising standard of quality, rarely found in mass distribution networks.
                 </p>
               </div>
 
-              <div class="feature-card">
+              <div class="feature-card ie-card-panel ie-card-panel-hover">
                 <h4 class="text-white uppercase tracking-[0.2em] text-xs font-bold mb-4">Dedicated Logistics</h4>
                 <p class="text-slate-400 text-sm leading-relaxed font-light">
                   We manage international shipping and temperature-sensitive logistics with precision, ensuring reliability and continuity of supply.
                 </p>
               </div>
 
-              <div class="feature-card">
+              <div class="feature-card ie-card-panel ie-card-panel-hover">
                 <h4 class="text-white uppercase tracking-[0.2em] text-xs font-bold mb-4">Wholesale Pricing</h4>
                 <p class="text-slate-400 text-sm leading-relaxed font-light">
                   Competitive pricing is reserved exclusively for verified businesses, hospitality groups, and professional operators in the industry.
@@ -438,61 +321,61 @@
       </div>
     </section>
 
-    <section id="business-contact" class="service-contact" aria-label="Business contact form">
-      <div class="service-contact-shell">
-        <div class="service-contact-meta ie-reveal">
+    <section id="business-contact" class="service-contact ie-form-section" aria-label="Business contact form">
+      <div class="service-contact-shell ie-form-shell">
+        <div class="service-contact-meta ie-form-meta ie-reveal">
           <span class="text-[#c5a059] uppercase tracking-[0.55em] text-[0.58rem] font-bold block mb-4">Contact Advisory</span>
           <h2 class="text-4xl md:text-5xl brand-font italic text-white leading-tight mb-6">Grow Your Business.</h2>
           <p class="text-slate-400 leading-relaxed text-sm md:text-base max-w-[36ch]">Tell us your company profile and product sector. We will prepare a strategic export and supply support path.</p>
         </div>
-        <div class="service-contact-card">
+        <div class="service-contact-card ie-form-card">
           <form action="https://forms.zohopublic.com/italianrecruitment/form/ItalianExperience/formperma/dSUYWQws7Sq0pF8lp6bSn-L3IVYXlfjJkrN7lkFScAM/htmlRecords/submit" id="business-form" method="POST" accept-charset="UTF-8" enctype="multipart/form-data" target="zoho-business-submit-frame">
             <input type="hidden" name="zf_referrer_name" value="For Your Business Page">
             <input type="hidden" name="zf_redirect_url" value="">
             <input type="hidden" name="zc_gad" value="">
             <input type="hidden" name="Dropdown" value="For your business">
             <input type="hidden" name="PhoneNumber_countrycode" id="business-phone-hidden">
-            <div class="service-grid">
+            <div class="service-grid ie-form-grid">
               <div>
-                <label class="service-label is-required" for="business-name-first">First Name</label>
-                <input class="service-field" id="business-name-first" type="text" name="Name_First" maxlength="255" required>
+                <label class="service-label ie-form-label is-required" for="business-name-first">First Name</label>
+                <input class="service-field ie-form-field" id="business-name-first" type="text" name="Name_First" maxlength="255" required>
               </div>
               <div>
-                <label class="service-label is-required" for="business-name-last">Last Name</label>
-                <input class="service-field" id="business-name-last" type="text" name="Name_Last" maxlength="255" required>
+                <label class="service-label ie-form-label is-required" for="business-name-last">Last Name</label>
+                <input class="service-field ie-form-field" id="business-name-last" type="text" name="Name_Last" maxlength="255" required>
               </div>
               <div>
-                <label class="service-label is-required" for="business-email">E-mail</label>
-                <input class="service-field" id="business-email" type="email" name="Email" maxlength="255" required>
+                <label class="service-label ie-form-label is-required" for="business-email">E-mail</label>
+                <input class="service-field ie-form-field" id="business-email" type="email" name="Email" maxlength="255" required>
               </div>
               <div>
-                <label class="service-label is-required" for="business-phone">Phone</label>
-                <div class="service-intl">
-                  <input class="service-field" id="business-phone" type="tel" maxlength="30" placeholder="Phone number" required>
+                <label class="service-label ie-form-label is-required" for="business-phone">Phone</label>
+                <div class="service-intl ie-form-intl">
+                  <input class="service-field ie-form-field" id="business-phone" type="tel" maxlength="30" placeholder="Phone number" required>
                 </div>
               </div>
               <div>
-                <label class="service-label is-required" for="business-company">Company Name</label>
-                <input class="service-field" id="business-company" type="text" name="SingleLine2" maxlength="255" required>
+                <label class="service-label ie-form-label is-required" for="business-company">Company Name</label>
+                <input class="service-field ie-form-field" id="business-company" type="text" name="SingleLine2" maxlength="255" required>
               </div>
               <div>
-                <label class="service-label is-required" for="business-sector">Industry / Product Sector</label>
-                <input class="service-field" id="business-sector" type="text" name="SingleLine3" maxlength="255" required>
+                <label class="service-label ie-form-label is-required" for="business-sector">Industry / Product Sector</label>
+                <input class="service-field ie-form-field" id="business-sector" type="text" name="SingleLine3" maxlength="255" required>
               </div>
-              <div class="service-full">
-                <label class="service-label is-required" for="business-category">Service Category</label>
-                <input class="service-field" id="business-category" type="text" name="SingleLine4" maxlength="255" required>
+              <div class="service-full ie-form-full">
+                <label class="service-label ie-form-label is-required" for="business-category">Service Category</label>
+                <input class="service-field ie-form-field" id="business-category" type="text" name="SingleLine4" maxlength="255" required>
               </div>
-              <div class="service-full">
-                <label class="service-label is-required" for="business-objectives">Describe Your Specific Registration Needs or Business Objectives</label>
-                <textarea class="service-field service-textarea" id="business-objectives" name="MultiLine4" maxlength="65535" required></textarea>
+              <div class="service-full ie-form-full">
+                <label class="service-label ie-form-label is-required" for="business-objectives">Describe Your Specific Registration Needs or Business Objectives</label>
+                <textarea class="service-field service-textarea ie-form-field ie-form-textarea" id="business-objectives" name="MultiLine4" maxlength="65535" required></textarea>
               </div>
-              <div class="service-full">
-                <button class="service-btn" type="submit">Submit Request</button>
+              <div class="service-full ie-form-full">
+                <button class="service-btn ie-form-btn" type="submit">Submit Request</button>
               </div>
             </div>
           </form>
-          <div class="service-success" id="business-success-msg" role="status" aria-live="polite">Thank you for your submission.</div>
+          <div class="service-success ie-form-success" id="business-success-msg" role="status" aria-live="polite">Thank you for your submission.</div>
           <iframe title="Zoho business submit frame" name="zoho-business-submit-frame" style="display:none;"></iframe>
         </div>
       </div>
@@ -502,84 +385,30 @@
 
   <div id="site-footer"></div>
 
+  <script src="/ItalianExperience/assets/js/bootstrap.js"></script>
+
+  <script src="/ItalianExperience/assets/js/forms.js"></script>
   <script>
     (function () {
-      const base = "/ItalianExperience";
-      const headerMount = document.getElementById("site-header");
-      const footerMount = document.getElementById("site-footer");
+      if (!window.IEForms || !window.IEForms.attachZohoPhoneForm) return;
 
-      function inject(el, html) { if (el) el.innerHTML = html; }
-
-      function loadScript(src) {
-        return new Promise((resolve, reject) => {
-          const s = document.createElement("script");
-          s.src = src;
-          s.defer = true;
-          s.onload = resolve;
-          s.onerror = reject;
-          document.head.appendChild(s);
-        });
-      }
-
-      Promise.all([
-        fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
-        fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
-      ]).then(async ([h, f]) => {
-        inject(headerMount, h);
-        inject(footerMount, f);
-
-        await loadScript(base + "/assets/js/site.js");
-        if (window.IEInit) window.IEInit(document);
-      }).catch(err => console.error(err));
-    })();
-  </script>
-
-  <script>
-    (function () {
-      const form = document.getElementById("business-form");
-      if (!form) return;
-      const phoneInput = document.getElementById("business-phone");
-      const phoneHidden = document.getElementById("business-phone-hidden");
-      const successMsg = document.getElementById("business-success-msg");
-      const frame = document.querySelector('iframe[name="zoho-business-submit-frame"]');
-      const iti = phoneInput && window.intlTelInput ? window.intlTelInput(phoneInput, {
-        initialCountry: "us",
-        separateDialCode: true,
-        preferredCountries: ["us", "it", "gb", "fr", "de", "es"],
-        loadUtils: () => import("https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.2/build/js/utils.js")
-      }) : null;
-      let submitted = false;
-
-      function syncPhone() {
-        if (!phoneHidden || !phoneInput) return;
-        const rawPhone = phoneInput.value ? phoneInput.value.trim() : "";
-        if (!rawPhone) {
-          phoneHidden.value = "";
-          return;
-        }
-        phoneHidden.value = iti ? (iti.getNumber() || "") : rawPhone;
-      }
-
-      if (phoneInput) {
-        phoneInput.addEventListener("input", syncPhone);
-        phoneInput.addEventListener("countrychange", syncPhone);
-      }
-
-      form.addEventListener("submit", function () {
-        submitted = true;
-        syncPhone();
+      window.IEForms.attachZohoPhoneForm({
+        formId: "business-form",
+        phoneInputId: "business-phone",
+        phoneHiddenId: "business-phone-hidden",
+        successMessageId: "business-success-msg",
+        iframeSelector: 'iframe[name="zoho-business-submit-frame"]',
+        intlTelInputOptions: {
+          initialCountry: "us",
+          separateDialCode: true,
+          preferredCountries: ["us", "it", "gb", "fr", "de", "es"],
+          loadUtils: function () {
+            return import(
+              "https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.2/build/js/utils.js"
+            );
+          },
+        },
       });
-
-      if (frame) {
-        frame.addEventListener("load", function () {
-          if (!submitted || !successMsg) return;
-          successMsg.classList.add("is-visible");
-          form.reset();
-          if (iti) iti.setCountry("us");
-          syncPhone();
-          submitted = false;
-        });
-      }
     })();
   </script>
 

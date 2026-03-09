@@ -101,38 +101,6 @@
 
   <div id="site-footer"></div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      (function () {
-        const base = "/ItalianExperience";
-        const headerMount = document.getElementById("site-header");
-        const footerMount = document.getElementById("site-footer");
-
-        function inject(el, html) { if (el) el.innerHTML = html; }
-
-        function loadScript(src) {
-          return new Promise((resolve, reject) => {
-            const s = document.createElement("script");
-            s.src = src;
-            s.defer = true;
-            s.onload = resolve;
-            s.onerror = reject;
-            document.head.appendChild(s);
-          });
-        }
-
-        Promise.all([
-          fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
-          fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
-        ]).then(async ([h, f]) => {
-          inject(headerMount, h);
-          inject(footerMount, f);
-
-          await loadScript(base + "/assets/js/site.js");
-          if (window.IEInit) window.IEInit(document);
-        }).catch(err => console.error("Error loading components:", err));
-      })();
-    });
-  </script>
+  <script src="/ItalianExperience/assets/js/bootstrap.js"></script>
 </body>
 </html>

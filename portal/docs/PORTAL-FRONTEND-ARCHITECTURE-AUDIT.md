@@ -4,6 +4,8 @@
 **Scope:** `portal/` — modular vanilla JavaScript web application with Supabase backend  
 **Goal:** Evaluate performance, architectural quality, maintainability, and developer comprehensibility. No code was modified.
 
+**Global header (search + Add):** See [PORTAL-GLOBAL-HEADER-SEARCH-ADD-PLAN.md](PORTAL-GLOBAL-HEADER-SEARCH-ADD-PLAN.md) for implementation progress and phases.
+
 **Note (post bottom-nav and toolbar removal):** Shell architecture: header = full width, nav left (shell padding), user right; desktop/tablet = header nav + user menu, footer with breadcrumbs (full width, shell padding; breadcrumbs left aligned, vertically centered); mobile = header shows page title, bottom nav primary, footer hidden (no breadcrumbs). No sidebar, hamburger, or top toolbar; page actions and filters live in content (`.page-list-actions`, `.page-detail-actions`, `.page-form-actions`, `.page-filters-column`). `header-loader.js` mounts header, bottom nav, and footer; dispatches `ie:header-loaded` once. `page-bootstrap.js` runs header init, page initializers, then dynamically loads and initializes `bottom-nav-runtime.js`. No `layout-runtime.js`, `sidebar-runtime.js`, or toolbar runtime; no `toolbar.css` or `--portal-toolbar-height`. Sticky filter column uses `top: calc(var(--portal-header-height) + var(--portal-safe-top))`. `forms-runtime.js` only uses `[data-entity-mode-indicator]` for mode labels.
 
 ---

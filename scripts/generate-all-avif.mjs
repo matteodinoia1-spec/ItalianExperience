@@ -10,7 +10,7 @@ const QUALITY = 67;
 const MIN_SOURCE_WIDTH = 1280;
 
 const EXCLUDED_DIRS = new Set(['node_modules', '.git']);
-const SKIP_DIR_MARKERS = ['/assets/img/_stage1_backup/'];
+const SKIP_DIR_MARKERS = ['/assets/img/_stage1_backup/', '/archive/website/assets-img-stage1/'];
 const PRE_SIZED_SUFFIX = /-(960|1280|1600|1920|2560)$/i;
 const SOURCE_EXT = /\.(jpg|jpeg|png)$/i;
 

@@ -1,5 +1,7 @@
 # Portal layout audit — global page header refactor
 
+For the global header actions (search + Add dropdown) and phased implementation, see [PORTAL-GLOBAL-HEADER-SEARCH-ADD-PLAN.md](PORTAL-GLOBAL-HEADER-SEARCH-ADD-PLAN.md).
+
 ## Current architecture (post bottom-nav and toolbar removal)
 
 ### Shared shell

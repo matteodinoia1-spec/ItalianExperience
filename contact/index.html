@@ -29,8 +29,6 @@
   <script defer src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.2/build/js/intlTelInput.min.js"></script>
 
   <style>
-    .brand-font { font-family: 'Playfair Display', serif; }
-
     .contact-hero {
       width: 100%;
       min-height: 100vh;
@@ -91,135 +89,6 @@
       padding: 2.3rem;
       border-radius: 4px;
       box-shadow: 0 25px 55px rgba(0,0,0,0.45);
-    }
-
-    /* --- FIELD STYLES --- */
-    .field {
-      width: 100%;
-      padding: 1.2rem 1.25rem;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: #fff;
-      outline: none;
-      font-size: 1rem;
-      transition: all 0.25s ease;
-      border-radius: 2px;
-    }
-
-    .field::placeholder {
-      color: rgba(255, 255, 255, 0.4);
-      font-weight: 300;
-    }
-
-    .field:focus {
-      background: rgba(255,255,255,0.05);
-      border-color: rgba(197,160,89,0.85);
-      box-shadow: 0 0 0 1px rgba(197,160,89,0.12);
-    }
-
-    select.field {
-      appearance: none;
-      -webkit-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23c5a059' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 1.2rem center;
-      background-size: 18px;
-      padding-right: 3rem;
-      color: rgba(255,255,255,0.9);
-    }
-    
-    select.field option {
-      background-color: #1a1a1a;
-      color: white;
-      padding: 10px;
-    }
-
-    textarea.field {
-      min-height: 160px;
-      resize: none;
-      line-height: 1.6;
-    }
-
-    .input-label {
-      display: block;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.25em;
-      color: #94a3b8;
-      margin-bottom: 0.75rem;
-      font-weight: 600;
-    }
-
-    .input-label.is-required::after {
-      content: "\00a0*";
-      color: var(--brand-gold);
-      letter-spacing: 0.1em;
-    }
-
-    .contact-intl .iti { width: 100%; }
-    .contact-intl .iti__selected-country {
-      height: 100%;
-      padding: 0 0.55rem 0 0.6rem;
-      background: rgba(255,255,255,0.03);
-      border-right: 1px solid rgba(255,255,255,0.14);
-    }
-    .contact-intl .iti__selected-country-primary {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-    }
-    .contact-intl .iti__selected-dial-code {
-      margin-left: 0;
-      font-size: 0.98rem;
-      color: rgba(255,255,255,0.95);
-    }
-    .contact-intl .iti__country-list {
-      background: #111;
-      border: 1px solid rgba(197,160,89,0.24);
-      color: #fff;
-    }
-    .contact-intl .iti__country.iti__highlight {
-      background: rgba(197,160,89,0.18);
-    }
-
-    .contact-success {
-      display: none;
-      margin-top: 0.8rem;
-      border: 1px solid rgba(197,160,89,0.35);
-      background: rgba(197,160,89,0.08);
-      color: #f8f3e8;
-      font-size: 0.78rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 0.9rem 1rem;
-      text-align: center;
-    }
-
-    .contact-success.is-visible { display: block; }
-
-    .btn-gold {
-      display: inline-block;
-      width: 100%;
-      padding: 1.25rem 1.2rem;
-      text-align: center;
-      border: 1px solid var(--brand-gold);
-      color: var(--brand-gold);
-      font-weight: 700;
-      text-transform: uppercase;
-      font-size: 0.75rem;
-      letter-spacing: 0.35em;
-      transition: all 0.45s ease;
-      background: transparent;
-      margin-top: 1rem;
-      cursor: pointer;
-    }
-
-    .btn-gold:hover {
-      background: var(--brand-gold);
-      color: #080808;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px -5px rgba(197, 160, 89, 0.3);
     }
 
     .contact-meta {
@@ -314,13 +183,7 @@
         padding: 1.25rem;
       }
       
-      .field {
-        padding: 1rem 1rem;
-      }
-
-      textarea.field {
-        min-height: 140px;
-      }
+      /* form field sizing handled by shared ie-form system */
     }
   </style>
 </head>
@@ -374,19 +237,19 @@
             
             <div class="grid md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label class="input-label is-required" for="contact-first-name">First Name</label>
-                <input id="contact-first-name" type="text" name="Name_First" maxlength="255" class="field" placeholder="First Name" autocomplete="given-name" required />
+                <label class="input-label ie-form-label is-required" for="contact-first-name">First Name</label>
+                <input id="contact-first-name" type="text" name="Name_First" maxlength="255" class="field ie-form-field ie-form-field--lg" placeholder="First Name" autocomplete="given-name" required />
               </div>
 
               <div>
-                <label class="input-label is-required" for="contact-last-name">Last Name</label>
-                <input id="contact-last-name" type="text" name="Name_Last" maxlength="255" class="field" placeholder="Last Name" autocomplete="family-name" required />
+                <label class="input-label ie-form-label is-required" for="contact-last-name">Last Name</label>
+                <input id="contact-last-name" type="text" name="Name_Last" maxlength="255" class="field ie-form-field ie-form-field--lg" placeholder="Last Name" autocomplete="family-name" required />
               </div>
             </div>
 
             <div class="mb-6">
-              <label class="input-label is-required" for="contact-topic">Topic</label>
-              <select id="contact-topic" name="Dropdown6" class="field w-full" required>
+              <label class="input-label ie-form-label is-required" for="contact-topic">Topic</label>
+              <select id="contact-topic" name="Dropdown6" class="field w-full ie-form-field ie-form-field--lg ie-form-select ie-form-select--lg" required>
                 <option value="" selected>Select topic</option>
                 <option value="General Information">General Information</option>
                 <option value="Bespoke Travel and Experience">Bespoke Travel and Experience</option>
@@ -397,20 +260,20 @@
             </div>
 
             <div class="mb-6">
-              <label class="input-label is-required" for="contact-email">Email</label>
-              <input id="contact-email" type="email" name="Email" maxlength="255" class="field w-full" placeholder="you@example.com" autocomplete="email" required />
+              <label class="input-label ie-form-label is-required" for="contact-email">Email</label>
+              <input id="contact-email" type="email" name="Email" maxlength="255" class="field w-full ie-form-field ie-form-field--lg" placeholder="you@example.com" autocomplete="email" required />
             </div>
 
             <div class="mb-6">
-              <label class="input-label is-required" for="contact-phone">Phone Number</label>
-              <div class="contact-intl">
-                <input type="tel" class="field" id="contact-phone" maxlength="30" placeholder="Phone number" autocomplete="tel-national" required />
+              <label class="input-label ie-form-label is-required" for="contact-phone">Phone Number</label>
+              <div class="contact-intl ie-form-intl">
+                <input type="tel" class="field ie-form-field ie-form-field--lg" id="contact-phone" maxlength="30" placeholder="Phone number" autocomplete="tel-national" required />
               </div>
             </div>
 
             <div class="mb-8">
-              <label class="input-label is-required" for="contact-message">How can we assist you today?</label>
-              <textarea id="contact-message" name="MultiLine7" maxlength="65535" class="field" placeholder="Please describe your request..." required></textarea>
+              <label class="input-label ie-form-label is-required" for="contact-message">How can we assist you today?</label>
+              <textarea id="contact-message" name="MultiLine7" maxlength="65535" class="field ie-form-field ie-form-field--lg ie-form-textarea ie-form-textarea--fixed" placeholder="Please describe your request..." required></textarea>
             </div>
 
             <button type="submit" class="btn-gold">
@@ -418,7 +281,7 @@
             </button>
 
           </form>
-          <div class="contact-success" id="contact-success-msg" role="status" aria-live="polite">Thank you for your submission.</div>
+          <div class="contact-success ie-form-success" id="contact-success-msg" role="status" aria-live="polite">Thank you for your submission.</div>
           <iframe title="Zoho contact submit frame" name="zoho-contact-submit-frame" style="display:none;"></iframe>
 
         </div>
@@ -430,85 +293,30 @@
 
   <div id="site-footer"></div>
 
+  <script src="/ItalianExperience/assets/js/bootstrap.js"></script>
+
+  <script src="/ItalianExperience/assets/js/forms.js"></script>
   <script>
     (function () {
-      const base = "/ItalianExperience";
-      const headerMount = document.getElementById("site-header");
-      const footerMount = document.getElementById("site-footer");
+      if (!window.IEForms || !window.IEForms.attachZohoPhoneForm) return;
 
-      function inject(el, html) { if (el) el.innerHTML = html; }
-
-      function loadScript(src) {
-        return new Promise((resolve, reject) => {
-          const s = document.createElement("script");
-          s.src = src;
-          s.defer = true;
-          s.onload = resolve;
-          s.onerror = reject;
-          document.head.appendChild(s);
-        });
-      }
-
-      Promise.all([
-        fetch(base + "/partials/header.html").then(r => { if (!r.ok) throw new Error("Header " + r.status); return r.text(); }),
-        fetch(base + "/partials/footer.html").then(r => { if (!r.ok) throw new Error("Footer " + r.status); return r.text(); })
-      ]).then(async ([h, f]) => {
-        inject(headerMount, h);
-        inject(footerMount, f);
-
-        await loadScript(base + "/assets/js/site.js");
-        if (window.IEInit) window.IEInit(document);
-      }).catch(err => console.error(err));
-    })();
-  </script>
-
-  <script>
-    (function () {
-      const form = document.getElementById("contactForm");
-      if (!form) return;
-
-      const phoneInput = document.getElementById("contact-phone");
-      const phoneHidden = document.getElementById("contact-phone-hidden");
-      const successMsg = document.getElementById("contact-success-msg");
-      const frame = document.querySelector('iframe[name="zoho-contact-submit-frame"]');
-      const iti = phoneInput && window.intlTelInput ? window.intlTelInput(phoneInput, {
-        initialCountry: "us",
-        separateDialCode: true,
-        preferredCountries: ["us", "it", "gb", "fr", "de", "es"],
-        loadUtils: () => import("https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.2/build/js/utils.js")
-      }) : null;
-      let submitted = false;
-
-      function syncPhone() {
-        if (!phoneHidden || !phoneInput) return;
-        const rawPhone = phoneInput.value ? phoneInput.value.trim() : "";
-        if (!rawPhone) {
-          phoneHidden.value = "";
-          return;
-        }
-        phoneHidden.value = iti ? (iti.getNumber() || "") : rawPhone;
-      }
-
-      if (phoneInput) {
-        phoneInput.addEventListener("input", syncPhone);
-        phoneInput.addEventListener("countrychange", syncPhone);
-      }
-
-      form.addEventListener("submit", function () {
-        submitted = true;
-        syncPhone();
+      window.IEForms.attachZohoPhoneForm({
+        formId: "contactForm",
+        phoneInputId: "contact-phone",
+        phoneHiddenId: "contact-phone-hidden",
+        successMessageId: "contact-success-msg",
+        iframeSelector: 'iframe[name="zoho-contact-submit-frame"]',
+        intlTelInputOptions: {
+          initialCountry: "us",
+          separateDialCode: true,
+          preferredCountries: ["us", "it", "gb", "fr", "de", "es"],
+          loadUtils: function () {
+            return import(
+              "https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.2/build/js/utils.js"
+            );
+          },
+        },
       });
-
-      if (frame) {
-        frame.addEventListener("load", function () {
-          if (!submitted || !successMsg) return;
-          successMsg.classList.add("is-visible");
-          form.reset();
-          if (iti) iti.setCountry("us");
-          syncPhone();
-          submitted = false;
-        });
-      }
     })();
   </script>
 
