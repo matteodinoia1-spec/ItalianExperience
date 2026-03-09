@@ -511,8 +511,9 @@ body {
     position: fixed;
     left: 0;
     right: 0;
-    bottom: var(--portal-safe-bottom);
-    height: var(--portal-bottom-nav-height);
+    bottom: 0;
+    min-height: var(--portal-bottom-nav-height);
+    padding-bottom: var(--portal-safe-bottom);
     padding-left: max(12px, env(safe-area-inset-left, 0px));
     padding-right: max(12px, env(safe-area-inset-right, 0px));
     box-sizing: border-box;
