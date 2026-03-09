@@ -1395,6 +1395,9 @@ body.menu-open{overflow:hidden}
 }
 
 /* ─── Hub / Selection System ─── */
+#services{
+  scroll-margin-top:var(--ie-header-clearance);
+}
 .services-horizontal,
 .ie-hub-rail{
   width:100%;
