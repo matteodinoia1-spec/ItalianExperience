@@ -163,36 +163,6 @@
       height:100%;
     }
 
-    .roadmap-step{
-      position:relative;
-      padding-left:4rem;
-      border-left:1px solid rgba(197,160,89,0.2);
-      padding-bottom:5rem;
-    }
-
-    .roadmap-step:last-child{
-      border-left-color:transparent;
-      padding-bottom:0;
-    }
-
-    .roadmap-number{
-      position:absolute;
-      left:-18px;
-      top:0;
-      width:36px;
-      height:36px;
-      background:#000;
-      border:1px solid var(--brand-gold);
-      color:var(--brand-gold);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:0.8rem;
-      font-weight:bold;
-      border-radius:50%;
-      box-shadow:0 0 15px rgba(197,160,89,0.2);
-    }
-
     @media (max-width:1024px){
       .hero-content{
         padding:0 2rem 130px;
@@ -393,10 +363,10 @@
           </h2>
         </div>
 
-        <div class="space-y-0 relative">
+        <div class="space-y-0 relative ie-timeline ie-timeline-roadmap">
 
-          <div class="roadmap-step">
-            <div class="roadmap-number">01</div>
+          <div class="roadmap-step ie-timeline-step">
+            <div class="roadmap-number ie-timeline-node--roadmap">01</div>
             <h4 class="text-xl brand-font text-white mb-4 italic">Valutazione e Conformità</h4>
             <p class="text-slate-400 text-sm font-light leading-relaxed max-w-2xl">
               Audit completo dei prodotti e verifica dei requisiti FDA/USDA. Analisi dei gap tecnici per garantire un accesso fluido
@@ -404,16 +374,16 @@
             </p>
           </div>
 
-          <div class="roadmap-step">
-            <div class="roadmap-number">02</div>
+          <div class="roadmap-step ie-timeline-step">
+            <div class="roadmap-number ie-timeline-node--roadmap">02</div>
             <h4 class="text-xl brand-font text-white mb-4 italic">Architettura di Canale</h4>
             <p class="text-slate-400 text-sm font-light leading-relaxed max-w-2xl">
               Selezione dei partner logistici e definizione del modello di posizionamento. Creiamo le fondamenta operative per la vostra presenza stabile.
             </p>
           </div>
 
-          <div class="roadmap-step">
-            <div class="roadmap-number">03</div>
+          <div class="roadmap-step ie-timeline-step">
+            <div class="roadmap-number ie-timeline-node--roadmap">03</div>
             <h4 class="text-xl brand-font text-white mb-4 italic">Lancio e Gestione Agente</h4>
             <p class="text-slate-400 text-sm font-light leading-relaxed max-w-2xl">
               Attivazione del ruolo di U.S. Agent e supporto continuo. Monitoraggio delle normative in evoluzione per proteggere la vostra eccellenza nel tempo.

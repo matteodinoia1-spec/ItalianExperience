@@ -136,21 +136,6 @@
       z-index:10;
     }
 
-    .swiper-pagination-bullet{
-      width:10px !important;
-      height:10px !important;
-      background:rgba(255,255,255,0.2) !important;
-      opacity:1 !important;
-      transition:0.4s ease;
-      border-radius:5px !important;
-      margin:0 8px !important;
-    }
-
-    .swiper-pagination-bullet-active{
-      background:var(--brand-gold) !important;
-      width:40px !important;
-    }
-
 
     @media (max-width:768px){
       .explore-indicator{bottom:54px}
@@ -165,11 +150,11 @@
 
   <div id="site-header"></div>
 
-  <header class="hero-odyssey ie-hero-shell ie-hero-offset" aria-label="Gap Year Hero">
-    <div class="swiper hero-swiper ie-hero-bg-layer">
+  <header class="hero-odyssey ie-hero-shell ie-hero-offset ie-hero--swiper" aria-label="Gap Year Hero">
+    <div class="swiper hero-swiper ie-hero-bg-layer ie-gallery-swiper">
       <div class="swiper-wrapper">
 
-        <div class="swiper-slide hero-slide">
+        <div class="swiper-slide hero-slide ie-gallery-slide">
           <picture>
             <source
               type="image/avif"
@@ -183,7 +168,7 @@
           </picture>
         </div>
 
-        <div class="swiper-slide hero-slide">
+        <div class="swiper-slide hero-slide ie-gallery-slide">
           <picture>
             <source
               type="image/avif"
@@ -196,7 +181,7 @@
           </picture>
         </div>
 
-        <div class="swiper-slide hero-slide">
+        <div class="swiper-slide hero-slide ie-gallery-slide">
           <picture>
             <source
               type="image/avif"
@@ -227,7 +212,7 @@
         <p class="ie-hero-lead max-w-[440px] md:max-w-none">
           Structured Gap Year & Deep Cultural Mastery
         </p>
-        <a class="hero-form-cta" href="#gapyear-contact" aria-label="Go to contact form">
+        <a class="hero-form-cta ie-btn-primary" href="#gapyear-contact" aria-label="Go to contact form">
           Contact Form
         </a>
       </div>
@@ -308,7 +293,7 @@
               Immerse yourself in Italian culture while exploring hidden gems and experiencing authentic local life.
             </p>
 
-            <a href="/ItalianExperience/contact/" class="enroll-btn py-3 px-10 text-[0.65rem] font-bold uppercase tracking-[0.2em] mt-auto">
+            <a href="/ItalianExperience/contact/" class="enroll-btn ie-btn-primary py-3 px-10 text-[0.65rem] font-bold uppercase tracking-[0.2em] mt-auto">
               Enroll today
             </a>
           </div>
@@ -338,7 +323,7 @@
               Strengthen your language and cultural knowledge while integrating into authentic Italian daily life.
             </p>
 
-            <a href="/ItalianExperience/contact/" class="enroll-btn py-3 px-10 text-[0.65rem] font-bold uppercase tracking-[0.2em] mt-auto">
+            <a href="/ItalianExperience/contact/" class="enroll-btn ie-btn-primary py-3 px-10 text-[0.65rem] font-bold uppercase tracking-[0.2em] mt-auto">
               Enroll today
             </a>
           </div>
@@ -362,7 +347,7 @@
               Combine language, cultural immersion, and personal development. Discover Italy in its most authentic form.
             </p>
 
-            <a href="/ItalianExperience/contact/" class="enroll-btn py-3 px-10 text-[0.65rem] font-bold uppercase tracking-[0.2em] mt-auto">
+            <a href="/ItalianExperience/contact/" class="enroll-btn ie-btn-primary py-3 px-10 text-[0.65rem] font-bold uppercase tracking-[0.2em] mt-auto">
               Enroll today
             </a>
           </div>
@@ -381,14 +366,14 @@
         </h2>
       </div>
 
-      <div class="swiper location-swiper">
+      <div class="swiper location-swiper ie-gallery-swiper">
         <div class="swiper-wrapper">
 
-          <div class="swiper-slide location-card">
+          <div class="swiper-slide location-card ie-gallery-slide">
             <picture>
               <img width="800" height="1200" src="/ItalianExperience/assets/img/travel/gapyear/gapyear-venice.jpg" alt="Venice" loading="lazy" decoding="async">
             </picture>
-            <div class="location-info">
+            <div class="location-info ie-gallery-overlay">
               <span class="text-[#c5a059] uppercase tracking-widest text-[0.6rem] mb-2 block">
                 Linguistic Mastery
               </span>
@@ -398,7 +383,7 @@
             </div>
           </div>
 
-          <div class="swiper-slide location-card">
+          <div class="swiper-slide location-card ie-gallery-slide">
             <picture>
               <source
                 type="image/avif"
@@ -406,7 +391,7 @@
                 sizes="(min-width: 1024px) 40vw, 100vw">
               <img width="3648" height="5472" src="/ItalianExperience/assets/img/travel/gapyear/gapyear-tuscany.jpg" alt="Tuscany" loading="lazy" decoding="async">
             </picture>
-            <div class="location-info">
+            <div class="location-info ie-gallery-overlay">
               <span class="text-[#c5a059] uppercase tracking-widest text-[0.6rem] mb-2 block">
                 Heritage Internships
               </span>
@@ -416,7 +401,7 @@
             </div>
           </div>
 
-          <div class="swiper-slide location-card">
+          <div class="swiper-slide location-card ie-gallery-slide">
             <picture>
               <source
                 type="image/avif"
@@ -429,7 +414,7 @@
                 alt="Bologna"
                 loading="lazy" decoding="async">
             </picture>
-            <div class="location-info">
+            <div class="location-info ie-gallery-overlay">
               <span class="text-[#c5a059] uppercase tracking-widest text-[0.6rem] mb-2 block">
                 Urban Immersion
               </span>
@@ -439,11 +424,11 @@
             </div>
           </div>
 
-          <div class="swiper-slide location-card">
+          <div class="swiper-slide location-card ie-gallery-slide">
             <picture>
               <img width="800" height="583" src="/ItalianExperience/assets/img/travel/gapyear/gapyear-rome.jpg" alt="Rome" loading="lazy" decoding="async">
             </picture>
-            <div class="location-info">
+            <div class="location-info ie-gallery-overlay">
               <span class="text-[#c5a059] uppercase tracking-widest text-[0.6rem] mb-2 block">
                 Classical Studies
               </span>
@@ -455,7 +440,7 @@
 
         </div>
 
-        <div class="swiper-pagination"></div>
+      <div class="swiper-pagination"></div>
       </div>
     </section>
 
@@ -549,7 +534,7 @@
                 <textarea class="gap-field gap-textarea ie-form-field ie-form-textarea" id="gapyear-message" name="MultiLine1" maxlength="65535" required></textarea>
               </div>
               <div class="gap-full ie-form-full">
-                <button class="gap-btn ie-form-btn" type="submit">Submit Request</button>
+                <button class="gap-btn ie-form-btn ie-btn-primary" type="submit">Submit Request</button>
               </div>
             </div>
           </form>
@@ -577,7 +562,12 @@
         loop: true,
         speed: 1000,
         autoplay: { delay: 4000 },
-        pagination: { el: ".swiper-pagination", clickable: true },
+        pagination: {
+          el: ".swiper-pagination",
+          clickable: true,
+          bulletClass: "ie-gallery-bullet",
+          bulletActiveClass: "ie-gallery-bullet--active"
+        },
         breakpoints: {
           768: { slidesPerView: 2 },
           1024: { slidesPerView: 3 }

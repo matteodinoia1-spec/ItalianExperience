@@ -92,18 +92,18 @@
 
   <div id="site-header"></div>
 
-  <header class="hero-culinary ie-hero-shell ie-hero-offset" aria-label="Culinary Academy Hero">
-    <div class="swiper hero-swiper ie-hero-bg-layer">
+  <header class="hero-culinary ie-hero-shell ie-hero-offset ie-hero--swiper" aria-label="Culinary Academy Hero">
+    <div class="swiper hero-swiper ie-hero-bg-layer ie-gallery-swiper">
       <div class="swiper-wrapper">
 
-        <div class="swiper-slide hero-slide">
+        <div class="swiper-slide hero-slide ie-gallery-slide">
           <picture>
             <source type="image/avif" srcset="/ItalianExperience/assets/img/travel/culinary/culinary-hero-02-960.avif 960w, /ItalianExperience/assets/img/travel/culinary/culinary-hero-02-1280.avif 1280w, /ItalianExperience/assets/img/travel/culinary/culinary-hero-02-1920.avif 1920w" sizes="100vw">
             <img width="1920" height="1196" src="/ItalianExperience/assets/img/travel/culinary/culinary-hero-02.jpg" alt="Pasta making" loading="eager" fetchpriority="high" decoding="async">
           </picture>
         </div>
 
-        <div class="swiper-slide hero-slide">
+        <div class="swiper-slide hero-slide ie-gallery-slide">
           <picture>
             <source type="image/avif" srcset="/ItalianExperience/assets/img/travel/culinary/culinary-hero-03-960.avif 960w, /ItalianExperience/assets/img/travel/culinary/culinary-hero-03-1280.avif 1280w, /ItalianExperience/assets/img/travel/culinary/culinary-hero-03-1920.avif 1920w" sizes="100vw">
             <img width="1920" height="1440" src="/ItalianExperience/assets/img/travel/culinary/culinary-hero-03.jpg" alt="Kitchen atmosphere" loading="lazy" decoding="async">
@@ -114,7 +114,7 @@
 
       <div class="ie-hero-overlay-layer ie-hero-overlay-soft" aria-hidden="true"></div>
 
-      <div class="hero-overlay-content ie-hero-content-layer ie-hero-lockup">
+      <div class="hero-overlay-content ie-hero-content-layer ie-hero-lockup ie-gallery-overlay">
         <h3 class="ie-hero-eyebrow mb-6">
           Mastering the Craft
         </h3>
@@ -128,7 +128,7 @@
         <p class="ie-hero-lead max-w-[420px] md:max-w-none">
           Professional Gastronomy & Regional Apprenticeships
         </p>
-        <a class="hero-form-cta" href="#culinary-contact" aria-label="Go to contact form">
+        <a class="hero-form-cta ie-btn-primary" href="#culinary-contact" aria-label="Go to contact form">
           Contact Form
         </a>
       </div>
@@ -278,7 +278,7 @@
 
         <div class="mt-16 text-center">
           <a href="/ItalianExperience/contact/"
-            class="request-info-btn inline-block px-12 py-4 border border-[#c5a059] text-[#c5a059] uppercase text-[0.7rem] tracking-[0.4em] hover:bg-[#c5a059] hover:text-[#080808] transition-all duration-500 font-bold">
+            class="request-info-btn ie-btn-primary inline-block px-12 py-4 border border-[#c5a059] text-[#c5a059] uppercase text-[0.7rem] tracking-[0.4em] hover:bg-[#c5a059] hover:text-[#080808] transition-all duration-500 font-bold">
             Request Information
           </a>
         </div>
@@ -344,7 +344,7 @@
                 <textarea class="service-field service-textarea ie-form-field ie-form-textarea" id="culinary-goals" name="MultiLine2" maxlength="65535" required></textarea>
               </div>
               <div class="service-full ie-form-full">
-                <button class="service-btn ie-form-btn" type="submit">Submit Request</button>
+                <button class="service-btn ie-form-btn ie-btn-primary" type="submit">Submit Request</button>
               </div>
             </div>
           </form>

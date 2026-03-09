@@ -122,31 +122,6 @@
       height:100%;
     }
 
-    .step-node{
-      width:45px;
-      height:45px;
-      border:1px solid var(--brand-gold);
-      border-radius:999px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:var(--brand-obsidian);
-      z-index:10;
-      font-weight:700;
-      color:var(--brand-gold);
-      font-size:0.85rem;
-      flex-shrink:0;
-    }
-
-    .timeline-line{
-      position:absolute;
-      left:22px;
-      top:0;
-      bottom:0;
-      width:1px;
-      background:linear-gradient(to bottom, transparent, rgba(255,255,255,0.1) 15%, rgba(255,255,255,0.1) 85%, transparent);
-    }
-
     .service-checks{display:grid; grid-template-columns:1fr 1fr; gap:0.55rem}
     .service-check{display:flex; gap:0.5rem; align-items:flex-start; font-size:0.78rem; color:#cbd5e1}
     .service-check input{accent-color:#c5a059; margin-top:0.2rem}
@@ -165,7 +140,6 @@
 
     @media (max-width:768px){
       .glass-card{padding:1.8rem;}
-      .timeline-line{display:none;}
       .service-checks{grid-template-columns:1fr}
       .hero-content.ie-hero-lockup{
         padding-bottom:calc(118px + env(safe-area-inset-bottom)) !important;
@@ -381,10 +355,10 @@
       </div>
 
       <div class="space-y-16 relative">
-        <div class="timeline-line hidden md:block"></div>
+        <div class="timeline-line ie-timeline-track hidden md:block"></div>
 
-        <div class="flex gap-8 items-start relative">
-          <div class="step-node">01</div>
+        <div class="flex gap-8 items-start relative ie-timeline-step">
+          <div class="step-node ie-timeline-node">01</div>
           <div class="glass-card ie-card ie-card-glass ie-card-hover w-full">
             <h4 class="text-lg font-bold uppercase tracking-widest text-white mb-2 italic">Technical Vetting</h4>
             <p class="text-slate-500 text-sm font-light leading-relaxed">
@@ -393,8 +367,8 @@
           </div>
         </div>
 
-        <div class="flex gap-8 items-start relative">
-          <div class="step-node">02</div>
+        <div class="flex gap-8 items-start relative ie-timeline-step">
+          <div class="step-node ie-timeline-node">02</div>
           <div class="glass-card ie-card ie-card-glass ie-card-hover w-full border-l-4 border-[#c5a059]">
             <h4 class="text-lg font-bold uppercase tracking-widest text-white mb-2 italic">Legal and Logistics</h4>
             <p class="text-slate-500 text-sm font-light leading-relaxed">
@@ -403,8 +377,8 @@
           </div>
         </div>
 
-        <div class="flex gap-8 items-start relative">
-          <div class="step-node">03</div>
+        <div class="flex gap-8 items-start relative ie-timeline-step">
+          <div class="step-node ie-timeline-node">03</div>
           <div class="glass-card ie-card ie-card-glass ie-card-hover w-full">
             <h4 class="text-lg font-bold uppercase tracking-widest text-white mb-2 italic">Ambassador Term</h4>
             <p class="text-slate-500 text-sm font-light leading-relaxed">

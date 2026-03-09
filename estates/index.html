@@ -90,24 +90,6 @@
       background:var(--brand-gold);
     }
 
-    .disclosure-card{
-      padding:3rem;
-      border:1px solid rgba(197,160,89,0.1);
-      background:rgba(255,255,255,0.01);
-      max-width:900px;
-      margin:0 auto;
-      text-align:center;
-    }
-
-    .legal-notice-text{
-      font-size:0.65rem;
-      line-height:2.2;
-      color:#666;
-      text-align:justify;
-      text-transform:uppercase;
-      letter-spacing:0.12em;
-    }
-
     @media (max-width:1024px){
       .hero-bg-estates{
         filter:brightness(0.6) contrast(1.1);
@@ -152,7 +134,7 @@
           Strategic advisory for the acquisition of prestigious Italian real estate. We navigate legal frameworks,
           fiscal structures, and cultural value to protect your long-term investment.
         </p>
-        <a class="hero-form-cta" href="#estates-contact" aria-label="Go to contact form">Contact Form</a>
+        <a class="hero-form-cta ie-btn-primary" href="#estates-contact" aria-label="Go to contact form">Contact Form</a>
       </div>
 
       <a href="#framework" class="explore-indicator" aria-label="Explore the strategy">
@@ -263,11 +245,11 @@
 
     <section class="py-24 px-8 bg-[#000]">
       <div class="max-w-4xl mx-auto ie-reveal">
-        <div class="disclosure-card">
+        <div class="disclosure-card ie-disclosure-card">
           <h5 class="font-bold uppercase text-[0.6rem] tracking-[0.4em] mb-8 text-slate-400 italic underline decoration-[#c5a059]/40">
             Real Estate Disclosure
           </h5>
-          <div class="legal-notice-text">
+          <div class="legal-notice-text ie-disclosure-text">
             Italian Heritage Estates is a strategic consultancy service. All real estate transactions are conducted through licensed professionals in accordance with Italian Civil Code and applicable fiscal regulations. We operate as advisory partners to ensure transparency, legal compliance, and long-term asset protection for cross-border acquisitions.
           </div>
         </div>
@@ -331,7 +313,7 @@
                 <textarea class="service-field service-textarea ie-form-field ie-form-textarea" id="estates-goals" name="MultiLine6" maxlength="65535" required></textarea>
               </div>
               <div class="service-full ie-form-full">
-                <button class="service-btn ie-form-btn" type="submit">Submit Request</button>
+                <button class="service-btn ie-form-btn ie-btn-primary" type="submit">Submit Request</button>
               </div>
             </div>
           </form>
