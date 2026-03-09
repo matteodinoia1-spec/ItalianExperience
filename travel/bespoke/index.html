@@ -139,25 +139,25 @@
 
   <div id="site-header"></div>
 
-  <header class="hero-odyssey ie-hero-shell ie-hero-offset" aria-label="Bespoke Hero">
-    <div class="swiper hero-swiper ie-hero-bg-layer">
+  <header class="hero-odyssey ie-hero-shell ie-hero-offset ie-hero--swiper" aria-label="Bespoke Hero">
+    <div class="swiper hero-swiper ie-hero-bg-layer ie-gallery-swiper">
       <div class="swiper-wrapper">
 
-        <div class="swiper-slide hero-slide">
+        <div class="swiper-slide hero-slide ie-gallery-slide">
           <picture>
             <source type="image/avif" srcset="/ItalianExperience/assets/img/travel/travel-bespoke-960.avif 960w, /ItalianExperience/assets/img/travel/travel-bespoke-1280.avif 1280w, /ItalianExperience/assets/img/travel/travel-bespoke-1920.avif 1920w" sizes="100vw">
             <img width="1920" height="1272" src="/ItalianExperience/assets/img/travel/travel-bespoke.jpg" alt="Italy coastline" loading="eager" fetchpriority="high" decoding="async">
           </picture>
         </div>
 
-        <div class="swiper-slide hero-slide">
+        <div class="swiper-slide hero-slide ie-gallery-slide">
           <picture>
             <source type="image/avif" srcset="/ItalianExperience/assets/img/travel/bespoke/bespoke-hero-02-960.avif 960w, /ItalianExperience/assets/img/travel/bespoke/bespoke-hero-02-1280.avif 1280w, /ItalianExperience/assets/img/travel/bespoke/bespoke-hero-02-1920.avif 1920w" sizes="100vw">
             <img width="1920" height="2912" src="/ItalianExperience/assets/img/travel/bespoke/bespoke-hero-02.jpg" alt="Venice canals" loading="lazy" decoding="async">
           </picture>
         </div>
 
-        <div class="swiper-slide hero-slide">
+        <div class="swiper-slide hero-slide ie-gallery-slide">
           <picture>
             <source type="image/avif" srcset="/ItalianExperience/assets/img/travel/travel-hero-960.avif 960w, /ItalianExperience/assets/img/travel/travel-hero-1280.avif 1280w, /ItalianExperience/assets/img/travel/travel-hero-1920.avif 1920w" sizes="100vw">
             <img width="1920" height="1281" src="/ItalianExperience/assets/img/travel/travel-hero.jpg" alt="Florence landscape" loading="lazy" decoding="async">
@@ -168,7 +168,7 @@
 
       <div class="ie-hero-overlay-layer ie-hero-overlay-soft" aria-hidden="true"></div>
 
-      <div class="hero-overlay-content ie-hero-content-layer ie-hero-lockup">
+      <div class="hero-overlay-content ie-hero-content-layer ie-hero-lockup ie-gallery-overlay">
         <h3 class="ie-hero-eyebrow mb-6">
           Private Advisory
         </h3>
@@ -182,7 +182,7 @@
         <p class="ie-hero-lead max-w-[340px] md:max-w-none">
           Curated Experiences Across Italy
         </p>
-        <a class="hero-form-cta" href="#bespoke-contact" aria-label="Go to contact form">
+        <a class="hero-form-cta ie-btn-primary" href="#bespoke-contact" aria-label="Go to contact form">
           Contact Form
         </a>
       </div>
@@ -236,12 +236,12 @@
         </h2>
       </div>
 
-      <div class="swiper location-swiper">
+      <div class="swiper location-swiper ie-gallery-swiper">
         <div class="swiper-wrapper">
 
-          <div class="swiper-slide location-card">
+          <div class="swiper-slide location-card ie-gallery-slide">
             <img width="800" height="1204" src="/ItalianExperience/assets/img/travel/bespoke/bespoke-amalfi.jpg" alt="Amalfi Coast" loading="lazy" decoding="async">
-            <div class="location-info">
+            <div class="location-info ie-gallery-overlay">
               <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">
                 Coastal Sanctuary
               </span>
@@ -252,9 +252,9 @@
             </div>
           </div>
 
-          <div class="swiper-slide location-card">
+          <div class="swiper-slide location-card ie-gallery-slide">
             <img width="800" height="1200" src="/ItalianExperience/assets/img/travel/bespoke/bespoke-tuscany.jpg" alt="Tuscany hills" loading="lazy" decoding="async">
-            <div class="location-info">
+            <div class="location-info ie-gallery-overlay">
               <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">
                 Rural Continuity
               </span>
@@ -265,9 +265,9 @@
             </div>
           </div>
 
-          <div class="swiper-slide location-card">
+          <div class="swiper-slide location-card ie-gallery-slide">
             <img width="800" height="1200" src="/ItalianExperience/assets/img/travel/bespoke/bespoke-venice.jpg" alt="Venice canals" loading="lazy" decoding="async">
-            <div class="location-info">
+            <div class="location-info ie-gallery-overlay">
               <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">
                 Floating Legacy
               </span>
@@ -278,9 +278,9 @@
             </div>
           </div>
 
-          <div class="swiper-slide location-card">
+          <div class="swiper-slide location-card ie-gallery-slide">
             <img width="800" height="583" src="/ItalianExperience/assets/img/travel/bespoke/bespoke-rome.jpg" alt="Rome Colosseum" loading="lazy" decoding="async">
-            <div class="location-info">
+            <div class="location-info ie-gallery-overlay">
               <span class="text-[#c5a059] text-[0.6rem] uppercase tracking-widest block mb-2 font-bold">
                 Urban Antiquity
               </span>
@@ -395,7 +395,7 @@
                 <textarea class="bespoke-field bespoke-textarea ie-form-field ie-form-textarea" id="bespoke-vision" name="MultiLine" maxlength="65535" required></textarea>
               </div>
               <div class="bespoke-full ie-form-full">
-                <button class="bespoke-btn ie-form-btn" type="submit">Submit Request</button>
+                <button class="bespoke-btn ie-form-btn ie-btn-primary" type="submit">Submit Request</button>
               </div>
             </div>
           </form>
