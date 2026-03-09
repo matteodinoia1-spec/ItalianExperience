@@ -29,45 +29,60 @@
   <style>
     .privacy-hero {
       width: 100%;
-      min-height: 40vh;
-      min-height: 40dvh;
+      min-height: 38vh;
+      min-height: 38dvh;
       position: relative;
       overflow: hidden;
-      background: #080808;
+      background: var(--brand-obsidian);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 4rem 2rem 3rem;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: var(--ie-space-hero) 2rem 3rem;
+      border-bottom: 1px solid var(--ice-border);
     }
     .privacy-hero-content {
       position: relative;
       z-index: 10;
-      max-width: 820px;
+      max-width: 720px;
       text-align: center;
     }
+    .privacy-hero-intro {
+      color: rgba(255,255,255,0.7);
+      font-weight: 300;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-top: 1.25rem;
+    }
     .privacy-content {
-      max-width: 720px;
+      max-width: 680px;
       margin-left: auto;
       margin-right: auto;
       text-align: left;
     }
+    .privacy-section {
+      background: var(--ice-bg);
+      border: 1px solid var(--ice-border);
+      border-radius: var(--radius-premium);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .privacy-section:last-of-type { margin-bottom: 0; }
     .privacy-content h2 {
       color: var(--brand-gold);
       font-size: 0.65rem;
       font-weight: 600;
       letter-spacing: 0.35em;
       text-transform: uppercase;
-      margin-bottom: 0.75rem;
-      margin-top: 2.5rem;
+      margin-bottom: 0.85rem;
+      margin-top: 0;
     }
-    .privacy-content h2:first-of-type { margin-top: 0; }
+    .privacy-content h2 + p { margin-top: 0; }
     .privacy-content p {
-      color: rgba(255,255,255,0.75);
+      color: rgba(255,255,255,0.78);
       font-weight: 300;
       line-height: 1.85;
-      font-size: 0.95rem;
-      margin-bottom: 1.25rem;
+      font-size: 0.9375rem;
+      margin-bottom: 1rem;
     }
     .privacy-content p:last-child { margin-bottom: 0; }
     .privacy-content a {
@@ -76,6 +91,53 @@
       text-underline-offset: 0.2em;
     }
     .privacy-content a:hover { opacity: 0.9; }
+    .privacy-preferences {
+      background: var(--ice-bg);
+      border: 1px solid var(--ice-border);
+      border-radius: var(--radius-premium);
+      padding: 2rem;
+      margin-top: 2.5rem;
+    }
+    .privacy-preferences h2 { margin-bottom: 0.5rem; }
+    .privacy-preferences p {
+      margin-bottom: 1.25rem;
+      font-size: 0.9rem;
+    }
+    .privacy-preferences-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    .privacy-pref-btn {
+      display: inline-block;
+      padding: 0.6rem 1.25rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-radius: var(--radius-premium);
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+      border: 1px solid var(--ice-border);
+      background: transparent;
+      color: rgba(255,255,255,0.9);
+      font-family: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .privacy-pref-btn:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.2);
+    }
+    .privacy-pref-btn--primary {
+      background: var(--brand-gold);
+      color: var(--brand-obsidian);
+      border-color: var(--brand-gold);
+    }
+    .privacy-pref-btn--primary:hover {
+      background: rgba(197,160,89,0.9);
+      border-color: var(--brand-gold);
+    }
   </style>
 </head>
 
@@ -93,63 +155,97 @@
         <h1 class="brand-font text-4xl md:text-5xl lg:text-6xl italic text-white leading-tight">
           Privacy & Cookie Policy
         </h1>
+        <p class="privacy-hero-intro">
+          How we handle your data and cookies on this website — clear, transparent, and respectful of your choices.
+        </p>
       </div>
     </section>
 
     <section class="py-16 md:py-24 px-6 md:px-8 bg-[#080808]" aria-label="Policy content">
       <div class="privacy-content">
 
-        <h2 id="intro">Introduction</h2>
-        <p>
-          This page explains how Italian Experience handles basic website privacy and cookie information. We believe in a clear and respectful browsing experience and aim to provide transparent information about how data may be collected and used through this website.
-        </p>
+        <div class="privacy-section">
+          <h2 id="intro">Introduction</h2>
+          <p>
+            This page explains how Italian Experience handles basic website privacy and cookie information. We believe in a clear and respectful browsing experience and aim to provide transparent information about how data may be collected and used through this website.
+          </p>
+        </div>
 
-        <h2 id="who-we-are">Who we are</h2>
-        <p>
-          Italian Experience is a cultural and hospitality platform connecting international guests, partners, and professionals with Italian travel experiences, culinary products, and selected opportunities inspired by Italian excellence.
-        </p>
+        <div class="privacy-section">
+          <h2 id="who-we-are">Who we are</h2>
+          <p>
+            Italian Experience is a cultural and hospitality platform connecting international guests, partners, and professionals with Italian travel experiences, culinary products, and selected opportunities inspired by Italian excellence.
+          </p>
+        </div>
 
-        <h2 id="data-we-collect">Data we collect</h2>
-        <p>
-          When you browse this website, certain technical information may be collected automatically, such as browser type, device type, pages visited, and approximate geographic information derived from IP address.
-        </p>
-        <p>
-          If you contact us through a form on the website, we may also collect personal information such as your name, email address, and the content of your message.
-        </p>
+        <div class="privacy-section">
+          <h2 id="data-we-collect">Data we collect</h2>
+          <p>
+            When you browse this website, certain technical information may be collected automatically, such as browser type, device type, pages visited, and approximate geographic information derived from IP address.
+          </p>
+          <p>
+            If you contact us through a form on the website, we may also collect personal information such as your name, email address, and the content of your message.
+          </p>
+        </div>
 
-        <h2 id="how-we-use-data">How we use data</h2>
-        <p>
-          Information collected through this website may be used to operate and maintain the website, respond to inquiries, and improve usability, performance, and user experience.
-        </p>
-        <p>
-          Italian Experience does not sell personal data to third parties.
-        </p>
+        <div class="privacy-section">
+          <h2 id="how-we-use-data">How we use data</h2>
+          <p>
+            Information collected through this website may be used to operate and maintain the website, respond to inquiries, and improve usability, performance, and user experience.
+          </p>
+          <p>
+            Italian Experience does not sell personal data to third parties.
+          </p>
+        </div>
 
-        <h2 id="cookies">Cookies</h2>
-        <p>
-          Cookies are small text files stored on your device when you visit a website. They help websites function correctly and, in some cases, help understand how visitors interact with online content.
-        </p>
-        <p>
-          At this stage, this website primarily uses technical cookies necessary for proper operation and user experience. In the future, analytics tools may be introduced to better understand website traffic and improve services.
-        </p>
-        <p>
-          Users can manage their cookie preferences through the cookie banner displayed on the website.
-        </p>
+        <div class="privacy-section">
+          <h2 id="cookies">Cookies</h2>
+          <p>
+            Cookies are small text files stored on your device when you visit a website. They help websites function correctly and, in some cases, help understand how visitors interact with online content.
+          </p>
+          <p>
+            At this stage, this website primarily uses technical cookies necessary for proper operation and user experience. In the future, analytics tools may be introduced to better understand website traffic and improve services.
+          </p>
+          <p>
+            Users can manage their cookie preferences through the cookie banner displayed on the website.
+          </p>
+        </div>
 
-        <h2 id="managing-cookies">Managing cookies</h2>
-        <p>
-          Most web browsers allow users to review, delete, or block cookies through browser settings. Please note that disabling certain cookies may affect the correct functionality of some parts of the website.
-        </p>
+        <div class="privacy-section">
+          <h2 id="managing-cookies">Managing cookies</h2>
+          <p>
+            Most web browsers allow users to review, delete, or block cookies through browser settings. Please note that disabling certain cookies may affect the correct functionality of some parts of the website.
+          </p>
+        </div>
 
-        <h2 id="third-party">Third-party services</h2>
-        <p>
-          This website may include or integrate third-party services in the future, such as analytics tools or embedded content. If and when those services are introduced, this page will be updated accordingly.
-        </p>
+        <div class="privacy-section">
+          <h2 id="third-party">Third-party services</h2>
+          <p>
+            This website may include or integrate third-party services in the future, such as analytics tools or embedded content. If and when those services are introduced, this page will be updated accordingly.
+          </p>
+        </div>
 
-        <h2 id="contact">Contact</h2>
-        <p>
-          For any question regarding this Privacy & Cookie Policy, please contact Italian Experience through the <a href="/ItalianExperience/contact/">contact page</a> available on this website.
-        </p>
+        <div class="privacy-section">
+          <h2 id="contact">Contact</h2>
+          <p>
+            For any question regarding this Privacy & Cookie Policy, please contact Italian Experience through the <a href="/ItalianExperience/contact/">contact page</a> available on this website.
+          </p>
+        </div>
+
+        <div class="privacy-preferences" id="cookie-preferences">
+          <h2 id="cookie-preferences-heading">Cookie Preferences</h2>
+          <p>
+            You can review your current cookie choice or revoke consent at any time. Revoking will clear your stored preference and show the cookie banner again so you can choose again.
+          </p>
+          <div class="privacy-preferences-actions" aria-labelledby="cookie-preferences-heading">
+            <button type="button" class="privacy-pref-btn privacy-pref-btn--primary" id="privacy-review-cookies" data-action="review">
+              Review cookie choices
+            </button>
+            <button type="button" class="privacy-pref-btn" id="privacy-revoke-consent" data-action="revoke">
+              Revoke consent
+            </button>
+          </div>
+        </div>
 
       </div>
     </section>
@@ -160,6 +256,30 @@
 
   <script src="/ItalianExperience/assets/js/bootstrap.js"></script>
   <script defer src="/ItalianExperience/assets/js/cookie-consent.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      function attachConsentHandlers() {
+        if (typeof window.IECookieConsent === 'undefined') {
+          setTimeout(attachConsentHandlers, 50);
+          return;
+        }
+        var review = document.getElementById('privacy-review-cookies');
+        var revoke = document.getElementById('privacy-revoke-consent');
+        if (review) {
+          review.addEventListener('click', function () {
+            window.IECookieConsent.reopenBanner();
+          });
+        }
+        if (revoke) {
+          revoke.addEventListener('click', function () {
+            window.IECookieConsent.resetConsent();
+            window.IECookieConsent.reopenBanner();
+          });
+        }
+      }
+      attachConsentHandlers();
+    });
+  </script>
 
 </body>
 </html>

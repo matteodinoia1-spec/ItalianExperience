@@ -73,6 +73,37 @@
     attachListeners(banner);
   }
 
+  function showBanner(bannerEl) {
+    if (!bannerEl) return;
+    bannerEl.removeAttribute('aria-hidden');
+    bannerEl.style.display = '';
+  }
+
+  function reopenBanner() {
+    var banner = document.getElementById('cookie-banner');
+    if (banner) {
+      showBanner(banner);
+      return;
+    }
+    fetch(BANNER_URL)
+      .then(function (res) { return res.ok ? res.text() : Promise.reject(new Error('Not ok')); })
+      .then(function (html) {
+        var mount = getOrCreateMount();
+        mount.innerHTML = html;
+        var b = document.getElementById('cookie-banner');
+        attachListeners(b);
+        showBanner(b);
+        bannerInjected = true;
+      })
+      .catch(function () {});
+  }
+
+  function resetConsent() {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (e) {}
+  }
+
   function init() {
     if (getConsent() !== null) return;
     if (fetchStarted) return;
@@ -93,7 +124,9 @@
   window.IECookieConsent = {
     hasAccepted: function () {
       return localStorage.getItem(STORAGE_KEY) === 'accepted';
-    }
+    },
+    reopenBanner: reopenBanner,
+    resetConsent: resetConsent
   };
 
   if (document.readyState === 'loading') {
