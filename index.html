@@ -587,6 +587,49 @@
       width:140px;
     }
     .hero-tricolore-line div{flex:1}
+
+    /* Desktop hero scroll indicator (local to home hero) */
+    .hero-scroll-indicator{
+      position:absolute;
+      bottom:2.5rem;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:30;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:1rem;
+      opacity:0.75;
+      transition:opacity 0.4s ease, transform 0.4s ease;
+      pointer-events:none;
+    }
+    .hero-scroll-text{
+      font-size:0.6rem;
+      text-transform:uppercase;
+      letter-spacing:0.4em;
+      color:var(--brand-gold);
+    }
+    .hero-scroll-line{
+      width:1px;
+      height:50px;
+      background:linear-gradient(to bottom, var(--brand-gold), transparent);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero-scroll-line::after{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:#fff;
+      animation:hero-scroll-anim 2s infinite cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes hero-scroll-anim{
+      0%{transform:translateY(-100%)}
+      100%{transform:translateY(100%)}
+    }
     .hero-portal-wrapper{
       display:flex;
       width:100%;
@@ -816,9 +859,9 @@
         <a href="/ItalianExperience/contact/" class="hero-contact-link" id="hero-contact-link">Contact</a>
       </header>
 
-      <div class="scroll-indicator" id="hero-scroll-indicator">
-        <span>Scroll</span>
-        <div class="scroll-track"><div class="scroll-dot"></div></div>
+      <div class="hero-scroll-indicator" id="hero-scroll-indicator">
+        <span class="hero-scroll-text">Scroll</span>
+        <div class="hero-scroll-line"></div>
       </div>
 
       <main class="hero-portal-wrapper" aria-label="Italian Experience Portal">
