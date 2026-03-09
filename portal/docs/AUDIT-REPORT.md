@@ -26,7 +26,11 @@ All portal pages follow:
 2. Main: `<main class="portal-main ...">` with content, then `#portal-bottom-nav` (mobile), then `#portal-footer` (desktop/tablet only; breadcrumbs). No top toolbar; actions and filters are in content.
 3. No sidebar (removed)
 
-### 2.2 Inconsistencies
+### 2.2 Clickable row pattern (list tables)
+
+- Rows with `.clickable-row` open the entity detail on click (primary action). Hover state signals interactivity; action icons in the row are secondary actions; tooltips clarify icon actions. Styling in `styles/components/tables.css`.
+
+### 2.3 Inconsistencies
 
 | Issue | Location | Detail |
 |-------|----------|--------|
@@ -84,7 +88,7 @@ All portal pages follow:
 **Suggestions:**
 
 - Add a minimum touch target for primary interactive elements (e.g. `min-h-[44px] min-w-[44px]` or equivalent) for toggle, pagination, and main CTAs.
-- Fix archiviati header so the user block is present and aligned (see Section 2.2).
+- Fix archiviati header so the user block is present and aligned (see Section 2.3).
 
 ---
 

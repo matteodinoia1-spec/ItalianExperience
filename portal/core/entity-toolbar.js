@@ -28,12 +28,22 @@ function renderLifecycleActions(config) {
   var btnClass = "ie-btn ie-btn-secondary";
   var archiveBtnClass = "ie-btn ie-btn-danger";
 
+  var entityLabel = (function () {
+    var t = (config.entityType || "").toString();
+    if (t === "candidate") return "candidate";
+    if (t === "job_offer") return "job offer";
+    if (t === "client") return "client";
+    if (t === "application") return "application";
+    return "";
+  })();
+
   if (normalizedStatus === "active") {
     if (config.onEdit) {
       editBtn = document.createElement("button");
       editBtn.type = "button";
       editBtn.textContent = "Edit";
       editBtn.className = btnClass;
+      editBtn.title = entityLabel ? "Edit " + entityLabel : "Edit";
       editBtn.addEventListener("click", function () {
         config.onEdit();
       });
@@ -54,6 +64,7 @@ function renderLifecycleActions(config) {
       archiveBtn.type = "button";
       archiveBtn.textContent = "Archive";
       archiveBtn.className = archiveBtnClass;
+      archiveBtn.title = entityLabel ? "Archive " + entityLabel : "Archive";
       archiveBtn.addEventListener("click", async function () {
         await config.onArchive();
       });
@@ -75,6 +86,7 @@ function renderLifecycleActions(config) {
       archiveBtn.type = "button";
       archiveBtn.textContent = "Archive";
       archiveBtn.className = archiveBtnClass;
+      archiveBtn.title = entityLabel ? "Archive " + entityLabel : "Archive";
       archiveBtn.addEventListener("click", async function () {
         await config.onArchive();
       });

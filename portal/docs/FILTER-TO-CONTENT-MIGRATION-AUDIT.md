@@ -119,6 +119,7 @@
 - **Toolbar:** *(Removed.)* `toolbar.css` has been deleted; `.portal-toolbar`, `.toolbar-inner`, `.toolbar-left` / `.toolbar-right`, and `--portal-toolbar-height` have been removed from layout.css.
 - **Filters:** `styles/components/filters.css`: `.filter-bar` (flex, wrap), `.filter-group`, `.filter-label`, `.filter-input`, `.filter-select`. Mobile: column layout, full width.
 - **Content:** `.portal-content` (padding), `.page-container` (max-width, horizontal padding). List pages use `.page-layout-with-filters`, `.page-filters-column` (sticky), `.page-main-column`; action rows: `.page-list-actions`, `.page-detail-actions`, `.page-form-actions`.
+- **Clickable row pattern:** Table rows with `.clickable-row` open entity detail on row click (primary action). Hover state signals interactivity; action icons in the row are secondary actions; tooltips clarify icon actions. Styles in `styles/components/tables.css`.
 
 Important: **Sticky** filter column uses `top: calc(var(--portal-header-height) + var(--portal-safe-top))`; no toolbar offset. Body is the scroll container; no overflow on ancestors that would clip the sticky column.
 

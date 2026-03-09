@@ -289,10 +289,10 @@
 
       rows.forEach(function (app) {
         var tr = document.createElement("tr");
-        tr.className = "hover:bg-gray-50/70 cursor-pointer";
+        tr.className = "table-row transition clickable-row";
 
         var tdCandidate = document.createElement("td");
-        tdCandidate.className = "px-6 py-4 align-top";
+        tdCandidate.className = "ie-table-cell";
         var candidateName = app.candidate_name || "—";
         if (app.candidate_id) {
           var cLink = document.createElement("a");
@@ -308,7 +308,7 @@
         }
 
         var tdOffer = document.createElement("td");
-        tdOffer.className = "px-6 py-4 align-top";
+        tdOffer.className = "ie-table-cell";
         var jobTitle = app.job_offer_title || "—";
         if (app.job_offer_id) {
           var oLink = document.createElement("a");
@@ -325,7 +325,7 @@
         }
 
         var tdClient = document.createElement("td");
-        tdClient.className = "px-6 py-4 align-top";
+        tdClient.className = "ie-table-cell";
         var clientName = app.client_name || "—";
         if (app.client_id) {
           var clLink = document.createElement("a");
@@ -342,7 +342,7 @@
         }
 
         var tdStatus = document.createElement("td");
-        tdStatus.className = "px-6 py-4 align-top";
+        tdStatus.className = "ie-table-cell";
         var currentStatus = (app.status || "applied").toLowerCase();
         var badgeSpan = document.createElement("span");
         badgeSpan.className =
@@ -351,7 +351,7 @@
         tdStatus.appendChild(badgeSpan);
 
         var tdUpdated = document.createElement("td");
-        tdUpdated.className = "px-6 py-4 align-top text-gray-700";
+        tdUpdated.className = "ie-table-cell text-gray-400";
         var updated = app.updated_at || app.created_at || null;
         tdUpdated.textContent = updated
           ? new Date(updated).toLocaleDateString("it-IT")

@@ -20,6 +20,7 @@
 
 - **portal-header** → **portal-content** → **portal-bottom-nav** → **portal-footer**. Footer and bottom-nav containers are get-or-create by `header-loader.js` inside `.portal-main`; DOM order is content, then `#portal-bottom-nav`, then `#portal-footer`. On mobile the footer is hidden (not displayed); main padding reserves space for bottom nav only.
 - **portal-content** (`.portal-content`) — Tables, cards, forms, and all page-specific layout (filter columns, action rows). List pages use `.page-layout-with-filters` with `.page-filters-column` (sticky left) and `.page-main-column`; primary CTAs in `.page-list-actions`. Detail pages use `.page-detail-actions`; form pages use `.page-form-actions` and `[data-entity-mode-indicator]`.
+- **Clickable row pattern:** Rows with `.clickable-row` open the entity detail on click (primary action). A hover state signals interactivity; action icons in the row (view, edit, archive, etc.) are secondary actions. Tooltips on icons clarify each action. Styles live in `styles/components/tables.css`.
 - Layout spacing: header, content, bottom nav (mobile), and footer (desktop/tablet) use design tokens; iOS/safe-area insets applied (e.g. `--portal-safe-top`, `--portal-safe-bottom`). Sticky filter column uses `top: calc(var(--portal-header-height) + var(--portal-safe-top))`. No `toolbar.css` or `--portal-toolbar-height`. Main padding-bottom reserves space for footer on desktop/tablet and for bottom nav on mobile.
 
 ---

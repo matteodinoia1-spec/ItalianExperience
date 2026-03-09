@@ -1,4 +1,6 @@
-/* Portal design system: tables */
+/* Portal design system: tables
+   Global row-height and cell consistency for candidates, clients, job offers,
+   applications, and archived tables. Single source for padding and alignment. */
 
 .ie-table {
   width: 100%;
@@ -11,21 +13,32 @@
   border-bottom: 1px solid #e5e7eb;
 }
 
+/* Shared cell padding and alignment – compact, professional ATS/CRM feel */
+.ie-table th,
+.ie-table td {
+  padding: 0.5rem 1rem;
+  vertical-align: middle;
+  color: #374151;
+}
+
 .ie-table th {
   text-align: left;
   font-weight: 600;
-  padding: 0.75rem 1rem;
-  color: #374151;
 }
 
 .ie-table td {
-  padding: 0.75rem 1rem;
   border-bottom: 1px solid #f3f4f6;
-  color: #374151;
 }
 
-.ie-table th,
-.ie-table td {
+/* Optional: use on thead th when you want to rely on global padding (avoids inline py overrides) */
+.ie-table-th {
+  padding: 0.5rem 1rem;
+  vertical-align: middle;
+}
+
+/* Data cells: use when rendering rows so global padding applies (no inline py/px needed) */
+.ie-table-cell {
+  padding: 0.5rem 1rem;
   vertical-align: middle;
 }
 
@@ -37,9 +50,16 @@
   background: #f9fafb;
 }
 
+/* Action column: right-aligned, same row height, buttons aligned in a row */
 .ie-table-actions {
   text-align: right;
   white-space: nowrap;
+  padding: 0.5rem 1rem;
+  vertical-align: middle;
+}
+
+.ie-table-actions .flex {
+  justify-content: flex-end;
 }
 
 .ie-table tbody tr.is-clickable:hover {
@@ -82,11 +102,28 @@
   text-decoration: underline;
 }
 
+/* Clickable table rows (primary action = open entity; secondary = action icons) */
 .clickable-row {
   cursor: pointer;
+  transition: background-color 0.13s ease;
 }
 
 .clickable-row:hover {
-  background: rgba(0, 0, 0, 0.03);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.clickable-row:focus-visible {
+  outline: 2px solid var(--gold, #c5a059);
+  outline-offset: -2px;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Action icons in rows: secondary actions; keep distinct on hover */
+.clickable-row .ie-btn {
+  cursor: pointer;
+}
+
+.clickable-row .ie-btn-secondary:hover {
+  color: #0f172a;
 }
 

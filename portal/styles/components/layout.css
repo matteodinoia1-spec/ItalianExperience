@@ -28,8 +28,12 @@
   box-sizing: border-box;
 }
 
+/* Desktop/tablet: use full shell width (no max-width cap) so content stretches; header/footer already full width with shell padding */
 @media (min-width: 769px) {
   .page-container {
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
     padding-left: var(--portal-padding-x-desktop);
     padding-right: var(--portal-padding-x-desktop);
   }
