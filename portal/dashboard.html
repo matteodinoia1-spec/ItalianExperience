@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Dashboard | Italian Experience Recruitment</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,24 +14,9 @@
 <body class="flex min-h-screen" style="visibility: hidden;">
 
     <div class="portal-shell">
-        <!-- SIDEBAR (loaded dynamically from sidebar.html) -->
-        <div id="sidebar"></div>
-
         <!-- MAIN CONTENT -->
-        <main class="portal-main flex-1 flex flex-col min-w-0">
+        <main class="portal-main portal-main--no-toolbar flex-1 flex flex-col min-w-0">
         <div id="portal-header"></div>
-
-        <div class="portal-toolbar sticky-toolbar">
-            <div class="page-container toolbar-inner">
-                <div class="toolbar-left">
-                    <div class="portal-toolbar__left"></div>
-                </div>
-                <div class="portal-toolbar__center"></div>
-                <div class="toolbar-right">
-                    <div class="portal-toolbar__right"></div>
-                </div>
-            </div>
-        </div>
 
         <!-- Page Content -->
         <div class="page-container">
@@ -105,10 +90,10 @@
                         <table class="ie-table w-full text-left">
                             <thead class="bg-gray-50/50 text-gray-500 text-[10px] uppercase tracking-widest">
                                 <tr>
-                                    <th class="px-6 py-4 font-bold">Name</th>
-                                    <th class="px-6 py-4 font-bold">Desired role</th>
-                                    <th class="px-6 py-4 font-bold">Date</th>
-                                    <th class="px-6 py-4 font-bold">Status</th>
+                                    <th class="ie-table-th font-bold">Name</th>
+                                    <th class="ie-table-th font-bold">Desired role</th>
+                                    <th class="ie-table-th font-bold">Date</th>
+                                    <th class="ie-table-th font-bold">Status</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100" data-dashboard="recentCandidates">
@@ -148,8 +133,6 @@
     <script src="core/session-ready.js"></script>
     <script src="core/router.js"></script>
     <script src="runtime/router-runtime.js"></script>
-    <script src="runtime/layout-runtime.js"></script>
-    <script src="runtime/sidebar-runtime.js"></script>
     <script src="runtime/forms-runtime.js"></script>
     <script src="runtime/modals-runtime.js"></script>
     <script src="runtime/profile-runtime.js"></script>

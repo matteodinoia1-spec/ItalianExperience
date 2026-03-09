@@ -3,7 +3,7 @@
 **Date:** March 7, 2025  
 **Scope:** Duplicate layout init, protected-page scripts, candidate.html, session checks, documentation.
 
-**Note (post Phase 6):** The layout fix below (header-runtime does not call initLayout on ie:header-loaded) remains the current state. Phase 6 sidebar cleanup confirmed this; layout init is solely from page-bootstrap.
+**Note (post bottom-nav and toolbar removal):** The layout/sidebar runtimes have been removed. The top toolbar has also been fully removed; page actions and filters live in content. The shell is header + bottom nav + footer; `header-loader.js` mounts all three and dispatches `ie:header-loaded`. `page-bootstrap.js` runs header init, page initializers, then dynamically loads and runs `bottom-nav-runtime.js`. There is no `layout-runtime.js`, `sidebar-runtime.js`, toolbar runtime, `toolbar.css`, or `--portal-toolbar-height`. The findings and change report below are historical; the current script baseline is in `BOOTSTRAP-AND-SCRIPTS.md` (no layout-runtime or sidebar-runtime in the list).
 
 ---
 
@@ -18,42 +18,24 @@
 
 ### 2. Protected-page script baseline (candidate)
 
-**Common order across dashboard, candidates, application, job-offers, clients, add-candidate, add-client, add-job-offer, profile, archived:**
+**Common order across dashboard, candidates, application, job-offers, clients, add-candidate, add-client, add-job-offer, profile, archived:**  
+*(Historical; layout-runtime and sidebar-runtime have been removed. Current baseline in BOOTSTRAP-AND-SCRIPTS.md.)*
 
 1. `shared/header-loader.js`
 2. `core/debug.js`
 3. `https://cdn.jsdelivr.net/npm/@supabase/supabase-js`
 4. `core/supabase.js`
-5. *(optional page-specific: queries/applications.queries.js, jobOffers.queries.js, clients.queries.js)*
+5. *(optional page-specific: queries/*.queries.js)*
 6. `core/auth.js`
-7. `core/router.js`
-8. `runtime/router-runtime.js`
-9. `runtime/layout-runtime.js`
-10. `runtime/sidebar-runtime.js`
-11. `runtime/forms-runtime.js`
-12. `runtime/modals-runtime.js`
-13. `runtime/profile-runtime.js`
-14. `runtime/status-runtime.js`
-15. `runtime/associations-runtime.js`
-16. `runtime/candidate-profile-runtime.js`
-17. `runtime/candidate-runtime.js`
-18. `runtime/client-runtime.js`
-19. `runtime/job-offer-runtime.js`
-20. **`runtime/header-runtime.js`**
-21. **`runtime/entity-actions-runtime.js`**
-22. `runtime/page-bootstrap.js`
-23. `components/page-header.js`
-24. `core/entity-toolbar.js`
-25. `core/lists-runtime.js`
-26. `core/session/session.js`
-27. `core/ui/modals.js`
-28. `core/ui/previews.js`
-29. `core/app-shell.js`
-30. *(page-specific: activity-section.js, feature scripts, etc.)*
+7. `core/session-ready.js`
+8. `core/router.js`
+9. `runtime/router-runtime.js`
+10. `runtime/forms-runtime.js`
+11. `runtime/modals-runtime.js`
+12. `runtime/profile-runtime.js`
+… (see BOOTSTRAP-AND-SCRIPTS.md for full current baseline; no layout-runtime or sidebar-runtime; bottom-nav-runtime is loaded dynamically by page-bootstrap.)
 
-**Pages that deviate:** `candidate.html` omits **header-runtime.js** and **entity-actions-runtime.js** (scripts 20–21).
-
-*(This section describes the pre-change state. The current authoritative baseline, including `core/session-ready.js`, is in `portal/docs/BOOTSTRAP-AND-SCRIPTS.md`.)*
+*(This section described the pre–bottom-nav state. Current authoritative baseline: `portal/docs/BOOTSTRAP-AND-SCRIPTS.md`.)*
 
 ### 3. candidate.html deviations
 

@@ -1,6 +1,6 @@
-/* Portal design system: layout (header-first shell, sticky header + toolbar, sidebar mobile-only) */
+/* Portal design system: layout (header-first shell, sticky header, bottom nav on mobile) */
 
-/* Design tokens for portal header/toolbar (used by toolbar.css) */
+/* Design tokens for portal header */
 :root {
   --portal-bg: var(--ie-color-bg, #fdfcf8);
   --border-subtle: var(--ie-color-border-subtle, rgba(15, 23, 42, 0.08));
@@ -8,11 +8,19 @@
   --portal-padding-x-desktop: 48px;
   --portal-header-height: 72px;
   --portal-footer-height: 40px;
+  --portal-bottom-nav-height: 56px;
+  --portal-content-padding-top: 24px;
+  --portal-content-padding-bottom: 1.5rem;
+  --portal-shell-max-width: 1280px;
+  /* Safe area insets for iOS/notched devices (used in layout.css only) */
+  --portal-safe-top: env(safe-area-inset-top, 0px);
+  --portal-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --page-filters-column-width: 280px;
 }
 
-/* Shared page container: centers UI and aligns header, toolbar, content — consistent left/right spacing */
+/* Shared page container: centers UI and aligns header, content — consistent left/right spacing */
 .page-container {
-  max-width: 1200px;
+  max-width: var(--portal-shell-max-width);
   margin: 0 auto;
   padding-left: var(--portal-padding-x);
   padding-right: var(--portal-padding-x);
@@ -20,21 +28,12 @@
   box-sizing: border-box;
 }
 
+/* Desktop/tablet: use full shell width (no max-width cap) so content stretches; header/footer already full width with shell padding */
 @media (min-width: 769px) {
   .page-container {
-    padding-left: var(--portal-padding-x-desktop);
-    padding-right: var(--portal-padding-x-desktop);
-  }
-}
-
-/* Toolbar: ensure left padding is always applied (header + filters row) */
-.portal-toolbar .page-container {
-  padding-left: var(--portal-padding-x);
-  padding-right: var(--portal-padding-x);
-}
-
-@media (min-width: 769px) {
-  .portal-toolbar .page-container {
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
     padding-left: var(--portal-padding-x-desktop);
     padding-right: var(--portal-padding-x-desktop);
   }
@@ -48,6 +47,10 @@
   top: 0;
   left: 0;
   right: 0;
+  padding-top: var(--portal-safe-top);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  box-sizing: border-box;
   background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -59,26 +62,12 @@
   overflow: visible;
 }
 
-/* Mobile: when sidebar is open, header stays behind sidebar (z-index lower). Content of header shifts right so hamburger + title + user appear to the right of the sidebar — no band on top of the dashboard. */
-@media (max-width: 1024px) {
-  body.ie-sidebar-open .portal-header {
-    padding-left: var(--ie-sidebar-width, 280px);
-    z-index: 100;
-  }
-
-  body.ie-sidebar-open .portal-main {
-    padding-top: 0;
-  }
-}
-
-/* Header: left = toggle + breadcrumbs + title; right = user only — same horizontal padding as toolbar/content */
+/* Header: full-width row — nav at left shell padding, user at right shell padding (no centered max-width) */
 .portal-header__inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
   padding-left: var(--portal-padding-x);
   padding-right: var(--portal-padding-x);
   box-sizing: border-box;
@@ -91,31 +80,24 @@
   }
 }
 
-/* Desktop: full-width header inner; user at right edge with min margin */
-@media (min-width: 1025px) {
-  .portal-header__inner {
-    max-width: none;
-    width: 100%;
-    margin: 0;
-    padding-left: var(--portal-padding-x-desktop);
-    padding-right: 20px;
-  }
-}
-
+/* Navigation group: strictly left-aligned; does not grow */
 .portal-header__left {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 1rem;
-  flex: 0 1 auto;
+  flex: 0 0 auto;
   min-width: 0;
   overflow: visible;
 }
 
+/* User/profile group: strictly right-aligned */
 .portal-header__right {
   flex-shrink: 0;
   margin-left: auto;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 1.5rem;
 }
 
@@ -142,13 +124,11 @@
   content: "";
   position: absolute;
   left: 0;
-  right: 0;
-  bottom: 0;
+  bottom: -4px;
+  width: 0;
   height: 2px;
   background: var(--ie-color-accent, #c5a059);
-  transform: scaleX(0);
-  transform-origin: center;
-  transition: transform 0.2s ease;
+  transition: width 0.18s ease;
 }
 
 .portal-header-nav__link:hover {
@@ -156,7 +136,7 @@
 }
 
 .portal-header-nav__link:hover::after {
-  transform: scaleX(1);
+  width: 100%;
 }
 
 .portal-header-nav__item-with-sub {
@@ -211,7 +191,7 @@
 }
 
 .portal-header-nav__link--active::after {
-  transform: scaleX(1);
+  width: 100%;
 }
 
 /* User area: dropdown trigger + menu (desktop) */
@@ -258,13 +238,15 @@
   text-decoration: none;
 }
 
-/* Main shell: full viewport height. Do not add overflow (auto/scroll/hidden) here or on portal-page/portal-layout — sticky toolbar requires no scroll container between it and the viewport. */
+/* Main shell: full viewport height. Do not add overflow (auto/scroll/hidden) here or on portal-page/portal-layout — body is the scroll container for sticky layout. */
 .portal-main {
   min-height: 100vh;
+  min-height: 100dvh;
   display: block;
   overflow: visible;
-  padding-top: var(--portal-header-height);
+  padding-top: calc(var(--portal-header-height) + var(--portal-safe-top));
   padding-bottom: var(--portal-footer-height);
+  box-sizing: border-box;
 }
 
 /* Header wrapper: ensure sticky header is not constrained by flex stretch; no overflow that would break stickiness */
@@ -274,9 +256,11 @@
   align-self: flex-start;
 }
 
-/* Content area: no fixed header offset — header is in flow */
+/* Content area: vertical rhythm; bottom padding so last block is not flush to footer/bottom-nav */
 .portal-content {
-  padding-top: 24px;
+  padding-top: var(--portal-content-padding-top);
+  padding-bottom: var(--portal-content-padding-bottom);
+  box-sizing: border-box;
 }
 
 .portal-content > * {
@@ -298,7 +282,7 @@ body {
   }
 }
 
-/* Improve mobile layout spacing — consistent with header/toolbar so left content is not flush to edge */
+/* Mobile: consistent horizontal padding; content uses full width of page-container (no extra side padding) */
 @media (max-width: 768px) {
   .page-container {
     padding-left: var(--portal-padding-x);
@@ -319,22 +303,32 @@ body {
     padding-left: 0;
     padding-right: 0;
   }
-}
 
-@media (max-width: 768px) {
-  .portal-content {
-    padding-bottom: 72px;
+  /* Touch: ensure header user menu trigger has comfortable tap area on mobile */
+  .portal-header-user[data-user-menu-trigger] {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 6px 0;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
-/* Page header: full width, left aligned with table content (padding matches .page-container) */
+/* Page header: full width, left aligned with content (padding matches .page-container) */
 .page-header {
-  padding: 28px 40px 18px 40px;
+  padding: 28px var(--portal-padding-x) 18px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   border-bottom: 1px solid rgba(0,0,0,0.06);
   background: white;
+  box-sizing: border-box;
+}
+
+@media (min-width: 769px) {
+  .page-header {
+    padding-left: var(--portal-padding-x-desktop);
+    padding-right: var(--portal-padding-x-desktop);
+  }
 }
 
 .page-title {
@@ -362,12 +356,16 @@ body {
   gap: 10px;
 }
 
+/* Breadcrumbs: left-aligned (footer and header); visually aligned with header nav via same container padding */
 .page-breadcrumbs {
   font-size: 12px;
   color: var(--text-muted, #6b7280);
   margin-bottom: 6px;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
 }
 
 .breadcrumb-link {
@@ -423,34 +421,17 @@ body {
   text-align: left;
 }
 
-/* Mobile: when sidebar is open, hide breadcrumbs in header to reduce clutter — show only page title */
-@media (max-width: 1024px) {
-  body.ie-sidebar-open .header-page-info .page-breadcrumbs,
-  body.ie-sidebar-open #page-breadcrumbs {
-    display: none !important;
-  }
-
-  body.ie-sidebar-open .header-page-info__inner {
-    gap: 0;
-  }
-}
-
-/* Toolbar: full width bar below sticky header; sticks at header height so content is not overlapped */
-.portal-toolbar {
-  width: 100%;
-  background: white;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-  position: sticky;
-  top: var(--portal-header-height);
-  z-index: 20;
-}
-
 .portal-footer {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
   height: var(--portal-footer-height);
+  min-height: var(--portal-footer-height);
+  padding-bottom: var(--portal-safe-bottom);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  box-sizing: border-box;
   background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -458,15 +439,22 @@ body {
   z-index: 40;
 }
 
+/* Footer inner: full width with shell padding (same left/right as header); breadcrumbs left-aligned and vertically centered */
 .portal-footer__inner {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   height: 100%;
+  min-height: 100%;
   width: 100%;
   padding-left: var(--portal-padding-x);
   padding-right: var(--portal-padding-x);
   box-sizing: border-box;
+}
+
+.portal-footer__inner .page-breadcrumbs {
+  justify-content: flex-start;
+  text-align: left;
 }
 
 @media (min-width: 769px) {
@@ -476,29 +464,394 @@ body {
   }
 }
 
-.toolbar-inner {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 14px 0;
-  gap: 1rem;
+/* Mobile: hide footer entirely (no breadcrumbs, no footer strip) */
+@media (max-width: 768px) {
+  .portal-footer,
+  #portal-footer .portal-footer {
+    display: none !important;
+  }
 }
 
-.toolbar-left {
+
+/* Bottom nav: mobile-only bar anchored above the footer */
+#portal-bottom-nav {
+  display: none;
+}
+
+.portal-bottom-nav {
+  display: none;
+}
+
+/* Header page title: mobile only (replaces footer breadcrumbs) */
+.portal-header__page-title {
+  display: none;
+}
+
+/* Bottom nav: visible on mobile only */
+@media (max-width: 768px) {
+  #portal-bottom-nav {
+    display: block;
+  }
+
+  /* Page title in header: visible on mobile, left-aligned, single line */
+  .portal-header__page-title {
+    display: block;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-main, #1b4332);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+    margin-right: 0.5rem;
+  }
+
+  .portal-bottom-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: var(--portal-safe-bottom);
+    height: var(--portal-bottom-nav-height);
+    padding-left: max(12px, env(safe-area-inset-left, 0px));
+    padding-right: max(12px, env(safe-area-inset-right, 0px));
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border-subtle);
+    box-shadow: 0 -4px 12px rgba(15, 23, 42, 0.06);
+    z-index: 45;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Touch: minimum ~44px tap target for nav items (iOS HIG) */
+  .portal-bottom-nav__item {
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 6px;
+    margin: 0 -2px;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--ie-color-fg, #374151);
+    font-size: 11px;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.15s ease, transform 0.15s ease, background-color 0.15s ease;
+  }
+
+  .portal-bottom-nav__item--active {
+    color: var(--text-main, #1b4332);
+    font-weight: 600;
+    transform: translateY(-1px);
+  }
+
+  .portal-bottom-nav__icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.06);
+    transition: background-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .portal-bottom-nav__item--active .portal-bottom-nav__icon {
+    background: var(--ie-color-accent, #c5a059);
+    transform: scale(1.05);
+  }
+
+  .portal-bottom-nav__label {
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  /* More panel: above bottom nav, safe-area aware, comfortable on narrow screens */
+  .portal-bottom-nav__more {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(
+      var(--portal-bottom-nav-height) + var(--portal-safe-bottom)
+    );
+    max-height: min(320px, 50dvh);
+    background: white;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.18);
+    padding: 12px 16px calc(16px + var(--portal-safe-bottom));
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 46;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+
+  .portal-bottom-nav--more-open .portal-bottom-nav__more {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .portal-bottom-nav__more a {
+    font-size: 14px;
+    padding: 12px 8px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--ie-color-fg, #374151);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .portal-bottom-nav__more a:hover {
+    text-decoration: underline;
+  }
+
+  .portal-bottom-nav__more-link--active {
+    font-weight: 600;
+    color: var(--text-main, #1b4332);
+  }
+
+  /* Reserve space for bottom nav + safe area only (footer hidden on mobile) */
+  .portal-main {
+    padding-bottom: calc(
+      var(--portal-bottom-nav-height) + 8px + var(--portal-safe-bottom)
+    );
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Page layout with filters (pilot: clients.html)
+   Desktop/tablet: left sticky filter column + right main content
+   Mobile: filter drawer opened by trigger; same filter fields, same data-filter
+   -------------------------------------------------------------------------- */
+
+.page-layout-with-filters {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex: 1;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1.5rem;
+  width: 100%;
+  position: relative;
+}
+
+.page-filters-column {
+  flex: 0 0 var(--page-filters-column-width);
+  width: var(--page-filters-column-width);
   min-width: 0;
-  justify-content: flex-start;
+  padding: 1.25rem;
+  background: var(--ie-color-surface, #fff);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--ie-radius-lg, 1rem);
+  position: sticky;
+  top: calc(var(--portal-header-height) + var(--portal-safe-top));
+  align-self: flex-start;
+  box-sizing: border-box;
 }
 
-.toolbar-right {
+.page-filters-column__mobile-header {
+  display: none;
+}
+
+.page-filters-column__view-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.page-filters-column__view-toggle .filter-label {
+  margin: 0;
+}
+
+.page-filters-column__bar {
+  margin-bottom: 0;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.page-filters-column__bar .filter-group {
+  width: 100%;
+}
+
+.page-main-column {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.page-filters-trigger-wrap {
+  display: none;
+}
+
+/* Mobile: hide filter column as sidebar; show as drawer */
+@media (max-width: 768px) {
+  .page-layout-with-filters {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .page-filters-column {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(320px, 85vw);
+    max-width: 100%;
+    z-index: 60;
+    border-radius: 0;
+    border-right: 1px solid var(--border-subtle);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-top: calc(var(--portal-header-height) + var(--portal-safe-top) + 16px);
+  }
+
+  .page-layout-with-filters.filter-drawer-open .page-filters-column {
+    transform: translateX(0);
+  }
+
+  .page-filters-column__mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 1rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .page-filters-column__mobile-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main, #1b4332);
+  }
+
+  .page-filters-drawer-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    margin: -0.5rem -0.5rem -0.5rem 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ie-color-fg, #374151);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .page-filters-drawer-close:hover {
+    color: var(--text-main, #1b4332);
+  }
+
+  .page-filters-trigger-wrap {
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .page-filters-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--ie-color-fg, #374151);
+    background: var(--ie-color-surface, #fff);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .page-filters-trigger:hover {
+    border-color: var(--ie-color-accent, #c5a059);
+    color: var(--text-main, #1b4332);
+  }
+
+  .page-filters-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 55;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .page-layout-with-filters.filter-drawer-open .page-filters-drawer-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Content action rows (Phase 3: toolbar actions moved into content)
+   Detail pages: right-aligned actions in/near entity hero/header.
+   Form pages: left = mode/status, right = action buttons.
+   -------------------------------------------------------------------------- */
+
+.page-detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.page-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.page-form-actions__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.page-form-actions__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted, #6b7280);
+}
+
+.page-form-actions__actions {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
-  margin-left: auto;
-  margin-right: 1rem;
+}
+
+/* List pages: primary CTA at top of main column (no toolbar) */
+.page-list-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
 }
 

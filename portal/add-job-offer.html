@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Create job offer | Italian Experience Recruitment</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,38 +14,26 @@
 <body class="flex min-h-screen" style="visibility: hidden;">
 
     <div class="portal-shell">
-        <!-- SIDEBAR (loaded dynamically from sidebar.html) -->
-        <div id="sidebar"></div>
-
         <!-- MAIN CONTENT -->
-        <main class="portal-main flex-1 flex flex-col min-w-0">
+        <main class="portal-main portal-main--no-toolbar flex-1 flex flex-col min-w-0">
         <div id="portal-header"></div>
-
-        <div class="portal-toolbar sticky-toolbar">
-            <div class="page-container toolbar-inner">
-                <div class="toolbar-left">
-                    <div class="portal-toolbar__left"></div>
-                </div>
-                <div class="portal-toolbar__center">
-                    <div
-                        class="text-xs font-semibold tracking-widest uppercase text-gray-500"
-                        data-entity-mode-indicator="job-offer"
-                    ></div>
-                    <div id="jobOfferHeaderStatus" class="ml-4"></div>
-                </div>
-                <div class="toolbar-right">
-                    <div class="portal-toolbar__right">
-                        <div class="portal-toolbar__actions">
-                            <div id="jobOfferActions" class="flex items-center space-x-3"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Page Content -->
         <div class="page-container">
         <div class="portal-content p-8 space-y-8">
+
+            <div class="page-form-actions">
+                <div class="page-form-actions__meta">
+                    <span
+                        class="page-form-actions__label"
+                        data-entity-mode-indicator="job-offer"
+                    ></span>
+                    <div id="jobOfferHeaderStatus"></div>
+                </div>
+                <div class="page-form-actions__actions">
+                    <div id="jobOfferActions" class="flex items-center gap-2"></div>
+                </div>
+            </div>
 
             <form id="jobOfferForm" class="space-y-8">
 
@@ -157,8 +145,6 @@
     <script src="core/session-ready.js"></script>
     <script src="core/router.js"></script>
     <script src="runtime/router-runtime.js"></script>
-    <script src="runtime/layout-runtime.js"></script>
-    <script src="runtime/sidebar-runtime.js"></script>
     <script src="runtime/forms-runtime.js"></script>
     <script src="runtime/modals-runtime.js"></script>
     <script src="runtime/profile-runtime.js"></script>

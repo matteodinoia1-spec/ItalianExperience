@@ -276,14 +276,14 @@
           ? window.IEStatusRuntime.formatDashboardCandidateStatusLabel(row.status)
           : (row.status ? String(row.status) : "New");
       tr.innerHTML =
-        "<td class=\"px-6 py-4\">" +
+        "<td class=\"ie-table-cell\">" +
         "<a href=\"" + candidateHref + "\" data-action=\"dashboard-open-candidate\" data-id=\"" + (window.escapeHtml ? window.escapeHtml(String(row.id || "")) : String(row.id || "")) + "\" class=\"text-[#1b4332] font-semibold hover:underline\">" +
         (window.escapeHtml ? window.escapeHtml(fullName) : fullName) +
         "</a>" +
         "</td>" +
-        "<td class=\"px-6 py-4 text-gray-600\">" + (window.escapeHtml ? window.escapeHtml(row.position || "—") : (row.position || "—")) + "</td>" +
-        "<td class=\"px-6 py-4 text-gray-500 text-sm\">" + (window.escapeHtml ? window.escapeHtml(createdDate) : createdDate) + "</td>" +
-        "<td class=\"px-6 py-4\"><span class=\"badge " + statusClass + "\">" + (window.escapeHtml ? window.escapeHtml(statusLabel) : statusLabel) + "</span></td>";
+        "<td class=\"ie-table-cell text-gray-600\">" + (window.escapeHtml ? window.escapeHtml(row.position || "—") : (row.position || "—")) + "</td>" +
+        "<td class=\"ie-table-cell text-gray-500 text-sm\">" + (window.escapeHtml ? window.escapeHtml(createdDate) : createdDate) + "</td>" +
+        "<td class=\"ie-table-cell\"><span class=\"badge " + statusClass + "\">" + (window.escapeHtml ? window.escapeHtml(statusLabel) : statusLabel) + "</span></td>";
       tbody.appendChild(tr);
     });
     if (!tbody.__ieDashboardRecentBound) {
@@ -356,25 +356,42 @@
     '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">' +
     '<path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>';
 
+  function getEntityLabel(entityType) {
+    var t = (entityType || "").toString();
+    if (t === "candidate") return "candidate";
+    if (t === "job_offer") return "job offer";
+    if (t === "client") return "client";
+    if (t === "application") return "application";
+    return "";
+  }
+
   function buildEntityActionsCell(opts) {
     var entityType = opts.entityType;
     var id = opts.id;
     var editUrl = opts.editUrl;
     var isArchived = !!opts.isArchived;
     var archivedList = !!opts.archivedList;
+    /* Archived list: no preview button; row click opens entity. Keeps actions consistent. */
+    var showPreviewButton = archivedList ? false : (opts.showPreviewButton !== false);
+    var entityLabel = getEntityLabel(entityType);
+    var editTitle = opts.editTitle != null ? opts.editTitle : (entityLabel ? "Edit " + entityLabel : "Edit");
+    var archiveTitle = opts.archiveTitle != null ? opts.archiveTitle : (entityLabel ? "Archive " + entityLabel : "Archive");
+    var viewTitle = opts.viewTitle != null ? opts.viewTitle : (entityLabel ? "View " + entityLabel : "View");
+    var restoreTitle = opts.restoreTitle != null ? opts.restoreTitle : (entityLabel ? "Restore " + entityLabel : "Restore");
     var idAttr = id ? " data-id=\"" + (window.escapeHtml ? window.escapeHtml(id) : id) + "\"" : "";
     var entityAttr = " data-entity=\"" + (window.escapeHtml ? window.escapeHtml(entityType) : entityType) + "\"";
     var editUrlAttr = editUrl ? " data-edit-url=\"" + (window.escapeHtml ? window.escapeHtml(editUrl) : editUrl) + "\"" : "";
 
-    var html =
-      '<div class="flex items-center justify-center space-x-2">' +
-      '<button type="button" data-action="preview-entity"' + idAttr + entityAttr + ' class="ie-btn ie-btn-secondary !py-2 !px-2 min-w-0" title="View">' + ENTITY_ROW_EYE_SVG + "</button>";
+    var html = '<div class="flex items-center justify-end gap-2">';
+    if (showPreviewButton) {
+      html += '<button type="button" data-action="preview-entity"' + idAttr + entityAttr + ' class="ie-btn ie-btn-secondary !py-2 !px-2 min-w-0" title="' + (window.escapeHtml ? window.escapeHtml(viewTitle) : viewTitle) + '">' + ENTITY_ROW_EYE_SVG + "</button>";
+    }
     if (!archivedList) {
-      html += '<button type="button" data-action="edit-entity"' + idAttr + entityAttr + editUrlAttr + ' class="ie-btn ie-btn-secondary !py-2 !px-2 min-w-0" title="Edit">' + ENTITY_ROW_EDIT_SVG + "</button>";
-      html += '<button type="button" data-action="archive-entity"' + idAttr + entityAttr + ' class="ie-btn ie-btn-secondary !py-2 !px-2 min-w-0" title="' + (isArchived ? "Archiviato" : "Archivia") + '">' + ENTITY_ROW_ARCHIVE_SVG + "</button>";
+      html += '<button type="button" data-action="edit-entity"' + idAttr + entityAttr + editUrlAttr + ' class="ie-btn ie-btn-secondary !py-2 !px-2 min-w-0" title="' + (window.escapeHtml ? window.escapeHtml(editTitle) : editTitle) + '">' + ENTITY_ROW_EDIT_SVG + "</button>";
+      html += '<button type="button" data-action="archive-entity"' + idAttr + entityAttr + ' class="ie-btn ie-btn-secondary !py-2 !px-2 min-w-0" title="' + (window.escapeHtml ? window.escapeHtml(archiveTitle) : archiveTitle) + '">' + ENTITY_ROW_ARCHIVE_SVG + "</button>";
     } else {
-      html += '<button type="button" data-action="restore-entity"' + idAttr + entityAttr + ' class="ie-btn ie-btn-success">Ripristina</button>';
-      html += '<button type="button" data-action="delete-entity-permanent"' + idAttr + entityAttr + ' class="ie-btn ie-btn-danger">Elimina definitivamente</button>';
+      html += '<button type="button" data-action="restore-entity"' + idAttr + entityAttr + ' class="ie-btn ie-btn-success" title="' + (window.escapeHtml ? window.escapeHtml(restoreTitle) : restoreTitle) + '">Ripristina</button>';
+      html += '<button type="button" data-action="delete-entity-permanent"' + idAttr + entityAttr + ' class="ie-btn ie-btn-danger" title="Delete permanently">Elimina definitivamente</button>';
     }
     html += "</div>";
     return html;
@@ -402,31 +419,35 @@
     if (rowEntity) tr.setAttribute("data-entity", rowEntity);
 
     var titleTd = document.createElement("td");
-    titleTd.className = "px-6 py-4 " + (entityType === "candidate" ? "font-semibold text-[#1b4332]" : "font-semibold text-gray-800");
+    titleTd.className = "ie-table-cell " + (entityType === "candidate" ? "font-semibold text-[#1b4332]" : "font-semibold text-gray-800");
     titleTd.textContent = title != null && title !== "" ? title : "—";
 
     leadingCells.forEach(function (cellHtml) {
       var td = document.createElement("td");
-      td.className = "px-6 py-4";
+      td.className = "ie-table-cell";
       td.innerHTML = cellHtml;
       tr.appendChild(td);
     });
     tr.appendChild(titleTd);
     middleCells.forEach(function (cellHtml) {
       var td = document.createElement("td");
-      td.className = "px-6 py-4";
+      td.className = "ie-table-cell";
       td.innerHTML = cellHtml;
       tr.appendChild(td);
     });
     var actionsTd = document.createElement("td");
-    actionsTd.className = "px-6 py-4";
+    actionsTd.className = "ie-table-cell ie-table-actions";
     var safeEditUrl = (editUrl != null && editUrl !== "") ? editUrl : null;
+    var actionCellOpts = options.actionCellOpts || {};
     actionsTd.innerHTML = buildEntityActionsCell({
       entityType: entityType,
       id: id,
       editUrl: safeEditUrl,
       isArchived: isArchived,
       archivedList: archivedList,
+      showPreviewButton: actionCellOpts.showPreviewButton,
+      editTitle: actionCellOpts.editTitle,
+      archiveTitle: actionCellOpts.archiveTitle,
     });
     tr.appendChild(actionsTd);
     return tr;
@@ -690,7 +711,7 @@
         ?.querySelector("[data-ie-pagination]");
 
       if (window.IESupabase && window.IESupabase.fetchCandidatesPaginated) {
-        tbody.innerHTML = "<tr><td colspan=\"10\" class=\"px-6 py-8 text-center text-gray-400\">Loading...</td></tr>";
+        tbody.innerHTML = "<tr><td colspan=\"9\" class=\"px-6 py-8 text-center text-gray-400\">Loading...</td></tr>";
         window.IESupabase.fetchCandidatesPaginated({
           filters,
           page: currentPage,
@@ -708,7 +729,7 @@
           updatePaginationUI(paginationContainer, totalCount, currentPage, limit, rows.length);
         }).catch(function (err) {
           console.error("[ItalianExperience] fetchCandidatesPaginated error:", err);
-          tbody.innerHTML = "<tr><td colspan=\"10\" class=\"px-6 py-8 text-center text-red-500\">Loading error. Please try again later.</td></tr>";
+          tbody.innerHTML = "<tr><td colspan=\"9\" class=\"px-6 py-8 text-center text-red-500\">Loading error. Please try again later.</td></tr>";
           updatePaginationUI(paginationContainer, 0, 1, limit, 0);
         });
         return;
@@ -732,7 +753,7 @@
       const targetBody = tbodyEl || tbody;
       targetBody.innerHTML = "";
       if (!rows.length) {
-        targetBody.innerHTML = "<tr><td colspan=\"10\" class=\"px-6 py-8 text-center text-gray-400\">No candidates found.</td></tr>";
+        targetBody.innerHTML = "<tr><td colspan=\"9\" class=\"px-6 py-8 text-center text-gray-400\">No candidates found.</td></tr>";
         return;
       }
       rows.forEach(function (row) {
@@ -797,14 +818,6 @@
           '" class="w-10 h-10 rounded-full border-2 border-white shadow-sm" alt="' +
           (window.escapeHtml ? window.escapeHtml((row.first_name || "") + " " + (row.last_name || "")) : ((row.first_name || "") + " " + (row.last_name || ""))) +
           '">';
-        const hasCv = !!row.cv_url;
-        const viewCvHtml = hasCv
-          ? '<button type="button" data-action="view-cv" data-id="' +
-            (window.escapeHtml ? window.escapeHtml(row.id) : row.id) +
-            '" class="ie-btn ie-btn-primary">View CV</button>'
-          : '<button type="button" data-action="view-cv" data-id="' +
-            (window.escapeHtml ? window.escapeHtml(row.id) : row.id) +
-            '" class="ie-btn ie-btn-secondary" disabled>View CV</button>';
         const candidateViewUrl = (window.IEPortal && window.IEPortal.links && window.IEPortal.links.candidateView) ? window.IEPortal.links.candidateView(row.id) : "candidate.html?id=" + encodeURIComponent(String(row.id));
         const tr = renderEntityRow({
           entityType: "candidate",
@@ -814,6 +827,7 @@
           title: [row.first_name, row.last_name].filter(Boolean).join(" ") || "—",
           isArchived: row.is_archived,
           archivedList: false,
+          actionCellOpts: { showPreviewButton: false, editTitle: "Edit candidate", archiveTitle: "Archive candidate" },
           leadingCells: [photoHtml],
           middleCells: [
             positionCellHtml,
@@ -828,7 +842,6 @@
               "</span>",
             '<span class="text-xs font-medium text-blue-600">' + (window.escapeHtml ? window.escapeHtml(sourceLabel || "—") : (sourceLabel || "—")) + "</span>",
             '<span class="text-gray-400">' + (window.escapeHtml ? window.escapeHtml(createdDate) : createdDate) + "</span>",
-            '<div class="text-center">' + viewCvHtml + "</div>",
           ],
           rowTitle: typeof formatLastUpdatedMeta === "function" ? formatLastUpdatedMeta(row) : "",
         });
@@ -888,10 +901,10 @@
     }) : null;
     if (candidatesTh) {
       const thAssociated = document.createElement("th");
-      thAssociated.className = "px-6 py-5 font-bold";
+      thAssociated.className = "ie-table-th font-bold";
       thAssociated.textContent = "Associated";
       const thRequired = document.createElement("th");
-      thRequired.className = "px-6 py-5 font-bold";
+      thRequired.className = "ie-table-th font-bold";
       thRequired.textContent = "Required";
       candidatesTh.replaceWith(thAssociated, thRequired);
     }
@@ -1211,6 +1224,7 @@
           title: row.title || "—",
           isArchived: row.is_archived,
           archivedList: false,
+          actionCellOpts: { showPreviewButton: false, editTitle: "Edit job offer", archiveTitle: "Archive job offer" },
           leadingCells: [],
           middleCells: [
             (window.escapeHtml ? window.escapeHtml(row.position || "—") : (row.position || "—")),
@@ -1425,7 +1439,7 @@
 
     function renderApplications() {
       if (!window.IESupabase || !window.IESupabase.fetchApplicationsPaginated) {
-        tbody.innerHTML = "<tr><td colspan=\"6\" class=\"px-6 py-8 text-center text-gray-400\">Applications not available.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan=\"5\" class=\"px-6 py-8 text-center text-gray-400\">Applications not available.</td></tr>";
         if (paginationContainer) updatePaginationUI(paginationContainer, 0, 1, limit, 0);
         return;
       }
@@ -1439,7 +1453,7 @@
         date_to: filters.date_to ? filters.date_to + "T23:59:59Z" : undefined,
       };
 
-      tbody.innerHTML = "<tr><td colspan=\"6\" class=\"px-6 py-8 text-center text-gray-400\">Loading...</td></tr>";
+      tbody.innerHTML = "<tr><td colspan=\"5\" class=\"px-6 py-8 text-center text-gray-400\">Loading...</td></tr>";
 
       window.IESupabase.fetchApplicationsPaginated(filterPayload, { page: currentPage, limit: limit })
         .then(function (result) {
@@ -1464,21 +1478,20 @@
           const escapeHtml = window.escapeHtml || function (s) { return (s == null ? "" : String(s)).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); };
 
           if (rows.length === 0) {
-            tbody.innerHTML = "<tr><td colspan=\"6\" class=\"px-6 py-8 text-center text-gray-400\">No applications found.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan=\"5\" class=\"px-6 py-8 text-center text-gray-400\">No applications found.</td></tr>";
           } else {
             rows.forEach(function (row) {
               const tr = document.createElement("tr");
-              tr.className = "clickable-row border-b border-gray-100 hover:bg-gray-50/80";
+              tr.className = "table-row transition clickable-row";
               tr.setAttribute("data-entity", "application");
               tr.setAttribute("data-id", String(row.id || ""));
               const candidateUrl = candidateViewUrl(row.candidate_id);
               tr.innerHTML =
-                "<td class=\"px-6 py-4\"><a href=\"" + escapeHtml(candidateUrl) + "\" class=\"text-[#1b4332] font-semibold hover:underline\" data-entity-type=\"candidate\" data-entity-id=\"" + escapeHtml(String(row.candidate_id || "")) + "\">" + escapeHtml(row.candidate_name || "—") + "</a></td>" +
-                "<td class=\"px-6 py-4 text-gray-700\">" + escapeHtml(row.job_offer_title || "—") + "</td>" +
-                "<td class=\"px-6 py-4 text-gray-700\">" + escapeHtml(row.client_name || "—") + "</td>" +
-                "<td class=\"px-6 py-4\"><span class=\"badge " + getApplicationStatusBadgeClass(row.status) + "\">" + escapeHtml(formatApplicationStatusLabel(row.status)) + "</span></td>" +
-                "<td class=\"px-6 py-4 text-gray-500 text-xs\">" + (row.created_at ? new Date(row.created_at).toLocaleDateString("it-IT") : "—") + "</td>" +
-                "<td class=\"px-6 py-4 text-center\"><a href=\"" + escapeHtml(candidateUrl) + "\" class=\"ie-btn ie-btn-secondary text-sm\">View</a></td>";
+                "<td class=\"ie-table-cell\"><a href=\"" + escapeHtml(candidateUrl) + "\" class=\"text-[#1b4332] font-semibold hover:underline\" data-entity-type=\"candidate\" data-entity-id=\"" + escapeHtml(String(row.candidate_id || "")) + "\">" + escapeHtml(row.candidate_name || "—") + "</a></td>" +
+                "<td class=\"ie-table-cell text-gray-700\">" + escapeHtml(row.job_offer_title || "—") + "</td>" +
+                "<td class=\"ie-table-cell text-gray-700\">" + escapeHtml(row.client_name || "—") + "</td>" +
+                "<td class=\"ie-table-cell\"><span class=\"badge " + getApplicationStatusBadgeClass(row.status) + "\">" + escapeHtml(formatApplicationStatusLabel(row.status)) + "</span></td>" +
+                "<td class=\"ie-table-cell text-gray-500 text-xs\">" + (row.created_at ? new Date(row.created_at).toLocaleDateString("it-IT") : "—") + "</td>";
               tbody.appendChild(tr);
             });
           }
@@ -1486,7 +1499,7 @@
         })
         .catch(function (err) {
           console.error("[ItalianExperience] fetchApplicationsPaginated error:", err);
-          tbody.innerHTML = "<tr><td colspan=\"6\" class=\"px-6 py-8 text-center text-red-500\">Loading error. Please try again later.</td></tr>";
+          tbody.innerHTML = "<tr><td colspan=\"5\" class=\"px-6 py-8 text-center text-red-500\">Loading error. Please try again later.</td></tr>";
           updatePaginationUI(paginationContainer, 0, 1, limit, 0);
         });
     }
@@ -1641,26 +1654,27 @@
                   ? '<button type="button" data-action="view-client-offers" data-id="' + (window.escapeHtml ? window.escapeHtml(row.id) : row.id) + '" class="ie-btn ie-btn-secondary !py-1 !px-2 min-w-0 font-semibold">' + (window.escapeHtml ? window.escapeHtml(String(activeOffersCount)) : String(activeOffersCount)) + "</button>"
                   : "0";
 
-              const tr = renderEntityRow({
-                entityType: "client",
-                id: row.id,
-                viewUrl:
-                  "add-client.html?id=" +
-                  encodeURIComponent(row.id) +
-                  "&mode=view",
-                editUrl: "add-client.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
-                title: row.name || "—",
-                isArchived: row.is_archived,
-                archivedList: false,
-                leadingCells: [],
-                middleCells: [
-                  (window.escapeHtml ? window.escapeHtml(row.city || "—") : (row.city || "—")),
-                  activeOffersHtml,
-                  (window.escapeHtml ? window.escapeHtml(row.email || "—") : (row.email || "—")),
-                  (window.escapeHtml ? window.escapeHtml(row.phone || "—") : (row.phone || "—")),
-                ],
-                rowTitle: typeof formatLastUpdatedMeta === "function" ? formatLastUpdatedMeta(row) : "",
-              });
+const tr = renderEntityRow({
+          entityType: "client",
+          id: row.id,
+          viewUrl:
+            "add-client.html?id=" +
+            encodeURIComponent(row.id) +
+            "&mode=view",
+          editUrl: "add-client.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+          title: row.name || "—",
+          isArchived: row.is_archived,
+          archivedList: false,
+          actionCellOpts: { showPreviewButton: false, editTitle: "Edit client", archiveTitle: "Archive client" },
+          leadingCells: [],
+          middleCells: [
+            (window.escapeHtml ? window.escapeHtml(row.city || "—") : (row.city || "—")),
+            activeOffersHtml,
+            (window.escapeHtml ? window.escapeHtml(row.email || "—") : (row.email || "—")),
+            (window.escapeHtml ? window.escapeHtml(row.phone || "—") : (row.phone || "—")),
+          ],
+          rowTitle: typeof formatLastUpdatedMeta === "function" ? formatLastUpdatedMeta(row) : "",
+        });
               tbody.appendChild(tr);
             });
 
@@ -1719,6 +1733,7 @@
               title: row.name || "—",
               isArchived: row.is_archived,
               archivedList: false,
+              actionCellOpts: { showPreviewButton: false, editTitle: "Edit client", archiveTitle: "Archive client" },
               leadingCells: [],
               middleCells: [
                 (window.escapeHtml ? window.escapeHtml(row.city || "—") : (row.city || "—")),

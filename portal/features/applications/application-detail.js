@@ -553,11 +553,6 @@
     archiveBtn.className = "ie-btn ie-btn-secondary";
     archiveBtn.textContent = "Archive";
 
-    var deleteBtn = document.createElement("button");
-    deleteBtn.type = "button";
-    deleteBtn.className = "ie-btn ie-btn-danger";
-    deleteBtn.textContent = "Delete";
-
     archiveBtn.addEventListener("click", function () {
       if (
         !window.IEQueries ||
@@ -620,58 +615,7 @@
         });
     });
 
-    deleteBtn.addEventListener("click", function () {
-      if (
-        !window.IEQueries ||
-        !window.IEQueries.applications ||
-        typeof window.IEQueries.applications.deleteApplicationPermanently !==
-          "function"
-      ) {
-        return;
-      }
-      if (
-        !window.confirm(
-          "Are you sure you want to permanently delete this application?"
-        )
-      ) {
-        return;
-      }
-
-      deleteBtn.disabled = true;
-
-      window.IEQueries.applications
-        .deleteApplicationPermanently(app.id)
-        .then(function (res) {
-          if (res.error) {
-            console.error(
-              "[ApplicationDetail] deleteApplicationPermanently error:",
-              res.error
-            );
-            deleteBtn.disabled = false;
-            return;
-          }
-
-          var target = "applications.html";
-          if (
-            window.IERouter &&
-            typeof window.IERouter.navigateTo === "function"
-          ) {
-            window.IERouter.navigateTo(target);
-          } else {
-            window.location.href = target;
-          }
-        })
-        .catch(function (err) {
-          console.error(
-            "[ApplicationDetail] deleteApplicationPermanently exception:",
-            err
-          );
-          deleteBtn.disabled = false;
-        });
-    });
-
     container.appendChild(archiveBtn);
-    container.appendChild(deleteBtn);
   }
 
   function hydrateCandidateSummary(app) {

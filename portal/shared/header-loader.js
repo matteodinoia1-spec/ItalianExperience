@@ -15,10 +15,23 @@ async function loadPortalHeader() {
     main.appendChild(footerContainer);
   }
 
+  let bottomNavContainer = document.getElementById("portal-bottom-nav");
+  if (!bottomNavContainer && main && footerContainer) {
+    bottomNavContainer = document.createElement("div");
+    bottomNavContainer.id = "portal-bottom-nav";
+    main.insertBefore(bottomNavContainer, footerContainer);
+  }
+
   if (footerContainer) {
     const footerResponse = await fetch("layout/footer.html");
     const footerHtml = await footerResponse.text();
     footerContainer.innerHTML = footerHtml;
+  }
+
+  if (bottomNavContainer) {
+    const bottomNavResponse = await fetch("layout/bottom-nav.html");
+    const bottomNavHtml = await bottomNavResponse.text();
+    bottomNavContainer.innerHTML = bottomNavHtml;
   }
 
   document.dispatchEvent(new CustomEvent("ie:header-loaded"));

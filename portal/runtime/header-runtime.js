@@ -25,6 +25,7 @@
       "add-job-offer": "Create New Job Offer",
       "add-client": "Add Client",
       candidate: "Candidate",
+      application: "Application",
     };
     return titles[key] || "Dashboard";
   }
@@ -179,6 +180,9 @@
         ? normalizeBreadcrumbs(effectiveMeta.breadcrumbs)
         : getDefaultBreadcrumbs();
     setPageBreadcrumbs(segments);
+
+    var titleEl = document.getElementById("portal-header-page-title");
+    if (titleEl) titleEl.textContent = effectiveMeta.title;
   }
 
   // -------------------------------------------------------------------------

@@ -2,7 +2,7 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
 /**
  * Archived page – Supabase integration
  * Loads archived candidates, job offers, and clients with pagination, search, and restore.
- * Requires: Supabase CDN, supabase.js, app.js (auth + sidebar).
+ * Requires: Supabase CDN, supabase.js, app.js (auth).
  */
 (function () {
   "use strict";
@@ -119,9 +119,11 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
     const tbody = el("tbody", SECTIONS.candidates);
     if (!tbody) return;
     tbody.innerHTML = "";
-    const renderRow = window.IEPortal && typeof window.IEPortal.renderEntityRow === "function"
+    const renderRow = (window.IEPortal && typeof window.IEPortal.renderEntityRow === "function"
       ? window.IEPortal.renderEntityRow
-      : null;
+      : null) || (window.IEListsRuntime && typeof window.IEListsRuntime.renderEntityRow === "function"
+      ? window.IEListsRuntime.renderEntityRow
+      : null);
     const links = window.IEPortal && window.IEPortal.links ? window.IEPortal.links : null;
     rows.forEach(function (row) {
       const name = [row.first_name, row.last_name].filter(Boolean).join(" ") || "—";
@@ -140,6 +142,7 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
           title: name,
           isArchived: true,
           archivedList: true,
+          actionCellOpts: { showPreviewButton: false },
           leadingCells: [],
           middleCells: [
             '<span class="text-gray-600">' + escapeHtml(position) + "</span>",
@@ -150,15 +153,16 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
         tbody.appendChild(tr);
       } else {
         const tr = document.createElement("tr");
-        tr.className = "table-row transition hover:bg-[#c5a059]/5";
+        tr.className = "table-row transition hover:bg-[#c5a059]/5 clickable-row";
+        tr.setAttribute("data-entity", "candidate");
+        tr.setAttribute("data-id", String(row.id || ""));
         tr.innerHTML =
-          '<td class="px-6 py-4">' + escapeHtml(name) + "</td>" +
-          '<td class="px-6 py-4 text-gray-600">' + escapeHtml(position) + "</td>" +
-          '<td class="px-6 py-4 text-gray-600">' + escapeHtml(status) + "</td>" +
-          '<td class="px-6 py-4 text-right"><div class="flex items-center justify-end space-x-2">' +
-          '<button type="button" data-action="preview-entity" data-entity="candidate" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-secondary !py-2 !px-2 min-w-0" title="View">👁</button>' +
-          '<button type="button" data-action="restore-entity" data-entity="candidate" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-success">Restore</button>' +
-          '<button type="button" data-action="delete-entity-permanent" data-entity="candidate" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-danger">Delete permanently</button>' +
+          '<td class="ie-table-cell font-semibold text-gray-800">' + escapeHtml(name) + "</td>" +
+          '<td class="ie-table-cell text-gray-600">' + escapeHtml(position) + "</td>" +
+          '<td class="ie-table-cell text-gray-600">' + escapeHtml(status) + "</td>" +
+          '<td class="ie-table-cell ie-table-actions"><div class="flex items-center justify-end gap-2">' +
+          '<button type="button" data-action="restore-entity" data-entity="candidate" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-success" title="Restore candidate">Ripristina</button>' +
+          '<button type="button" data-action="delete-entity-permanent" data-entity="candidate" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-danger" title="Elimina definitivamente">Elimina definitivamente</button>' +
           "</div></td>";
         tbody.appendChild(tr);
       }
@@ -206,9 +210,11 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
     const tbody = el("tbody", SECTIONS.jobs);
     if (!tbody) return;
     tbody.innerHTML = "";
-    const renderRow = window.IEPortal && typeof window.IEPortal.renderEntityRow === "function"
+    const renderRow = (window.IEPortal && typeof window.IEPortal.renderEntityRow === "function"
       ? window.IEPortal.renderEntityRow
-      : null;
+      : null) || (window.IEListsRuntime && typeof window.IEListsRuntime.renderEntityRow === "function"
+      ? window.IEListsRuntime.renderEntityRow
+      : null);
     const links = window.IEPortal && window.IEPortal.links ? window.IEPortal.links : null;
     rows.forEach(function (row) {
       const title = row.title || "—";
@@ -227,6 +233,7 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
           title: title,
           isArchived: true,
           archivedList: true,
+          actionCellOpts: { showPreviewButton: false },
           leadingCells: [],
           middleCells: [
             '<span class="text-gray-600">' + escapeHtml(client) + "</span>",
@@ -237,16 +244,16 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
         tbody.appendChild(tr);
       } else {
         const tr = document.createElement("tr");
-        tr.className = "table-row transition hover:bg-[#c5a059]/5";
+        tr.className = "table-row transition hover:bg-[#c5a059]/5 clickable-row";
+        tr.setAttribute("data-entity", "jobOffer");
+        tr.setAttribute("data-id", String(row.id || ""));
         tr.innerHTML =
-          '<td class="px-6 py-4">' + escapeHtml(title) + "</td>" +
-          '<td class="px-6 py-4 text-gray-600">' + escapeHtml(client) + "</td>" +
-          '<td class="px-6 py-4 text-gray-600">' + escapeHtml(location) + "</td>" +
-          '<td class="px-6 py-4 text-right">' +
-          '<div class="flex items-center justify-end space-x-2">' +
-          '<button type="button" data-action="preview-entity" data-entity="job_offer" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-secondary !py-2 !px-2 min-w-0" title="View">👁</button>' +
-          '<button type="button" data-action="restore-entity" data-entity="job_offer" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-success">Restore</button>' +
-          '<button type="button" data-action="delete-entity-permanent" data-entity="job_offer" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-danger">Delete permanently</button>' +
+          '<td class="ie-table-cell font-semibold text-gray-800">' + escapeHtml(title) + "</td>" +
+          '<td class="ie-table-cell text-gray-600">' + escapeHtml(client) + "</td>" +
+          '<td class="ie-table-cell text-gray-600">' + escapeHtml(location) + "</td>" +
+          '<td class="ie-table-cell ie-table-actions"><div class="flex items-center justify-end gap-2">' +
+          '<button type="button" data-action="restore-entity" data-entity="job_offer" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-success" title="Restore job offer">Ripristina</button>' +
+          '<button type="button" data-action="delete-entity-permanent" data-entity="job_offer" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-danger" title="Elimina definitivamente">Elimina definitivamente</button>' +
           "</div></td>";
         tbody.appendChild(tr);
       }
@@ -317,18 +324,19 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
       : function (id) { return "candidate.html?id=" + encodeURIComponent(String(id || "")); };
     rows.forEach(function (row) {
       const tr = document.createElement("tr");
-      tr.className = "table-row transition hover:bg-[#c5a059]/5";
+      tr.className = "table-row transition hover:bg-[#c5a059]/5 clickable-row";
+      tr.setAttribute("data-entity", "application");
+      tr.setAttribute("data-id", String(row.id || ""));
       const withdrawnDate = row.created_at ? new Date(row.created_at).toLocaleDateString("it-IT") : "—";
       tr.innerHTML =
-        '<td class="px-6 py-4"><a href="' + candidateViewUrl(row.candidate_id) + '" class="text-[#1b4332] font-semibold hover:underline">' + escapeHtml(row.candidate_name || "—") + "</a></td>" +
-        '<td class="px-6 py-4 text-gray-600">' + escapeHtml(row.job_offer_title || "—") + "</td>" +
-        '<td class="px-6 py-4 text-gray-600">' + escapeHtml(row.client_name || "—") + "</td>" +
-        '<td class="px-6 py-4"><span class="badge ' + getApplicationStatusBadgeClass(row.status) + '">' + escapeHtml(formatApplicationStatusLabel(row.status)) + "</span></td>" +
-        '<td class="px-6 py-4 text-gray-500 text-xs">' + escapeHtml(withdrawnDate) + "</td>" +
-        '<td class="px-6 py-4 text-right">' +
-        '<div class="flex items-center justify-end space-x-2">' +
-        '<button type="button" data-action="restore-entity" data-entity="application" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-success">Restore</button>' +
-        '<button type="button" data-action="delete-entity-permanent" data-entity="application" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-danger">Delete permanently</button>' +
+        '<td class="ie-table-cell"><a href="' + candidateViewUrl(row.candidate_id) + '" class="text-[#1b4332] font-semibold hover:underline">' + escapeHtml(row.candidate_name || "—") + "</a></td>" +
+        '<td class="ie-table-cell text-gray-600">' + escapeHtml(row.job_offer_title || "—") + "</td>" +
+        '<td class="ie-table-cell text-gray-600">' + escapeHtml(row.client_name || "—") + "</td>" +
+        '<td class="ie-table-cell"><span class="badge ' + getApplicationStatusBadgeClass(row.status) + '">' + escapeHtml(formatApplicationStatusLabel(row.status)) + "</span></td>" +
+        '<td class="ie-table-cell text-gray-500 text-xs">' + escapeHtml(withdrawnDate) + "</td>" +
+        '<td class="ie-table-cell ie-table-actions"><div class="flex items-center justify-end gap-2">' +
+        '<button type="button" data-action="restore-entity" data-entity="application" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-success" title="Restore application">Ripristina</button>' +
+        '<button type="button" data-action="delete-entity-permanent" data-entity="application" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-danger" title="Elimina definitivamente">Elimina definitivamente</button>' +
         "</div></td>";
       tbody.appendChild(tr);
     });
@@ -375,9 +383,11 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
     const tbody = el("tbody", SECTIONS.clients);
     if (!tbody) return;
     tbody.innerHTML = "";
-    const renderRow = window.IEPortal && typeof window.IEPortal.renderEntityRow === "function"
+    const renderRow = (window.IEPortal && typeof window.IEPortal.renderEntityRow === "function"
       ? window.IEPortal.renderEntityRow
-      : null;
+      : null) || (window.IEListsRuntime && typeof window.IEListsRuntime.renderEntityRow === "function"
+      ? window.IEListsRuntime.renderEntityRow
+      : null);
     rows.forEach(function (row) {
       const name = row.name || "—";
       const city = row.city || "—";
@@ -392,6 +402,7 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
           title: name,
           isArchived: true,
           archivedList: true,
+          actionCellOpts: { showPreviewButton: false },
           leadingCells: [],
           middleCells: [
             '<span class="text-gray-600">' + escapeHtml(city) + "</span>",
@@ -403,17 +414,17 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
         tbody.appendChild(tr);
       } else {
         const tr = document.createElement("tr");
-        tr.className = "table-row transition hover:bg-[#c5a059]/5";
+        tr.className = "table-row transition hover:bg-[#c5a059]/5 clickable-row";
+        tr.setAttribute("data-entity", "client");
+        tr.setAttribute("data-id", String(row.id || ""));
         tr.innerHTML =
-          '<td class="px-6 py-4">' + escapeHtml(name) + "</td>" +
-          '<td class="px-6 py-4 text-gray-600">' + escapeHtml(city) + "</td>" +
-          '<td class="px-6 py-4 text-gray-600">' + escapeHtml(stateName) + "</td>" +
-          '<td class="px-6 py-4 text-gray-600">' + escapeHtml(email) + "</td>" +
-          '<td class="px-6 py-4 text-right">' +
-          '<div class="flex items-center justify-end space-x-2">' +
-          '<button type="button" data-action="preview-entity" data-entity="client" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-secondary !py-2 !px-2 min-w-0" title="View">👁</button>' +
-          '<button type="button" data-action="restore-entity" data-entity="client" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-success">Restore</button>' +
-          '<button type="button" data-action="delete-entity-permanent" data-entity="client" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-danger">Delete permanently</button>' +
+          '<td class="ie-table-cell font-semibold text-gray-800">' + escapeHtml(name) + "</td>" +
+          '<td class="ie-table-cell text-gray-600">' + escapeHtml(city) + "</td>" +
+          '<td class="ie-table-cell text-gray-600">' + escapeHtml(stateName) + "</td>" +
+          '<td class="ie-table-cell text-gray-600">' + escapeHtml(email) + "</td>" +
+          '<td class="ie-table-cell ie-table-actions"><div class="flex items-center justify-end gap-2">' +
+          '<button type="button" data-action="restore-entity" data-entity="client" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-success" title="Restore client">Ripristina</button>' +
+          '<button type="button" data-action="delete-entity-permanent" data-entity="client" data-id="' + escapeHtml(row.id) + '" class="ie-btn ie-btn-danger" title="Elimina definitivamente">Elimina definitivamente</button>' +
           "</div></td>";
         tbody.appendChild(tr);
       }
@@ -478,27 +489,26 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
       const offerTitle = row.job_offer_title || "—";
       const clientName = row.client_name || "—";
       const tr = document.createElement("tr");
-      tr.className = "table-row transition hover:bg-[#c5a059]/5";
+      tr.className = "table-row transition hover:bg-[#c5a059]/5 clickable-row";
+      tr.setAttribute("data-entity", "application");
+      tr.setAttribute("data-id", String(row.id || ""));
       tr.innerHTML =
-        '<td class="px-6 py-4">' +
+        '<td class="ie-table-cell">' +
         escapeHtml(candidateName) +
         "</td>" +
-        '<td class="px-6 py-4 text-gray-600">' +
+        '<td class="ie-table-cell text-gray-600">' +
         escapeHtml(offerTitle) +
         "</td>" +
-        '<td class="px-6 py-4 text-gray-600">' +
+        '<td class="ie-table-cell text-gray-600">' +
         escapeHtml(clientName) +
         "</td>" +
-        '<td class="px-6 py-4 text-right"><div class="flex items-center justify-end space-x-2">' +
-        '<button type="button" data-action="preview-entity" data-entity="application" data-id="' +
-        escapeHtml(row.id) +
-        '" class="ie-btn ie-btn-secondary !py-2 !px-2 min-w-0" title="View">👁</button>' +
+        '<td class="ie-table-cell ie-table-actions"><div class="flex items-center justify-end gap-2">' +
         '<button type="button" data-action="restore-application" data-id="' +
         escapeHtml(row.id) +
-        '" class="ie-btn ie-btn-success">Restore</button>' +
+        '" class="ie-btn ie-btn-success" title="Restore application">Ripristina</button>' +
         '<button type="button" data-action="delete-application-permanent" data-id="' +
         escapeHtml(row.id) +
-        '" class="ie-btn ie-btn-danger">Delete permanently</button>' +
+        '" class="ie-btn ie-btn-danger" title="Elimina definitivamente">Elimina definitivamente</button>' +
         "</div></td>";
       tbody.appendChild(tr);
     });

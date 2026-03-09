@@ -187,111 +187,34 @@
   }
 
   function initEditToolbars() {
-    var toolbars = document.querySelectorAll(".portal-toolbar");
-    if (!toolbars || toolbars.length === 0) return;
+    /* Mode indicator: set "Editing Candidate" / "Creating Candidate" etc. from URL state */
+    var entityIndicator = document.querySelector("[data-entity-mode-indicator]");
+    if (entityIndicator) {
+      var type = entityIndicator.getAttribute("data-entity-mode-indicator");
+      var params = new URLSearchParams(window.location.search);
+      var state = window.IERouter && typeof window.IERouter.resolveEntityPageState === "function"
+        ? window.IERouter.resolveEntityPageState(params)
+        : { mode: "", id: "" };
+      var mode = state.mode;
+      var hasId = !!state.id;
 
-    toolbars.forEach(function (toolbar) {
-      var entityIndicator = toolbar.querySelector("[data-entity-mode-indicator]");
-      var cancelBtnCandidate = toolbar.querySelector("[data-toolbar-cancel='candidate']");
-      var saveBtnCandidate = toolbar.querySelector("[data-toolbar-save='candidate']");
-      var cancelBtnClient = toolbar.querySelector("[data-toolbar-cancel='client']");
-      var saveBtnClient = toolbar.querySelector("[data-toolbar-save='client']");
-      var cancelBtnJob = toolbar.querySelector("[data-toolbar-cancel='job-offer']");
-      var saveBtnJob = toolbar.querySelector("[data-toolbar-save='job-offer']");
-
-      if (entityIndicator) {
-        var type = entityIndicator.getAttribute("data-entity-mode-indicator");
-        var params = new URLSearchParams(window.location.search);
-        var state = window.IERouter && typeof window.IERouter.resolveEntityPageState === "function"
-          ? window.IERouter.resolveEntityPageState(params)
-          : { mode: "", id: "" };
-        var mode = state.mode;
-        var hasId = !!state.id;
-
-        var text = "";
-        if (mode === "edit" && hasId) {
-          if (type === "candidate") text = "Editing Candidate";
-          else if (type === "client") text = "Editing Client";
-          else if (type === "job-offer") text = "Editing Job Offer";
-        } else if (mode === "create" && !hasId) {
-          if (type === "candidate") text = "Creating Candidate";
-          else if (type === "client") text = "Creating Client";
-          else if (type === "job-offer") text = "Creating Job Offer";
-        }
-
-        if (text) {
-          entityIndicator.textContent = text;
-        } else {
-          entityIndicator.style.display = "none";
-        }
+      var text = "";
+      if (mode === "edit" && hasId) {
+        if (type === "candidate") text = "Editing Candidate";
+        else if (type === "client") text = "Editing Client";
+        else if (type === "job-offer") text = "Editing Job Offer";
+      } else if (mode === "create" && !hasId) {
+        if (type === "candidate") text = "Creating Candidate";
+        else if (type === "client") text = "Creating Client";
+        else if (type === "job-offer") text = "Creating Job Offer";
       }
 
-      if (cancelBtnCandidate || saveBtnCandidate) {
-        var candidateForm = document.querySelector("#candidateForm");
-        if (candidateForm) {
-          var formCancel = candidateForm.querySelector("[data-edit-cancel]");
-          var formSave = candidateForm.querySelector('button[type="submit"]');
-          if (cancelBtnCandidate && formCancel) {
-            cancelBtnCandidate.addEventListener("click", function () {
-              formCancel.click();
-            });
-          }
-          if (saveBtnCandidate && formSave) {
-            saveBtnCandidate.addEventListener("click", function () {
-              if (typeof candidateForm.requestSubmit === "function") {
-                candidateForm.requestSubmit();
-              } else {
-                formSave.click();
-              }
-            });
-          }
-        }
+      if (text) {
+        entityIndicator.textContent = text;
+      } else {
+        entityIndicator.style.display = "none";
       }
-
-      if (cancelBtnClient || saveBtnClient) {
-        var clientForm = document.querySelector("#clientForm");
-        if (clientForm) {
-          var clientCancel = clientForm.querySelector("[data-edit-cancel]");
-          var clientSave = clientForm.querySelector('button[type="submit"]');
-          if (cancelBtnClient && clientCancel) {
-            cancelBtnClient.addEventListener("click", function () {
-              clientCancel.click();
-            });
-          }
-          if (saveBtnClient && clientSave) {
-            saveBtnClient.addEventListener("click", function () {
-              if (typeof clientForm.requestSubmit === "function") {
-                clientForm.requestSubmit();
-              } else {
-                clientSave.click();
-              }
-            });
-          }
-        }
-      }
-
-      if (cancelBtnJob || saveBtnJob) {
-        var jobOfferForm = document.querySelector("#jobOfferForm");
-        if (jobOfferForm) {
-          var jobCancel = jobOfferForm.querySelector("button[type='button']");
-          var jobSave = jobOfferForm.querySelector('button[type="submit"]');
-          if (cancelBtnJob && jobCancel) {
-            cancelBtnJob.addEventListener("click", function () {
-              jobCancel.click();
-            });
-          }
-          if (saveBtnJob && jobSave) {
-            saveBtnJob.addEventListener("click", function () {
-              if (typeof jobOfferForm.requestSubmit === "function") {
-                jobOfferForm.requestSubmit();
-              } else {
-                jobSave.click();
-              }
-            });
-          }
-        }
-      }
-    });
+    }
   }
 
   window.IEFormsRuntime = {

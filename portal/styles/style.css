@@ -4,7 +4,7 @@
    - Elegant, minimal, professional
    - Light background, soft shadows, rounded corners
    - Modern typography (Playfair Display + Montserrat)
-   - Shared layout for sidebar, header, cards, tables, forms, buttons
+   - Shared layout for header, cards, tables, forms, buttons
    ======================================================================= */
 
 /* ------------------------------ CSS Reset -------------------------------- */
@@ -53,8 +53,6 @@ textarea {
   --ie-radius-lg: 1rem;
   --ie-radius-xl: 1.5rem;
   --ie-radius-pill: 999px;
-
-  --ie-sidebar-width: 280px;
 }
 
 /* ------------------------------ Base Text ------------------------------- */
@@ -90,15 +88,7 @@ a:hover {
 
 /* ------------------------------ Layout ---------------------------------- */
 
-/* Main layout used by all portal pages: sidebar + main content */
-
-/* IMPORTANT:
-   Portal pages mix Tailwind utilities + inline <style> blocks.
-   To guarantee a professional full-height dashboard shell consistently, we
-   enforce the fixed sidebar layout with targeted selectors and minimal
-   !important overrides (so we don't have to change the form pages). */
-
-/* Main content: full width (header-first shell on desktop/tablet; sidebar does not reserve layout width) */
+/* Main layout: header-first shell; full-width main content */
 .portal-shell {
   display: flex;
   flex: 1;
@@ -115,140 +105,6 @@ a:hover {
   min-height: 100dvh;
   margin-left: 0 !important;
   width: 100% !important;
-}
-
-/* ------------------------------ Sidebar --------------------------------- */
-
-/* Fixed sidebar: fixed width, fixed position so main content can reserve space with margin-left */
-.sidebar {
-  width: var(--ie-sidebar-width);
-  min-width: var(--ie-sidebar-width);
-  position: fixed !important;
-  left: 0 !important;
-  top: 0 !important;
-  height: 100vh !important;
-  height: 100dvh !important;
-  min-height: 100vh !important;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  z-index: 70;
-  background: radial-gradient(circle at top left, #245746 0, #10281f 55%, #07130f 100%);
-  color: #f9fafb;
-  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.16), var(--ie-color-shadow-soft);
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.sidebar .brand-badge {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--ie-color-accent), #e9cf8d);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 10px 25px rgba(197, 160, 89, 0.35);
-}
-
-.sidebar .brand-subtitle {
-  font-size: 0.625rem;
-  text-transform: uppercase;
-  letter-spacing: 0.22em;
-  opacity: 0.8;
-}
-
-.sidebar nav {
-  margin-top: 0.5rem;
-}
-
-.nav-link {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.75rem 1rem;
-  border-radius: 0 var(--ie-radius-lg) var(--ie-radius-lg) 0;
-  color: rgba(249, 250, 251, 0.9);
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-left: 3px solid transparent;
-  background: transparent;
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.nav-link svg {
-  opacity: 0.85;
-}
-
-.nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.06);
-  border-left-color: var(--ie-color-accent);
-  color: #fef3c7;
-  transform: translateX(2px);
-}
-
-.nav-link.active {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.12),
-    rgba(197, 160, 89, 0.22)
-  );
-  border-left-color: var(--ie-color-accent);
-  color: #fefce8;
-}
-
-.sidebar-footer {
-  border-top: 1px solid rgba(249, 250, 251, 0.12);
-  margin-top: auto;
-}
-
-/* Desktop/tablet (1025px+): sidebar remains in DOM but is off-screen; no layout width reserved */
-@media (min-width: 1025px) {
-  .sidebar {
-    transform: translateX(-100%);
-    pointer-events: none;
-  }
-}
-
-@media (max-width: 1024px) {
-  /* Sidebar off-canvas when closed; slides in from left when open, above header and content */
-  .sidebar {
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    z-index: 110;
-    pointer-events: auto;
-  }
-
-  body.ie-sidebar-open .sidebar,
-  .sidebar.open {
-    transform: translateX(0);
-  }
-}
-
-/* Mobile sidebar: backdrop over full viewport when open; content stays full width underneath (no shrink) */
-.ie-sidebar-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease;
-  z-index: 65;
-}
-
-@media (max-width: 1024px) {
-  body.ie-sidebar-open .ie-sidebar-overlay {
-    opacity: 1;
-    pointer-events: auto;
-  }
-}
-
-@media (min-width: 1025px) {
-  .ie-sidebar-overlay {
-    display: none;
-  }
 }
 
 /* ------------------------------ Header ---------------------------------- */
@@ -271,32 +127,6 @@ a:hover {
   letter-spacing: 0.18em;
   color: var(--ie-color-accent);
   font-weight: 800;
-}
-
-.portal-header-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  min-width: 44px;
-  min-height: 44px;
-  border-radius: 0.75rem;
-  border: 1px solid rgba(17, 24, 39, 0.06);
-  background: transparent;
-  cursor: pointer;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-.portal-header-toggle:hover {
-  background-color: rgba(243, 244, 246, 0.9);
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
-  transform: translateY(-1px);
-}
-
-@media (min-width: 1024px) {
-  .portal-header-toggle {
-    display: none;
-  }
 }
 
 /* ------------------------------ Content Shell --------------------------- */
@@ -679,9 +509,7 @@ textarea[readonly]::placeholder {
 
 @media (prefers-reduced-motion: reduce) {
   .ie-modal-overlay,
-  .ie-modal,
-  .ie-sidebar-overlay,
-  .sidebar {
+  .ie-modal {
     transition: none !important;
   }
 }

@@ -23,7 +23,6 @@
     "add-job-offer",
     "add-client",
     "settings",
-    "sidebar",
   ]);
 
   /**

@@ -67,3 +67,10 @@
 .ie-btn-success:hover {
   filter: brightness(0.95);
 }
+
+/* Mobile: minimum tap target (accessibility) */
+@media (max-width: 768px) {
+  .ie-btn {
+    min-height: 44px;
+  }
+}
