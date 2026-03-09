@@ -2,7 +2,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const skipDirs = new Set(['node_modules', '.git', 'assets/img/_stage1_backup']);
+const skipDirs = new Set([
+  'node_modules',
+  '.git',
+  'assets/img/_stage1_backup',
+  'archive/website/assets-img-stage1'
+]);
 const htmlFiles = [];
 const problems = [];
 
