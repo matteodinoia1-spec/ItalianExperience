@@ -25,6 +25,7 @@
       "add-job-offer": "Create New Job Offer",
       "add-client": "Add Client",
       candidate: "Candidate",
+      application: "Application",
     };
     return titles[key] || "Dashboard";
   }
