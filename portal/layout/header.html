@@ -4,29 +4,31 @@
       <span class="portal-header__page-title" id="portal-header-page-title" aria-hidden="true"></span>
       <nav class="portal-header-nav hidden lg:flex items-center" aria-label="Primary navigation">
         <a href="dashboard.html" class="portal-header-nav__link" data-nav-group="dashboard">Dashboard</a>
-        <div class="portal-header-nav__item-with-sub">
-          <a href="candidates.html" class="portal-header-nav__link" data-nav-group="candidates">Candidates</a>
-          <ul class="portal-header-nav__sub" aria-label="Candidates submenu">
-            <li><a href="add-candidate.html" class="portal-header-nav__sublink">Add Candidate</a></li>
-          </ul>
-        </div>
-        <div class="portal-header-nav__item-with-sub">
-          <a href="job-offers.html" class="portal-header-nav__link" data-nav-group="job-offers">Job Offers</a>
-          <ul class="portal-header-nav__sub" aria-label="Job offers submenu">
-            <li><a href="add-job-offer.html" class="portal-header-nav__sublink">Add Job Offer</a></li>
-          </ul>
-        </div>
+        <a href="candidates.html" class="portal-header-nav__link" data-nav-group="candidates">Candidates</a>
+        <a href="job-offers.html" class="portal-header-nav__link" data-nav-group="job-offers">Job Offers</a>
         <a href="applications.html" class="portal-header-nav__link" data-nav-group="applications">Applications</a>
-        <div class="portal-header-nav__item-with-sub">
-          <a href="clients.html" class="portal-header-nav__link" data-nav-group="clients">Clients</a>
-          <ul class="portal-header-nav__sub" aria-label="Clients submenu">
-            <li><a href="add-client.html" class="portal-header-nav__sublink">Add Client</a></li>
-          </ul>
-        </div>
+        <a href="clients.html" class="portal-header-nav__link" data-nav-group="clients">Clients</a>
         <a href="archived.html" class="portal-header-nav__link" data-nav-group="archived">Archived</a>
       </nav>
     </div>
     <div class="portal-header__right">
+      <div class="portal-header-actions">
+        <button type="button" class="portal-header-actions__search-trigger" data-global-search-trigger aria-label="Search portal" aria-expanded="false">
+          <svg xmlns="http://www.w3.org/2000/svg" class="portal-header-actions__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
+        <div class="portal-header-actions__add-wrap">
+          <button type="button" class="portal-header-actions__add-trigger" data-global-add-trigger aria-haspopup="true" aria-expanded="false" aria-label="Add">
+            <span class="portal-header-actions__add-label">+ Add</span>
+          </button>
+          <div class="portal-header-actions__add-menu" role="menu" aria-label="Add menu" hidden>
+            <a href="add-candidate.html" class="portal-header-actions__add-item" role="menuitem" data-action="add-candidate">Add Candidate</a>
+            <a href="add-job-offer.html" class="portal-header-actions__add-item" role="menuitem" data-action="add-job-offer">Add Job Offer</a>
+            <a href="add-client.html" class="portal-header-actions__add-item" role="menuitem" data-action="add-client">Add Client</a>
+          </div>
+        </div>
+      </div>
       <div class="portal-header-user-area">
         <div class="portal-header-user" data-user-block data-user-menu-trigger role="button" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-label="User menu">
           <div class="text-right hidden md:block">
@@ -42,6 +44,13 @@
           <a href="#" data-action="logout" class="portal-header-user-menu__item">Logout</a>
         </div>
       </div>
+    </div>
+  </div>
+  <!-- Phase 3A/3B: Global search panel (unified results list; no visible category sections) -->
+  <div class="portal-header-search-panel" id="portal-header-search-panel" role="dialog" aria-label="Search portal" aria-modal="true" hidden>
+    <input type="text" class="portal-header-search-panel__input" placeholder="Search candidates, clients, job offers..." data-global-search-input autocomplete="off" aria-label="Search" />
+    <div class="portal-header-search-results" data-global-search-results aria-live="polite">
+      <p class="portal-header-search-placeholder">Start typing to search</p>
     </div>
   </div>
 </header>

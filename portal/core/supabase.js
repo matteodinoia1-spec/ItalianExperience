@@ -1477,6 +1477,47 @@
     }
   }
 
+  /**
+   * Search job offers by title (for global header search).
+   * @param {{ term: string, limit?: number }} opts
+   * @returns {Promise<{ data: Array<{ id: string, title: string }>, error: object | null }>}
+   */
+  async function searchJobOffersByTitle(opts) {
+    const term = (opts && opts.term) != null ? String(opts.term).trim() : "";
+    const rawLimit = (opts && opts.limit) || 5;
+    const limit = Math.max(1, Math.min(20, parseInt(rawLimit, 10) || 5));
+
+    if (!term) {
+      return { data: [], error: null };
+    }
+
+    try {
+      const escaped = term.replace(/%/g, "\\%").replace(/_/g, "\\_");
+      const pattern = "%" + escaped + "%";
+
+      const { data, error } = await supabase
+        .from("job_offers")
+        .select("id, title, position")
+        .or("title.ilike." + pattern + ",position.ilike." + pattern)
+        .or("is_archived.is.null,is_archived.eq.false")
+        .order("title", { ascending: true })
+        .limit(limit);
+
+      if (error) {
+        console.error("[Supabase] searchJobOffersByTitle error:", error.message, error);
+        return { data: [], error };
+      }
+
+      const rows = (data || []).map(function (r) {
+        return { id: r.id, title: r.title || r.position || "", position: r.position };
+      });
+      return { data: rows, error: null };
+    } catch (err) {
+      console.error("[Supabase] searchJobOffersByTitle exception:", err);
+      return { data: [], error: err };
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // DELETE / ARCHIVE HELPERS
   // ---------------------------------------------------------------------------
@@ -3981,6 +4022,7 @@
     archiveJobOffer,
     fetchJobOffers,
     fetchJobOffersPaginated,
+    searchJobOffersByTitle,
     // Clients
     insertClient,
     getClientById,
