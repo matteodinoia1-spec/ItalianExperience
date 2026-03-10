@@ -1,8 +1,14 @@
 // ============================================================================
-// Italian Experience – Supabase integration
+// Italian Experience – Supabase compatibility façade
 // ----------------------------------------------------------------------------
-// Load this AFTER the Supabase CDN script:
+// This file now acts as a thin compatibility layer:
+// - obtains the Supabase client from `window.IESupabaseClient`
+// - delegates domain operations to `window.IEData.*` modules
+// - exposes a stable `window.IESupabase` API used by existing runtime code
+//
+// Load this AFTER the Supabase CDN script and core/supabase-client.js:
 //   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+//   <script src="portal/core/supabase-client.js"></script>
 // Uses publishable (anon) key only.
 //
 // SECURITY – RLS is mandatory:
@@ -29,15 +35,33 @@
 (function () {
   "use strict";
 
-  if (typeof window.supabase === "undefined") {
-    console.error("[Supabase] window.supabase not found. Include Supabase JS v2 from CDN before this script.");
+  var client = window.IESupabaseClient || null;
+  if (!client || !client.supabase) {
+    console.error(
+      "[Supabase] window.IESupabaseClient.supabase not found. " +
+        "Ensure core/supabase-client.js is loaded after the Supabase CDN and before core/supabase.js."
+    );
     window.IESupabase = null;
     return;
   }
 
-  const supabaseUrl = "https://xgioojjmrjcurajgirpa.supabase.co".trim();
-  const supabaseKey = "sb_publishable_36r1oFbqjUoktzPTCvxDWg_sSwhxhzM";
-  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+  const supabase = client.supabase;
+  const getBasePath =
+    typeof client.getBasePath === "function"
+      ? client.getBasePath
+      : function () {
+          try {
+            const url = new URL(".", window.location.href);
+            return url.href;
+          } catch (e) {
+            const path = (window.location.pathname || "").replace(/[^/]+$/, "");
+            return (
+              window.location.origin +
+              (path || "/") +
+              (path && !path.endsWith("/") ? "/" : "")
+            );
+          }
+        };
 
   // ---------------------------------------------------------------------------
   // Auth
@@ -135,67 +159,18 @@
     }
   }
 
-  /**
-   * Internal helper: augment update payloads with audit fields.
-   * - Requires an authenticated user.
-   * - Adds updated_at (ISO string) and updated_by (user.id).
-   * @param {object} updates
-   * @returns {Promise<object>} merged updates
-   */
-  async function withUpdateAuditFields(updates) {
-    const { data, error } = await getSession();
-    if (error) {
-      console.error("[Supabase] withUpdateAuditFields getSession error:", error.message || error, error);
-      throw error;
-    }
-    const user = data && data.user;
-    if (!user || !user.id) {
-      const err = new Error("Not authenticated");
-      console.error("[Supabase] withUpdateAuditFields:", err);
-      throw err;
-    }
-    return {
-      ...updates,
-      updated_at: new Date().toISOString(),
-      updated_by: user.id,
-    };
-  }
-
   // ---------------------------------------------------------------------------
-  // Activity Logs (internal helpers)
+  // Activity Logs (delegated to portal/core/data/activity.js)
   // ---------------------------------------------------------------------------
 
-  function assertEntity(entityType, entityId) {
-    const allowed = ["candidate", "job_offer", "client", "application"];
-    if (!allowed.includes(entityType)) {
-      throw new Error("Invalid entityType");
+  function getActivityModule() {
+    if (!window.IEData || !window.IEData.activity) {
+      console.error(
+        "[Supabase] IEData.activity not found. Ensure portal/core/data/activity.js is loaded before core/supabase.js."
+      );
+      return null;
     }
-    if (typeof entityId !== "string" || !entityId) {
-      throw new Error("Invalid entityId");
-    }
-  }
-
-  function normalizeMessage(message) {
-    const cleaned = String(message ?? "").trim();
-    if (!cleaned) {
-      throw new Error("Message is required");
-    }
-    if (cleaned.length > 500) {
-      throw new Error("Message too long (max 500 chars)");
-    }
-    return cleaned;
-  }
-
-  async function getCurrentUserId() {
-    const { data: sessionData, error } = await getSession();
-    if (error) {
-      throw error;
-    }
-    const userId = sessionData?.user?.id;
-    if (!userId) {
-      throw new Error("Not authenticated");
-    }
-    return userId;
+    return window.IEData.activity;
   }
 
   /**
@@ -230,16 +205,6 @@
     const user = await enforceAuthGuard();
     if (!user) return undefined;
     return user;
-  }
-
-  function getBasePath() {
-    try {
-      const url = new URL(".", window.location.href);
-      return url.href;
-    } catch (e) {
-      const path = (window.location.pathname || "").replace(/[^/]+$/, "");
-      return window.location.origin + (path || "/") + (path && !path.endsWith("/") ? "/" : "");
-    }
   }
 
   // ---------------------------------------------------------------------------
@@ -387,209 +352,232 @@
   }
 
   // ---------------------------------------------------------------------------
-  // Candidates
+  // Candidates (delegated to portal/core/data/candidates.js)
   // ---------------------------------------------------------------------------
 
-  /**
-   * Insert a new candidate (created_by = current user id).
-   * Expects table: candidates (id, created_by, first_name, last_name, position, address, status, source, notes, created_at, ...).
-   * Client is linked via candidate_job_associations -> job_offers -> clients; do not send client_name.
-   * @param {object} payload - { first_name, last_name, position, address, status, source, notes }
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
+  function getCandidatesModule() {
+    if (!window.IEData || !window.IEData.candidates) {
+      console.error(
+        "[Supabase] IEData.candidates not found. Ensure portal/core/data/candidates.js is loaded before core/supabase.js."
+      );
+      return null;
+    }
+    return window.IEData.candidates;
+  }
+
   async function insertCandidate(payload) {
-    const { data: sessionData } = await getSession();
-    const userId = sessionData?.user?.id;
-    if (!userId) {
-      const err = new Error("Not authenticated");
-      console.error("[Supabase] insertCandidate:", err);
-      return { data: null, error: err };
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.insertCandidate !== "function") {
+      return { data: null, error: new Error("Candidates module not available") };
     }
-    try {
-      if (typeof window.debugLog === "function") window.debugLog("[Supabase] insertCandidate");
-      const row = {
-        created_by: userId,
-        first_name: payload.first_name || "",
-        last_name: payload.last_name || "",
-        position: payload.position || null,
-        address: payload.address || null,
-        status: payload.status || "new",
-        source: payload.source || null,
-        notes: payload.notes || null,
-        email: payload.email || null,
-        phone: payload.phone || null,
-        linkedin_url: payload.linkedin_url || null,
-        date_of_birth: payload.date_of_birth || null,
-        summary: payload.summary || null,
-        is_archived: false,
-      };
-      const { data, error } = await supabase.from("candidates").insert(row).select().single();
-      if (error) {
-        console.error("[Supabase] insertCandidate error:", error.message, error);
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] insertCandidate exception:", err);
-      return { data: null, error: err };
-    }
+    return mod.insertCandidate(payload);
   }
 
-  /**
-   * Fetch a single candidate by id (for edit page).
-   * @param {string} id - candidate id
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
   async function getCandidateById(id) {
-    if (!id) return { data: null, error: new Error("Missing id") };
-    try {
-      const { data, error } = await supabase
-        .from("candidates")
-        .select(
-          `
-            *,
-            created_by_profile:profiles!candidates_created_by_profiles_fkey(
-              id,
-              first_name,
-              last_name
-            ),
-            updated_by_profile:profiles!candidates_updated_by_profiles_fkey(
-              id,
-              first_name,
-              last_name
-            ),
-            candidate_job_associations (
-              job_offer_id,
-              job_offers (
-                id,
-                title,
-                position,
-                city,
-                state,
-                clients (
-                  id,
-                  name,
-                  city,
-                  state
-                )
-              )
-            )
-          `
-        )
-        .eq("id", id)
-        .maybeSingle();
-      if (error) {
-        console.error("[Supabase] getCandidateById error:", error.message, error);
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] getCandidateById exception:", err);
-      return { data: null, error: err };
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.getCandidateById !== "function") {
+      return { data: null, error: new Error("Candidates module not available") };
     }
+    return mod.getCandidateById(id);
   }
 
-  /**
-   * Update an existing candidate by id.
-   * @param {string} id - candidate id
-   * @param {object} payload - { first_name, last_name, position, address, status, source, notes }
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
   async function updateCandidate(id, payload) {
-    if (!id) return { data: null, error: new Error("Missing id") };
-    try {
-      const baseUpdates = {
-        first_name: payload.first_name ?? "",
-        last_name: payload.last_name ?? "",
-        position: payload.position ?? null,
-        address: payload.address ?? null,
-        status: payload.status ?? "new",
-        source: payload.source ?? null,
-        notes: payload.notes ?? null,
-        email: payload.email ?? null,
-        phone: payload.phone ?? null,
-        linkedin_url: payload.linkedin_url ?? null,
-        date_of_birth: payload.date_of_birth ?? null,
-        summary: payload.summary ?? null,
-      };
-      const updates = await withUpdateAuditFields(baseUpdates);
-      const { data, error } = await supabase
-        .from("candidates")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] updateCandidate error:", error.message, error);
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] updateCandidate exception:", err);
-      return { data: null, error: err };
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.updateCandidate !== "function") {
+      return { data: null, error: new Error("Candidates module not available") };
     }
+    return mod.updateCandidate(id, payload);
   }
 
-  /**
-   * Fetch all candidates created by the logged-in user.
-   * @returns {Promise<{ data: array, error: object | null }>}
-   */
   async function fetchMyCandidates() {
-    const { data: sessionData } = await getSession();
-    const userId = sessionData?.user?.id;
-    if (!userId) return { data: [], error: null };
-    try {
-      if (typeof window.debugLog === "function") window.debugLog("[Supabase] fetchMyCandidates");
-      const { data, error } = await supabase
-        .from("candidates")
-        .select(
-          `
-          *,
-          candidate_job_associations (
-            job_offer_id,
-            job_offers (
-              id,
-              title,
-              position,
-              city,
-              state,
-              clients (
-                id,
-                name,
-                city,
-                state
-              )
-            )
-          )
-        `
-        )
-        .order("created_at", { ascending: false });
-      if (error) {
-        console.error("[Supabase] fetchMyCandidates error:", error.message, error);
-        return { data: [], error };
-      }
-      const rows = (data || []).map(function (r) {
-        let clientName = r.client_name || null;
-        if (!clientName && Array.isArray(r.candidate_job_associations) && r.candidate_job_associations.length > 0) {
-          const assoc = r.candidate_job_associations[0];
-          const job = assoc && assoc.job_offers;
-          const client = job && job.clients;
-          if (client && client.name) {
-            clientName = client.name;
-          }
-        }
-        return Object.assign({}, r, { client_name: clientName });
-      });
-      return { data: rows, error: null };
-    } catch (err) {
-      console.error("[Supabase] fetchMyCandidates exception:", err);
-      return { data: [], error: err };
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.fetchMyCandidates !== "function") {
+      return { data: [], error: new Error("Candidates module not available") };
     }
+    return mod.fetchMyCandidates();
+  }
+
+  async function archiveCandidate(id) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.archiveCandidate !== "function") {
+      return { data: null, error: new Error("Candidates module not available") };
+    }
+    return mod.archiveCandidate(id);
+  }
+
+  async function unarchiveCandidate(id) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.unarchiveCandidate !== "function") {
+      return { data: null, error: new Error("Candidates module not available") };
+    }
+    return mod.unarchiveCandidate(id);
+  }
+
+  async function fetchCandidatesPaginated(opts) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.fetchCandidatesPaginated !== "function") {
+      return { data: [], totalCount: 0, error: new Error("Candidates module not available") };
+    }
+    return mod.fetchCandidatesPaginated(opts);
+  }
+
+  async function searchCandidatesByName(opts) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.searchCandidatesByName !== "function") {
+      return { data: [], error: new Error("Candidates module not available") };
+    }
+    return mod.searchCandidatesByName(opts);
+  }
+
+  async function getCandidateSkills(candidateId) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.getCandidateSkills !== "function") {
+      return { data: [], error: new Error("Candidates module not available") };
+    }
+    return mod.getCandidateSkills(candidateId);
+  }
+
+  async function replaceCandidateSkills(candidateId, skills) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.replaceCandidateSkills !== "function") {
+      return { data: null, error: new Error("Candidates module not available") };
+    }
+    return mod.replaceCandidateSkills(candidateId, skills);
+  }
+
+  async function getCandidateLanguages(candidateId) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.getCandidateLanguages !== "function") {
+      return { data: [], error: new Error("Candidates module not available") };
+    }
+    return mod.getCandidateLanguages(candidateId);
+  }
+
+  async function replaceCandidateLanguages(candidateId, languages) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.replaceCandidateLanguages !== "function") {
+      return { data: null, error: new Error("Candidates module not available") };
+    }
+    return mod.replaceCandidateLanguages(candidateId, languages);
+  }
+
+  async function getCandidateExperience(candidateId) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.getCandidateExperience !== "function") {
+      return { data: [], error: new Error("Candidates module not available") };
+    }
+    return mod.getCandidateExperience(candidateId);
+  }
+
+  async function replaceCandidateExperience(candidateId, experiences) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.replaceCandidateExperience !== "function") {
+      return { data: null, error: new Error("Candidates module not available") };
+    }
+    return mod.replaceCandidateExperience(candidateId, experiences);
+  }
+
+  async function getCandidateEducation(candidateId) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.getCandidateEducation !== "function") {
+      return { data: [], error: new Error("Candidates module not available") };
+    }
+    return mod.getCandidateEducation(candidateId);
+  }
+
+  async function replaceCandidateEducation(candidateId, education) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.replaceCandidateEducation !== "function") {
+      return { data: null, error: new Error("Candidates module not available") };
+    }
+    return mod.replaceCandidateEducation(candidateId, education);
+  }
+
+  async function getCandidateCertifications(candidateId) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.getCandidateCertifications !== "function") {
+      return { data: [], error: new Error("Candidates module not available") };
+    }
+    return mod.getCandidateCertifications(candidateId);
+  }
+
+  async function replaceCandidateCertifications(candidateId, certifications) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.replaceCandidateCertifications !== "function") {
+      return { data: null, error: new Error("Candidates module not available") };
+    }
+    return mod.replaceCandidateCertifications(candidateId, certifications);
+  }
+
+  async function getCandidateHobbies(candidateId) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.getCandidateHobbies !== "function") {
+      return { data: [], error: new Error("Candidates module not available") };
+    }
+    return mod.getCandidateHobbies(candidateId);
+  }
+
+  async function replaceCandidateHobbies(candidateId, hobbies) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.replaceCandidateHobbies !== "function") {
+      return { data: null, error: new Error("Candidates module not available") };
+    }
+    return mod.replaceCandidateHobbies(candidateId, hobbies);
+  }
+
+  async function uploadCandidateFile(path, file, options) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.uploadCandidateFile !== "function") {
+      return { data: null, error: new Error("Candidates module not available") };
+    }
+    return mod.uploadCandidateFile(path, file, options);
+  }
+
+  async function createSignedCandidateUrl(path, expiresInSeconds) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.createSignedCandidateUrl !== "function") {
+      return null;
+    }
+    return mod.createSignedCandidateUrl(path, expiresInSeconds);
+  }
+
+  async function deleteCandidateFiles(paths) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.deleteCandidateFiles !== "function") {
+      return { data: null, error: new Error("Candidates module not available") };
+    }
+    return mod.deleteCandidateFiles(paths);
+  }
+
+  async function moveCandidateFile(fromPath, toPath) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.moveCandidateFile !== "function") {
+      return { data: null, error: new Error("Candidates module not available") };
+    }
+    return mod.moveCandidateFile(fromPath, toPath);
+  }
+
+  async function updateCandidateFiles(id, payload) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.updateCandidateFiles !== "function") {
+      return { data: null, error: new Error("Candidates module not available") };
+    }
+    return mod.updateCandidateFiles(id, payload);
   }
 
   // ---------------------------------------------------------------------------
   // Job offers
   // ---------------------------------------------------------------------------
+
+  function getJobOffersModule() {
+    if (!window.IEData || !window.IEData.jobOffers) {
+      console.error(
+        "[Supabase] IEData.jobOffers not found. Ensure portal/core/data/job-offers.js is loaded before core/supabase.js."
+      );
+      return null;
+    }
+    return window.IEData.jobOffers;
+  }
 
   /**
    * Insert a new job offer.
@@ -598,42 +586,11 @@
    * @returns {Promise<{ data: object | null, error: object | null }>}
    */
   async function insertJobOffer(payload) {
-    const { data: sessionData } = await getSession();
-    const userId = sessionData?.user?.id;
-    if (!userId) {
-      const err = new Error("Not authenticated");
-      console.error("[Supabase] insertJobOffer:", err);
-      return { data: null, error: err };
+    const mod = getJobOffersModule();
+    if (!mod || typeof mod.insertJobOffer !== "function") {
+      return { data: null, error: new Error("Job-offers module not available") };
     }
-    try {
-      if (typeof window.debugLog === "function") window.debugLog("[Supabase] insertJobOffer");
-      const row = {
-        created_by: userId,
-        client_id: payload.client_id || null,
-        title: payload.title || "",
-        position: payload.position || null,
-        description: payload.description || null,
-        requirements: payload.requirements || null,
-        notes: payload.notes || null,
-        salary: payload.salary || null,
-        contract_type: payload.contract_type || null,
-        positions: payload.positions ?? null,
-        positions_required: Math.max(1, Number(payload.positions_required ?? payload.positions ?? 1)),
-        city: payload.city || null,
-        state: payload.state || null,
-        deadline: payload.deadline || null,
-        status: payload.status || "active",
-      };
-      const { data, error } = await supabase.from("job_offers").insert(row).select().single();
-      if (error) {
-        console.error("[Supabase] insertJobOffer error:", error.message, error);
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] insertJobOffer exception:", err);
-      return { data: null, error: err };
-    }
+    return mod.insertJobOffer(payload);
   }
 
   /**
@@ -642,26 +599,11 @@
    * @returns {Promise<{ data: object | null, error: object | null }>}
    */
   async function getJobOfferById(id) {
-    if (!id) return { data: null, error: new Error("Missing id") };
-    try {
-      // Use a simple, robust query shape to avoid join or view issues.
-      const { data, error } = await supabase
-        .from("job_offers")
-        .select("*")
-        .eq("id", id)
-        .single();
-      if (error) {
-        console.error("[Supabase] getJobOfferById error:", error);
-        return { data: null, error };
-      }
-      if (!data) {
-        return { data: null, error: null };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] getJobOfferById exception:", err);
-      return { data: null, error: err };
+    const mod = getJobOffersModule();
+    if (!mod || typeof mod.getJobOfferById !== "function") {
+      return { data: null, error: new Error("Job-offers module not available") };
     }
+    return mod.getJobOfferById(id);
   }
 
   /**
@@ -672,7 +614,12 @@
    * @returns {Promise<{ data: object | null, error: object | null }>}
    */
   async function fetchJobOfferById(id) {
-    return getJobOfferById(id);
+    const mod = getJobOffersModule();
+    if (!mod || typeof mod.fetchJobOfferById !== "function") {
+      // Fallback to getJobOfferById if dedicated wrapper is not present.
+      return getJobOfferById(id);
+    }
+    return mod.fetchJobOfferById(id);
   }
 
   /**
@@ -682,42 +629,11 @@
    * @returns {Promise<{ data: object | null, error: object | null }>}
    */
   async function updateJobOffer(id, payload) {
-    if (!id) return { data: null, error: new Error("Missing id") };
-    try {
-      const baseUpdates = {
-        client_id: payload.client_id ?? null,
-        title: payload.title ?? "",
-        position: payload.position ?? null,
-        description: payload.description ?? null,
-        requirements: payload.requirements ?? null,
-        notes: payload.notes ?? null,
-        salary: payload.salary ?? null,
-        contract_type: payload.contract_type ?? null,
-        positions: payload.positions ?? null,
-        city: payload.city ?? null,
-        state: payload.state ?? null,
-        deadline: payload.deadline ?? null,
-        status: payload.status ?? "open",
-      };
-      if (payload.positions !== undefined || payload.positions_required !== undefined) {
-        baseUpdates.positions_required = Math.max(1, Number(payload.positions_required ?? payload.positions ?? 1));
-      }
-      const updates = await withUpdateAuditFields(baseUpdates);
-      const { data, error } = await supabase
-        .from("job_offers")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] updateJobOffer error:", error.message, error);
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] updateJobOffer exception:", err);
-      return { data: null, error: err };
+    const mod = getJobOffersModule();
+    if (!mod || typeof mod.updateJobOffer !== "function") {
+      return { data: null, error: new Error("Job-offers module not available") };
     }
+    return mod.updateJobOffer(id, payload);
   }
 
   /**
@@ -727,72 +643,11 @@
    * @returns {Promise<{ data: object | null, error: object | null }>}
    */
   async function updateJobOfferStatus(id, status) {
-    if (!id) return { data: null, error: new Error("Missing id") };
-    try {
-      const { data: existing, error: fetchError } = await supabase
-        .from("job_offers")
-        .select("status")
-        .eq("id", id)
-        .single();
-
-      if (fetchError) {
-        console.error("[Supabase] updateJobOfferStatus fetch error:", fetchError.message, fetchError);
-        return { data: null, error: fetchError };
-      }
-
-      const oldStatus = existing?.status || null;
-
-      const { data, error } = await supabase
-        .from("job_offers")
-        .update({ status })
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) {
-        console.error("[Supabase] updateJobOfferStatus update error:", error.message, error);
-        return { data: null, error };
-      }
-
-      // Manual close path: when transitioning into "closed", update associations and
-      // then recalculate availability for affected candidates.
-      if (oldStatus !== "closed" && status === "closed") {
-        const { data: updatedAssocs, error: assocError } = await supabase
-          .from("candidate_job_associations")
-          .update({ status: "not_selected" })
-          .eq("job_offer_id", id)
-          .not("status", "in", "(hired,rejected,not_selected,withdrawn)")
-          .select("candidate_id");
-
-        if (assocError) {
-          console.error(
-            "[Supabase] updateJobOfferStatus associations update error:",
-            assocError.message || assocError,
-            assocError,
-            { jobOfferId: id }
-          );
-        } else if (Array.isArray(updatedAssocs) && updatedAssocs.length > 0) {
-          const candidateIds = Array.from(
-            new Set(
-              updatedAssocs
-                .map(function (row) {
-                  return row && row.candidate_id;
-                })
-                .filter(Boolean)
-            )
-          );
-
-          for (const candidateId of candidateIds) {
-            await recalculateCandidateAvailability(candidateId);
-          }
-        }
-      }
-
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] updateJobOfferStatus exception:", err);
-      return { data: null, error: err };
+    const mod = getJobOffersModule();
+    if (!mod || typeof mod.updateJobOfferStatus !== "function") {
+      return { data: null, error: new Error("Job-offers module not available") };
     }
+    return mod.updateJobOfferStatus(id, status);
   }
 
   /**
@@ -800,681 +655,69 @@
    * @returns {Promise<{ data: array, error: object | null }>}
    */
   async function fetchJobOffers() {
-    try {
-      const { data, error } = await supabase
-        .from("job_offers")
-        .select(
-          `
-          *,
-          clients (
-            id,
-            name,
-            city,
-            state
-          )
-        `
-        )
-        .order("created_at", { ascending: false });
-      if (error) {
-        console.error("[Supabase] fetchJobOffers error:", error.message, error);
-        return { data: [], error };
-      }
-      return { data: data || [], error: null };
-    } catch (err) {
-      console.error("[Supabase] fetchJobOffers exception:", err);
-      return { data: [], error: err };
+    const mod = getJobOffersModule();
+    if (!mod || typeof mod.fetchJobOffers !== "function") {
+      return { data: [], error: new Error("Job-offers module not available") };
     }
-  }
-
-  /**
-   * Build candidates query with filters (same logic for count and data).
-   * Filters: name, position, address, status, source, archived.
-   * Columns: first_name, last_name, position, address, status, source, is_archived, created_by.
-   */
-  function buildCandidatesQuery(supabaseQuery, filters, userId) {
-    let q = supabaseQuery;
-    if (filters.archived === "active") q = q.eq("is_archived", false);
-    if (filters.archived === "archived") q = q.eq("is_archived", true);
-    if (filters.status) q = q.eq("status", filters.status);
-    if (filters.source) q = q.eq("source", filters.source);
-    const nameTerm = (filters.name || "").trim().replace(/,/g, " ");
-    if (nameTerm) {
-      const escaped = nameTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
-      const pattern = "%" + escaped + "%";
-      q = q.or("first_name.ilike." + pattern + ",last_name.ilike." + pattern);
-    }
-    const posTerm = (filters.position || "").trim();
-    if (posTerm) {
-      const escaped = posTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
-      q = q.ilike("position", "%" + escaped + "%");
-    }
-    const addrTerm = (filters.address || "").trim();
-    if (addrTerm) {
-      const escaped = addrTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
-      q = q.ilike("address", "%" + escaped + "%");
-    }
-    return q;
-  }
-
-  /**
-   * Fetch candidates with filters and pagination. Returns total count (with same filters) and page of data.
-   * @param {object} opts - { filters: object, page: number, limit: number }
-   * @returns {Promise<{ data: array, totalCount: number, error: object | null }>}
-   */
-  async function fetchCandidatesPaginated(opts) {
-    const { data: sessionData } = await getSession();
-    const userId = sessionData?.user?.id;
-    if (!userId) return { data: [], totalCount: 0, error: null };
-
-    const filters = opts.filters || {};
-    const jobOfferId = filters.jobOfferId || null;
-    const page = Math.max(1, parseInt(opts.page, 10) || 1);
-    const limit = Math.max(1, Math.min(100, parseInt(opts.limit, 10) || 10));
-    const offset = (page - 1) * limit;
-
-    try {
-      let candidateIdsForOffer = null;
-
-      if (jobOfferId) {
-        const { data: assocRows, error: assocError } = await supabase
-          .from("candidate_job_associations")
-          .select("candidate_id")
-          .eq("job_offer_id", jobOfferId);
-
-        if (assocError) {
-          console.error("[Supabase] fetchCandidatesPaginated associations error:", assocError.message);
-          return { data: [], totalCount: 0, error: assocError };
-        }
-
-        const candidateIds =
-          Array.isArray(assocRows)
-            ? Array.from(
-                new Set(
-                  assocRows
-                    .map(function (r) {
-                      return r && r.candidate_id;
-                    })
-                    .filter(function (id) {
-                      return !!id;
-                    })
-                )
-              )
-            : [];
-
-        if (!candidateIds.length) {
-          return { data: [], totalCount: 0, error: null };
-        }
-
-        candidateIdsForOffer = candidateIds;
-      }
-
-      let baseCountQuery = supabase.from("candidates").select("*", { count: "exact", head: true });
-      if (candidateIdsForOffer && candidateIdsForOffer.length) {
-        baseCountQuery = baseCountQuery.in("id", candidateIdsForOffer);
-      }
-
-      const countQuery = buildCandidatesQuery(baseCountQuery, filters, userId);
-      const { count, error: countError } = await countQuery;
-      if (countError) {
-        console.error("[Supabase] fetchCandidatesPaginated count error:", countError.message);
-        return { data: [], totalCount: 0, error: countError };
-      }
-      const totalCount = count ?? 0;
-
-      let baseDataQuery = supabase
-        .from("candidates")
-        .select(
-          `
-            *,
-            candidate_job_associations (
-              id,
-              status,
-              created_at,
-              job_offer_id,
-              job_offers (
-                id,
-                title,
-                position,
-                city,
-                state,
-                clients (
-                  id,
-                  name,
-                  city,
-                  state
-                )
-              )
-            )
-          `
-        );
-
-      if (candidateIdsForOffer && candidateIdsForOffer.length) {
-        baseDataQuery = baseDataQuery.in("id", candidateIdsForOffer);
-      }
-
-      const dataQuery = buildCandidatesQuery(baseDataQuery, filters, userId);
-      const { data: rows, error: dataError } = await dataQuery
-        .order("created_at", { foreignTable: "candidate_job_associations", ascending: false })
-        .order("created_at", { ascending: false })
-        .range(offset, offset + limit - 1);
-
-      if (dataError) {
-        console.error("[Supabase] fetchCandidatesPaginated data error:", dataError.message);
-        return { data: [], totalCount, error: dataError };
-      }
-      function computeDerivedAvailabilityFromAssociations(associations) {
-        if (!Array.isArray(associations) || associations.length === 0) return "available";
-        const activeStatuses = ["applied", "screening", "interview", "offer", "new", "offered"];
-        const hasHired = associations.some(function (a) {
-          const s = (a && a.status && String(a.status)).toLowerCase();
-          return s === "hired";
-        });
-        if (hasHired) return "working";
-        const hasActive = associations.some(function (a) {
-          const s = (a && a.status && String(a.status)).toLowerCase();
-          return s === "hired" || activeStatuses.indexOf(s) !== -1;
-        });
-        if (hasActive) return "in_process";
-        return "available";
-      }
-
-      const data = (rows || []).map(function (r) {
-        let latestAssociation = null;
-        if (Array.isArray(r.candidate_job_associations) && r.candidate_job_associations.length > 0) {
-          latestAssociation = r.candidate_job_associations[0];
-        }
-
-        let latestJob = latestAssociation && latestAssociation.job_offers ? latestAssociation.job_offers : null;
-        let latestClient = latestJob && latestJob.clients ? latestJob.clients : null;
-
-        const latestClientName =
-          r.client_name ||
-          (latestClient && latestClient.name) ||
-          null;
-
-        const latestJobLocation = latestJob
-          ? [latestJob.city, latestJob.state]
-              .filter(function (x) {
-                return x;
-              })
-              .join(", ")
-          : null;
-
-        const latestAssociationStatus = latestAssociation && latestAssociation.status ? latestAssociation.status : null;
-
-        const derived_availability = computeDerivedAvailabilityFromAssociations(r.candidate_job_associations);
-
-        return {
-          id: r.id,
-          first_name: r.first_name,
-          last_name: r.last_name,
-          position: r.position,
-          address: r.address,
-          status: r.status,
-          source: r.source,
-          notes: r.notes,
-          created_at: r.created_at,
-          is_archived: r.is_archived,
-          client_name: latestClientName,
-          photo_url: r.photo_url,
-          cv_url:
-            typeof r.cv_url === "string" && r.cv_url.trim().length > 0
-              ? r.cv_url
-              : null,
-          derived_availability: derived_availability,
-          latest_association: latestAssociation
-            ? {
-                id: latestAssociation.id,
-                status: latestAssociationStatus,
-                created_at: latestAssociation.created_at,
-                job_offer_id: latestAssociation.job_offer_id,
-                job_title: latestJob ? latestJob.title : null,
-                job_location: latestJobLocation,
-                client_name: latestClientName,
-                client_id: latestClient ? latestClient.id : null,
-              }
-            : null,
-        };
-      });
-      return { data, totalCount, error: null };
-    } catch (err) {
-      console.error("[Supabase] fetchCandidatesPaginated exception:", err);
-      return { data: [], totalCount: 0, error: err };
-    }
-  }
-
-  /**
-   * Build job offers query with filters (same logic for count and data).
-   * Filters: title, offerStatus, archived (is_archived-based), city, state. Columns: title, city, state, status, is_archived.
-   * Archived filter uses is_archived as the source of truth.
-   */
-  function buildJobOffersQuery(supabaseQuery, filters) {
-    let q = supabaseQuery;
-
-    if (filters.archived === "active") {
-      q = q.eq("is_archived", false);
-    } else if (filters.archived === "archived") {
-      q = q.eq("is_archived", true);
-    }
-
-    if (filters.excludeArchivedStatus === true) {
-      q = q.not("status", "eq", "archived");
-    }
-    if (filters.clientId) q = q.eq("client_id", filters.clientId);
-    if (filters.contractType) q = q.eq("contract_type", filters.contractType);
-    if (filters.offerStatus === "active") {
-      q = q.in("status", ["open", "inprogress", "active"]);
-    } else if (filters.offerStatus) {
-      q = q.eq("status", filters.offerStatus);
-    }
-    const titleTerm = (filters.title || "").trim();
-    if (titleTerm) {
-      const escaped = titleTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
-      q = q.ilike("title", "%" + escaped + "%");
-    }
-    const cityTerm = (filters.city || "").trim();
-    if (cityTerm) {
-      const escaped = cityTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
-      q = q.ilike("city", "%" + escaped + "%");
-    }
-    const stateTerm = (filters.state || "").trim();
-    if (stateTerm) {
-      const escaped = stateTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
-      q = q.ilike("state", "%" + escaped + "%");
-    }
-    return q;
-  }
-
-  /**
-   * Fetch job offers with filters and pagination. Returns total count (with same filters) and page of data.
-   * @param {object} opts - { filters: object, page: number, limit: number }
-   * @returns {Promise<{ data: array, totalCount: number, error: object | null }>}
-   */
-  async function fetchJobOffersPaginated(opts) {
-    const filters = opts.filters || {};
-    const page = Math.max(1, parseInt(opts.page, 10) || 1);
-    const limit = Math.max(1, Math.min(100, parseInt(opts.limit, 10) || 10));
-    const offset = (page - 1) * limit;
-
-    try {
-      const countQuery = buildJobOffersQuery(
-        supabase.from("job_offers").select("*", { count: "exact", head: true }),
-        filters
-      );
-      const { count, error: countError } = await countQuery;
-      if (countError) {
-        console.error("[Supabase] fetchJobOffersPaginated count error:", countError.message);
-        return { data: [], totalCount: 0, error: countError };
-      }
-      const totalCount = count ?? 0;
-
-      const dataQuery = buildJobOffersQuery(
-        supabase
-          .from("job_offers")
-          .select(
-            `
-            *,
-            clients (
-              id,
-              name,
-              city,
-              state
-            ),
-            candidate_job_associations (
-              id,
-              candidate_id,
-              candidates (
-                id,
-                is_archived
-              )
-            )
-          `
-          ),
-        filters
-      );
-      const { data: rows, error: dataError } = await dataQuery
-        .order("created_at", { ascending: false })
-        .range(offset, offset + limit - 1);
-
-      if (dataError) {
-        console.error("[Supabase] fetchJobOffersPaginated data error:", dataError.message);
-        return { data: [], totalCount, error: dataError };
-      }
-      const data = (rows || []).map(function (r) {
-        const client = r.clients || null;
-        const clientName = r.client_name || (client && client.name) || null;
-        const location =
-          r.location ||
-          [r.city, r.state]
-            .filter(function (x) {
-              return x;
-            })
-            .join(", ");
-        return {
-          id: r.id,
-          title: r.title,
-          position: r.position,
-          client_id: r.client_id,
-          client_name: clientName,
-          description: r.description,
-          requirements: r.requirements,
-          notes: r.notes,
-          salary: r.salary,
-          contract_type: r.contract_type,
-          positions: r.positions,
-          city: r.city,
-          state: r.state,
-          location: location,
-          deadline: r.deadline,
-          status: r.status,
-          created_at: r.created_at,
-          is_archived: r.is_archived,
-          candidate_job_associations: Array.isArray(r.candidate_job_associations)
-            ? r.candidate_job_associations
-            : [],
-        };
-      });
-      return { data, totalCount, error: null };
-    } catch (err) {
-      console.error("[Supabase] fetchJobOffersPaginated exception:", err);
-      return { data: [], totalCount: 0, error: err };
-    }
+    return mod.fetchJobOffers();
   }
 
   // ---------------------------------------------------------------------------
-  // Clients
+  // Clients (delegated to portal/core/data/clients.js)
   // ---------------------------------------------------------------------------
 
-  /**
-   * Build clients query with filters (same logic for count and data).
-   * Filters: name, city, state, country, archived.
-   * Columns: name, city, state, country, email, phone, is_archived.
-   */
-  function buildClientsQuery(supabaseQuery, filters) {
-    let q = supabaseQuery;
-
-    if (filters.archived === "active") {
-      q = q.eq("is_archived", false);
+  function getClientsModule() {
+    if (!window.IEData || !window.IEData.clients) {
+      console.error(
+        "[Supabase] IEData.clients not found. Ensure portal/core/data/clients.js is loaded before core/supabase.js."
+      );
+      return null;
     }
-    if (filters.archived === "archived") q = q.eq("is_archived", true);
-
-    const nameTerm = (filters.name || "").trim();
-    if (nameTerm) {
-      const escaped = nameTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
-      q = q.ilike("name", "%" + escaped + "%");
-    }
-
-    const cityTerm = (filters.city || "").trim();
-    if (cityTerm) {
-      const escaped = cityTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
-      q = q.ilike("city", "%" + escaped + "%");
-    }
-
-    const stateTerm = (filters.state || "").trim();
-    if (stateTerm) {
-      const escaped = stateTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
-      q = q.ilike("state", "%" + escaped + "%");
-    }
-
-    const countryTerm = (filters.country || "").trim();
-    if (countryTerm) {
-      const escaped = countryTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
-      q = q.ilike("country", "%" + escaped + "%");
-    }
-
-    return q;
+    return window.IEData.clients;
   }
 
-  /**
-   * Insert a new client. Expects table: clients (id, created_by, name, city, state, country, email, phone, notes, is_archived, created_at).
-   * @param {object} payload - { name, city?, state?, country?, email?, phone?, notes? }
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
   async function insertClient(payload) {
-    const { data: sessionData } = await getSession();
-    const userId = sessionData?.user?.id;
-    if (!userId) {
-      const err = new Error("Not authenticated");
-      console.error("[Supabase] insertClient:", err);
-      return { data: null, error: err };
+    const mod = getClientsModule();
+    if (!mod || typeof mod.insertClient !== "function") {
+      return { data: null, error: new Error("Clients module not available") };
     }
-    try {
-      if (typeof window.debugLog === "function") window.debugLog("[Supabase] insertClient");
-      const row = {
-        created_by: userId,
-        name: payload.name || "",
-        city: payload.city || null,
-        state: payload.state || null,
-        country: payload.country || null,
-        email: payload.email || null,
-        phone: payload.phone || null,
-        notes: payload.notes || null,
-        is_archived: false,
-      };
-      const { data, error } = await supabase.from("clients").insert(row).select().single();
-      if (error) {
-        console.error("[Supabase] insertClient error:", error.message, error);
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] insertClient exception:", err);
-      return { data: null, error: err };
-    }
+    return mod.insertClient(payload);
   }
 
-  /**
-   * Get a single client by id.
-   * @param {string} id - client id
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
   async function getClientById(id) {
-    if (!id) return { data: null, error: new Error("Missing id") };
-    try {
-      // Use a simple, robust query shape to avoid join or view issues.
-      const { data, error } = await supabase
-        .from("clients")
-        .select("*")
-        .eq("id", id)
-        .single();
-      if (error) {
-        console.error("[Supabase] getClientById error:", error);
-        return { data: null, error };
-      }
-      return {
-        data: data || null,
-        error: null,
-      };
-    } catch (err) {
-      console.error("[Supabase] getClientById exception:", err);
-      return { data: null, error: err };
+    const mod = getClientsModule();
+    if (!mod || typeof mod.getClientById !== "function") {
+      return { data: null, error: new Error("Clients module not available") };
     }
+    return mod.getClientById(id);
   }
 
-  /**
-   * Update an existing client by id.
-   * @param {string} id - client id
-   * @param {object} payload - { name, city?, state?, country?, email?, phone?, notes? }
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
   async function updateClient(id, payload) {
-    if (!id) return { data: null, error: new Error("Missing id") };
-    try {
-      const baseUpdates = {
-        name: (payload.name ?? "").toString().trim() || null,
-        city: payload.city ?? null,
-        state: payload.state ?? null,
-        country: payload.country ?? null,
-        email: payload.email ?? null,
-        phone: payload.phone ?? null,
-        notes: payload.notes ?? null,
-      };
-      const updates = await withUpdateAuditFields(baseUpdates);
-      const { data, error } = await supabase
-        .from("clients")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] updateClient error:", error.message, error);
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] updateClient exception:", err);
-      return { data: null, error: err };
+    const mod = getClientsModule();
+    if (!mod || typeof mod.updateClient !== "function") {
+      return { data: null, error: new Error("Clients module not available") };
     }
+    return mod.updateClient(id, payload);
   }
 
-  /**
-   * Fetch clients with filters and pagination. Returns total count (with same filters) and page of data.
-   * @param {object} opts - { filters: object, page: number, limit: number }
-   * @returns {Promise<{ data: array, totalCount: number, error: object | null }>}
-   */
   async function fetchClientsPaginated(opts) {
-    const filters = opts.filters || {};
-    const page = Math.max(1, parseInt(opts.page, 10) || 1);
-    const limit = Math.max(1, Math.min(100, parseInt(opts.limit, 10) || 10));
-    const offset = (page - 1) * limit;
-
-    try {
-      const countQuery = buildClientsQuery(
-        supabase.from("clients").select("*", { count: "exact", head: true }),
-        filters
-      );
-      const { count, error: countError } = await countQuery;
-      if (countError) {
-        console.error("[Supabase] fetchClientsPaginated count error:", countError.message, countError);
-        return { data: [], totalCount: 0, error: countError };
-      }
-      const totalCount = count ?? 0;
-
-      const dataQuery = buildClientsQuery(
-        supabase
-          .from("clients")
-          .select(
-            `
-            *,
-            job_offers (
-              id,
-              status,
-              is_archived
-            )
-          `
-          ),
-        filters
-      );
-      const { data: rows, error: dataError } = await dataQuery
-        .order("created_at", { ascending: false })
-        .range(offset, offset + limit - 1);
-
-      if (dataError) {
-        console.error("[Supabase] fetchClientsPaginated data error:", dataError.message, dataError);
-        return { data: [], totalCount, error: dataError };
-      }
-
-      const data = (rows || []).map(function (r) {
-        return {
-          id: r.id,
-          name: r.name,
-          city: r.city,
-          state: r.state,
-          country: r.country,
-          email: r.email,
-          phone: r.phone,
-          notes: r.notes,
-          is_archived: !!r.is_archived,
-          // Nested job_offers used by frontend to compute Active Offers per client
-          job_offers: Array.isArray(r.job_offers) ? r.job_offers : [],
-        };
-      });
-
-      return { data, totalCount, error: null };
-    } catch (err) {
-      console.error("[Supabase] fetchClientsPaginated exception:", err);
-      return { data: [], totalCount: 0, error: err };
+    const mod = getClientsModule();
+    if (!mod || typeof mod.fetchClientsPaginated !== "function") {
+      return {
+        data: [],
+        totalCount: 0,
+        error: new Error("Clients module not available"),
+      };
     }
+    return mod.fetchClientsPaginated(opts);
   }
 
-  /**
-   * Lightweight client search by name, for autocomplete widgets.
-   * @param {{ term: string, limit?: number }} opts
-   * @returns {Promise<{ data: Array<{ id: string, name: string }>, error: object | null }>}
-   */
   async function searchClientsByName(opts) {
-    const term = (opts && opts.term) || "";
-    const rawLimit = (opts && opts.limit) || 5;
-    const limit = Math.max(1, Math.min(20, parseInt(rawLimit, 10) || 5));
-
-    if (!term.trim()) {
-      return { data: [], error: null };
+    const mod = getClientsModule();
+    if (!mod || typeof mod.searchClientsByName !== "function") {
+      return { data: [], error: new Error("Clients module not available") };
     }
-
-    try {
-      const escaped = term.trim().replace(/%/g, "\\%").replace(/_/g, "\\_");
-      const pattern = "%" + escaped + "%";
-
-      const { data, error } = await supabase
-        .from("clients")
-        .select("id, name")
-        .ilike("name", pattern)
-        .order("name", { ascending: true })
-        .limit(limit);
-
-      if (error) {
-        console.error("[Supabase] searchClientsByName error:", error.message, error);
-        return { data: [], error };
-      }
-
-      const rows = (data || []).map(function (r) {
-        return { id: r.id, name: r.name || "" };
-      });
-
-      return { data: rows, error: null };
-    } catch (err) {
-      console.error("[Supabase] searchClientsByName exception:", err);
-      return { data: [], error: err };
-    }
-  }
-
-  /**
-   * Search candidates by first or last name (no created_by filter).
-   * For autocomplete so candidates appear even after association removal.
-   * @param {{ term?: string, limit?: number }} opts
-   * @returns {Promise<{ data: Array, error: object | null }>}
-   */
-  async function searchCandidatesByName(opts) {
-    const term = (opts && opts.term) != null ? String(opts.term).trim() : "";
-    const limit = Math.max(1, Math.min(100, parseInt((opts && opts.limit) || 10, 10) || 10));
-
-    if (!term || term.length < 2) {
-      return { data: [], error: null };
-    }
-
-    try {
-      const safeTerm = term.replace(/,/g, " ");
-      const escaped = safeTerm.replace(/%/g, "\\%").replace(/_/g, "\\_");
-      const pattern = "%" + escaped + "%";
-
-      const { data, error } = await supabase
-        .from("candidates")
-        .select("id, first_name, last_name, position, is_archived")
-        .or("first_name.ilike." + pattern + ",last_name.ilike." + pattern)
-        .or("is_archived.is.null,is_archived.eq.false")
-        .order("first_name", { ascending: true })
-        .limit(limit);
-
-      if (error) {
-        console.error("[Supabase] searchCandidatesByName error:", error.message, error);
-        return { data: [], error };
-      }
-
-      return { data: data || [], error: null };
-    } catch (err) {
-      console.error("[Supabase] searchCandidatesByName exception:", err);
-      return { data: [], error: err };
-    }
+    return mod.searchClientsByName(opts);
   }
 
   /**
@@ -1516,6 +759,28 @@
       console.error("[Supabase] searchJobOffersByTitle exception:", err);
       return { data: [], error: err };
     }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Job offers – paginated lists (delegated to IEData.jobOffers)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Fetch job offers with filters and pagination. Returns total count (with same filters) and page of data.
+   * Delegates to portal/core/data/job-offers.js via IEData.jobOffers.
+   * @param {object} opts - { filters: object, page: number, limit: number }
+   * @returns {Promise<{ data: array, totalCount: number, error: object | null }>}
+   */
+  async function fetchJobOffersPaginated(opts) {
+    const mod = getJobOffersModule();
+    if (!mod || typeof mod.fetchJobOffersPaginated !== "function") {
+      return {
+        data: [],
+        totalCount: 0,
+        error: new Error("Job-offers module not available"),
+      };
+    }
+    return mod.fetchJobOffersPaginated(opts);
   }
 
   // ---------------------------------------------------------------------------
@@ -1705,77 +970,38 @@
   // ---------------------------------------------------------------------------
 
   /**
-   * Archive a candidate (set is_archived = true). Does not remove the record.
-   * @param {string} id - candidate id
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
-  async function archiveCandidate(id) {
-    if (!id) return { data: null, error: new Error("Missing id") };
-    return archiveRecord({ table: "candidates", id });
-  }
-
-  /**
    * Archive a job offer (set is_archived = true). Does not remove the record.
    * @param {string} id - job_offers id
    * @returns {Promise<{ data: object | null, error: object | null }>}
    */
   async function archiveJobOffer(id) {
-    if (!id) return { data: null, error: new Error("Missing id") };
-    return archiveRecord({ table: "job_offers", id });
+    const mod = getJobOffersModule();
+    if (!mod || typeof mod.archiveJobOffer !== "function") {
+      return { data: null, error: new Error("Job-offers module not available") };
+    }
+    return mod.archiveJobOffer(id);
   }
 
   /**
    * Archive a client (set is_archived = true). Does not remove the record.
+   * Delegates to IEData.clients.archiveClient for implementation.
    * @param {string} id - clients id
    * @returns {Promise<{ data: object | null, error: object | null }>}
    */
   async function archiveClient(id) {
-    if (!id) return { data: null, error: new Error("Missing id") };
-    try {
-      // Soft archive the client itself.
-      const { data: client, error: clientError } = await supabase
-        .from("clients")
-        .update({ is_archived: true })
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (clientError) {
-        console.error("[Supabase] archiveClient clients update error:", clientError.message, clientError, { id });
-        return { data: null, error: clientError };
-      }
-
-      // Soft cascade: archive ALL job offers belonging to this client.
-      const { error: offersError } = await supabase
-        .from("job_offers")
-        .update({ is_archived: true })
-        .eq("client_id", id);
-
-      if (offersError) {
-        console.error("[Supabase] archiveClient job_offers update error:", offersError.message, offersError, { id });
-        return { data: client || null, error: offersError };
-      }
-
-      return { data: client || null, error: null };
-    } catch (err) {
-      console.error("[Supabase] archiveClient exception:", err, { id });
-      return { data: null, error: err };
+    const mod = getClientsModule();
+    if (!mod || typeof mod.archiveClient !== "function") {
+      return { data: null, error: new Error("Clients module not available") };
     }
+    return mod.archiveClient(id);
   }
 
   // ---------------------------------------------------------------------------
   // Restore (unarchive) – set is_archived = false for Archiviati page
   // ---------------------------------------------------------------------------
 
-  /**
-   * Restore a candidate from archive (set is_archived = false).
-   * @param {string} id - candidate id
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
-  async function unarchiveCandidate(id) {
-    if (!id) return { data: null, error: new Error("Missing id") };
-    return unarchiveRecord({ table: "candidates", id });
-  }
+  // archiveCandidate and unarchiveCandidate are delegated to IEData.candidates via the
+  // facade wrappers defined in the Candidates section above.
 
   /**
    * Restore a job offer from archive (set is_archived = false).
@@ -1783,351 +1009,122 @@
    * @returns {Promise<{ data: object | null, error: object | null }>}
    */
   async function unarchiveJobOffer(id) {
-    if (!id) return { data: null, error: new Error("Missing id") };
-    return unarchiveRecord({ table: "job_offers", id });
+    const mod = getJobOffersModule();
+    if (!mod || typeof mod.unarchiveJobOffer !== "function") {
+      return { data: null, error: new Error("Job-offers module not available") };
+    }
+    return mod.unarchiveJobOffer(id);
   }
 
   /**
    * Restore a client from archive (set is_archived = false).
+   * Delegates to IEData.clients.unarchiveClient for implementation.
    * @param {string} id - clients id
    * @returns {Promise<{ data: object | null, error: object | null }>}
    */
   async function unarchiveClient(id) {
-    if (!id) return { data: null, error: new Error("Missing id") };
-    return unarchiveRecord({ table: "clients", id });
+    const mod = getClientsModule();
+    if (!mod || typeof mod.unarchiveClient !== "function") {
+      return { data: null, error: new Error("Clients module not available") };
+    }
+    return mod.unarchiveClient(id);
   }
 
   // ---------------------------------------------------------------------------
   // Candidate–Job associations
   // ---------------------------------------------------------------------------
 
+  function getApplicationsModule() {
+    if (!window.IEData || !window.IEData.applications) {
+      console.error(
+        "[Supabase] IEData.applications not found. Ensure portal/core/data/applications.js is loaded before core/supabase.js."
+      );
+      return null;
+    }
+    return window.IEData.applications;
+  }
+
   // recalculateCandidateAvailability is deprecated in favor of derived availability from applications.
-  /**
-   * Recalculate a candidate's availability_status based on active associations.
-   * Compatibility layer: availability is now derived from applications in the UI;
-   * this still writes availability_status for backward compatibility and search filters.
-   * A candidate is unavailable if they have ANY association whose status is NOT
-   * in ("rejected", "not_selected", "withdrawn"); otherwise they are available.
-   * This helper must NOT call updateCandidateAssociationStatus to avoid loops.
-   * @param {string} candidateId
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
   async function recalculateCandidateAvailability(candidateId) {
-    if (!candidateId) {
-      const error = new Error("Missing candidateId");
-      console.error("[Supabase] recalculateCandidateAvailability:", error);
-      return { data: null, error };
-    }
-    try {
-      const { data: rows, error } = await supabase
-        .from("candidate_job_associations")
-        .select("status")
-        .eq("candidate_id", candidateId);
-      if (error) {
-        console.error(
-          "[Supabase] recalculateCandidateAvailability fetch error:",
-          error.message || error,
-          { candidateId }
-        );
-        return { data: null, error };
-      }
-      const associations = Array.isArray(rows) ? rows : [];
-      const hasActive = associations.some(function (row) {
-        const raw = row && row.status ? String(row.status).toLowerCase() : "";
-        if (!raw) return false;
-        // Treat anything that is not an explicit terminal status as active.
-        return raw !== "rejected" && raw !== "not_selected" && raw !== "withdrawn";
-      });
-      const availability = hasActive ? "unavailable" : "available";
-      const { data: updated, error: updateError } = await supabase
-        .from("candidates")
-        .update({ availability_status: availability })
-        .eq("id", candidateId)
-        .select("id, availability_status")
-        .single();
-      if (updateError) {
-        console.error(
-          "[Supabase] recalculateCandidateAvailability update error:",
-          updateError.message || updateError,
-          { candidateId }
-        );
-        return { data: null, error: updateError };
-      }
-      return { data: updated || null, error: null };
-    } catch (err) {
-      console.error(
-        "[Supabase] recalculateCandidateAvailability exception:",
-        err,
-        { candidateId }
-      );
-      return { data: null, error: err };
-    }
-  }
-
-  /**
-   * Search available, non-archived candidates for association.
-   * Primary source of truth for operational availability is availability_status.
-   * Excludes candidates with status = 'hired'.
-   * @param {object} opts - { term: string, limit?: number, clientId?: string | null, jobOfferId?: string | null }
-   * @returns {Promise<{ data: array, error: object | null }>}
-   */
-  async function searchAvailableCandidatesForAssociation(opts) {
-    const termRaw = (opts && opts.term ? String(opts.term) : "").trim();
-    if (termRaw.length < 2) {
-      return { data: [], error: null };
-    }
-    const limit =
-      opts && typeof opts.limit === "number"
-        ? Math.max(1, Math.min(50, opts.limit))
-        : 20;
-
-    // Escape % and _ for ilike search.
-    const escaped = termRaw.replace(/%/g, "\\%").replace(/_/g, "\\_");
-    const pattern = "%" + escaped + "%";
-
-    try {
-      let q = supabase
-        .from("candidates")
-        .select(
-          `
-          id,
-          first_name,
-          last_name,
-          position,
-          status,
-          availability_status,
-          is_archived
-        `
-        )
-        .or(
-          [
-            "first_name.ilike." + pattern,
-            "last_name.ilike." + pattern,
-          ].join(",")
-        )
-        .or("is_archived.is.null,is_archived.eq.false")
-        .eq("availability_status", "available")
-        .not("status", "eq", "hired")
-        .order("first_name", { ascending: true })
-        .order("last_name", { ascending: true })
-        .limit(limit);
-
-      const { data, error } = await q;
-      if (error) {
-        console.error(
-          "[Supabase] searchAvailableCandidatesForAssociation error:",
-          error.message || error,
-          { term: termRaw }
-        );
-        return { data: [], error };
-      }
+    const mod = getApplicationsModule();
+    if (
+      !mod ||
+      typeof mod.recalculateCandidateAvailability !== "function"
+    ) {
       return {
-        data:
-          (data || []).map(function (row) {
-            return {
-              id: row.id,
-              first_name: row.first_name,
-              last_name: row.last_name,
-              position: row.position,
-              status: row.status,
-              availability_status: row.availability_status,
-              is_archived: row.is_archived,
-            };
-          }),
-        error: null,
+        data: null,
+        error: new Error("Applications module not available"),
       };
-    } catch (err) {
-      console.error(
-        "[Supabase] searchAvailableCandidatesForAssociation exception:",
-        err,
-        { term: termRaw }
-      );
-      return { data: [], error: err };
     }
+    return mod.recalculateCandidateAvailability(candidateId);
   }
 
-  /**
-   * Link a candidate to a job offer.
-   * Table: candidate_job_associations (candidate_id, job_offer_id, status, notes, created_by, ...)
-   * @param {object} payload - { candidate_id, job_offer_id, status, notes }
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
+  async function searchAvailableCandidatesForAssociation(opts) {
+    const mod = getApplicationsModule();
+    if (
+      !mod ||
+      typeof mod.searchAvailableCandidatesForAssociation !== "function"
+    ) {
+      return {
+        data: [],
+        error: new Error("Applications module not available"),
+      };
+    }
+    return mod.searchAvailableCandidatesForAssociation(opts);
+  }
+
   async function linkCandidateToJob(payload) {
-    const { data: sessionData } = await getSession();
-    const userId = sessionData?.user?.id;
-    if (!userId) {
-      const err = new Error("Not authenticated");
-      console.error("[Supabase] linkCandidateToJob:", err);
-      return { data: null, error: err };
-    }
-    try {
-      const candidateId = payload.candidate_id;
-      const { data: candidateRow, error: fetchErr } = await supabase
-        .from("candidates")
-        .select("id")
-        .eq("id", candidateId)
-        .maybeSingle();
-      if (fetchErr) {
-        console.error("[Supabase] linkCandidateToJob fetch candidate error:", fetchErr.message, fetchErr);
-        return { data: null, error: fetchErr };
-      }
-      if (!candidateRow) {
-        const err = new Error("Candidate not found");
-        console.error("[Supabase] linkCandidateToJob:", err.message);
-        return { data: null, error: err };
-      }
-      const jobOfferId = payload.job_offer_id;
-      const { data: existing, error: existingErr } = await supabase
-        .from("candidate_job_associations")
-        .select("id, status")
-        .eq("candidate_id", candidateId)
-        .eq("job_offer_id", jobOfferId)
-        .not("status", "in", "(rejected,withdrawn,not_selected)")
-        .maybeSingle();
-      if (existingErr) {
-        console.error("[Supabase] linkCandidateToJob duplicate check error:", existingErr.message, existingErr);
-        return { data: null, error: existingErr };
-      }
-      if (existing) {
-        const err = new Error("This candidate already has an active application for this job offer.");
-        err.code = "DUPLICATE_APPLICATION";
-        console.warn("[Supabase] linkCandidateToJob duplicate:", candidateId, jobOfferId);
-        return { data: null, error: err };
-      }
-      if (typeof window.debugLog === "function") window.debugLog("[Supabase] linkCandidateToJob");
-      const rawStatus = payload.status || "applied";
-      const status = rawStatus === "new" ? "applied" : rawStatus;
-      const row = {
-        candidate_id: candidateId,
-        job_offer_id: jobOfferId,
-        status: status,
-        notes: payload.notes || null,
-        created_by: userId,
+    const mod = getApplicationsModule();
+    if (!mod || typeof mod.linkCandidateToJob !== "function") {
+      return {
+        data: null,
+        error: new Error("Applications module not available"),
       };
-      const { data, error } = await supabase
-        .from("candidate_job_associations")
-        .insert(row)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] linkCandidateToJob error:", error.message, error);
-        return { data: null, error };
-      }
-      // Any new association (by definition) makes the candidate unavailable.
-      await recalculateCandidateAvailability(candidateId);
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] linkCandidateToJob exception:", err);
-      return { data: null, error: err };
     }
+    return mod.linkCandidateToJob(payload);
   }
 
-  /**
-   * Search active, non-archived job offers for association.
-   * Delegates active/archived semantics to buildJobOffersQuery.
-   * @param {object} opts - { term?: string, limit?: number, clientId?: string | null }
-   * @returns {Promise<{ data: array, error: object | null }>}
-   */
   async function searchActiveJobOffersForAssociation(opts) {
-    const termRaw = opts && typeof opts.term === "string" ? opts.term : "";
-    const term = termRaw.trim();
-    const limit =
-      opts && typeof opts.limit === "number"
-        ? Math.max(1, Math.min(50, opts.limit))
-        : 20;
-    const clientId = opts && opts.clientId ? String(opts.clientId) : null;
-
-    const filters = {
-      archived: "active",
-      offerStatus: "active",
-      title: term || "",
-      clientId: clientId || undefined,
-    };
-
-    try {
-      let baseQuery = supabase
-        .from("job_offers")
-        .select(
-          `
-          id,
-          title,
-          status,
-          is_archived,
-          client_id,
-          clients (
-            id,
-            name
-          )
-        `
-        );
-
-      const filteredQuery = buildJobOffersQuery(baseQuery, filters);
-      const { data: rows, error } = await filteredQuery
-        .order("created_at", { ascending: false })
-        .range(0, limit - 1);
-
-      if (error) {
-        console.error(
-          "[Supabase] searchActiveJobOffersForAssociation error:",
-          error.message || error,
-          { term, clientId }
-        );
-        return { data: [], error };
-      }
-
-      const data =
-        rows && Array.isArray(rows)
-          ? rows.map(function (r) {
-              const client = r.clients || null;
-              return {
-                id: r.id,
-                title: r.title,
-                status: r.status,
-                is_archived: r.is_archived,
-                client_id: r.client_id,
-                client_name:
-                  (client && client.name) || r.client_name || null,
-              };
-            })
-          : [];
-
-      return { data, error: null };
-    } catch (err) {
-      console.error(
-        "[Supabase] searchActiveJobOffersForAssociation exception:",
-        err,
-        { term, clientId }
-      );
-      return { data: [], error: err };
+    const mod = getApplicationsModule();
+    if (
+      !mod ||
+      typeof mod.searchActiveJobOffersForAssociation !== "function"
+    ) {
+      return {
+        data: [],
+        error: new Error("Applications module not available"),
+      };
     }
+    return mod.searchActiveJobOffersForAssociation(opts);
   }
 
   // ---------------------------------------------------------------------------
-  // Dashboard stats (real-time from candidates + job_offers)
+  // Dashboard stats (delegated to portal/core/data/dashboard.js)
   // ---------------------------------------------------------------------------
-  // Candidates table: id, first_name, last_name, position, status, source, created_at, is_archived (and created_by)
+  // Candidates table: id, first_name, last_name, position, status, source,
+  // created_at, is_archived (and created_by)
   // Job offers table: id, status, is_archived, ...
+
+  function getDashboardModule() {
+    if (!window.IEData || !window.IEData.dashboard) {
+      console.error(
+        "[Supabase] IEData.dashboard not found. Ensure portal/core/data/dashboard.js is loaded before core/supabase.js."
+      );
+      return null;
+    }
+    return window.IEData.dashboard;
+  }
 
   /**
    * Total count of candidates (non-archived only).
    * @returns {Promise<{ data: number, error: object | null }>}
    */
   async function getTotalCandidates() {
-    try {
-      let q = supabase.from("candidates").select("*", { count: "exact", head: true });
-      try {
-        q = q.eq("is_archived", false);
-      } catch (_) {}
-      const { count, error } = await q;
-      if (error) {
-        console.error("[Supabase] getTotalCandidates error:", error.message, error);
-        return { data: 0, error };
-      }
-      return { data: count ?? 0, error: null };
-    } catch (err) {
-      console.error("[Supabase] getTotalCandidates exception:", err);
-      return { data: 0, error: err };
+    const mod = getDashboardModule();
+    if (!mod || typeof mod.getTotalCandidates !== "function") {
+      return { data: 0, error: new Error("Dashboard module not available") };
     }
+    return mod.getTotalCandidates();
   }
 
   /**
@@ -2135,24 +1132,11 @@
    * @returns {Promise<{ data: number, error: object | null }>}
    */
   async function getActiveJobOffers() {
-    try {
-      let q = supabase.from("job_offers").select("*", { count: "exact", head: true });
-      try {
-        q = q.eq("is_archived", false);
-      } catch (_) {}
-      try {
-        q = q.in("status", ["open", "active", "inprogress", "in progress"]);
-      } catch (_) {}
-      const { count, error } = await q;
-      if (error) {
-        console.error("[Supabase] getActiveJobOffers error:", error.message, error);
-        return { data: 0, error };
-      }
-      return { data: count ?? 0, error: null };
-    } catch (err) {
-      console.error("[Supabase] getActiveJobOffers exception:", err);
-      return { data: 0, error: err };
+    const mod = getDashboardModule();
+    if (!mod || typeof mod.getActiveJobOffers !== "function") {
+      return { data: 0, error: new Error("Dashboard module not available") };
     }
+    return mod.getActiveJobOffers();
   }
 
   /**
@@ -2160,24 +1144,11 @@
    * @returns {Promise<{ data: number, error: object | null }>}
    */
   async function getNewCandidatesToday() {
-    try {
-      const now = new Date();
-      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-      const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString();
-      const { data, error } = await supabase
-        .from("candidates")
-        .select("id")
-        .gte("created_at", startOfDay)
-        .lt("created_at", endOfDay);
-      if (error) {
-        console.error("[Supabase] getNewCandidatesToday error:", error.message, error);
-        return { data: 0, error };
-      }
-      return { data: (data || []).length, error: null };
-    } catch (err) {
-      console.error("[Supabase] getNewCandidatesToday exception:", err);
-      return { data: 0, error: err };
+    const mod = getDashboardModule();
+    if (!mod || typeof mod.getNewCandidatesToday !== "function") {
+      return { data: 0, error: new Error("Dashboard module not available") };
     }
+    return mod.getNewCandidatesToday();
   }
 
   /**
@@ -2185,25 +1156,11 @@
    * @returns {Promise<{ data: number, error: object | null }>}
    */
   async function getHiredThisMonth() {
-    try {
-      const now = new Date();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
-      const { data, error } = await supabase
-        .from("candidates")
-        .select("id")
-        .eq("status", "hired")
-        .gte("created_at", startOfMonth)
-        .lt("created_at", endOfMonth);
-      if (error) {
-        console.error("[Supabase] getHiredThisMonth error:", error.message, error);
-        return { data: 0, error };
-      }
-      return { data: (data || []).length, error: null };
-    } catch (err) {
-      console.error("[Supabase] getHiredThisMonth exception:", err);
-      return { data: 0, error: err };
+    const mod = getDashboardModule();
+    if (!mod || typeof mod.getHiredThisMonth !== "function") {
+      return { data: 0, error: new Error("Dashboard module not available") };
     }
+    return mod.getHiredThisMonth();
   }
 
   /**
@@ -2211,25 +1168,11 @@
    * @returns {Promise<{ data: array, error: object | null }>}
    */
   async function getRecentCandidates() {
-    try {
-      let q = supabase
-        .from("candidates")
-        .select("id, first_name, last_name, position, status, source, created_at")
-        .order("created_at", { ascending: false })
-        .limit(10);
-      try {
-        q = q.eq("is_archived", false);
-      } catch (_) {}
-      const { data, error } = await q;
-      if (error) {
-        console.error("[Supabase] getRecentCandidates error:", error.message, error);
-        return { data: [], error };
-      }
-      return { data: data || [], error: null };
-    } catch (err) {
-      console.error("[Supabase] getRecentCandidates exception:", err);
-      return { data: [], error: err };
+    const mod = getDashboardModule();
+    if (!mod || typeof mod.getRecentCandidates !== "function") {
+      return { data: [], error: new Error("Dashboard module not available") };
     }
+    return mod.getRecentCandidates();
   }
 
   /**
@@ -2237,1306 +1180,131 @@
    * @returns {Promise<{ data: array, error: object | null }>}
    */
   async function getCandidatesBySource() {
-    try {
-      const { data, error } = await supabase
-        .from("candidates")
-        .select("source")
-        .eq("is_archived", false);
-      if (error) {
-        console.error("[Supabase] getCandidatesBySource error:", error.message, error);
-        return { data: [], error };
-      }
-      const list = data || [];
-      const bySource = {};
-      list.forEach((row) => {
-        const s = (row.source || "other").toString().trim() || "other";
-        bySource[s] = (bySource[s] || 0) + 1;
-      });
-      const total = list.length;
-      const result = Object.entries(bySource).map(([source, count]) => ({
-        source,
-        count,
-        percentage: total > 0 ? Math.round((count / total) * 100) : 0,
-      }));
-      result.sort((a, b) => b.count - a.count);
-      return { data: result, error: null };
-    } catch (err) {
-      console.error("[Supabase] getCandidatesBySource exception:", err);
-      return { data: [], error: err };
+    const mod = getDashboardModule();
+    if (!mod || typeof mod.getCandidatesBySource !== "function") {
+      return { data: [], error: new Error("Dashboard module not available") };
     }
+    return mod.getCandidatesBySource();
   }
 
   /**
    * Fetch job history for a candidate (associations with job_offers joined).
    * Returns list of { association, job_offer }.
-   * @param {string} candidateId
-   * @returns {Promise<{ data: array, error: object | null }>}
    */
   async function fetchJobHistoryForCandidate(candidateId) {
-    if (!candidateId) return { data: [], error: null };
-    try {
-      const { data: assocs, error: assocError } = await supabase
-        .from("candidate_job_associations")
-        .select("*")
-        .eq("candidate_id", candidateId)
-        .order("created_at", { ascending: false });
-      if (assocError) {
-        console.error("[Supabase] fetchJobHistoryForCandidate error:", assocError.message, assocError);
-        return { data: [], error: assocError };
-      }
-      if (!assocs?.length) return { data: [], error: null };
-      const offerIds = [...new Set(assocs.map((a) => a.job_offer_id))];
-      const { data: offers, error: offersError } = await supabase
-        .from("job_offers")
-        .select(
-          `
-          id,
-          title,
-          position,
-          city,
-          state,
-          salary,
-          deadline,
-          status,
-          clients (
-            id,
-            name,
-            city,
-            state
-          )
-        `
-        )
-        .in("id", offerIds);
-      if (offersError) {
-        console.error("[Supabase] fetchJobHistoryForCandidate job_offers error:", offersError.message);
-        return { data: assocs.map((a) => ({ association: a, job_offer: null })), error: null };
-      }
-      const normalizedOffers = (offers || []).map(function (o) {
-        const client = o.clients || null;
-        const clientName = (client && client.name) || null;
-        const location = [o.city, o.state]
-          .filter(function (x) {
-            return x;
-          })
-          .join(", ");
-        return {
-          id: o.id,
-          title: o.title,
-          position: o.position,
-          city: o.city,
-          state: o.state,
-          salary: o.salary,
-          deadline: o.deadline,
-          status: o.status,
-          client_name: clientName,
-          location: location,
-        };
-      });
-      const offerMap = normalizedOffers.reduce(function (acc, o) {
-        acc[o.id] = o;
-        return acc;
-      }, {});
-      const result = assocs.map((a) => ({ association: a, job_offer: offerMap[a.job_offer_id] || null }));
-      return { data: result, error: null };
-    } catch (err) {
-      console.error("[Supabase] fetchJobHistoryForCandidate exception:", err);
-      return { data: [], error: err };
+    const mod = getApplicationsModule();
+    if (
+      !mod ||
+      typeof mod.fetchJobHistoryForCandidate !== "function"
+    ) {
+      return {
+        data: [],
+        error: new Error("Applications module not available"),
+      };
     }
+    return mod.fetchJobHistoryForCandidate(candidateId);
   }
 
-  /**
-   * Fetch candidates associated with a job offer (with candidate data).
-   * @param {string} jobOfferId - job_offers.id
-   * @returns {Promise<{ data: array, error: object | null }>}
-   */
   async function fetchCandidatesForJobOffer(jobOfferId) {
-    if (!jobOfferId) return { data: [], error: null };
-    try {
-      const { data, error } = await supabase
-        .from("candidate_job_associations")
-        .select(
-          `
-          id,
-          status,
-          notes,
-          rejection_reason,
-          created_at,
-          candidates (
-            id,
-            first_name,
-            last_name,
-            position,
-            is_archived,
-            cv_url
-          )
-        `
-        )
-        .eq("job_offer_id", jobOfferId)
-        .order("created_at", { ascending: false });
-      if (error) {
-        console.error("[Supabase] fetchCandidatesForJobOffer error:", error.message, error);
-        return { data: [], error };
-      }
-      return { data: data || [], error: null };
-    } catch (err) {
-      console.error("[Supabase] fetchCandidatesForJobOffer exception:", err);
-      return { data: [], error: err };
+    const mod = getApplicationsModule();
+    if (
+      !mod ||
+      typeof mod.fetchCandidatesForJobOffer !== "function"
+    ) {
+      return {
+        data: [],
+        error: new Error("Applications module not available"),
+      };
     }
+    return mod.fetchCandidatesForJobOffer(jobOfferId);
   }
 
-  /**
-   * Fetch applications (candidate_job_associations) paginated with filters.
-   * @param {object} filters - { status?, job_offer_id?, client_id?, candidate_id?, date_from?, date_to? }
-   * @param {object} pagination - { page: number, limit: number }
-   * @returns {Promise<{ data: array, totalCount: number, error: object | null }>}
-   */
   async function fetchApplicationsPaginated(filters, pagination) {
-    filters = filters || {};
-    const page = Math.max(1, (pagination && pagination.page) || 1);
-    const limit = Math.max(1, Math.min(100, (pagination && pagination.limit) || 25));
-    const offset = (page - 1) * limit;
-
-    try {
-      let query = supabase
-        .from("candidate_job_associations")
-        .select(
-          `
-          id,
-          candidate_id,
-          job_offer_id,
-          status,
-          notes,
-          rejection_reason,
-          created_at,
-          candidates (
-            id,
-            first_name,
-            last_name,
-            position,
-            status,
-            is_archived
-          ),
-          job_offers (
-            id,
-            title,
-            position,
-            status,
-            client_id,
-            clients (
-              id,
-              name
-            )
-          )
-        `,
-          { count: "exact" }
-        );
-
-      if (filters.status) {
-        query = query.eq("status", filters.status);
-      }
-      if (filters.job_offer_id) {
-        query = query.eq("job_offer_id", filters.job_offer_id);
-      }
-      if (filters.candidate_id) {
-        query = query.eq("candidate_id", filters.candidate_id);
-      }
-      if (filters.client_id) {
-        const { data: offerIds } = await supabase
-          .from("job_offers")
-          .select("id")
-          .eq("client_id", filters.client_id);
-        const ids = (offerIds || []).map(function (o) {
-          return o.id;
-        }).filter(Boolean);
-        if (ids.length === 0) {
-          return { data: [], totalCount: 0, error: null };
-        }
-        query = query.in("job_offer_id", ids);
-      }
-      if (filters.date_from) {
-        query = query.gte("created_at", filters.date_from);
-      }
-      if (filters.date_to) {
-        query = query.lte("created_at", filters.date_to);
-      }
-
-      const { data: rows, error, count } = await query
-        .order("created_at", { ascending: false })
-        .range(offset, offset + limit - 1);
-
-      if (error) {
-        console.error("[Supabase] fetchApplicationsPaginated error:", error.message, error);
-        return { data: [], totalCount: 0, error };
-      }
-
-      const data = (rows || []).map(function (r) {
-        const cand = r.candidates || null;
-        const offer = r.job_offers || null;
-        const client = (offer && offer.clients) || null;
-        return {
-          id: r.id,
-          candidate_id: r.candidate_id,
-          job_offer_id: r.job_offer_id,
-          status: r.status,
-          notes: r.notes,
-          rejection_reason: r.rejection_reason,
-          created_at: r.created_at,
-          candidate_name: cand
-            ? [cand.first_name, cand.last_name].filter(Boolean).join(" ").trim() || "—"
-            : "—",
-          candidate_position: (cand && cand.position) || null,
-          job_offer_title: (offer && (offer.title || offer.position)) || "—",
-          client_name: (client && client.name) || "—",
-          client_id: (offer && offer.client_id) || null,
-        };
-      });
-
-      return { data, totalCount: count ?? 0, error: null };
-    } catch (err) {
-      console.error("[Supabase] fetchApplicationsPaginated exception:", err);
-      return { data: [], totalCount: 0, error: err };
+    const mod = getApplicationsModule();
+    if (
+      !mod ||
+      typeof mod.fetchApplicationsPaginated !== "function"
+    ) {
+      return {
+        data: [],
+        totalCount: 0,
+        error: new Error("Applications module not available"),
+      };
     }
+    return mod.fetchApplicationsPaginated(filters, pagination);
   }
 
-  /**
-   * Internal helper: sync job_offers.status from hired count (auto-close / auto-reopen).
-   * Not exported. When hired_count >= positions_required -> close; when < required and closed -> active.
-   * Archived offers are never auto-reopened.
-   * @param {string} jobOfferId - job_offers.id
-   */
-  async function syncJobOfferStatusFromHired(jobOfferId) {
-    if (!jobOfferId) return;
-    try {
-      const { count } = await supabase
-        .from("candidate_job_associations")
-        .select("id", { count: "exact", head: true })
-        .eq("job_offer_id", jobOfferId)
-        .eq("status", "hired");
-
-      const { data: offer, error: offerErr } = await supabase
-        .from("job_offers")
-        .select("positions_required, status")
-        .eq("id", jobOfferId)
-        .single();
-
-      if (offerErr || !offer) return;
-
-      const required = offer.positions_required ?? 1;
-      const hiredCount = count ?? 0;
-
-      if (offer.status === "archived") return;
-
-      if (hiredCount >= required && offer.status !== "closed" && offer.status !== "archived") {
-        const { error: jobUpdateError } = await supabase
-          .from("job_offers")
-          .update({
-            status: "closed",
-            closure_note: "Auto-closed: positions filled",
-          })
-          .eq("id", jobOfferId);
-
-        if (jobUpdateError) {
-          console.error(
-            "[Supabase] syncJobOfferStatusFromHired job_offers update error:",
-            jobUpdateError.message || jobUpdateError,
-            jobUpdateError,
-            { jobOfferId }
-          );
-          return;
-        }
-
-        const { data: updatedAssocs, error: assocUpdateError } = await supabase
-          .from("candidate_job_associations")
-          .update({ status: "not_selected" })
-          .eq("job_offer_id", jobOfferId)
-          .not("status", "in", "(hired,rejected,withdrawn)")
-          .select("id,candidate_id");
-
-        if (assocUpdateError) {
-          console.error(
-            "[Supabase] syncJobOfferStatusFromHired associations update error:",
-            assocUpdateError.message || assocUpdateError,
-            assocUpdateError,
-            { jobOfferId }
-          );
-        } else if (Array.isArray(updatedAssocs) && updatedAssocs.length > 0) {
-          if (
-            typeof window !== "undefined" &&
-            window.IESupabase &&
-            typeof window.IESupabase.createAutoLog === "function"
-          ) {
-            updatedAssocs.forEach(function (assoc) {
-              if (!assoc || !assoc.id) return;
-              window.IESupabase
-                .createAutoLog("application", assoc.id, {
-                  event_type: "status_changed",
-                  message: "Application status changed to not_selected (job closed)",
-                  metadata: {
-                    job_offer_id: jobOfferId,
-                    new_status: "not_selected",
-                  },
-                })
-                .catch(function () {});
-            });
-          }
-
-          const candidateIds = Array.from(
-            new Set(
-              updatedAssocs
-                .map(function (row) {
-                  return row && row.candidate_id;
-                })
-                .filter(Boolean)
-            )
-          );
-
-          for (const candidateId of candidateIds) {
-            await recalculateCandidateAvailability(candidateId);
-          }
-        }
-      } else if (hiredCount < required && offer.status === "closed") {
-        const { error: reopenError } = await supabase
-          .from("job_offers")
-          .update({ status: "active" })
-          .eq("id", jobOfferId);
-        if (reopenError) {
-          console.error(
-            "[Supabase] syncJobOfferStatusFromHired job_offers reopen error:",
-            reopenError.message || reopenError,
-            reopenError,
-            { jobOfferId }
-          );
-          return;
-        }
-
-        const { data: reopenedAssocs, error: reopenedAssocsError } = await supabase
-          .from("candidate_job_associations")
-          .update({ status: "screening" })
-          .eq("job_offer_id", jobOfferId)
-          .eq("status", "not_selected")
-          .select("id,candidate_id");
-
-        if (reopenedAssocsError) {
-          console.error(
-            "[Supabase] syncJobOfferStatusFromHired reopen associations error:",
-            reopenedAssocsError.message || reopenedAssocsError,
-            reopenedAssocsError,
-            { jobOfferId }
-          );
-        } else if (Array.isArray(reopenedAssocs) && reopenedAssocs.length > 0) {
-          if (
-            typeof window !== "undefined" &&
-            window.IESupabase &&
-            typeof window.IESupabase.createAutoLog === "function"
-          ) {
-            reopenedAssocs.forEach(function (assoc) {
-              if (!assoc || !assoc.id) return;
-              window.IESupabase
-                .createAutoLog("application", assoc.id, {
-                  event_type: "status_changed",
-                  message: "Application status changed to screening (job reopened)",
-                  metadata: {
-                    job_offer_id: jobOfferId,
-                    new_status: "screening",
-                  },
-                })
-                .catch(function () {});
-            });
-          }
-
-          const candidateIds = Array.from(
-            new Set(
-              reopenedAssocs
-                .map(function (row) {
-                  return row && row.candidate_id;
-                })
-                .filter(Boolean)
-            )
-          );
-
-          for (const candidateId of candidateIds) {
-            await recalculateCandidateAvailability(candidateId);
-          }
-        }
-      }
-    } catch (err) {
-      console.error("[Supabase] syncJobOfferStatusFromHired exception:", err);
+  async function updateCandidateAssociationStatus(
+    associationId,
+    status,
+    options
+  ) {
+    const mod = getApplicationsModule();
+    if (
+      !mod ||
+      typeof mod.updateCandidateAssociationStatus !== "function"
+    ) {
+      return {
+        data: null,
+        error: new Error("Applications module not available"),
+      };
     }
+    return mod.updateCandidateAssociationStatus(
+      associationId,
+      status,
+      options
+    );
   }
 
-  /**
-   * Update the status of a candidate-job association.
-   * @param {string} associationId - candidate_job_associations.id
-   * @param {string} status
-   * @param {object} [options]
-   * @param {string|null} [options.rejectionReason]
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
-  async function updateCandidateAssociationStatus(associationId, status, options) {
-    options = options || {};
-    if (!associationId) {
-      const err = new Error("Missing association id");
-      console.error("[Supabase] updateCandidateAssociationStatus:", err);
-      return { data: null, error: err };
-    }
-    try {
-      const { data: oldRow, error: fetchErr } = await supabase
-        .from("candidate_job_associations")
-        .select("candidate_id, job_offer_id, status")
-        .eq("id", associationId)
-        .single();
-      if (fetchErr || !oldRow) {
-        console.error("[Supabase] updateCandidateAssociationStatus fetch error:", fetchErr?.message, fetchErr);
-        return { data: null, error: fetchErr || new Error("Association not found") };
-      }
-
-      const updatePayload = { status };
-      if (status === "rejected") {
-        updatePayload.rejection_reason = options.rejectionReason ?? null;
-      }
-
-      const { data, error } = await supabase
-        .from("candidate_job_associations")
-        .update(updatePayload)
-        .eq("id", associationId)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] updateCandidateAssociationStatus error:", error.message, error);
-        return { data: null, error };
-      }
-
-      // Sync candidate status when hired (pipeline logic only; do not change)
-      if (status === "hired" && oldRow.candidate_id) {
-        const { error: candidateUpdateError } = await supabase
-          .from("candidates")
-          .update({ status: "hired" })
-          .eq("id", oldRow.candidate_id);
-
-        if (candidateUpdateError) {
-          console.error(
-            "[Supabase] Failed to sync candidate status to hired:",
-            candidateUpdateError.message
-          );
-        }
-      }
-
-      // Recalculate candidate availability based on all associations.
-      if (oldRow.candidate_id) {
-        await recalculateCandidateAvailability(oldRow.candidate_id);
-      }
-
-      if (oldRow.job_offer_id) {
-        await syncJobOfferStatusFromHired(oldRow.job_offer_id);
-      }
-
-      if (oldRow.candidate_id && typeof createAutoLog === "function") {
-        if (status === "rejected") {
-          createAutoLog("candidate", oldRow.candidate_id, {
-            event_type: "rejection",
-            message: "Application rejected",
-            metadata: {
-              association_id: associationId,
-              job_offer_id: oldRow.job_offer_id,
-              rejection_reason: options.rejectionReason ?? null,
-            },
-          }).catch(function (e) {
-            console.warn("[Supabase] createAutoLog rejection:", e && e.message);
-          });
-        } else if (status === "hired") {
-          createAutoLog("candidate", oldRow.candidate_id, {
-            event_type: "status_change",
-            message: "Hired for job offer",
-            metadata: { association_id: associationId, job_offer_id: oldRow.job_offer_id },
-          }).catch(function (e) {
-            console.warn("[Supabase] createAutoLog hired:", e && e.message);
-          });
-        } else if (status === "withdrawn") {
-          createAutoLog("candidate", oldRow.candidate_id, {
-            event_type: "system_event",
-            message: "Application withdrawn",
-            metadata: { association_id: associationId, job_offer_id: oldRow.job_offer_id },
-          }).catch(function (e) {
-            console.warn("[Supabase] createAutoLog withdrawn:", e && e.message);
-          });
-        }
-      }
-
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] updateCandidateAssociationStatus exception:", err);
-      return { data: null, error: err };
-    }
-  }
-
-  /**
-   * Remove a candidate from a job (logical withdrawal: set status to 'withdrawn').
-   * Does not delete the row; use deleteAssociationPermanently for admin cleanup.
-   * @param {string} associationId - candidate_job_associations.id
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
   async function removeCandidateFromJob(associationId) {
-    if (!associationId) {
-      const err = new Error("Missing association id");
-      console.error("[Supabase] removeCandidateFromJob:", err);
-      return { data: null, error: err };
+    const mod = getApplicationsModule();
+    if (!mod || typeof mod.removeCandidateFromJob !== "function") {
+      return {
+        data: null,
+        error: new Error("Applications module not available"),
+      };
     }
-    try {
-      const { data: updated, error } = await supabase
-        .from("candidate_job_associations")
-        .update({ status: "withdrawn" })
-        .eq("id", associationId)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] removeCandidateFromJob error:", error.message, error);
-        return { data: null, error };
-      }
-      if (updated && updated.candidate_id) {
-        await recalculateCandidateAvailability(updated.candidate_id);
-      }
-      if (updated && updated.job_offer_id) {
-        await syncJobOfferStatusFromHired(updated.job_offer_id);
-      }
-      if (updated && updated.candidate_id && typeof createAutoLog === "function") {
-        createAutoLog("candidate", updated.candidate_id, {
-          event_type: "system_event",
-          message: "Application withdrawn",
-          metadata: { association_id: associationId, job_offer_id: updated.job_offer_id },
-        }).catch(function (e) {
-          console.warn("[Supabase] createAutoLog withdrawn (remove):", e && e.message);
-        });
-      }
-      return { data: updated, error: null };
-    } catch (err) {
-      console.error("[Supabase] removeCandidateFromJob exception:", err);
-      return { data: null, error: err };
-    }
+    return mod.removeCandidateFromJob(associationId);
   }
 
-  /**
-   * Permanently delete an association (admin only). Use after logical withdrawal when cleanup is required.
-   * @param {string} associationId - candidate_job_associations.id
-   * @returns {Promise<{ data: array | null, error: object | null }>}
-   */
   async function deleteAssociationPermanently(associationId) {
-    if (!associationId) {
-      const err = new Error("Missing association id");
-      console.error("[Supabase] deleteAssociationPermanently:", err);
-      return { data: null, error: err };
+    const mod = getApplicationsModule();
+    if (
+      !mod ||
+      typeof mod.deleteAssociationPermanently !== "function"
+    ) {
+      return {
+        data: null,
+        error: new Error("Applications module not available"),
+      };
     }
-    try {
-      const { data: deleted, error } = await supabase
-        .from("candidate_job_associations")
-        .delete()
-        .eq("id", associationId)
-        .select();
-      if (error) {
-        console.error("[Supabase] deleteAssociationPermanently error:", error.message, error);
-        return { data: null, error };
-      }
-      const deletedRow = Array.isArray(deleted) ? deleted[0] : deleted;
-      if (deletedRow && deletedRow.job_offer_id) {
-        await syncJobOfferStatusFromHired(deletedRow.job_offer_id);
-      }
-      if (deletedRow && deletedRow.candidate_id) {
-        await recalculateCandidateAvailability(deletedRow.candidate_id);
-      }
-      return { data: deleted || [], error: null };
-    } catch (err) {
-      console.error("[Supabase] deleteAssociationPermanently exception:", err);
-      return { data: null, error: err };
-    }
+    return mod.deleteAssociationPermanently(associationId);
   }
 
-  /**
-   * Restore a withdrawn application (set status to 'applied').
-   * @param {string} associationId - candidate_job_associations.id
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
   async function restoreApplication(associationId) {
-    if (!associationId) {
-      const err = new Error("Missing association id");
-      console.error("[Supabase] restoreApplication:", err);
-      return { data: null, error: err };
+    const mod = getApplicationsModule();
+    if (!mod || typeof mod.restoreApplication !== "function") {
+      return {
+        data: null,
+        error: new Error("Applications module not available"),
+      };
     }
-    try {
-      const { data: updated, error } = await supabase
-        .from("candidate_job_associations")
-        .update({ status: "applied" })
-        .eq("id", associationId)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] restoreApplication error:", error.message, error);
-        return { data: null, error };
-      }
-      if (updated && updated.candidate_id) {
-        await recalculateCandidateAvailability(updated.candidate_id);
-      }
-      if (updated && updated.job_offer_id) {
-        await syncJobOfferStatusFromHired(updated.job_offer_id);
-      }
-      return { data: updated, error: null };
-    } catch (err) {
-      console.error("[Supabase] restoreApplication exception:", err);
-      return { data: null, error: err };
-    }
+    return mod.restoreApplication(associationId);
   }
 
   // ---------------------------------------------------------------------------
   // Candidate file storage helpers (Supabase Storage)
   // ---------------------------------------------------------------------------
 
-  /**
-   * Upload a candidate-related file to the private "candidate-files" bucket.
-   * @param {string} path - object key inside the bucket (e.g. "123/photo.jpg")
-   * @param {File|Blob} file - browser File/Blob instance
-   * @param {object} [options] - Supabase storage upload options (upsert, cacheControl, etc.)
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
-  async function uploadCandidateFile(path, file, options) {
-    if (!path || !file) {
-      const err = new Error("Missing path or file");
-      console.error("[Supabase Storage] uploadCandidateFile:", err, { path });
-      return { data: null, error: err };
-    }
-    try {
-      const opts = Object.assign({ upsert: false }, options || {});
-      const { data, error } = await supabase
-        .storage
-        .from("candidate-files")
-        .upload(path, file, opts);
-      if (error) {
-        console.error("[Supabase Storage] uploadCandidateFile error:", error.message || error, { path });
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase Storage] uploadCandidateFile exception:", err, { path });
-      return { data: null, error: err };
-    }
-  }
-
-  /**
-   * Create a short-lived signed URL for a candidate file.
-   * @param {string} path - object key inside the "candidate-files" bucket
-   * @param {number} [expiresInSeconds=60] - TTL for the signed URL
-   * @returns {Promise<string|null>} signed URL or null on error
-   */
-  async function createSignedCandidateUrl(path, expiresInSeconds) {
-    if (!path) return null;
-    const ttl = typeof expiresInSeconds === "number" && expiresInSeconds > 0 ? expiresInSeconds : 60;
-    try {
-      const { data, error } = await supabase
-        .storage
-        .from("candidate-files")
-        .createSignedUrl(path, ttl);
-      if (error) {
-        console.error("[Supabase Storage] createSignedCandidateUrl error:", error.message || error, { path });
-        return null;
-      }
-      return (data && data.signedUrl) || null;
-    } catch (err) {
-      console.error("[Supabase Storage] createSignedCandidateUrl exception:", err, { path });
-      return null;
-    }
-  }
-
-  /**
-   * Delete one or more candidate files from storage.
-   * @param {string[]|string} paths - one or more object keys in the bucket
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
-  async function deleteCandidateFiles(paths) {
-    const raw = Array.isArray(paths) ? paths : [paths];
-    const keys = raw
-      .map(function (p) {
-        return (p || "").toString().trim();
-      })
-      .filter(function (p) {
-        return !!p;
-      });
-    if (!keys.length) {
-      return { data: null, error: null };
-    }
-    try {
-      const { data, error } = await supabase
-        .storage
-        .from("candidate-files")
-        .remove(keys);
-      if (error) {
-        console.error("[Supabase Storage] deleteCandidateFiles error:", error.message || error, { keys });
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase Storage] deleteCandidateFiles exception:", err, { keys });
-      return { data: null, error: err };
-    }
-  }
-
-  /**
-   * Move/rename a candidate file inside the same bucket (e.g. temp -> final path).
-   * @param {string} fromPath - current object key
-   * @param {string} toPath - new object key
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
-  async function moveCandidateFile(fromPath, toPath) {
-    if (!fromPath || !toPath) {
-      const err = new Error("Missing fromPath or toPath");
-      console.error("[Supabase Storage] moveCandidateFile:", err, { fromPath, toPath });
-      return { data: null, error: err };
-    }
-    try {
-      const { data, error } = await supabase
-        .storage
-        .from("candidate-files")
-        .move(fromPath, toPath);
-      if (error) {
-        console.error("[Supabase Storage] moveCandidateFile error:", error.message || error, { fromPath, toPath });
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase Storage] moveCandidateFile exception:", err, { fromPath, toPath });
-      return { data: null, error: err };
-    }
-  }
-
-  /**
-   * Patch candidate row with file-related columns (photo_url, cv_url) plus audit fields.
-   * Leaves all other columns untouched.
-   * @param {string} id - candidates.id
-   * @param {object} payload - partial update (e.g. { photo_url, cv_url })
-   * @returns {Promise<{ data: object | null, error: object | null }>}
-   */
-  async function updateCandidateFiles(id, payload) {
-    if (!id) {
-      const err = new Error("Missing id");
-      console.error("[Supabase] updateCandidateFiles:", err);
-      return { data: null, error: err };
-    }
-    try {
-      const basePayload = payload || {};
-      const updates = await withUpdateAuditFields(Object.assign({}, basePayload));
-      const { data, error } = await supabase
-        .from("candidates")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] updateCandidateFiles error:", error.message || error, { id });
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] updateCandidateFiles exception:", err, { id });
-      return { data: null, error: err };
-    }
-  }
+  // Candidate file storage helpers are implemented in portal/core/data/candidates.js and
+  // exposed via IEData.candidates.
 
   // ---------------------------------------------------------------------------
   // Candidate profile details (skills, languages, experience, education, certifications, hobbies)
   // ---------------------------------------------------------------------------
 
-  /**
-   * Fetch skills for a candidate.
-   * @param {string} candidateId
-   * @returns {Promise<{ data: array, error: object | null }>}
-   */
-  async function getCandidateSkills(candidateId) {
-    if (!candidateId) {
-      return { data: [], error: null };
-    }
-    try {
-      const { data, error } = await supabase
-        .from("candidate_skills")
-        .select("*")
-        .eq("candidate_id", candidateId)
-        .order("created_at", { ascending: true });
-      if (error) {
-        console.error("[Supabase] getCandidateSkills error:", error.message || error, { candidateId });
-        return { data: [], error };
-      }
-      return { data: Array.isArray(data) ? data : [], error: null };
-    } catch (err) {
-      console.error("[Supabase] getCandidateSkills exception:", err, { candidateId });
-      return { data: [], error: err };
-    }
-  }
-
-  /**
-   * Replace skills for a candidate (delete then bulk insert).
-   * @param {string} candidateId
-   * @param {array} skills
-   * @returns {Promise<{ data: array | null, error: object | null }>}
-   */
-  async function replaceCandidateSkills(candidateId, skills) {
-    if (!candidateId || typeof candidateId !== "string") {
-      const error = new Error("Missing candidateId");
-      console.error("[Supabase] replaceCandidateSkills:", error, { candidateId });
-      return { data: null, error };
-    }
-    const items = Array.isArray(skills) ? skills : [];
-    try {
-      const { error: deleteError } = await supabase
-        .from("candidate_skills")
-        .delete()
-        .eq("candidate_id", candidateId);
-      if (deleteError) {
-        console.error("[Supabase] replaceCandidateSkills delete error:", deleteError.message || deleteError, {
-          candidateId,
-        });
-        return { data: null, error: deleteError };
-      }
-      if (!items.length) {
-        return { data: [], error: null };
-      }
-      const userId = await getCurrentUserId();
-      const rows = items.map(function (skill) {
-        return {
-          candidate_id: candidateId,
-          skill: skill && skill.skill != null ? skill.skill : null,
-          created_by: userId,
-        };
-      });
-      const { data, error } = await supabase.from("candidate_skills").insert(rows).select();
-      if (error) {
-        console.error("[Supabase] replaceCandidateSkills insert error:", error.message || error, { candidateId });
-        return { data: null, error };
-      }
-      return { data: Array.isArray(data) ? data : [], error: null };
-    } catch (err) {
-      console.error("[Supabase] replaceCandidateSkills exception:", err, { candidateId });
-      return { data: null, error: err };
-    }
-  }
-
-  /**
-   * Fetch languages for a candidate.
-   * @param {string} candidateId
-   * @returns {Promise<{ data: array, error: object | null }>}
-   */
-  async function getCandidateLanguages(candidateId) {
-    if (!candidateId) {
-      return { data: [], error: null };
-    }
-    try {
-      const { data, error } = await supabase
-        .from("candidate_languages")
-        .select("*")
-        .eq("candidate_id", candidateId)
-        .order("created_at", { ascending: true });
-      if (error) {
-        console.error("[Supabase] getCandidateLanguages error:", error.message || error, { candidateId });
-        return { data: [], error };
-      }
-      return { data: Array.isArray(data) ? data : [], error: null };
-    } catch (err) {
-      console.error("[Supabase] getCandidateLanguages exception:", err, { candidateId });
-      return { data: [], error: err };
-    }
-  }
-
-  /**
-   * Replace languages for a candidate (delete then bulk insert).
-   * @param {string} candidateId
-   * @param {array} languages
-   * @returns {Promise<{ data: array | null, error: object | null }>}
-   */
-  async function replaceCandidateLanguages(candidateId, languages) {
-    if (!candidateId || typeof candidateId !== "string") {
-      const error = new Error("Missing candidateId");
-      console.error("[Supabase] replaceCandidateLanguages:", error, { candidateId });
-      return { data: null, error };
-    }
-    const items = Array.isArray(languages) ? languages : [];
-    try {
-      const { error: deleteError } = await supabase
-        .from("candidate_languages")
-        .delete()
-        .eq("candidate_id", candidateId);
-      if (deleteError) {
-        console.error("[Supabase] replaceCandidateLanguages delete error:", deleteError.message || deleteError, {
-          candidateId,
-        });
-        return { data: null, error: deleteError };
-      }
-      if (!items.length) {
-        return { data: [], error: null };
-      }
-      const userId = await getCurrentUserId();
-      const rows = items.map(function (raw) {
-        var lang = raw || {};
-        return {
-          candidate_id: candidateId,
-          created_by: userId,
-          // DB columns: language, level
-          language: lang.language != null ? String(lang.language).trim() || null : null,
-          level:
-            lang.level != null && String(lang.level).trim() !== ""
-              ? String(lang.level).trim()
-              : lang.proficiency != null && String(lang.proficiency).trim() !== ""
-              ? String(lang.proficiency).trim()
-              : null,
-        };
-      });
-      const { data, error } = await supabase.from("candidate_languages").insert(rows).select();
-      if (error) {
-        console.error("[Supabase] replaceCandidateLanguages insert error:", error.message || error, { candidateId });
-        return { data: null, error };
-      }
-      return { data: Array.isArray(data) ? data : [], error: null };
-    } catch (err) {
-      console.error("[Supabase] replaceCandidateLanguages exception:", err, { candidateId });
-      return { data: null, error: err };
-    }
-  }
-
-  /**
-   * Fetch work experience for a candidate.
-   * @param {string} candidateId
-   * @returns {Promise<{ data: array, error: object | null }>}
-   */
-  async function getCandidateExperience(candidateId) {
-    if (!candidateId) {
-      return { data: [], error: null };
-    }
-    try {
-      const { data, error } = await supabase
-        .from("candidate_experience")
-        .select("id, candidate_id, title, company, start_date, end_date, description")
-        .eq("candidate_id", candidateId)
-        .order("created_at", { ascending: true });
-      if (error) {
-        console.error("[Supabase] getCandidateExperience error:", error.message || error, { candidateId });
-        return { data: [], error };
-      }
-      return { data: Array.isArray(data) ? data : [], error: null };
-    } catch (err) {
-      console.error("[Supabase] getCandidateExperience exception:", err, { candidateId });
-      return { data: [], error: err };
-    }
-  }
-
-  /**
-   * Replace work experience entries for a candidate (delete then bulk insert).
-   * Uses the canonical candidate_experience schema:
-   *   candidate_id, title, company, start_date, end_date, description.
-   * @param {string} candidateId
-   * @param {array} experiences
-   * @returns {Promise<{ data: array | null, error: object | null }>}
-   */
-  async function replaceCandidateExperience(candidateId, experiences) {
-    if (!candidateId || typeof candidateId !== "string") {
-      const error = new Error("Missing candidateId");
-      console.error("[Supabase] replaceCandidateExperience:", error, { candidateId });
-      return { data: null, error };
-    }
-    const items = Array.isArray(experiences) ? experiences : [];
-    try {
-      const { error: deleteError } = await supabase
-        .from("candidate_experience")
-        .delete()
-        .eq("candidate_id", candidateId);
-      if (deleteError) {
-        console.error(
-          "[Supabase] replaceCandidateExperience delete error:",
-          deleteError.message || deleteError,
-          {
-            candidateId,
-          }
-        );
-        return { data: null, error: deleteError };
-      }
-      if (!items.length) {
-        return { data: [], error: null };
-      }
-
-      // Build a sanitized payload that only contains real table columns.
-      // Table public.candidate_experience:
-      // id, candidate_id, title, company, start_date, end_date, description, created_at
-      var rows = items.map(function (raw) {
-        var exp = raw || {};
-        return {
-          candidate_id: candidateId,
-          title: exp.title != null ? String(exp.title).trim() || null : null,
-          company: exp.company != null ? String(exp.company).trim() || null : null,
-          start_date: exp.start_date || null,
-          end_date: exp.end_date || null,
-          description:
-            exp.description != null ? String(exp.description).trim() || null : null,
-        };
-      });
-
-      const { data, error } = await supabase
-        .from("candidate_experience")
-        .insert(rows)
-        .select();
-      if (error) {
-        console.error("[Supabase] replaceCandidateExperience insert error:", error, {
-          candidateId,
-        });
-        return { data: null, error };
-      }
-      return { data: Array.isArray(data) ? data : [], error: null };
-    } catch (err) {
-      console.error("[Supabase] replaceCandidateExperience exception:", err, {
-        candidateId,
-      });
-      return { data: null, error: err };
-    }
-  }
-
-  /**
-   * Fetch education entries for a candidate.
-   * @param {string} candidateId
-   * @returns {Promise<{ data: array, error: object | null }>}
-   */
-  async function getCandidateEducation(candidateId) {
-    if (!candidateId) {
-      return { data: [], error: null };
-    }
-    try {
-      const { data, error } = await supabase
-        .from("candidate_education")
-        .select("*")
-        .eq("candidate_id", candidateId)
-        .order("created_at", { ascending: true });
-      if (error) {
-        console.error("[Supabase] getCandidateEducation error:", error.message || error, { candidateId });
-        return { data: [], error };
-      }
-      return { data: Array.isArray(data) ? data : [], error: null };
-    } catch (err) {
-      console.error("[Supabase] getCandidateEducation exception:", err, { candidateId });
-      return { data: [], error: err };
-    }
-  }
-
-  /**
-   * Replace education entries for a candidate (delete then bulk insert).
-   * @param {string} candidateId
-   * @param {array} education
-   * @returns {Promise<{ data: array | null, error: object | null }>}
-   */
-  async function replaceCandidateEducation(candidateId, education) {
-    if (!candidateId || typeof candidateId !== "string") {
-      const error = new Error("Missing candidateId");
-      console.error("[Supabase] replaceCandidateEducation:", error, { candidateId });
-      return { data: null, error };
-    }
-    const items = Array.isArray(education) ? education : [];
-    try {
-      const { error: deleteError } = await supabase
-        .from("candidate_education")
-        .delete()
-        .eq("candidate_id", candidateId);
-      if (deleteError) {
-        console.error("[Supabase] replaceCandidateEducation delete error:", deleteError.message || deleteError, {
-          candidateId,
-        });
-        return { data: null, error: deleteError };
-      }
-      if (!items.length) {
-        return { data: [], error: null };
-      }
-      const userId = await getCurrentUserId();
-      const rows = items.map(function (raw) {
-        var edu = raw || {};
-        return {
-          candidate_id: candidateId,
-          created_by: userId,
-          institution: edu.institution != null ? String(edu.institution).trim() || null : null,
-          degree: edu.degree != null ? String(edu.degree).trim() || null : null,
-          start_year: edu.start_year != null ? Number(edu.start_year) || null : null,
-          end_year: edu.end_year != null ? Number(edu.end_year) || null : null,
-          description: edu.description != null ? String(edu.description).trim() || null : null,
-        };
-      });
-      const { data, error } = await supabase.from("candidate_education").insert(rows).select();
-      if (error) {
-        console.error("[Supabase] replaceCandidateEducation insert error:", error.message || error, { candidateId });
-        return { data: null, error };
-      }
-      return { data: Array.isArray(data) ? data : [], error: null };
-    } catch (err) {
-      console.error("[Supabase] replaceCandidateEducation exception:", err, { candidateId });
-      return { data: null, error: err };
-    }
-  }
-
-  /**
-   * Fetch certifications for a candidate.
-   * @param {string} candidateId
-   * @returns {Promise<{ data: array, error: object | null }>}
-   */
-  async function getCandidateCertifications(candidateId) {
-    if (!candidateId) {
-      return { data: [], error: null };
-    }
-    try {
-      const { data, error } = await supabase
-        .from("candidate_certifications")
-        .select("*")
-        .eq("candidate_id", candidateId)
-        .order("created_at", { ascending: true });
-      if (error) {
-        console.error("[Supabase] getCandidateCertifications error:", error.message || error, { candidateId });
-        return { data: [], error };
-      }
-      return { data: Array.isArray(data) ? data : [], error: null };
-    } catch (err) {
-      console.error("[Supabase] getCandidateCertifications exception:", err, { candidateId });
-      return { data: [], error: err };
-    }
-  }
-
-  /**
-   * Replace certifications for a candidate (delete then bulk insert).
-   * @param {string} candidateId
-   * @param {array} certifications
-   * @returns {Promise<{ data: array | null, error: object | null }>}
-   */
-  async function replaceCandidateCertifications(candidateId, certifications) {
-    if (!candidateId || typeof candidateId !== "string") {
-      const error = new Error("Missing candidateId");
-      console.error("[Supabase] replaceCandidateCertifications:", error, { candidateId });
-      return { data: null, error };
-    }
-    const items = Array.isArray(certifications) ? certifications : [];
-    try {
-      const { error: deleteError } = await supabase
-        .from("candidate_certifications")
-        .delete()
-        .eq("candidate_id", candidateId);
-      if (deleteError) {
-        console.error(
-          "[Supabase] replaceCandidateCertifications delete error:",
-          deleteError.message || deleteError,
-          { candidateId }
-        );
-        return { data: null, error: deleteError };
-      }
-      if (!items.length) {
-        return { data: [], error: null };
-      }
-      const userId = await getCurrentUserId();
-      const rows = items.map(function (raw) {
-        var cert = raw || {};
-
-        // candidate_certifications columns: id, candidate_id, name, issuer, year, created_at, created_by
-        // Map the UI fields (name, issuer, issue_date/expiry_date) into these columns.
-        var year = null;
-        if (cert.year != null && String(cert.year).trim() !== "") {
-          year = Number(cert.year) || null;
-        } else if (cert.issue_date) {
-          var d = new Date(cert.issue_date);
-          if (!Number.isNaN(d.getTime())) {
-            year = d.getUTCFullYear();
-          }
-        }
-
-        return {
-          candidate_id: candidateId,
-          created_by: userId,
-          name: cert.name != null ? String(cert.name).trim() || null : null,
-          issuer: cert.issuer != null ? String(cert.issuer).trim() || null : null,
-          year: year,
-        };
-      });
-      const { data, error } = await supabase.from("candidate_certifications").insert(rows).select();
-      if (error) {
-        console.error(
-          "[Supabase] replaceCandidateCertifications insert error:",
-          error.message || error,
-          { candidateId }
-        );
-        return { data: null, error };
-      }
-      return { data: Array.isArray(data) ? data : [], error: null };
-    } catch (err) {
-      console.error("[Supabase] replaceCandidateCertifications exception:", err, { candidateId });
-      return { data: null, error: err };
-    }
-  }
-
-  /**
-   * Fetch hobbies for a candidate.
-   * @param {string} candidateId
-   * @returns {Promise<{ data: array, error: object | null }>}
-   */
-  async function getCandidateHobbies(candidateId) {
-    if (!candidateId) {
-      return { data: [], error: null };
-    }
-    try {
-      const { data, error } = await supabase
-        .from("candidate_hobbies")
-        .select("*")
-        .eq("candidate_id", candidateId)
-        .order("created_at", { ascending: true });
-      if (error) {
-        console.error("[Supabase] getCandidateHobbies error:", error.message || error, { candidateId });
-        return { data: [], error };
-      }
-      return { data: Array.isArray(data) ? data : [], error: null };
-    } catch (err) {
-      console.error("[Supabase] getCandidateHobbies exception:", err, { candidateId });
-      return { data: [], error: err };
-    }
-  }
-
-  /**
-   * Replace hobbies for a candidate (delete then bulk insert).
-   * @param {string} candidateId
-   * @param {array} hobbies
-   * @returns {Promise<{ data: array | null, error: object | null }>}
-   */
-  async function replaceCandidateHobbies(candidateId, hobbies) {
-    if (!candidateId || typeof candidateId !== "string") {
-      const error = new Error("Missing candidateId");
-      console.error("[Supabase] replaceCandidateHobbies:", error, { candidateId });
-      return { data: null, error };
-    }
-    const items = Array.isArray(hobbies) ? hobbies : [];
-    try {
-      const { error: deleteError } = await supabase
-        .from("candidate_hobbies")
-        .delete()
-        .eq("candidate_id", candidateId);
-      if (deleteError) {
-        console.error("[Supabase] replaceCandidateHobbies delete error:", deleteError.message || deleteError, {
-          candidateId,
-        });
-        return { data: null, error: deleteError };
-      }
-      if (!items.length) {
-        return { data: [], error: null };
-      }
-      const userId = await getCurrentUserId();
-      const rows = items.map(function (raw) {
-        var hobby = raw || {};
-        return {
-          candidate_id: candidateId,
-          created_by: userId,
-          // Table column is `hobby`; UI uses the same key via data-field="hobby".
-          hobby: hobby.hobby != null ? String(hobby.hobby).trim() || null : null,
-        };
-      });
-      const { data, error } = await supabase.from("candidate_hobbies").insert(rows).select();
-      if (error) {
-        console.error("[Supabase] replaceCandidateHobbies insert error:", error.message || error, { candidateId });
-        return { data: null, error };
-      }
-      return { data: Array.isArray(data) ? data : [], error: null };
-    } catch (err) {
-      console.error("[Supabase] replaceCandidateHobbies exception:", err, { candidateId });
-      return { data: null, error: err };
-    }
-  }
+  // Candidate profile detail helpers (skills, languages, experience, education, certifications, hobbies)
+  // are now implemented in portal/core/data/candidates.js and exposed via IEData.candidates.
 
   // ---------------------------------------------------------------------------
   // Activity Logs
@@ -3544,417 +1312,131 @@
 
   /**
    * Create a manual activity log note for an entity.
-   * @param {"candidate"|"job_offer"|"client"} entityType
-   * @param {string} entityId
-   * @param {string} message
-   * @returns {Promise<{ data: object | null, error: object | null }>}
+   * Delegates to IEData.activity.createLog.
    */
   async function createLog(entityType, entityId, message) {
-    try {
-      assertEntity(entityType, entityId);
-      const cleanedMessage = normalizeMessage(message);
-      const userId = await getCurrentUserId();
-
-      const row = {
-        entity_type: entityType,
-        entity_id: entityId,
-        message: cleanedMessage,
-        created_by: userId,
-        event_type: "manual_note",
-        metadata: null,
-      };
-
-      const { data, error } = await supabase
-        .from("activity_logs")
-        .insert(row)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] createLog error:", error.message || error, error, { entityType, entityId });
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] createLog exception:", err, { entityType, entityId });
-      return { data: null, error: err };
+    const mod = getActivityModule();
+    if (!mod || typeof mod.createLog !== "function") {
+      return { data: null, error: new Error("Activity module not available") };
     }
+    return mod.createLog(entityType, entityId, message);
   }
 
   /**
    * Fetch activity logs for an entity.
-   * Default (compact) mode: returns first 20 logs + hasMore computed from 21-row fetch.
-   * Full mode: returns all logs.
-   * @param {"candidate"|"job_offer"|"client"} entityType
-   * @param {string} entityId
-   * @param {{ full?: boolean }=} options
-   * @returns {Promise<{ data: { logs: array, hasMore: boolean } | null, error: object | null }>}
+   * Delegates to IEData.activity.fetchLogs.
    */
   async function fetchLogs(entityType, entityId, options) {
-    try {
-      assertEntity(entityType, entityId);
-
-      const isFull = !!(options && options.full === true);
-      let q = supabase
-        .from("activity_logs")
-        .select("*")
-        .eq("entity_type", entityType)
-        .eq("entity_id", entityId)
-        .order("created_at", { ascending: false })
-        .order("id", { ascending: false });
-
-      if (!isFull) {
-        q = q.limit(21);
-      }
-
-      const { data: rows, error } = await q;
-      if (error) {
-        console.error("[Supabase] fetchLogs error:", error.message || error, error, { entityType, entityId });
-        return { data: { logs: [], hasMore: false }, error };
-      }
-
-      const allLogs = Array.isArray(rows) ? rows : [];
-      const hasMore = !isFull && allLogs.length > 20;
-      const logs = !isFull ? allLogs.slice(0, 20) : allLogs;
-
-      const createdByIds = Array.from(
-        new Set(
-          logs
-            .map(function (l) {
-              return l && l.created_by;
-            })
-            .filter(Boolean)
-        )
-      );
-
-      let profileById = {};
-      if (createdByIds.length) {
-        const { data: profiles, error: profilesError } = await supabase
-          .from("profiles")
-          .select("id,first_name,last_name")
-          .in("id", createdByIds);
-
-        if (profilesError) {
-          console.error("[Supabase] fetchLogs profiles error:", profilesError.message || profilesError, profilesError);
-        } else {
-          profileById = (profiles || []).reduce(function (acc, p) {
-            if (p && p.id) {
-              acc[p.id] = {
-                id: p.id,
-                first_name: p.first_name ?? null,
-                last_name: p.last_name ?? null,
-              };
-            }
-            return acc;
-          }, {});
-        }
-      }
-
-      const normalized = logs.map(function (l) {
-        const createdBy = l && l.created_by;
-        return Object.assign({}, l, {
-          created_by_profile: createdBy ? profileById[createdBy] || null : null,
-        });
-      });
-
-      return { data: { logs: normalized, hasMore }, error: null };
-    } catch (err) {
-      console.error("[Supabase] fetchLogs exception:", err, { entityType, entityId });
-      return { data: { logs: [], hasMore: false }, error: err };
+    const mod = getActivityModule();
+    if (!mod || typeof mod.fetchLogs !== "function") {
+      return {
+        data: { logs: [], hasMore: false },
+        error: new Error("Activity module not available"),
+      };
     }
+    return mod.fetchLogs(entityType, entityId, options);
   }
 
   /**
    * Thin wrapper returning a flat array of logs for an entity.
-   * Matches the simpler `{ data: array, error }` shape expected by some views.
-   * @param {"candidate"|"job_offer"|"client"} entityType
-   * @param {string} entityId
-   * @returns {Promise<{ data: array, error: object | null }>}
+   * Delegates to IEData.activity.fetchEntityLogs.
    */
   async function fetchEntityLogs(entityType, entityId) {
-    const result = await fetchLogs(entityType, entityId, { full: true });
-    const logs = result && result.data && Array.isArray(result.data.logs) ? result.data.logs : [];
-    return {
-      data: logs,
-      error: result ? result.error || null : null,
-    };
+    const mod = getActivityModule();
+    if (!mod || typeof mod.fetchEntityLogs !== "function") {
+      return { data: [], error: new Error("Activity module not available") };
+    }
+    return mod.fetchEntityLogs(entityType, entityId);
   }
 
   /**
    * Thin wrapper to insert a manual note log for an entity.
-   * Ignores payload.event_type and delegates to createLog so event_type stays "manual_note".
-   * @param {{ entity_type: "candidate"|"job_offer"|"client", entity_id: string, event_type?: string, message: string }} payload
-   * @returns {Promise<{ data: object | null, error: object | null }>}
+   * Delegates to IEData.activity.insertEntityLog.
    */
   async function insertEntityLog(payload) {
-    if (!payload || !payload.entity_type || !payload.entity_id) {
-      const error = new Error("Missing entity_type or entity_id");
-      console.error("[Supabase] insertEntityLog:", error, payload);
-      return { data: null, error };
+    const mod = getActivityModule();
+    if (!mod || typeof mod.insertEntityLog !== "function") {
+      return { data: null, error: new Error("Activity module not available") };
     }
-    return createLog(payload.entity_type, payload.entity_id, payload.message);
+    return mod.insertEntityLog(payload);
   }
 
   /**
    * Fetch all activity logs created by the logged-in user.
-   * Returns a flat array of logs scoped to the current user.
-   * @returns {Promise<{ data: array | null, error: object | null }>}
+   * Delegates to IEData.activity.fetchMyActivityLogs.
    */
   async function fetchMyActivityLogs() {
-    const { data: sessionData, error: sessionError } = await getSession();
-    if (sessionError) {
-      console.error("[Supabase] fetchMyActivityLogs session error:", sessionError.message || sessionError, sessionError);
-      return { data: null, error: sessionError };
+    const mod = getActivityModule();
+    if (!mod || typeof mod.fetchMyActivityLogs !== "function") {
+      return { data: null, error: new Error("Activity module not available") };
     }
-    const userId = sessionData?.user?.id;
-    if (!userId) {
-      const err = new Error("Not authenticated");
-      console.error("[Supabase] fetchMyActivityLogs:", err);
-      return { data: null, error: err };
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from("activity_logs")
-        .select(
-          `
-          id,
-          entity_type,
-          entity_id,
-          event_type,
-          message,
-          created_at,
-          updated_at,
-          updated_by
-        `
-        )
-        .eq("created_by", userId)
-        .order("created_at", { ascending: false })
-        .order("id", { ascending: false });
-
-      if (error) {
-        console.error("[Supabase] fetchMyActivityLogs error:", error.message || error, error);
-        return { data: null, error };
-      }
-
-      return { data: Array.isArray(data) ? data : [], error: null };
-    } catch (err) {
-      console.error("[Supabase] fetchMyActivityLogs exception:", err);
-      return { data: null, error: err };
-    }
+    return mod.fetchMyActivityLogs();
   }
 
   /**
    * Update an activity log message.
-   * @param {string} logId
-   * @param {string} message
-   * @returns {Promise<{ data: object | null, error: object | null }>}
+   * Delegates to IEData.activity.updateLog.
    */
   async function updateLog(logId, message) {
-    if (!logId) {
-      const error = new Error("Missing logId");
-      console.error("[Supabase] updateLog:", error);
-      return { data: null, error };
+    const mod = getActivityModule();
+    if (!mod || typeof mod.updateLog !== "function") {
+      return { data: null, error: new Error("Activity module not available") };
     }
-    try {
-      const cleanedMessage = normalizeMessage(message);
-      const userId = await getCurrentUserId();
-
-      const { data, error } = await supabase
-        .from("activity_logs")
-        .update({
-          message: cleanedMessage,
-          updated_at: new Date().toISOString(),
-          updated_by: userId,
-        })
-        .eq("id", logId)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] updateLog error:", error.message || error, error, { logId });
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] updateLog exception:", err, { logId });
-      return { data: null, error: err };
-    }
+    return mod.updateLog(logId, message);
   }
 
   /**
    * Update a manual activity log created by the current user.
-   * @param {string} id
-   * @param {{ message: string }} payload
-   * @returns {Promise<{ data: object | null, error: object | null }>}
+   * Delegates to IEData.activity.updateMyManualLog.
    */
   async function updateMyManualLog(id, payload) {
-    if (!id || typeof id !== "string") {
-      const error = new Error("Missing id");
-      console.error("[Supabase] updateMyManualLog:", error);
-      return { data: null, error };
+    const mod = getActivityModule();
+    if (!mod || typeof mod.updateMyManualLog !== "function") {
+      return { data: null, error: new Error("Activity module not available") };
     }
-
-    try {
-      const userId = await getCurrentUserId();
-      const cleanedMessage = normalizeMessage(payload && payload.message);
-
-      const { data, error } = await supabase
-        .from("activity_logs")
-        .update({
-          message: cleanedMessage,
-          updated_at: new Date().toISOString(),
-          updated_by: userId,
-        })
-        .eq("id", id)
-        .eq("created_by", userId)
-        .eq("event_type", "manual_note")
-        .select()
-        .single();
-
-      if (error) {
-        console.error("[Supabase] updateMyManualLog error:", error.message || error, error, { id });
-        return { data: null, error };
-      }
-
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] updateMyManualLog exception:", err, { id });
-      return { data: null, error: err };
-    }
+    return mod.updateMyManualLog(id, payload);
   }
 
   /**
    * Delete an activity log by id.
-   * @param {string} logId
-   * @returns {Promise<{ data: { success: boolean } | null, error: object | null }>}
+   * Delegates to IEData.activity.deleteLog.
    */
   async function deleteLog(logId) {
-    if (!logId) {
-      const error = new Error("Missing logId");
-      console.error("[Supabase] deleteLog:", error);
-      return { data: null, error };
+    const mod = getActivityModule();
+    if (!mod || typeof mod.deleteLog !== "function") {
+      return {
+        data: { success: false },
+        error: new Error("Activity module not available"),
+      };
     }
-    try {
-      await getCurrentUserId();
-
-      const { data, error } = await supabase
-        .from("activity_logs")
-        .delete()
-        .eq("id", logId)
-        .select();
-
-      if (error) {
-        console.error("[Supabase] deleteLog error:", error.message || error, error, { logId });
-        return { data: { success: false }, error };
-      }
-
-      const rowCount = Array.isArray(data) ? data.length : data ? 1 : 0;
-      if (rowCount === 0) {
-        const zeroError = new Error("Delete succeeded but 0 rows affected");
-        console.error("[Supabase] deleteLog zero rows:", { logId });
-        return { data: { success: false }, error: zeroError };
-      }
-
-      return { data: { success: true }, error: null };
-    } catch (err) {
-      console.error("[Supabase] deleteLog exception:", err, { logId });
-      return { data: { success: false }, error: err };
-    }
+    return mod.deleteLog(logId);
   }
 
   /**
    * Delete a manual activity log created by the current user.
-   * @param {string} id
-   * @returns {Promise<{ data: { success: boolean } | null, error: object | null }>}
+   * Delegates to IEData.activity.deleteMyManualLog.
    */
   async function deleteMyManualLog(id) {
-    if (!id || typeof id !== "string") {
-      const error = new Error("Missing id");
-      console.error("[Supabase] deleteMyManualLog:", error);
-      return { data: null, error };
+    const mod = getActivityModule();
+    if (!mod || typeof mod.deleteMyManualLog !== "function") {
+      return {
+        data: { success: false },
+        error: new Error("Activity module not available"),
+      };
     }
-
-    try {
-      const userId = await getCurrentUserId();
-
-      const { data, error } = await supabase
-        .from("activity_logs")
-        .delete()
-        .eq("id", id)
-        .eq("created_by", userId)
-        .eq("event_type", "manual_note")
-        .select();
-
-      if (error) {
-        console.error("[Supabase] deleteMyManualLog error:", error.message || error, error, { id });
-        return { data: { success: false }, error };
-      }
-
-      const rowCount = Array.isArray(data) ? data.length : data ? 1 : 0;
-      if (rowCount === 0) {
-        const zeroError = new Error("Delete succeeded but 0 rows affected");
-        console.error("[Supabase] deleteMyManualLog zero rows:", { id });
-        return { data: { success: false }, error: zeroError };
-      }
-
-      return { data: { success: true }, error: null };
-    } catch (err) {
-      console.error("[Supabase] deleteMyManualLog exception:", err, { id });
-      return { data: { success: false }, error: err };
-    }
+    return mod.deleteMyManualLog(id);
   }
 
   /**
    * Create an automatic/system activity log for an entity.
-   * @param {"candidate"|"job_offer"|"client"} entityType
-   * @param {string} entityId
-   * @param {{ event_type: string, message: string, metadata: object | null }} payload
-   * @returns {Promise<{ data: object | null, error: object | null }>}
+   * Delegates to IEData.activity.createAutoLog.
    */
   async function createAutoLog(entityType, entityId, payload) {
-    try {
-      assertEntity(entityType, entityId);
-
-      const allowedEventTypes = ["status_change", "salary_update", "rejection", "system_event"];
-      const eventType = payload && payload.event_type;
-      if (!allowedEventTypes.includes(eventType)) {
-        const error = new Error("Invalid event_type");
-        console.error("[Supabase] createAutoLog:", error, { event_type: eventType });
-        return { data: null, error };
-      }
-
-      const cleanedMessage = normalizeMessage(payload && payload.message);
-      const metadata = payload ? payload.metadata : null;
-      if (metadata !== null && (typeof metadata !== "object" || Array.isArray(metadata))) {
-        const error = new Error("Invalid metadata");
-        console.error("[Supabase] createAutoLog:", error, { metadataType: typeof metadata });
-        return { data: null, error };
-      }
-
-      const userId = await getCurrentUserId();
-
-      const row = {
-        entity_type: entityType,
-        entity_id: entityId,
-        message: cleanedMessage,
-        created_by: userId,
-        event_type: eventType,
-        metadata: metadata ?? null,
-      };
-
-      const { data, error } = await supabase
-        .from("activity_logs")
-        .insert(row)
-        .select()
-        .single();
-      if (error) {
-        console.error("[Supabase] createAutoLog error:", error.message || error, error, { entityType, entityId, event_type: eventType });
-        return { data: null, error };
-      }
-      return { data, error: null };
-    } catch (err) {
-      console.error("[Supabase] createAutoLog exception:", err, { entityType, entityId });
-      return { data: null, error: err };
+    const mod = getActivityModule();
+    if (!mod || typeof mod.createAutoLog !== "function") {
+      return { data: null, error: new Error("Activity module not available") };
     }
+    return mod.createAutoLog(entityType, entityId, payload);
   }
 
   // ---------------------------------------------------------------------------

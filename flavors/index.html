@@ -29,117 +29,8 @@
   <link rel="stylesheet" href="/ItalianExperience/assets/css/cookie-banner.css" />
 
   <style>
-    .hero-narrative{
-      width:100%;
-      min-height:100vh;
-      min-height:100dvh;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      position:relative;
-      overflow:hidden;
-    }
     .hero-bg{
-      position:absolute;inset:0;z-index:0;
       background:url('/ItalianExperience/assets/img/flavors/flavors-home.jpg') no-repeat center center;
-      background-size:cover;
-      filter:brightness(0.35);
-      transform:scale(1.02);
-    }
-    .hero-overlay{
-      position:absolute;inset:0;z-index:1;
-      background:linear-gradient(to bottom,rgba(8,8,8,0) 0%,var(--brand-obsidian) 100%);
-    }
-    .hero-content{
-      position:relative;z-index:10;
-      text-align:center;
-      max-width:1100px;
-      padding:0 2rem;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-    }
-
-    .services-horizontal{
-      width:100%;
-      height:min(850px, 85vh);
-      display:flex;
-      flex-direction:row;
-      background:var(--brand-obsidian);
-      border-top:none;
-    }
-    .service-panel{
-      position:relative;
-      flex:1;
-      height:100%;
-      overflow:hidden;
-      border-radius:0 !important;
-      border:none !important;
-      box-shadow:none !important;
-      display:flex;
-      flex-direction:column;
-      justify-content:flex-end;
-      padding:6rem 3.5rem;
-      text-decoration:none;
-      transition:transform 0.6s cubic-bezier(0.16,1,0.3,1);
-      border-right:none !important;
-      will-change:transform;
-    }
-    .service-panel:last-child{border-right:none}
-
-    .panel-bg{
-      position:absolute;inset:0;z-index:0;
-      transition:transform 1.2s cubic-bezier(0.16,1,0.3,1),filter 0.8s ease;
-      filter:grayscale(100%) brightness(0.2);
-    }
-    .panel-bg img{width:100%;height:100%;object-fit:cover}
-    .service-panel:hover .panel-bg{transform:scale(1.1);filter:grayscale(0%) brightness(0.4)}
-
-    .panel-content{
-      position:relative;
-      z-index:10;
-      pointer-events:none;
-      transition:transform 0.6s cubic-bezier(0.16,1,0.3,1);
-    }
-    .service-panel:hover .panel-content{transform:translateY(-15px)}
-    .gold-line{width:40px;height:2px;background:var(--brand-gold);margin-bottom:2rem;transition:width 0.6s ease}
-    .service-panel:hover .gold-line{width:80px}
-
-    .btn-panel{
-      display:inline-block;
-      margin-top:3rem;
-      padding:1.2rem 2.5rem;
-      border:1px solid var(--brand-gold);
-      color:var(--brand-gold);
-      font-size:0.7rem;
-      font-weight:600;
-      text-transform:uppercase;
-      letter-spacing:0.25em;
-      transition:all 0.25s ease;
-      background:transparent;
-      pointer-events:auto;
-    }
-    .service-panel:hover .btn-panel{
-      background:var(--brand-gold);
-      color:var(--brand-obsidian);
-      box-shadow:0 10px 30px rgba(197,160,89,0.3);
-    }
-
-    @media (max-width:1024px){
-      .services-horizontal{flex-direction:column;height:auto}
-      .service-panel{
-        height:68vh;
-        width:100%;
-        border-right:none;
-        border-bottom:none !important;
-      }
-    }
-    @media (hover:none){
-      .service-panel{transition:none}
-      .panel-bg{transition:filter 0.4s ease}
-      .service-panel:hover{flex:1}
-      .service-panel:hover .panel-bg{transform:none}
     }
 
     .split-content{position:relative}
@@ -161,21 +52,6 @@
         width:1px;
         background:linear-gradient(to bottom, transparent, rgba(197,160,89,0.22), transparent);
       }
-    }
-
-    .disclosure-container{
-      border:1px solid rgba(197,160,89,0.15);
-      background:rgba(255,255,255,0.01);
-      padding:2.6rem;
-    }
-
-    .legal-notice-text{
-      font-size:0.65rem;
-      line-height:2.2;
-      color:#555;
-      text-align:justify;
-      text-transform:uppercase;
-      letter-spacing:0.12em;
     }
 
     .lang-divider{
@@ -231,7 +107,7 @@
           <span class="text-[#c5a059] text-[0.65rem] uppercase tracking-[0.4em] mb-3 block font-bold">Gourmet Experience</span>
           <h2 class="text-4xl md:text-5xl brand-font italic text-white mb-6">For Your Home</h2>
           <p class="text-slate-400 text-sm font-light leading-relaxed max-w-sm">E-Commerce Store</p>
-          <div class="btn-panel ie-hub-card-cta">For Your Home</div>
+          <div class="btn-panel ie-hub-card-cta ie-btn-primary">For Your Home</div>
         </div>
       </a>
 
@@ -244,7 +120,7 @@
           <span class="text-[#c5a059] text-[0.65rem] uppercase tracking-[0.4em] mb-3 block font-bold">Professional Supply</span>
           <h2 class="text-4xl md:text-5xl brand-font italic text-white mb-6">For Your Business</h2>
           <p class="text-slate-400 text-sm font-light leading-relaxed max-w-sm">Wholesale</p>
-          <div class="btn-panel ie-hub-card-cta">For Your Business</div>
+          <div class="btn-panel ie-hub-card-cta ie-btn-primary">For Your Business</div>
         </div>
       </a>
 
@@ -258,7 +134,7 @@
           <h2 class="text-4xl md:text-5xl brand-font italic text-white mb-6">Italian Companies</h2>
           <p class="text-slate-400 text-sm font-light leading-relaxed max-w-sm">Export to USA Market</p>
           <p class="text-slate-500 text-xs font-light leading-relaxed max-w-sm mt-4 italic">This specific service is available exclusively for the Italian market. Content is provided in Italian.</p>
-          <div class="btn-panel ie-hub-card-cta">Italian Companies</div>
+          <div class="btn-panel ie-hub-card-cta ie-btn-primary">Italian Companies</div>
         </div>
       </a>
     </section>
@@ -334,6 +210,7 @@
 
   <div id="site-footer"></div>
 
+  <script src="/ItalianExperience/assets/js/config.js"></script>
   <script src="/ItalianExperience/assets/js/bootstrap.js"></script>
   <script defer src="/ItalianExperience/assets/js/cookie-consent.js"></script>
 

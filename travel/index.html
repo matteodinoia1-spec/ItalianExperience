@@ -19,117 +19,8 @@
   <link rel="stylesheet" href="/ItalianExperience/assets/css/cookie-banner.css" />
 
   <style>
-    .hero-narrative{
-      width:100%;
-      min-height:100vh;
-      min-height:100dvh;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      position:relative;
-      overflow:hidden;
-    }
     .hero-bg{
-      position:absolute;inset:0;z-index:0;
       background:url('/ItalianExperience/assets/img/travel/travel-hero.jpg') no-repeat center center;
-      background-size:cover;
-      filter:brightness(0.35);
-      transform:scale(1.02);
-    }
-    .hero-overlay{
-      position:absolute;inset:0;z-index:1;
-      background:linear-gradient(to bottom,rgba(8,8,8,0) 0%,var(--brand-obsidian) 100%);
-    }
-    .hero-content{
-      position:relative;z-index:10;
-      text-align:center;
-      max-width:1100px;
-      padding:0 2rem;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-    }
-
-    .services-horizontal{
-      width:100%;
-      height:min(850px, 85vh);
-      display:flex;
-      flex-direction:row;
-      background:var(--brand-obsidian);
-      border-top:none;
-    }
-    .service-panel{
-      position:relative;
-      flex:1;
-      height:100%;
-      overflow:hidden;
-      border-radius:0 !important;
-      border:none !important;
-      box-shadow:none !important;
-      display:flex;
-      flex-direction:column;
-      justify-content:flex-end;
-      padding:6rem 3.5rem;
-      text-decoration:none;
-      transition:transform 0.6s cubic-bezier(0.16,1,0.3,1);
-      border-right:none !important;
-      will-change:transform;
-    }
-    .service-panel:last-child{border-right:none}
-
-    .panel-bg{
-      position:absolute;inset:0;z-index:0;
-      transition:transform 1.2s cubic-bezier(0.16,1,0.3,1),filter 0.8s ease;
-      filter:grayscale(100%) brightness(0.2);
-    }
-    .panel-bg img{width:100%;height:100%;object-fit:cover}
-    .service-panel:hover .panel-bg{transform:scale(1.1);filter:grayscale(0%) brightness(0.4)}
-
-    .panel-content{
-      position:relative;
-      z-index:10;
-      pointer-events:none;
-      transition:transform 0.6s cubic-bezier(0.16,1,0.3,1);
-    }
-    .service-panel:hover .panel-content{transform:translateY(-15px)}
-    .gold-line{width:40px;height:2px;background:var(--brand-gold);margin-bottom:2rem;transition:width 0.6s ease}
-    .service-panel:hover .gold-line{width:80px}
-
-    .btn-panel{
-      display:inline-block;
-      margin-top:3rem;
-      padding:1.2rem 2.5rem;
-      border:1px solid var(--brand-gold);
-      color:var(--brand-gold);
-      font-size:0.7rem;
-      font-weight:600;
-      text-transform:uppercase;
-      letter-spacing:0.25em;
-      transition:all 0.25s ease;
-      background:transparent;
-      pointer-events:auto;
-    }
-    .service-panel:hover .btn-panel{
-      background:var(--brand-gold);
-      color:var(--brand-obsidian);
-      box-shadow:0 10px 30px rgba(197,160,89,0.3);
-    }
-
-    @media (max-width:1024px){
-      .services-horizontal{flex-direction:column;height:auto}
-      .service-panel{
-        height:68vh;
-        width:100%;
-        border-right:none;
-        border-bottom:none !important;
-      }
-    }
-    @media (hover:none){
-      .service-panel{transition:none}
-      .panel-bg{transition:filter 0.4s ease}
-      .service-panel:hover{flex:1}
-      .service-panel:hover .panel-bg{transform:none}
     }
   </style>
 </head>
@@ -174,7 +65,7 @@
         <span class="text-[#c5a059] text-[0.65rem] uppercase tracking-[0.4em] mb-3 block font-bold">Signature Series</span>
         <h2 class="text-4xl md:text-5xl brand-font italic text-white mb-6">Bespoke Travel</h2>
         <p class="text-slate-400 text-sm font-light leading-relaxed max-w-sm">Private itineraries curated by industry elites.</p>
-        <div class="btn-panel ie-hub-card-cta">Explore Leisure</div>
+        <div class="btn-panel ie-hub-card-cta ie-btn-primary">Explore Leisure</div>
       </div>
     </a>
 
@@ -187,7 +78,7 @@
         <span class="text-[#c5a059] text-[0.65rem] uppercase tracking-[0.4em] mb-3 block font-bold">Academic Heritage</span>
         <h2 class="text-4xl md:text-5xl brand-font italic text-white mb-6">Gap Year</h2>
         <p class="text-slate-400 text-sm font-light leading-relaxed max-w-sm">Total cultural immersion programs.</p>
-        <div class="btn-panel ie-hub-card-cta">Explore Education</div>
+        <div class="btn-panel ie-hub-card-cta ie-btn-primary">Explore Education</div>
       </div>
     </a>
 
@@ -205,13 +96,14 @@
         <span class="text-[#c5a059] text-[0.65rem] uppercase tracking-[0.4em] mb-3 block font-bold">Mastery Series</span>
         <h2 class="text-4xl md:text-5xl brand-font italic text-white mb-6">Culinary Academy</h2>
         <p class="text-slate-400 text-sm font-light leading-relaxed max-w-sm">Master regional heritage in prestigious kitchens.</p>
-        <div class="btn-panel ie-hub-card-cta">Explore Culinary</div>
+        <div class="btn-panel ie-hub-card-cta ie-btn-primary">Explore Culinary</div>
       </div>
     </a>
   </section>
 
   <div id="site-footer"></div>
 
+  <script src="/ItalianExperience/assets/js/config.js"></script>
   <script src="/ItalianExperience/assets/js/bootstrap.js"></script>
   <script defer src="/ItalianExperience/assets/js/cookie-consent.js"></script>
 
