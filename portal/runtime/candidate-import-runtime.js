@@ -134,6 +134,7 @@
       skills: [],
       languages: [],
       hobbies: [],
+      certifications: [],
     };
 
     if (Array.isArray(payload.skills)) {
@@ -166,11 +167,28 @@
         });
     }
 
-    if (
-      payload.experience ||
-      payload.education ||
-      payload.certifications
-    ) {
+    if (Array.isArray(payload.certifications)) {
+      repeatables.certifications = payload.certifications
+        .filter(function (c) {
+          return typeof c === "string" && c.trim() !== "";
+        })
+        .map(function (c) {
+          return {
+            name: c,
+            issuer: "",
+            issue_date: "",
+            expiry_date: "",
+          };
+        });
+      if (typeof console !== "undefined" && console.debug) {
+        console.debug(
+          "[ItalianExperience] candidate-import-runtime: mapped certifications repeatables",
+          repeatables.certifications
+        );
+      }
+    }
+
+    if (payload.experience || payload.education || payload.certifications) {
       if (typeof console !== "undefined" && console.debug) {
         console.debug(
           "[ItalianExperience] candidate-import-runtime: complex sections present in parser JSON but ignored for Phase 1."
@@ -234,6 +252,9 @@
     }
     if ("hobbies" in repeatables) {
       renderSection("hobbies", repeatables.hobbies);
+    }
+    if ("certifications" in repeatables) {
+      renderSection("certifications", repeatables.certifications);
     }
   }
 
