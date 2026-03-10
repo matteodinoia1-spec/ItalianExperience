@@ -423,6 +423,13 @@
           "Add New Candidate | Italian Experience Recruitment";
       }
       initProfileSections("create", null);
+      if (
+        window.IECandidateImportRuntime &&
+        typeof window.IECandidateImportRuntime.initCandidateJsonImport ===
+          "function"
+      ) {
+        window.IECandidateImportRuntime.initCandidateJsonImport(form);
+      }
       if (typeof window.renderEntityToolbar === "function" && window.IEToolbar) {
         window.IEToolbar.renderEntityToolbar({
           entityType: "candidate",
