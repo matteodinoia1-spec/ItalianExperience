@@ -105,6 +105,47 @@ input,textarea,select,button{font-size:16px}
   z-index:10;
 }
 
+/* Static hub hero structural aliases (public site) */
+.hero-narrative{
+  width:100%;
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+  overflow:hidden;
+}
+
+.hero-bg{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  filter:brightness(0.35);
+  transform:scale(1.02);
+}
+
+.hero-overlay{
+  position:absolute;
+  inset:0;
+  z-index:1;
+}
+
+.hero-content{
+  position:relative;
+  z-index:10;
+  text-align:center;
+  max-width:1100px;
+  padding:0 2rem;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
 /* Split hero layout variant for hub-style heroes (panels side-by-side on desktop, stacked on mobile) */
 .ie-hero-content-layer.hero-layout--split{
   display:flex;
@@ -1308,9 +1349,10 @@ body.menu-open{overflow:hidden}
 
 /* ─── Disclosure / Legal System ─── */
 .disclosure-card,
+.disclosure-container,
 .ie-disclosure-card{
-  padding:3rem;
-  border:1px solid rgba(197,160,89,0.1);
+  padding:2.6rem;
+  border:1px solid rgba(197,160,89,0.15);
   background:rgba(255,255,255,0.01);
   max-width:900px;
   margin:0 auto;
@@ -1321,7 +1363,7 @@ body.menu-open{overflow:hidden}
 .ie-disclosure-text{
   font-size:0.65rem;
   line-height:2.2;
-  color:#666;
+  color:#555;
   text-align:justify;
   text-transform:uppercase;
   letter-spacing:0.12em;
@@ -1516,6 +1558,25 @@ body.menu-open{overflow:hidden}
     width:100%;
     border-right:none;
     border-bottom:none !important;
+  }
+}
+
+@media (hover:none){
+  .service-panel,
+  .ie-hub-card{
+    transition:none;
+  }
+  .panel-bg,
+  .ie-hub-card-bg{
+    transition:filter 0.4s ease;
+  }
+  .service-panel:hover,
+  .ie-hub-card:hover{
+    flex:1;
+  }
+  .service-panel:hover .panel-bg,
+  .ie-hub-card:hover .ie-hub-card-bg{
+    transform:none;
   }
 }
 

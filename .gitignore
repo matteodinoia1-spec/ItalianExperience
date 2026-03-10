@@ -21,3 +21,10 @@ $RECYCLE.BIN/
 # Editor/IDE system files
 .vscode/
 .idea/
+
+# Node / JS tooling
+node_modules/
+
+# Environment files
+.env
+.env.local

@@ -1,5 +1,5 @@
 ;(function () {
-  const base = '/ItalianExperience';
+  const base = (window.IEConfig && window.IEConfig.BASE_PATH) || '/ItalianExperience';
 
   function inject(el, html) {
     if (el) el.innerHTML = html;

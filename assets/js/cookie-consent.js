@@ -4,8 +4,10 @@
  * Exposes IECookieConsent.hasAccepted() for future analytics.
  */
 (function () {
+  var BASE_PATH =
+    (window.IEConfig && window.IEConfig.BASE_PATH) || '/ItalianExperience';
   var STORAGE_KEY = 'cookie_consent';
-  var BANNER_URL = '/ItalianExperience/partials/cookie-banner.html';
+  var BANNER_URL = BASE_PATH + '/partials/cookie-banner.html';
   var MOUNT_ID = 'cookie-banner-mount';
   var bannerInjected = false;
   var fetchStarted = false;
