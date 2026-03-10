@@ -239,12 +239,25 @@
 
   function applyPrefillToForm(form, mapped) {
     if (!form || !mapped) return;
+    if (typeof console !== "undefined" && console.debug) {
+      console.debug(
+        "[ItalianExperience] candidate-import-runtime: applyPrefillToForm",
+        { hasCore: !!(mapped && mapped.core), hasRepeatables: !!(mapped && mapped.repeatables) }
+      );
+    }
     applyCoreToForm(form, mapped.core || {});
     applyRepeatablesToForm(form, mapped.repeatables || {});
   }
 
-  function handleJsonFileSelected(file, form) {
+  function handleJsonFileSelected(file, form, fileInput) {
     if (!file || !form) return;
+
+    if (typeof console !== "undefined" && console.debug) {
+      console.debug(
+        "[ItalianExperience] candidate-import-runtime: handleJsonFileSelected",
+        { fileName: file.name, fileType: file.type, fileSize: file.size }
+      );
+    }
 
     var reader = new FileReader();
     reader.onload = function (event) {
@@ -254,21 +267,45 @@
         parsed = JSON.parse(text);
       } catch (e) {
         showError("Invalid JSON file.");
+        if (fileInput) {
+          fileInput.value = "";
+        }
         return;
       }
 
       var validation = validateParserPayload(parsed);
+      if (typeof console !== "undefined" && console.debug) {
+        console.debug(
+          "[ItalianExperience] candidate-import-runtime: validateParserPayload result",
+          validation
+        );
+      }
       if (!validation.ok) {
         showError(validation.reason || "Unsupported JSON format for parser import.");
+        if (fileInput) {
+          fileInput.value = "";
+        }
         return;
       }
 
       var mapped = mapParserToFormModel(parsed);
+      if (typeof console !== "undefined" && console.debug) {
+        console.debug(
+          "[ItalianExperience] candidate-import-runtime: mapParserToFormModel produced",
+          mapped
+        );
+      }
       applyPrefillToForm(form, mapped);
       showSuccess("Parser JSON imported. Review the fields and click Save to persist.");
+      if (fileInput) {
+        fileInput.value = "";
+      }
     };
     reader.onerror = function () {
       showError("Unable to read JSON file.");
+      if (fileInput) {
+        fileInput.value = "";
+      }
     };
 
     reader.readAsText(file);
@@ -290,11 +327,16 @@
   fileInput.addEventListener("change", function () {
     var files = fileInput.files;
     var file = files && files[0];
+    if (typeof console !== "undefined" && console.debug) {
+      console.debug(
+        "[ItalianExperience] candidate-import-runtime: file input change",
+        { filesLength: files ? files.length : null, hasFile: !!file }
+      );
+    }
     if (!file) {
       return;
     }
-    handleJsonFileSelected(file, form);
-    fileInput.value = "";
+    handleJsonFileSelected(file, form, fileInput);
   });
   }
 
