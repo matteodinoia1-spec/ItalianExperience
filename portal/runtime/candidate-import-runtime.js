@@ -279,28 +279,23 @@
 
     var params = getRouterParamsSafe();
     if (params && params.id) {
-      return;
+    return;
     }
 
-    var button = document.getElementById("candidateImportJsonButton");
-    var fileInput = document.getElementById("candidateParserJsonInput");
-    if (!button || !fileInput) {
+  var fileInput = document.getElementById("candidateParserJsonInput");
+  if (!fileInput) {
+    return;
+  }
+
+  fileInput.addEventListener("change", function () {
+    var files = fileInput.files;
+    var file = files && files[0];
+    if (!file) {
       return;
     }
-
-    button.addEventListener("click", function () {
-      fileInput.click();
-    });
-
-    fileInput.addEventListener("change", function () {
-      var files = fileInput.files;
-      var file = files && files[0];
-      if (!file) {
-        return;
-      }
-      handleJsonFileSelected(file, form);
-      fileInput.value = "";
-    });
+    handleJsonFileSelected(file, form);
+    fileInput.value = "";
+  });
   }
 
   window.IECandidateImportRuntime = {
