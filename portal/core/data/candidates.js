@@ -1078,7 +1078,7 @@
       const { data, error } = await supabase
         .from("candidate_experience")
         .select(
-          "id, candidate_id, title, company, start_date, end_date, description"
+          "id, candidate_id, title, company, location, start_date, end_date, description"
         )
         .eq("candidate_id", candidateId)
         .order("created_at", { ascending: true });
@@ -1104,7 +1104,7 @@
   /**
    * Replace work experience entries for a candidate (delete then bulk insert).
    * Uses the canonical candidate_experience schema:
-   *   candidate_id, title, company, start_date, end_date, description.
+   *   candidate_id, title, company, location, start_date, end_date, description.
    * @param {string} candidateId
    * @param {array} experiences
    * @returns {Promise<{ data: array | null, error: object | null }>}
@@ -1139,7 +1139,7 @@
 
       // Build a sanitized payload that only contains real table columns.
       // Table public.candidate_experience:
-      // id, candidate_id, title, company, start_date, end_date, description, created_at
+      // id, candidate_id, title, company, location, start_date, end_date, description, created_at
       var rows = items.map(function (raw) {
         var exp = raw || {};
         return {
@@ -1148,6 +1148,10 @@
             exp.title != null ? String(exp.title).trim() || null : null,
           company:
             exp.company != null ? String(exp.company).trim() || null : null,
+          location:
+            exp.location != null
+              ? String(exp.location).trim() || null
+              : null,
           start_date: exp.start_date || null,
           end_date: exp.end_date || null,
           description:

@@ -95,6 +95,12 @@
   function mapParserToFormModel(payload) {
     var nameParts = splitName(payload.name || "");
 
+    function yearFromDate(date) {
+      if (typeof date !== "string") return "";
+      var m = date.match(/^\d{4}/);
+      return m ? m[0] : "";
+    }
+
     var phone = "";
     if (Array.isArray(payload.phones)) {
       for (var i = 0; i < payload.phones.length; i++) {
@@ -135,6 +141,8 @@
       languages: [],
       hobbies: [],
       certifications: [],
+      education: [],
+      experience: [],
     };
 
     if (Array.isArray(payload.skills)) {
@@ -147,7 +155,39 @@
         });
     }
 
-    if (Array.isArray(payload.languages)) {
+    if (Array.isArray(payload.languages_items) && payload.languages_items.length) {
+      repeatables.languages = payload.languages_items
+        .filter(function (item) {
+          return item && typeof item === "object";
+        })
+        .map(function (item) {
+          var language =
+            typeof item.language === "string" ? item.language.trim() : "";
+          if (!language) {
+            return null;
+          }
+          var proficiency =
+            typeof item.level === "string" ? item.level.trim() : "";
+          return {
+            language: language,
+            proficiency: proficiency,
+          };
+        })
+        .filter(function (mapped) {
+          return !!mapped;
+        });
+
+      if (
+        typeof console !== "undefined" &&
+        console.debug &&
+        repeatables.languages.length
+      ) {
+        console.debug(
+          "[ItalianExperience] candidate-import-runtime: mapped structured languages repeatables",
+          repeatables.languages
+        );
+      }
+    } else if (Array.isArray(payload.languages)) {
       repeatables.languages = payload.languages
         .filter(function (l) {
           return typeof l === "string" && l.trim() !== "";
@@ -167,7 +207,44 @@
         });
     }
 
-    if (Array.isArray(payload.certifications)) {
+    if (Array.isArray(payload.certifications_items) && payload.certifications_items.length > 0) {
+      repeatables.certifications = payload.certifications_items
+        .filter(function (item) {
+          return item && typeof item === "object";
+        })
+        .map(function (item) {
+          var name = typeof item.name === "string" ? item.name.trim() : "";
+          if (!name) {
+            return null;
+          }
+          var issuer =
+            typeof item.issuer === "string" ? item.issuer.trim() : "";
+          var issue_date =
+            typeof item.issue_date === "string" ? item.issue_date.trim() : "";
+          var expiry_date =
+            typeof item.expiry_date === "string" ? item.expiry_date.trim() : "";
+          return {
+            name: name,
+            issuer: issuer,
+            issue_date: issue_date,
+            expiry_date: expiry_date,
+          };
+        })
+        .filter(function (mapped) {
+          return !!mapped;
+        });
+
+      if (
+        typeof console !== "undefined" &&
+        console.debug &&
+        repeatables.certifications.length
+      ) {
+        console.debug(
+          "[ItalianExperience] candidate-import-runtime: mapped structured certifications repeatables",
+          repeatables.certifications
+        );
+      }
+    } else if (Array.isArray(payload.certifications) && payload.certifications.length > 0) {
       repeatables.certifications = payload.certifications
         .filter(function (c) {
           return typeof c === "string" && c.trim() !== "";
@@ -188,10 +265,111 @@
       }
     }
 
-    if (payload.experience || payload.education || payload.certifications) {
-      if (typeof console !== "undefined" && console.debug) {
+    if (Array.isArray(payload.experience)) {
+      repeatables.experience = payload.experience
+        .filter(function (item) {
+          return item && typeof item === "object";
+        })
+        .map(function (item) {
+          var title =
+            typeof item.role === "string" ? item.role : "";
+          var company =
+            typeof item.company === "string" ? item.company : "";
+          var location =
+            typeof item.location === "string" ? item.location : "";
+
+          var description = "";
+          if (
+            typeof item.description === "string" &&
+            item.description.trim() !== ""
+          ) {
+            description = item.description;
+          } else if (Array.isArray(item.bullets)) {
+            description = item.bullets
+              .filter(function (b) {
+                return typeof b === "string" && b.trim() !== "";
+              })
+              .join("\n");
+          }
+
+          var start_date =
+            typeof item.start_date === "string" ? item.start_date : "";
+          var end_date =
+            typeof item.end_date === "string" ? item.end_date : "";
+          var current = !!item.current;
+
+          return {
+            title: title,
+            company: company,
+            location: location,
+            start_date: start_date,
+            end_date: end_date,
+            current: current,
+            description: description,
+          };
+        })
+        .filter(function (mapped) {
+          return (
+            (mapped.title && mapped.title.trim() !== "") ||
+            (mapped.company && mapped.company.trim() !== "") ||
+            (mapped.location && mapped.location.trim() !== "") ||
+            (mapped.description && mapped.description.trim() !== "")
+          );
+        });
+
+      if (
+        typeof console !== "undefined" &&
+        console.debug &&
+        repeatables.experience.length
+      ) {
         console.debug(
-          "[ItalianExperience] candidate-import-runtime: complex sections present in parser JSON but ignored for Phase 1."
+          "[ItalianExperience] candidate-import-runtime: mapped experience repeatables",
+          repeatables.experience
+        );
+      }
+    }
+
+    if (Array.isArray(payload.education)) {
+      repeatables.education = payload.education
+        .filter(function (item) {
+          return item && typeof item === "object";
+        })
+        .map(function (item) {
+          var institution =
+            typeof item.institution === "string" ? item.institution : "";
+          var degree = typeof item.degree === "string" ? item.degree : "";
+          var fieldOfStudy =
+            typeof item.field_of_study === "string" ? item.field_of_study : "";
+          var startYear = yearFromDate(item.start_date);
+          var endYear = yearFromDate(item.end_date);
+
+          return {
+            institution: institution,
+            degree: degree,
+            field_of_study: fieldOfStudy,
+            start_year: startYear,
+            end_year: endYear,
+          };
+        })
+        .filter(function (mapped) {
+          return (
+            (mapped.institution && mapped.institution.trim() !== "") ||
+            (mapped.degree && mapped.degree.trim() !== "") ||
+            (mapped.field_of_study &&
+              mapped.field_of_study.trim() !== "") ||
+            (mapped.start_year && mapped.start_year.trim() !== "") ||
+            (mapped.end_year && mapped.end_year.trim() !== "")
+          );
+        });
+
+      if (
+        typeof console !== "undefined" &&
+        console.debug &&
+        repeatables.education.length
+      ) {
+        console.debug(
+          "[ItalianExperience] candidate-import-runtime: mapped education repeatables",
+          repeatables.education
         );
       }
     }
@@ -255,6 +433,12 @@
     }
     if ("certifications" in repeatables) {
       renderSection("certifications", repeatables.certifications);
+    }
+    if ("education" in repeatables) {
+      renderSection("education", repeatables.education);
+    }
+    if ("experience" in repeatables) {
+      renderSection("experience", repeatables.experience);
     }
   }
 

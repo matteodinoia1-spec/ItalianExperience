@@ -537,6 +537,8 @@
     collectCandidateProfileData: collectCandidateProfileData,
     saveCandidateProfileChildren: saveCandidateProfileChildren,
     logCandidateProfileUpdated: logCandidateProfileUpdated,
+    renderRepeatableSection: renderRepeatableSection,
+    addRepeatableItem: addRepeatableItem,
   };
 
   // Compatibility: used by runtime/modals-runtime.js when a candidate form is

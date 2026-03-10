@@ -288,7 +288,7 @@
             "rejection_reason",
             "created_at",
             "updated_at",
-            "candidates ( id, first_name, last_name, position, address, status, notes, candidate_experience ( id, candidate_id, title, company, start_date, end_date ), candidate_skills ( id, candidate_id, skill ), candidate_languages ( id, candidate_id, language, level ) )",
+            "candidates ( id, first_name, last_name, position, address, status, notes, candidate_experience ( id, candidate_id, title, company, location, start_date, end_date, description ), candidate_skills ( id, candidate_id, skill ), candidate_languages ( id, candidate_id, language, level ) )",
             "job_offers ( id, title, position, city, state, positions_required, notes, clients ( id, name, city, state, notes ) )",
           ].join(",")
         )
