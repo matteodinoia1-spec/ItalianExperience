@@ -370,7 +370,22 @@
 
                         <!-- Section: Documents -->
                         <div id="candidateDocumentsSection" class="ie-card glass-card p-8 rounded-3xl">
-                            <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Documents</h3>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Documents</h3>
+                                <div class="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        id="candidateImportJsonButton"
+                                        class="ie-btn ie-btn-secondary"
+                                        data-import-json-only-create="true"
+                                    >
+                                        Import Parser JSON
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 mb-4">
+                                Prefills the form from a parser-generated JSON file. Data is only saved when you click Save.
+                            </p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div>
                                     <label class="form-label">Upload CV (PDF)</label>
@@ -389,6 +404,13 @@
                                     </div>
                                 </div>
                             </div>
+                            <input
+                                type="file"
+                                id="candidateParserJsonInput"
+                                accept="application/json,.json"
+                                class="hidden"
+                                data-role="candidate-parser-json-input"
+                            >
                         </div>
 
                         <!-- Section: Notes -->
@@ -434,6 +456,7 @@
     <script src="runtime/status-runtime.js"></script>
     <script src="runtime/associations-runtime.js"></script>
     <script src="runtime/candidate-profile-runtime.js"></script>
+    <script src="runtime/candidate-import-runtime.js"></script>
     <script src="runtime/candidate-runtime.js"></script>
     <script src="runtime/client-runtime.js"></script>
     <script src="runtime/job-offer-runtime.js"></script>
