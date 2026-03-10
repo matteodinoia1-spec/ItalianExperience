@@ -187,6 +187,11 @@
     var dobText = candidate.date_of_birth ? formatDate(candidate.date_of_birth) : "";
     setField("date_of_birth", dobText || "");
 
+    // Pipeline status (new / interview / hired / rejected), not availability
+    var pipelineStatus = (candidate.status || "new").toString().toLowerCase();
+    var statusLabels = { new: "New", interview: "Interview", hired: "Hired", rejected: "Rejected" };
+    setField("status-text", statusLabels[pipelineStatus] || pipelineStatus.charAt(0).toUpperCase() + pipelineStatus.slice(1));
+
     // Buttons
     var editBtn = document.querySelector('[data-action="edit-candidate"]');
     if (editBtn) {
@@ -217,7 +222,7 @@
   function applyAvailabilityToHeader(availability) {
     var value = (availability || "available").toString();
     var badge = document.querySelector('[data-field="status-badge"]');
-    var textEl = document.querySelector('[data-field="status-text"]');
+    // Only update the hero badge; "Status" in Candidate Information is pipeline status (set in renderCandidateCore)
     if (badge) {
       if ("value" in badge) {
         badge.value = value;
@@ -231,13 +236,6 @@
           : value === "in_process"
           ? "bg-amber-50 text-amber-800 border border-amber-100"
           : "bg-gray-50 text-gray-700 border border-gray-200");
-    }
-    if (textEl) {
-      if ("value" in textEl) {
-        textEl.value = value;
-      } else {
-        textEl.textContent = value;
-      }
     }
   }
 

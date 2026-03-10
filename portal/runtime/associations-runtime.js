@@ -810,10 +810,6 @@
     }
     container.innerHTML = "";
 
-    var sectionTitle = document.createElement("h3");
-    sectionTitle.className = "serif text-xl font-bold text-[#1b4332] section-title mb-4";
-    sectionTitle.textContent = "Associated Candidates";
-    container.appendChild(sectionTitle);
     if (list.length === 0) {
       var emptyMsg = document.createElement("p");
       emptyMsg.className = "text-gray-500 text-sm";
