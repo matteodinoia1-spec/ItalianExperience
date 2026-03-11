@@ -146,8 +146,8 @@
       if (item.type === "job-offer" && typeof links.offerView === "function") return links.offerView(id);
     }
     if (item.type === "candidate") return "candidate.html?id=" + encodeURIComponent(id);
-    if (item.type === "client") return "add-client.html?id=" + encodeURIComponent(id) + "&mode=view";
-    if (item.type === "job-offer") return "add-job-offer.html?id=" + encodeURIComponent(id) + "&mode=view";
+    if (item.type === "client") return "client.html?id=" + encodeURIComponent(id) + "&mode=view";
+    if (item.type === "job-offer") return "job-offer.html?id=" + encodeURIComponent(id) + "&mode=view";
     return "#";
   }
 

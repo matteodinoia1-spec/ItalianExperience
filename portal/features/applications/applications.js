@@ -177,8 +177,18 @@
       tr.addEventListener("click", function (event) {
         var target = event.target;
         if (target.closest("a, button, svg, path")) return;
-        var href =
-          "application.html?id=" + encodeURIComponent(String(application.id));
+        var href;
+        if (
+          window.IEPortal &&
+          window.IEPortal.links &&
+          typeof window.IEPortal.links.applicationView === "function"
+        ) {
+          href = window.IEPortal.links.applicationView(application.id);
+        } else {
+          href =
+            "application.html?id=" +
+            encodeURIComponent(String(application.id));
+        }
         if (
           window.IERouter &&
           typeof window.IERouter.navigateTo === "function"
@@ -296,9 +306,17 @@
         var candidateName = app.candidate_name || "—";
         if (app.candidate_id) {
           var cLink = document.createElement("a");
-          cLink.href =
-            "candidate.html?id=" +
-            encodeURIComponent(String(app.candidate_id));
+          if (
+            window.IEPortal &&
+            window.IEPortal.links &&
+            typeof window.IEPortal.links.candidateView === "function"
+          ) {
+            cLink.href = window.IEPortal.links.candidateView(app.candidate_id);
+          } else {
+            cLink.href =
+              "candidate.html?id=" +
+              encodeURIComponent(String(app.candidate_id));
+          }
           cLink.className =
             "text-[#1b4332] font-semibold hover:underline";
           cLink.textContent = candidateName;
@@ -313,9 +331,13 @@
         if (app.job_offer_id) {
           var oLink = document.createElement("a");
           oLink.href =
-            "add-job-offer.html?id=" +
-            encodeURIComponent(String(app.job_offer_id)) +
-            "&mode=view";
+            window.IEPortal &&
+            window.IEPortal.links &&
+            typeof window.IEPortal.links.offerView === "function"
+              ? window.IEPortal.links.offerView(app.job_offer_id)
+              : "job-offer.html?id=" +
+                encodeURIComponent(String(app.job_offer_id)) +
+                "&mode=view";
           oLink.className =
             "text-[#1b4332] font-semibold hover:underline";
           oLink.textContent = jobTitle;
@@ -329,10 +351,18 @@
         var clientName = app.client_name || "—";
         if (app.client_id) {
           var clLink = document.createElement("a");
-          clLink.href =
-            "add-client.html?id=" +
-            encodeURIComponent(String(app.client_id)) +
-            "&mode=view";
+          if (
+            window.IEPortal &&
+            window.IEPortal.links &&
+            typeof window.IEPortal.links.clientView === "function"
+          ) {
+            clLink.href = window.IEPortal.links.clientView(app.client_id);
+          } else {
+            clLink.href =
+              "client.html?id=" +
+              encodeURIComponent(String(app.client_id)) +
+              "&mode=view";
+          }
           clLink.className =
             "text-gray-800 font-medium hover:underline";
           clLink.textContent = clientName;
@@ -579,9 +609,19 @@
                 card.appendChild(job);
 
                 card.addEventListener("click", function () {
-                  var href =
-                    "application.html?id=" +
-                    encodeURIComponent(String(app.id));
+                  var href;
+                  if (
+                    window.IEPortal &&
+                    window.IEPortal.links &&
+                    typeof window.IEPortal.links.applicationView ===
+                      "function"
+                  ) {
+                    href = window.IEPortal.links.applicationView(app.id);
+                  } else {
+                    href =
+                      "application.html?id=" +
+                      encodeURIComponent(String(app.id));
+                  }
                   if (
                     window.IERouter &&
                     typeof window.IERouter.navigateTo === "function"

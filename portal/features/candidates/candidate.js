@@ -1,13 +1,578 @@
 (function () {
   "use strict";
 
+  var _candidatePageParams = null;
+  var EDITABLE_FIELDS = [
+    "first_name",
+    "last_name",
+    "email",
+    "phone",
+    "position",
+    "source",
+    "linkedin_url",
+    "date_of_birth",
+    "address",
+    "summary",
+    "notes",
+  ];
+  var CONFIG = window.CandidateEntityConfig || null;
+  window.CANDIDATE_EDITABLE_FIELDS = EDITABLE_FIELDS;
+  var _currentCandidate = null;
+
   function getRoot() {
-    return document.getElementById("candidateProfileRoot");
+    var rootId =
+      CONFIG && CONFIG.ui && CONFIG.ui.rootId
+        ? CONFIG.ui.rootId
+        : "candidateProfileRoot";
+    return document.getElementById(rootId);
   }
 
   function safeString(value) {
+    if (window.IEEntityFieldMapper && typeof window.IEEntityFieldMapper.safeString === "function") {
+      return window.IEEntityFieldMapper.safeString(value);
+    }
     if (value === null || value === undefined) return "";
     return String(value);
+  }
+
+  function getCandidatePageParamsSafe() {
+    if (_candidatePageParams) return _candidatePageParams;
+
+    var params = null;
+
+    if (
+      CONFIG &&
+      CONFIG.route &&
+      typeof CONFIG.route.getPageParams === "function"
+    ) {
+      params = CONFIG.route.getPageParams();
+    } else if (
+      window.IERouter &&
+      typeof window.IERouter.getCandidatePageParams === "function"
+    ) {
+      params = window.IERouter.getCandidatePageParams();
+    } else {
+      var search = new URLSearchParams(window.location.search || "");
+      var rawId = search.get("id");
+      var id = rawId ? rawId.toString() : null;
+      var rawMode = (search.get("mode") || "").toString().toLowerCase();
+      var mode = rawMode === "edit" ? "edit" : "view";
+      params = { id: id, mode: mode };
+    }
+
+    _candidatePageParams = params || { id: null, mode: "view" };
+    return _candidatePageParams;
+  }
+
+  function isViewMode() {
+    return getCandidatePageParamsSafe().mode === "view";
+  }
+
+  function isEditMode() {
+    return getCandidatePageParamsSafe().mode === "edit";
+  }
+
+  function applyModeToProfileFields(mode) {
+    var makeEditable = mode === "edit";
+    EDITABLE_FIELDS.forEach(function (field) {
+      var nodes = document.querySelectorAll('[data-field="' + field + '"]');
+      nodes.forEach(function (el) {
+        if ("readOnly" in el) {
+          el.readOnly = !makeEditable;
+        }
+
+        // View-mode styling uses the "field-display" class plus the readonly
+        // attribute to make inputs look like plain text and disable interaction
+        // via pointer-events. In edit mode we must remove that class so the
+        // same elements become truly editable without changing layout.
+        if (makeEditable) {
+          if (el.classList && el.classList.contains("field-display")) {
+            el.classList.remove("field-display");
+          }
+        } else {
+          if (el.classList && !el.classList.contains("field-display")) {
+            el.classList.add("field-display");
+          }
+        }
+
+        // When entering edit mode, clear the visual "—" placeholder so that
+        // native input placeholders can appear instead and the save logic
+        // still reads an empty value for untouched fields.
+        if (makeEditable && "value" in el) {
+          var currentValue = safeString(el.value).trim();
+          if (currentValue === "—") {
+            el.value = "";
+          }
+        }
+      });
+    });
+  }
+
+  function applyHeroContactMode(mode) {
+    var isEdit = mode === "edit";
+
+    var nameView = document.querySelector("[data-hero-name-view]");
+    var nameEdit = document.querySelector("[data-hero-name-edit]");
+    if (nameView && nameEdit) {
+      if (isEdit) {
+        nameView.classList.add("hidden");
+        nameEdit.classList.remove("hidden");
+      } else {
+        nameView.classList.remove("hidden");
+        nameEdit.classList.add("hidden");
+      }
+    }
+
+    function swap(viewSelector, inputSelector) {
+      var viewEl = document.querySelector(viewSelector);
+      var inputEl = document.querySelector(inputSelector);
+      if (!viewEl || !inputEl) return;
+      if (isEdit) {
+        viewEl.classList.add("hidden");
+        inputEl.classList.remove("hidden");
+      } else {
+        viewEl.classList.remove("hidden");
+        inputEl.classList.add("hidden");
+      }
+    }
+
+    swap("[data-hero-email-view]", "[data-hero-email-input]");
+    swap("[data-hero-phone-view]", "[data-hero-phone-input]");
+    swap("[data-hero-source-view]", "[data-hero-source-input]");
+  }
+
+  function applyInlineProfileEditVisibility(mode) {
+    var isEdit = mode === "edit";
+    var sections = [
+      "experience",
+      "education",
+      "skills",
+      "hobbies",
+      "languages",
+      "certifications",
+    ];
+
+    sections.forEach(function (sectionName) {
+      var listEl = document.querySelector('[data-list="' + sectionName + '"]');
+      var emptyEl = document.querySelector('[data-empty="' + sectionName + '"]');
+      var repeatableEl = document.querySelector(
+        '[data-repeatable-section="' + sectionName + '"]'
+      );
+
+      if (listEl) {
+        listEl.style.display = isEdit ? "none" : "";
+      }
+      if (emptyEl) {
+        emptyEl.style.display = isEdit ? "none" : "";
+      }
+      if (repeatableEl) {
+        repeatableEl.style.display = isEdit ? "" : "none";
+      }
+    });
+  }
+
+  function applyActivityVisibility(mode) {
+    var activitySection = document.getElementById("candidateActivityLog");
+    if (!activitySection) return;
+    if (mode === "edit") {
+      activitySection.classList.add("hidden");
+    } else {
+      activitySection.classList.remove("hidden");
+    }
+  }
+
+  function applyJsonImportVisibility(mode) {
+    var controls = document.getElementById("candidateJsonImportControls");
+    if (!controls) return;
+    if (mode === "edit") {
+      controls.classList.remove("hidden");
+    } else {
+      controls.classList.add("hidden");
+    }
+  }
+
+  function applyDocumentsMode(mode, candidate) {
+    var documentsSection = document.getElementById("candidateDocumentsSection");
+    if (!documentsSection) return;
+
+    var isEdit = mode === "edit";
+
+    // In edit mode, hide the simple view-only CV/photo placeholders inside
+    // the Documents subsection to avoid duplicate controls; hero photo and
+    // view-mode CV link are still managed separately by renderDocuments.
+    var cvLinkEl = document.querySelector('[data-doc-link="cv"]');
+    var cvEmptyEl = document.querySelector('[data-doc-empty="cv"]');
+    var photoEmptyEl = document.querySelector('[data-doc-empty="photo"]');
+
+    if (isEdit) {
+      documentsSection.classList.remove("hidden");
+      if (cvLinkEl) cvLinkEl.style.display = "none";
+      if (cvEmptyEl) cvEmptyEl.style.display = "none";
+      if (photoEmptyEl) photoEmptyEl.style.display = "none";
+    } else {
+      documentsSection.classList.add("hidden");
+      if (cvLinkEl) cvLinkEl.style.display = "";
+      if (cvEmptyEl) cvEmptyEl.style.display = "";
+      if (photoEmptyEl) photoEmptyEl.style.display = "";
+      return;
+    }
+
+    if (!candidate || !window.IECandidateRuntime) return;
+
+    try {
+      var cvInput = documentsSection.querySelector('input[name="cv_file"]');
+      var photoInput = documentsSection.querySelector('input[name="foto_file"]');
+
+      if (cvInput && candidate.cv_url) {
+        cvInput.dataset.currentPath = candidate.cv_url;
+      }
+      if (photoInput && candidate.photo_url) {
+        photoInput.dataset.currentPath = candidate.photo_url;
+      }
+
+      if (
+        typeof window.IECandidateRuntime.renderCandidateFileState === "function"
+      ) {
+        window.IECandidateRuntime.renderCandidateFileState(
+          "cv",
+          candidate,
+          "edit"
+        );
+        window.IECandidateRuntime.renderCandidateFileState(
+          "photo",
+          candidate,
+          "edit"
+        );
+      }
+
+      function bindInput(inputEl, type) {
+        if (!inputEl || inputEl._ieDocBound) return;
+        inputEl._ieDocBound = true;
+        inputEl.addEventListener("change", function () {
+          if (
+            window.IECandidateRuntime &&
+            typeof window.IECandidateRuntime.handleCandidateFileChange ===
+              "function"
+          ) {
+            window.IECandidateRuntime.handleCandidateFileChange({
+              input: inputEl,
+              type: type,
+            });
+          }
+        });
+      }
+
+      bindInput(cvInput, "cv");
+      bindInput(photoInput, "photo");
+    } catch (err) {
+      console.error("[Candidate] applyDocumentsMode error:", err);
+    }
+  }
+
+  function collectEditableFieldValues(candidate) {
+    if (
+      window.IEEntityFieldMapper &&
+      typeof window.IEEntityFieldMapper.collectEditableFieldValues === "function"
+    ) {
+      return window.IEEntityFieldMapper.collectEditableFieldValues({
+        editableFields: EDITABLE_FIELDS,
+        entity: candidate || {},
+        fieldParsers: {
+          date_of_birth: function (value, ctx) {
+            if (
+              window.CandidateParsers &&
+              typeof window.CandidateParsers.parseDateOfBirth === "function"
+            ) {
+              return window.CandidateParsers.parseDateOfBirth(value, ctx);
+            }
+
+            if (!value) {
+              return null;
+            }
+            if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+              return value;
+            }
+            var m = value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+            if (m) {
+              var day = m[1].padStart(2, "0");
+              var month = m[2].padStart(2, "0");
+              var year = m[3];
+              return year + "-" + month + "-" + day;
+            }
+            return ctx && ctx.entity && ctx.entity.date_of_birth
+              ? ctx.entity.date_of_birth
+              : null;
+          },
+        },
+      });
+    }
+
+    var result = {};
+
+    function readFieldValue(fieldName) {
+      var nodes = document.querySelectorAll('[data-field="' + fieldName + '"]');
+      if (!nodes || !nodes.length) return "";
+
+      var raw = "";
+      nodes.forEach(function (el) {
+        var v = "";
+        if ("value" in el && el.value != null) {
+          v = el.value.toString();
+        } else if (el.textContent != null) {
+          v = el.textContent.toString();
+        }
+        if (!raw && v) {
+          raw = v;
+        }
+      });
+
+      var trimmed = safeString(raw).trim();
+      if (trimmed === "—") return "";
+      return trimmed;
+    }
+
+    EDITABLE_FIELDS.forEach(function (fieldName) {
+      var value = readFieldValue(fieldName);
+
+      if (fieldName === "date_of_birth") {
+        if (
+          window.CandidateParsers &&
+          typeof window.CandidateParsers.parseDateOfBirth === "function"
+        ) {
+          result.date_of_birth = window.CandidateParsers.parseDateOfBirth(
+            value,
+            { entity: candidate || {} }
+          );
+          return;
+        }
+
+        if (!value) {
+          result.date_of_birth = null;
+          return;
+        }
+        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+          result.date_of_birth = value;
+          return;
+        }
+        var m = value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if (m) {
+          var day = m[1].padStart(2, "0");
+          var month = m[2].padStart(2, "0");
+          var year = m[3];
+          result.date_of_birth = year + "-" + month + "-" + day;
+          return;
+        }
+        result.date_of_birth =
+          candidate && candidate.date_of_birth ? candidate.date_of_birth : null;
+        return;
+      }
+
+      if (value) {
+        result[fieldName] = value;
+      } else {
+        result[fieldName] = null;
+      }
+    });
+
+    return result;
+  }
+
+  async function saveInlineProfileEdits() {
+    var params = getCandidatePageParamsSafe();
+    var candidateId = params && params.id;
+    if (!candidateId) return;
+
+    if (
+      window.CandidateEntityConfig &&
+      window.CandidateEntityConfig.data &&
+      typeof window.CandidateEntityConfig.data.buildSavePayload === "function" &&
+      typeof window.CandidateEntityConfig.data.performSave === "function"
+    ) {
+      var state = {
+        id: candidateId,
+        mode: params.mode || "edit",
+        entity: _currentCandidate || {},
+        params: params,
+        config: window.CandidateEntityConfig,
+      };
+
+      var payload;
+      try {
+        payload = await window.CandidateEntityConfig.data.buildSavePayload(
+          state
+        );
+      } catch (errBuild) {
+        console.error(
+          "[Candidate] buildSavePayload exception from inline edit:",
+          errBuild
+        );
+        return;
+      }
+
+      var result;
+      try {
+        result = await window.CandidateEntityConfig.data.performSave(
+          state,
+          payload || {}
+        );
+      } catch (errSave) {
+        console.error(
+          "[Candidate] performSave exception from inline edit:",
+          errSave
+        );
+        return;
+      }
+
+      if (result && result.entity) {
+        _currentCandidate = result.entity;
+      }
+
+      if (result && result.haltRedirect) {
+        return;
+      }
+
+      if (
+        window.IERouter &&
+        typeof window.IERouter.redirectToEntityView === "function"
+      ) {
+        window.IERouter.redirectToEntityView("candidate", candidateId);
+      } else {
+        window.location.href =
+          "candidate.html?id=" + encodeURIComponent(candidateId);
+      }
+
+      return;
+    }
+
+    if (
+      !window.IESupabase ||
+      typeof window.IESupabase.updateCandidate !== "function"
+    ) {
+      console.error("[Candidate] IESupabase.updateCandidate not available");
+      return;
+    }
+
+    var candidate = _currentCandidate || {};
+
+    var payloadLegacy = {
+      first_name: candidate.first_name || "",
+      last_name: candidate.last_name || "",
+      address: candidate.address || null,
+      position: candidate.position || null,
+      status: candidate.status || "pending_review",
+      source: candidate.source || null,
+      notes: candidate.notes || null,
+      email: candidate.email || null,
+      phone: candidate.phone || null,
+      linkedin_url: candidate.linkedin_url || null,
+      date_of_birth: candidate.date_of_birth || null,
+      summary: candidate.summary || null,
+    };
+
+    var edited = collectEditableFieldValues(candidate);
+    Object.keys(edited).forEach(function (key) {
+      payloadLegacy[key] = edited[key];
+    });
+
+    var profile = null;
+    try {
+      var profileRoot = document.getElementById("candidateInlineProfileForm");
+      if (
+        profileRoot &&
+        window.IECandidateProfileRuntime &&
+        typeof window.IECandidateProfileRuntime.collectCandidateProfileData ===
+          "function"
+      ) {
+        profile =
+          window.IECandidateProfileRuntime.collectCandidateProfileData(
+            profileRoot
+          ) || null;
+      }
+    } catch (profileErr) {
+      console.error(
+        "[Candidate] collectCandidateProfileData error from inline edit:",
+        profileErr
+      );
+    }
+
+    try {
+      var resultLegacy = await window.IESupabase.updateCandidate(
+        candidateId,
+        payloadLegacy
+      );
+      if (!resultLegacy || resultLegacy.error) {
+        console.error(
+          "[Candidate] updateCandidate error from inline edit:",
+          resultLegacy && resultLegacy.error
+        );
+        if (
+          window.IESupabase &&
+          typeof window.IESupabase.showError === "function"
+        ) {
+          window.IESupabase.showError(
+            (resultLegacy &&
+              resultLegacy.error &&
+              resultLegacy.error.message) ||
+              "Error while saving candidate profile.",
+            "candidateInlineEdit"
+          );
+        }
+        return;
+      }
+
+      _currentCandidate = resultLegacy.data || candidate;
+
+      if (
+        profile &&
+        window.IECandidateProfileRuntime &&
+        typeof window.IECandidateProfileRuntime.saveCandidateProfileChildren ===
+          "function"
+      ) {
+        var childrenResult =
+          await window.IECandidateProfileRuntime.saveCandidateProfileChildren(
+            candidateId,
+            profile
+          );
+        if (!childrenResult || childrenResult.ok === false) {
+          return;
+        }
+      }
+
+      if (
+        window.IECandidateProfileRuntime &&
+        typeof window.IECandidateProfileRuntime.logCandidateProfileUpdated ===
+          "function"
+      ) {
+        try {
+          await window.IECandidateProfileRuntime.logCandidateProfileUpdated(
+            candidateId
+          );
+        } catch (logErr) {
+          console.error(
+            "[Candidate] logCandidateProfileUpdated error from inline edit:",
+            logErr
+          );
+        }
+      }
+
+      if (
+        window.IERouter &&
+        typeof window.IERouter.redirectToEntityView === "function"
+      ) {
+        window.IERouter.redirectToEntityView("candidate", candidateId);
+      } else {
+        window.location.href =
+          "candidate.html?id=" + encodeURIComponent(candidateId);
+      }
+    } catch (err) {
+      console.error("[Candidate] updateCandidate exception from inline edit:", err);
+      if (window.IESupabase && typeof window.IESupabase.showError === "function") {
+        window.IESupabase.showError(
+          "Unexpected error while saving candidate profile.",
+          "candidateInlineEdit"
+        );
+      }
+    }
   }
 
   function escapeHtml(str) {
@@ -19,6 +584,10 @@
   }
 
   function setField(name, value) {
+    if (window.IEEntityFieldMapper && typeof window.IEEntityFieldMapper.setField === "function") {
+      window.IEEntityFieldMapper.setField(name, value);
+      return;
+    }
     var elements = document.querySelectorAll('[data-field="' + name + '"]');
     var text = safeString(value).trim() || "—";
     elements.forEach(function (el) {
@@ -134,12 +703,15 @@
     }
   }
 
-  function renderCandidateCore(candidate, candidateId) {
-    var fullName =
-      safeString(candidate.first_name).trim() +
-      (candidate.last_name ? " " + safeString(candidate.last_name).trim() : "");
-    var candidateName = fullName || "Candidate";
-    setField("full-name", candidateName || "—");
+  function renderCandidateCore(candidate, candidateId, mode) {
+    _currentCandidate = candidate || null;
+    var first = safeString(candidate.first_name).trim();
+    var last = safeString(candidate.last_name).trim();
+    var fullName = first + (last ? " " + last : "");
+    var candidateName =
+      fullName ||
+      (mode === "view" ? "First Name Last Name" : "Candidate");
+    setField("full-name", candidateName);
     window.pageMeta = {
       title: candidateName,
       subtitle: "Candidate profile",
@@ -152,11 +724,19 @@
     if (window.IEPortal && typeof window.IEPortal.mountPageHeader === "function") {
       window.IEPortal.mountPageHeader();
     }
-    setField("position", candidate.position || "");
+    var rawPosition = safeString(candidate.position).trim();
+    var displayPosition =
+      rawPosition || (mode === "view" ? "Role / Position" : "");
+    setField("position", displayPosition);
+    setField("first_name", candidate.first_name || "");
+    setField("last_name", candidate.last_name || "");
     // Email/phone shown in hero only; not duplicated in Candidate Information card
     setField("linkedin_url", candidate.linkedin_url || "");
     setField("address", candidate.address || "");
     setField("summary", candidate.summary || "");
+    setField("email", candidate.email || "");
+    setField("phone", candidate.phone || "");
+    setField("source", candidate.source || "");
     // Internal notes (separate from activity log)
     setField("notes", candidate.notes || "");
 
@@ -204,31 +784,29 @@
       if (email) {
         heroEmailEl.href = "mailto:" + email;
         heroEmailEl.textContent = email;
-        heroEmailWrap.style.display = "";
       } else {
-        heroEmailEl.textContent = "—";
+        heroEmailEl.textContent = "No email provided";
         heroEmailEl.removeAttribute("href");
-        heroEmailWrap.style.display = "none";
       }
+      heroEmailWrap.style.display = "";
     }
     if (heroPhoneEl && heroPhoneWrap) {
       var phone = safeString(candidate.phone).trim();
       if (phone) {
         heroPhoneEl.textContent = phone;
-        heroPhoneWrap.style.display = "";
       } else {
-        heroPhoneEl.textContent = "—";
-        heroPhoneWrap.style.display = "none";
+        heroPhoneEl.textContent = "No phone number";
       }
+      heroPhoneWrap.style.display = "";
     }
     if (heroSourceEl && heroSourceWrap) {
       var source = safeString(candidate.source).trim();
       if (source) {
         heroSourceEl.textContent = source;
-        heroSourceWrap.style.display = "";
       } else {
-        heroSourceWrap.style.display = "none";
+        heroSourceEl.textContent = "Source not specified";
       }
+      heroSourceWrap.style.display = "";
     }
 
     // Buttons
@@ -240,7 +818,7 @@
           target = window.IEPortal.links.candidateEdit(candidateId);
         } else {
           target =
-            "add-candidate.html?id=" + encodeURIComponent(candidateId) + "&mode=edit";
+            "candidate.html?id=" + encodeURIComponent(candidateId) + "&mode=edit";
         }
         if (window.IERouter && typeof window.IERouter.navigateTo === "function") {
           window.IERouter.navigateTo(target);
@@ -766,7 +1344,7 @@
             href = window.IEPortal.links.offerView(offer.id);
           } else {
             href =
-              "add-job-offer.html?id=" + encodeURIComponent(offer.id) + "&mode=view";
+              "job-offer.html?id=" + encodeURIComponent(offer.id) + "&mode=view";
           }
 
           var a = document.createElement("a");
@@ -826,7 +1404,16 @@
           }
           var id = tr.dataset.associationId;
           if (!id) return;
-          var href = "application.html?id=" + encodeURIComponent(id);
+          var href;
+          if (
+            window.IEPortal &&
+            window.IEPortal.links &&
+            typeof window.IEPortal.links.applicationView === "function"
+          ) {
+            href = window.IEPortal.links.applicationView(id);
+          } else {
+            href = "application.html?id=" + encodeURIComponent(id);
+          }
           if (window.IERouter && typeof window.IERouter.navigateTo === "function") {
             window.IERouter.navigateTo(href);
           } else {
@@ -842,106 +1429,8 @@
     }
   }
 
-  async function loadCandidateLogs(candidateId) {
-    if (!candidateId) return;
-
-    var list = document.getElementById("candidateLogList");
-    var empty = document.getElementById("candidateLogEmpty");
-    if (!list) return;
-
-    list.innerHTML = "";
-    if (empty) {
-      empty.classList.add("hidden");
-    }
-
-    if (typeof window === "undefined" || !window.IESupabase) {
-      return;
-    }
-
-    var logs = [];
-    try {
-      if (typeof window.IESupabase.fetchEntityLogs === "function") {
-        var result = await window.IESupabase.fetchEntityLogs("candidate", candidateId);
-        logs = (result && result.data) || [];
-      } else if (typeof window.IESupabase.fetchLogs === "function") {
-        var result2 = await window.IESupabase.fetchLogs("candidate", candidateId, { full: true });
-        logs = (result2 && result2.data && result2.data.logs) || [];
-      } else {
-        return;
-      }
-    } catch (err) {
-      console.error("[Candidate] loadCandidateLogs exception:", err);
-      return;
-    }
-
-    if (!Array.isArray(logs) || !logs.length) {
-      if (empty) {
-        empty.classList.remove("hidden");
-      }
-      return;
-    }
-
-    function safeToLocaleString(isoDateString) {
-      if (!isoDateString) return "";
-      try {
-        return new Date(isoDateString).toLocaleString();
-      } catch (_) {
-        return String(isoDateString);
-      }
-    }
-
-    function getDisplayNameForLog(log) {
-      if (!log) return "—";
-      var p = log.created_by_profile;
-      if (p && (p.first_name || p.last_name)) {
-        var name = [p.first_name, p.last_name].filter(Boolean).join(" ").trim();
-        if (name) return name;
-      }
-      if (log.created_by) return String(log.created_by).slice(0, 8) + "…";
-      return "—";
-    }
-
-    logs.forEach(function (log) {
-      var item = document.createElement("div");
-      item.className = "activity-item";
-
-      var dot = document.createElement("div");
-      dot.className = "activity-item__dot";
-      item.appendChild(dot);
-
-      var content = document.createElement("div");
-      content.className = "activity-item__content";
-
-      var headerRow = document.createElement("div");
-      headerRow.className = "activity-item__headerRow";
-
-      var who = document.createElement("span");
-      who.className = "activity-item__who";
-      who.textContent = getDisplayNameForLog(log);
-      headerRow.appendChild(who);
-
-      var ts = document.createElement("span");
-      ts.className = "activity-item__timestamp";
-      ts.textContent = safeToLocaleString(log && log.created_at);
-      headerRow.appendChild(ts);
-
-      content.appendChild(headerRow);
-
-      var message = document.createElement("div");
-      message.className = "activity-item__message";
-      message.textContent = (log && log.message) || "";
-      content.appendChild(message);
-
-      var actions = document.createElement("div");
-      actions.className = "activity-item__actions";
-      content.appendChild(actions);
-
-      item.appendChild(content);
-      list.appendChild(item);
-    });
-  }
-
-  async function loadCandidatePage(candidateId) {
+  async function loadCandidatePage(candidateId, mode) {
+    var effectiveMode = mode || "view";
     var core = await loadCandidateCore(candidateId);
     var candidate = core.candidate;
     if (!candidate) {
@@ -949,7 +1438,41 @@
       return;
     }
 
-    renderCandidateCore(candidate, candidateId);
+    _currentCandidate = candidate;
+
+    renderCandidateCore(candidate, candidateId, effectiveMode);
+
+    applyModeToProfileFields(effectiveMode);
+    applyHeroContactMode(effectiveMode);
+    applyActivityVisibility(effectiveMode);
+    applyDocumentsMode(effectiveMode, candidate);
+    applyJsonImportVisibility(effectiveMode);
+
+    try {
+      if (
+        effectiveMode === "edit" &&
+        window.IECandidateProfileRuntime &&
+        typeof window.IECandidateProfileRuntime.initCandidateProfileSections ===
+          "function"
+      ) {
+        var profileRoot = document.getElementById("candidateInlineProfileForm");
+        if (profileRoot) {
+          window.IECandidateProfileRuntime.initCandidateProfileSections(
+            profileRoot,
+            "edit",
+            candidate
+          );
+        }
+        applyInlineProfileEditVisibility("edit");
+      } else {
+        applyInlineProfileEditVisibility("view");
+      }
+    } catch (profileInitErr) {
+      console.error(
+        "[Candidate] initCandidateProfileSections error from inline edit:",
+        profileInitErr
+      );
+    }
 
     // Load applications for availability and associated offers
     var applicationsForAvailability = [];
@@ -989,7 +1512,7 @@
       applyAvailabilityToHeader("available");
     }
 
-    // Lifecycle toolbar wiring for candidate profile (view mode only)
+    // Lifecycle toolbar wiring for candidate profile
     try {
       var lifecycleStatus = candidate && candidate.is_archived ? "archived" : "active";
 
@@ -1003,7 +1526,7 @@
           target = window.IEPortal.links.candidateEdit(candidateId);
         } else {
           target =
-            "add-candidate.html?id=" + encodeURIComponent(candidateId) + "&mode=edit";
+            "candidate.html?id=" + encodeURIComponent(candidateId) + "&mode=edit";
         }
         if (window.IERouter && typeof window.IERouter.navigateTo === "function") {
           window.IERouter.navigateTo(target);
@@ -1064,11 +1587,12 @@
             entityType: "candidate",
             entityId: candidateId,
             status: "active",
-            mode: "view",
+            mode: effectiveMode,
             containerId: "candidateActions",
             onEdit: onEdit,
             onArchive: onArchive,
             onReopen: onReopen,
+            onSave: effectiveMode === "edit" ? saveInlineProfileEdits : undefined,
           });
         }
       }
@@ -1078,11 +1602,12 @@
           entityType: "candidate",
           entityId: candidateId,
           status: lifecycleStatus,
-          mode: "view",
+          mode: effectiveMode,
           containerId: "candidateActions",
           onEdit: onEdit,
           onArchive: onArchive,
           onReopen: onReopen,
+          onSave: effectiveMode === "edit" ? saveInlineProfileEdits : undefined,
         });
       }
 
@@ -1139,13 +1664,54 @@
       loadCandidateProfileSections(candidateId),
       renderAssociatedOffers(candidateId),
       renderDocuments(candidate),
-      loadCandidateLogs(candidateId),
     ]);
+
+    try {
+      if (
+        effectiveMode === "edit" &&
+        window.IECandidateImportRuntime &&
+        typeof window.IECandidateImportRuntime.initCandidateJsonImport ===
+          "function"
+      ) {
+        var profileRoot = document.getElementById("candidateInlineProfileForm");
+        if (profileRoot) {
+          window.IECandidateImportRuntime.initCandidateJsonImport(
+            profileRoot,
+            { allowExistingCandidate: true }
+          );
+        }
+      }
+    } catch (jsonErr) {
+      console.error(
+        "[Candidate] initCandidateJsonImport error on candidate.html:",
+        jsonErr
+      );
+    }
+
+    try {
+      var activityContainer = document.getElementById("activity-container");
+      if (
+        effectiveMode === "view" &&
+        activityContainer &&
+        window.ActivitySection &&
+        typeof window.ActivitySection.init === "function"
+      ) {
+        window.ActivitySection.init({
+          entityType: "candidate",
+          entityId: candidateId,
+          container: activityContainer,
+        });
+      }
+    } catch (err3) {
+      console.error("[Candidate] ActivitySection init error:", err3);
+    }
   }
 
   async function initCandidateProfilePage() {
-    var params = new URLSearchParams(window.location.search || "");
-    var candidateId = params.get("id");
+    var state = getCandidatePageParamsSafe();
+    var candidateId = state.id;
+    var mode = state.mode || "view";
+
     if (!candidateId) {
       navigateToCandidates();
       return;
@@ -1193,13 +1759,7 @@
       }
     }
 
-    await loadCandidatePage(candidateId);
-
-    try {
-      bindCandidateActivityLog(candidateId);
-    } catch (err) {
-      console.error("[Candidate] bindCandidateActivityLog exception:", err);
-    }
+    await loadCandidatePage(candidateId, mode);
 
     try {
       var addAppBtn = document.querySelector('[data-action="add-application"]');
@@ -1385,66 +1945,43 @@
     } catch (_) {}
   }
 
-  function bindCandidateActivityLog(candidateId) {
-    if (!candidateId) return;
-
-    var addBtn = document.getElementById("candidateAddLogBtn");
-    var textarea = document.getElementById("candidateLogInput");
-    if (!addBtn || !textarea) return;
-    if (addBtn._ieBound === true) return;
-    addBtn._ieBound = true;
-
-    addBtn.addEventListener("click", function () {
-      if (!window.IESupabase) return;
-
-      var raw = textarea.value || "";
-      var message = raw.trim();
-      if (!message) return;
-
-      addBtn.disabled = true;
-
-      var done = function () {
-        addBtn.disabled = false;
-      };
-
-      var promise;
-      if (typeof window.IESupabase.insertEntityLog === "function") {
-        promise = window.IESupabase.insertEntityLog({
-          entity_type: "candidate",
-          entity_id: candidateId,
-          message: message,
-        });
-      } else if (typeof window.IESupabase.createLog === "function") {
-        promise = window.IESupabase.createLog("candidate", candidateId, message);
-      }
-
-      if (!promise || typeof promise.then !== "function") {
-        done();
-        return;
-      }
-
-      promise
-        .then(function (result) {
-          if (!result || result.error || !result.data) {
-            return;
-          }
-          textarea.value = "";
-          return loadCandidateLogs(candidateId);
-        })
-        .catch(function (err) {
-          console.error("[Candidate] add note error:", err);
-        })
-        .finally(done);
-    });
-  }
+  // Expose candidate helpers for the Entity Page Shell and config.
+  window.applyModeToProfileFields = applyModeToProfileFields;
+  window.applyHeroContactMode = applyHeroContactMode;
+  window.applyInlineProfileEditVisibility = applyInlineProfileEditVisibility;
+  window.applyActivityVisibility = applyActivityVisibility;
+  window.applyDocumentsMode = applyDocumentsMode;
+  window.applyJsonImportVisibility = applyJsonImportVisibility;
+  window.collectEditableFieldValues = collectEditableFieldValues;
+  window.saveInlineProfileEdits = saveInlineProfileEdits;
+  window.loadCandidateCore = loadCandidateCore;
+  window.renderCandidateCore = renderCandidateCore;
+  window.renderNotFound = renderNotFound;
+  window.renderAssociatedOffers = renderAssociatedOffers;
+  window.applyAvailabilityToHeader = applyAvailabilityToHeader;
 
   document.addEventListener("DOMContentLoaded", function () {
-    initCandidateProfilePage().catch(function (err) {
-      console.error("[Candidate] initCandidateProfilePage exception:", err);
-      try {
-        document.body.style.visibility = "visible";
-      } catch (_) {}
-    });
+    if (
+      window.EntityPageShell &&
+      window.CandidateEntityConfig &&
+      typeof window.EntityPageShell.init === "function"
+    ) {
+      Promise.resolve(
+        window.EntityPageShell.init(window.CandidateEntityConfig)
+      ).catch(function (err) {
+        console.error("[Candidate] EntityPageShell.init exception:", err);
+        try {
+          document.body.style.visibility = "visible";
+        } catch (_) {}
+      });
+    } else {
+      initCandidateProfilePage().catch(function (err) {
+        console.error("[Candidate] initCandidateProfilePage exception:", err);
+        try {
+          document.body.style.visibility = "visible";
+        } catch (_) {}
+      });
+    }
   });
 })();
 

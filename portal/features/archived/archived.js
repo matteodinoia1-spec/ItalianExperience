@@ -138,7 +138,7 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
             : "candidate.html?id=" + encodeURIComponent(row.id),
           editUrl: links
             ? links.candidateEdit(row.id)
-            : "add-candidate.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+            : "candidate.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
           title: name,
           isArchived: true,
           archivedList: true,
@@ -226,10 +226,10 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
           id: row.id,
           viewUrl: links
             ? links.offerView(row.id)
-            : "add-job-offer.html?id=" + encodeURIComponent(row.id) + "&mode=view",
+            : "job-offer.html?id=" + encodeURIComponent(String(row.id)) + "&mode=view",
           editUrl: links
             ? links.offerEdit(row.id)
-            : "add-job-offer.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+            : "job-offer.html?id=" + encodeURIComponent(String(row.id)) + "&mode=edit",
           title: title,
           isArchived: true,
           archivedList: true,
@@ -388,6 +388,7 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
       : null) || (window.IEListsRuntime && typeof window.IEListsRuntime.renderEntityRow === "function"
       ? window.IEListsRuntime.renderEntityRow
       : null);
+    const links = window.IEPortal && window.IEPortal.links ? window.IEPortal.links : null;
     rows.forEach(function (row) {
       const name = row.name || "—";
       const city = row.city || "—";
@@ -397,8 +398,12 @@ if (typeof window.debugLog === "function") window.debugLog("ARCHIVED JS ACTIVE -
         const tr = renderRow({
           entityType: "client",
           id: row.id,
-          viewUrl: "add-client.html?id=" + encodeURIComponent(row.id) + "&mode=view",
-          editUrl: "add-client.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+          viewUrl: links && typeof links.clientView === "function"
+            ? links.clientView(row.id)
+            : "client.html?id=" + encodeURIComponent(String(row.id)) + "&mode=view",
+          editUrl: links && typeof links.clientEdit === "function"
+            ? links.clientEdit(row.id)
+            : "client.html?id=" + encodeURIComponent(String(row.id)) + "&mode=edit",
           title: name,
           isArchived: true,
           archivedList: true,

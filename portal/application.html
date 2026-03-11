@@ -16,16 +16,23 @@
         <div id="portal-header"></div>
 
         <div class="page-container">
-        <div class="portal-content p-8 space-y-8" id="applicationDetailRoot">
+        <div class="portal-content p-8">
+            <div class="application-page-layout max-w-5xl mx-auto w-full space-y-6">
 
             <!-- Header -->
             <section class="ie-card glass-card p-6 rounded-3xl" data-application-header>
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div>
+                    <div class="min-w-0 space-y-1">
                         <p class="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-1">Application</p>
-                        <h1 class="serif text-2xl font-bold text-[#1b4332]" data-app-candidate>—</h1>
-                        <p class="text-sm text-gray-600" data-app-offer>—</p>
-                        <p class="text-xs text-gray-500" data-app-client>—</p>
+                        <h1 class="serif text-2xl font-bold text-[#1b4332] truncate">
+                            <span data-app-candidate data-field="candidate_name">—</span>
+                        </h1>
+                        <p class="text-sm text-gray-600 truncate">
+                            <span data-app-offer data-field="job_offer_title">—</span>
+                        </p>
+                        <p class="text-xs text-gray-500 truncate">
+                            <span data-app-client data-field="client_name">—</span>
+                        </p>
                     </div>
                     <div class="flex flex-col items-start md:items-end gap-2">
                         <label class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Status</label>
@@ -62,6 +69,7 @@
                 </div>
             </section>
 
+            <div id="applicationProfileRoot" class="w-full">
             <!-- Info cards -->
             <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="ie-card glass-card p-6 rounded-3xl space-y-4" data-app-candidate-card>
@@ -69,8 +77,8 @@
 
                     <div class="space-y-1 text-xs text-gray-600">
                         <p class="font-semibold text-gray-500 uppercase tracking-widest">Position</p>
-                        <p class="text-sm text-gray-900" data-app-candidate-position>—</p>
-                        <p class="text-xs text-gray-500" data-app-candidate-location>—</p>
+                        <p class="text-sm text-gray-900" data-app-candidate-position data-field="candidate_position">—</p>
+                        <p class="text-xs text-gray-500" data-app-candidate-location data-field="candidate_location">—</p>
                     </div>
 
                     <div class="space-y-1 text-xs text-gray-600">
@@ -101,8 +109,8 @@
                 </div>
                 <div class="ie-card glass-card p-6 rounded-3xl" data-app-offer-card>
                     <h3 class="serif text-lg font-bold text-[#1b4332] mb-2">Job offer</h3>
-                    <p class="text-sm font-semibold text-gray-900" data-app-offer-title>—</p>
-                    <p class="text-xs text-gray-500 mb-2" data-app-offer-position>—</p>
+                    <p class="text-sm font-semibold text-gray-900" data-app-offer-title data-field="job_offer_title">—</p>
+                    <p class="text-xs text-gray-500 mb-2" data-app-offer-position data-field="job_offer_position">—</p>
                     <dl class="space-y-1 text-xs text-gray-600 mb-3">
                         <div class="flex justify-between gap-4">
                             <dt class="font-semibold text-gray-500 uppercase tracking-widest">Salary</dt>
@@ -117,75 +125,73 @@
                 </div>
                 <div class="ie-card glass-card p-6 rounded-3xl" data-app-client-card>
                     <h3 class="serif text-lg font-bold text-[#1b4332] mb-2">Client</h3>
-                    <p class="text-sm font-semibold text-gray-900" data-app-client-name>—</p>
+                    <p class="text-sm font-semibold text-gray-900" data-app-client-name data-field="client_name">—</p>
                     <a href="#" class="text-xs text-emerald-700 font-semibold hover:underline" data-app-client-link>View client</a>
                 </div>
             </section>
 
-            <!-- Notes -->
-            <section>
-                <div class="ie-card glass-card p-6 rounded-3xl">
-                    <h3 class="serif text-lg font-bold text-[#1b4332] mb-2">Notes</h3>
-                    <div class="space-y-4 text-sm text-gray-700">
-                        <div>
-                            <p class="font-semibold text-xs uppercase tracking-widest text-gray-500 mb-1">
-                                Candidate Notes
-                            </p>
-                            <p class="whitespace-pre-line" data-app-notes-candidate>—</p>
-                        </div>
-                        <div>
-                            <p class="font-semibold text-xs uppercase tracking-widest text-gray-500 mb-1">
-                                Job Offer Notes
-                            </p>
-                            <p class="whitespace-pre-line" data-app-notes-offer>—</p>
-                        </div>
-                        <div>
-                            <p class="font-semibold text-xs uppercase tracking-widest text-gray-500 mb-1">
-                                Client Notes
-                            </p>
-                            <p class="whitespace-pre-line" data-app-notes-client>—</p>
-                        </div>
-                        <div>
-                            <p class="font-semibold text-xs uppercase tracking-widest text-gray-500 mb-1">
-                                Application Notes
-                            </p>
-
-                            <p
-                                class="whitespace-pre-line text-sm text-gray-700"
-                                data-app-notes-display
-                            >—</p>
-
-                            <button
-                                class="ie-btn ie-btn-secondary mt-2"
-                                data-app-notes-edit
-                            >
-                                Edit
-                            </button>
-
-                            <textarea
-                                class="form-input field-edit hidden mt-2"
-                                data-app-notes-editor
-                                rows="4"
-                            ></textarea>
-
-                            <div class="hidden mt-2 space-x-2" data-app-notes-actions>
-                                <button class="ie-btn ie-btn-primary" data-app-notes-save>
-                                    Save
-                                </button>
-                                <button class="ie-btn ie-btn-ghost" data-app-notes-cancel>
-                                    Cancel
-                                </button>
+            <!-- Notes and activity grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Notes -->
+                    <section class="ie-card glass-card p-6 rounded-3xl">
+                        <h3 class="serif text-lg font-bold text-[#1b4332] mb-2">Notes</h3>
+                        <div class="space-y-4 text-sm text-gray-700">
+                            <div>
+                                <p class="font-semibold text-xs uppercase tracking-widest text-gray-500 mb-1">
+                                    Candidate Notes
+                                </p>
+                                <p class="whitespace-pre-line" data-app-notes-candidate>—</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-xs uppercase tracking-widest text-gray-500 mb-1">
+                                    Job Offer Notes
+                                </p>
+                                <p class="whitespace-pre-line" data-app-notes-offer>—</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-xs uppercase tracking-widest text-gray-500 mb-1">
+                                    Client Notes
+                                </p>
+                                <p class="whitespace-pre-line" data-app-notes-client>—</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-xs uppercase tracking-widest text-gray-500 mb-1">
+                                    Application Notes
+                                </p>
+                                <textarea
+                                    class="form-input field-display mt-1 text-gray-800 text-sm leading-relaxed whitespace-pre-line w-full resize-none"
+                                    data-field="notes"
+                                    rows="4"
+                                    readonly
+                                >—</textarea>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-xs uppercase tracking-widest text-gray-500 mb-1">
+                                    Rejection Reason
+                                </p>
+                                <textarea
+                                    class="form-input field-display mt-1 text-gray-800 text-sm leading-relaxed whitespace-pre-line w-full resize-none"
+                                    data-field="rejection_reason"
+                                    rows="3"
+                                    readonly
+                                >—</textarea>
                             </div>
                         </div>
-                    </div>
+                    </section>
                 </div>
-            </section>
 
-            <!-- Activity log -->
-            <section class="ie-card glass-card p-6 rounded-3xl">
-                <div id="activity-container"></div>
-            </section>
+                <!-- Activity log -->
+                <div>
+                    <section class="ie-card glass-card p-6 rounded-3xl">
+                        <h3 class="serif text-lg font-bold text-[#1b4332] mb-2">Activity Log</h3>
+                        <div id="activity-container" class="mt-4"></div>
+                    </section>
+                </div>
+            </div>
+            </div>
 
+            </div>
         </div>
         </div>
         </main>
@@ -204,7 +210,7 @@
     </script>
     <script src="shared/header-loader.js"></script>
     <script src="core/debug.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="core/supabase-client.js"></script>
     <script src="core/data/candidates.js"></script>
     <script src="core/data/clients.js"></script>
@@ -236,8 +242,11 @@
     <script src="core/ui/modals.js"></script>
     <script src="core/ui/previews.js"></script>
     <script src="core/app-shell.js"></script>
+    <script src="core/entity-page/entity-field-mapper.js"></script>
+    <script src="core/entity-page/entity-page-shell.js"></script>
+    <script src="features/applications/application-entity-config.js"></script>
     <script src="shared/activity-section.js"></script>
-    <script src="features/applications/application-detail.js"></script>
+    <script src="features/applications/application.js"></script>
 </body>
 </html>
 

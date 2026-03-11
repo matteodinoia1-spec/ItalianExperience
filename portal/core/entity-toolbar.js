@@ -129,15 +129,31 @@ function getEntityViewUrl(entityType, entityId) {
       : "candidates.html";
   }
   if (type === "job-offer") {
+    if (
+      typeof window !== "undefined" &&
+      window.IEPortal &&
+      window.IEPortal.links &&
+      typeof window.IEPortal.links.offerView === "function" &&
+      hasId
+    ) {
+      return window.IEPortal.links.offerView(entityId);
+    }
     return hasId
-      ? "add-job-offer.html?id=" + encodeURIComponent(String(entityId)) + "&mode=view"
+      ? "job-offer.html?id=" + encodeURIComponent(String(entityId)) + "&mode=view"
       : "job-offers.html";
   }
   if (type === "client") {
+    if (
+      typeof window !== "undefined" &&
+      window.IEPortal &&
+      window.IEPortal.links &&
+      typeof window.IEPortal.links.clientView === "function" &&
+      hasId
+    ) {
+      return window.IEPortal.links.clientView(entityId);
+    }
     return hasId
-      ? "add-client.html?id=" +
-          encodeURIComponent(String(entityId)) +
-          "&mode=view"
+      ? "client.html?id=" + encodeURIComponent(String(entityId)) + "&mode=view"
       : "clients.html";
   }
   if (type === "application") {
