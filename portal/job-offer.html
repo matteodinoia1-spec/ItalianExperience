@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Job Offer | Italian Experience Recruitment</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="styles/ui.css">
+</head>
+<body class="flex min-h-screen" style="visibility: hidden;">
+
+  <div class="portal-shell">
+    <!-- MAIN CONTENT -->
+    <main class="portal-main portal-main--no-toolbar flex-1 flex flex-col min-w-0">
+      <div id="portal-header"></div>
+
+      <!-- Page Content -->
+      <div class="page-container">
+        <div class="portal-content p-8">
+          <div class="job-offer-page-layout max-w-5xl mx-auto w-full space-y-6">
+
+            <!-- Hero -->
+            <section class="ie-card glass-card p-5 md:p-6 rounded-3xl relative">
+              <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <!-- Left: title + meta -->
+                <div class="min-w-0 space-y-2">
+                  <h1 class="serif text-2xl md:text-3xl font-bold text-[#1b4332] truncate">
+                    <input
+                      type="text"
+                      class="form-input field-display serif text-2xl md:text-3xl font-bold text-[#1b4332] w-full"
+                      data-field="title"
+                      readonly
+                      value="Job Offer"
+                      placeholder="Job title"
+                    >
+                  </h1>
+                  <p class="text-sm text-gray-500 flex flex-wrap items-center gap-2">
+                    <span class="inline-flex items-center gap-1">
+                      <span class="text-gray-400 text-xs uppercase tracking-widest font-semibold">Client</span>
+                      <span data-field="client_name">—</span>
+                    </span>
+                    <span class="hidden md:inline text-gray-300">•</span>
+                    <span class="inline-flex items-center gap-1">
+                      <span class="text-gray-400 text-xs uppercase tracking-widest font-semibold">Location</span>
+                      <span>
+                        <span data-field="city">—</span>
+                        <span class="text-gray-300 mx-1">/</span>
+                        <span data-field="state">—</span>
+                      </span>
+                    </span>
+                  </p>
+                  <p class="text-xs text-gray-500 flex flex-wrap items-center gap-3">
+                    <span class="inline-flex items-center gap-1">
+                      <span class="text-gray-400 uppercase tracking-widest font-semibold">Contract</span>
+                      <span data-field="contract_type">—</span>
+                    </span>
+                    <span class="hidden md:inline text-gray-300">•</span>
+                    <span class="inline-flex items-center gap-1">
+                      <span class="text-gray-400 uppercase tracking-widest font-semibold">Positions</span>
+                      <span data-field="positions">—</span>
+                    </span>
+                    <span class="hidden md:inline text-gray-300">•</span>
+                    <span class="inline-flex items-center gap-1">
+                      <span class="text-gray-400 uppercase tracking-widest font-semibold">Deadline</span>
+                      <span data-field="deadline">—</span>
+                    </span>
+                  </p>
+                </div>
+
+                <!-- Right: status + toolbar -->
+                <div class="flex flex-col items-start md:items-end gap-2 shrink-0">
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] uppercase tracking-widest text-gray-400 font-semibold">Status</span>
+                    <span class="badge badge-open" data-field="status">—</span>
+                    <select
+                      class="form-input hidden text-xs py-1 px-2 rounded-lg border border-gray-200 bg-white"
+                      data-field="status"
+                      aria-label="Job offer status"
+                    >
+                      <option value="active">Active</option>
+                      <option value="open">Open</option>
+                      <option value="inprogress">In Progress</option>
+                      <option value="closed">Closed</option>
+                    </select>
+                  </div>
+                  <div id="jobOfferActions" class="page-detail-actions mt-0.5"></div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Main grid -->
+            <div id="jobOfferProfileRoot" class="w-full">
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-6">
+                <!-- Left: core info + description -->
+                <div class="lg:col-span-2 space-y-6">
+                  <section class="ie-card glass-card p-6 rounded-3xl">
+                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Job Information</h3>
+                    <div class="mt-4 space-y-6">
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Job Title</p>
+                          <input
+                            type="text"
+                            class="form-input field-display text-gray-800 text-sm w-full"
+                            data-field="title"
+                            readonly
+                            placeholder="e.g. Executive Chef"
+                          >
+                        </div>
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Position</p>
+                          <input
+                            type="text"
+                            class="form-input field-display text-gray-800 text-sm w-full"
+                            data-field="position"
+                            readonly
+                            placeholder="e.g. Kitchen / Management"
+                          >
+                        </div>
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">City</p>
+                          <input
+                            type="text"
+                            class="form-input field-display text-gray-800 text-sm w-full"
+                            data-field="city"
+                            readonly
+                            placeholder="e.g. Venice"
+                          >
+                        </div>
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">State / Region</p>
+                          <input
+                            type="text"
+                            class="form-input field-display text-gray-800 text-sm w-full"
+                            data-field="state"
+                            readonly
+                            placeholder="e.g. VE"
+                          >
+                        </div>
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Contract Type</p>
+                          <input
+                            type="text"
+                            class="form-input field-display text-gray-800 text-sm w-full"
+                            data-field="contract_type"
+                            readonly
+                            placeholder="e.g. Full-time"
+                          >
+                        </div>
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Open Positions</p>
+                          <input
+                            type="number"
+                            class="form-input field-display text-gray-800 text-sm w-full"
+                            data-field="positions"
+                            readonly
+                            placeholder="e.g. 1"
+                          >
+                        </div>
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Salary</p>
+                          <input
+                            type="text"
+                            class="form-input field-display text-gray-800 text-sm w-full"
+                            data-field="salary"
+                            readonly
+                            placeholder="e.g. €45,000 - €55,000"
+                          >
+                        </div>
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Deadline</p>
+                          <input
+                            type="text"
+                            class="form-input field-display text-gray-800 text-sm w-full"
+                            data-field="deadline"
+                            readonly
+                            placeholder="YYYY-MM-DD"
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="ie-card glass-card p-6 rounded-3xl">
+                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Details</h3>
+                    <div class="mt-4 space-y-6">
+                      <div>
+                        <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Job Description</p>
+                        <textarea
+                          class="form-input field-display mt-1 text-gray-800 text-sm leading-relaxed whitespace-pre-line w-full resize-none"
+                          data-field="description"
+                          rows="5"
+                          readonly
+                        >—</textarea>
+                      </div>
+                      <div>
+                        <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Requirements</p>
+                        <textarea
+                          class="form-input field-display mt-1 text-gray-800 text-sm leading-relaxed whitespace-pre-line w-full resize-none"
+                          data-field="requirements"
+                          rows="5"
+                          readonly
+                        >—</textarea>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+
+                <!-- Right: notes + activity -->
+                <div class="space-y-6">
+                  <section class="ie-card glass-card p-6 rounded-3xl">
+                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Internal Notes</h3>
+                    <textarea
+                      class="form-input field-display mt-3 text-gray-800 text-sm leading-relaxed whitespace-pre-line w-full resize-none"
+                      data-field="notes"
+                      rows="6"
+                      readonly
+                    >—</textarea>
+                  </section>
+
+                  <section class="ie-card glass-card p-6 rounded-3xl">
+                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Activity Log</h3>
+                    <div id="activity-container" class="mt-4"></div>
+                  </section>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    window.pageMeta = {
+      title: "Job Offer",
+      subtitle: "Job offer",
+      breadcrumbs: [
+        { label: "Dashboard", entity: "dashboard" },
+        { label: "Job Offers", entity: "job-offers" },
+        { label: "Job Offer" }
+      ]
+    };
+  </script>
+
+  <script src="shared/header-loader.js"></script>
+  <script src="core/debug.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="core/supabase-client.js"></script>
+  <script src="core/data/candidates.js"></script>
+  <script src="core/data/clients.js"></script>
+  <script src="core/data/job-offers.js"></script>
+  <script src="core/data/applications.js"></script>
+  <script src="core/data/activity.js"></script>
+  <script src="core/supabase.js"></script>
+  <script src="core/auth.js"></script>
+  <script src="core/session-ready.js"></script>
+  <script src="core/router.js"></script>
+  <script src="runtime/router-runtime.js"></script>
+  <script src="runtime/forms-runtime.js"></script>
+  <script src="runtime/modals-runtime.js"></script>
+  <script src="runtime/profile-runtime.js"></script>
+  <script src="runtime/status-runtime.js"></script>
+  <script src="runtime/associations-runtime.js"></script>
+  <script src="runtime/candidate-profile-runtime.js"></script>
+  <script src="runtime/candidate-import-runtime.js"></script>
+  <script src="runtime/candidate-runtime.js"></script>
+  <script src="runtime/client-runtime.js"></script>
+  <script src="runtime/job-offer-runtime.js"></script>
+  <script src="runtime/header-runtime.js"></script>
+  <script src="runtime/global-header-actions-runtime.js"></script>
+  <script src="runtime/entity-actions-runtime.js"></script>
+  <script src="runtime/page-bootstrap.js"></script>
+  <script src="components/page-header.js"></script>
+  <script src="core/entity-toolbar.js"></script>
+  <script src="core/lists-runtime.js"></script>
+  <script src="core/session/session.js"></script>
+  <script src="core/ui/modals.js"></script>
+  <script src="core/ui/previews.js"></script>
+  <script src="core/app-shell.js"></script>
+  <script src="core/entity-page/entity-field-mapper.js"></script>
+  <script src="core/entity-page/entity-page-shell.js"></script>
+  <script src="features/job-offers/job-offer-entity-config.js"></script>
+  <script src="shared/activity-section.js"></script>
+  <script src="features/job-offers/job-offer.js"></script>
+</body>
+</html>
+

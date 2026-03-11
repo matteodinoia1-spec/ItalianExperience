@@ -639,9 +639,114 @@
   // Candidates list
   // ---------------------------------------------------------------------------
 
+  // Page-local selection state for candidates list (MVP bulk actions)
+  var _candidateSelectionState = {
+    ids: new Set(), // selected candidate IDs on the current page
+    pageIds: [], // IDs for the currently rendered page
+    listeners: [], // selection change subscribers
+  };
+
+  function getCandidateSelectionSnapshot() {
+    return {
+      ids: Array.from(_candidateSelectionState.ids),
+      pageIds: _candidateSelectionState.pageIds.slice(),
+    };
+  }
+
+  function notifyCandidateSelectionChange() {
+    var snapshot = getCandidateSelectionSnapshot();
+    _candidateSelectionState.listeners.forEach(function (fn) {
+      try {
+        fn(snapshot);
+      } catch (err) {
+        console.error("[IEListsRuntime] candidate selection listener error:", err);
+      }
+    });
+  }
+
+  function setCandidateSelectionIds(ids) {
+    var next = new Set();
+    (ids || []).forEach(function (id) {
+      if (id != null) next.add(String(id));
+    });
+    _candidateSelectionState.ids = next;
+    notifyCandidateSelectionChange();
+  }
+
+  function clearCandidateSelection() {
+    if (_candidateSelectionState.ids.size === 0) return;
+    _candidateSelectionState.ids = new Set();
+    notifyCandidateSelectionChange();
+  }
+
+  function isCandidateSelected(id) {
+    if (id == null) return false;
+    return _candidateSelectionState.ids.has(String(id));
+  }
+
+  function setCandidateSelected(id, selected) {
+    if (id == null) return;
+    var key = String(id);
+    var next = new Set(_candidateSelectionState.ids);
+    if (selected) {
+      next.add(key);
+    } else {
+      next.delete(key);
+    }
+    _candidateSelectionState.ids = next;
+    notifyCandidateSelectionChange();
+  }
+
+  function setCandidatePageIds(ids) {
+    _candidateSelectionState.pageIds = (ids || []).map(function (id) {
+      return id == null ? id : String(id);
+    });
+    // Reset selection whenever a new page of rows is rendered
+    if (_candidateSelectionState.ids.size > 0) {
+      _candidateSelectionState.ids = new Set();
+    }
+    notifyCandidateSelectionChange();
+  }
+
+  function selectAllCandidatesOnCurrentPage() {
+    setCandidateSelectionIds(_candidateSelectionState.pageIds);
+  }
+
+  function onCandidateSelectionChange(handler) {
+    if (typeof handler !== "function") return function () {};
+    _candidateSelectionState.listeners.push(handler);
+    // Immediately notify with current snapshot so UI can sync
+    try {
+      handler(getCandidateSelectionSnapshot());
+    } catch (err) {
+      console.error("[IEListsRuntime] candidate selection listener error:", err);
+    }
+    return function unsubscribe() {
+      _candidateSelectionState.listeners = _candidateSelectionState.listeners.filter(
+        function (fn) {
+          return fn !== handler;
+        }
+      );
+    };
+  }
+
   function initCandidatesPage() {
     const tbody = document.querySelector("[data-ie-candidates-body]");
     if (!tbody) return;
+
+    const importJsonBtn = document.querySelector(
+      "[data-action='candidate-import-json']"
+    );
+    if (
+      importJsonBtn &&
+      window.IECandidateImportRuntime &&
+      typeof window.IECandidateImportRuntime.openCandidateJsonImportModal ===
+        "function"
+    ) {
+      importJsonBtn.addEventListener("click", function () {
+        window.IECandidateImportRuntime.openCandidateJsonImportModal();
+      });
+    }
 
     if (!tbody.__ieClientLinkBound) {
       tbody.addEventListener("click", function (event) {
@@ -651,7 +756,13 @@
         var id = link.getAttribute("data-id");
         if (!id) return;
         if (typeof IERouter !== "undefined" && IERouter && typeof IERouter.navigateTo === "function") {
-          IERouter.navigateTo("add-client.html?id=" + encodeURIComponent(id) + "&mode=view");
+          var targetUrl = id;
+          if (window.IEPortal && window.IEPortal.links && typeof window.IEPortal.links.clientView === "function") {
+            targetUrl = window.IEPortal.links.clientView(id);
+          } else {
+            targetUrl = "client.html?id=" + encodeURIComponent(id) + "&mode=view";
+          }
+          IERouter.navigateTo(targetUrl);
         }
       });
       tbody.__ieClientLinkBound = true;
@@ -695,6 +806,10 @@
 
     const pendingReviewBanner = document.querySelector("[data-ie-pending-review-banner]");
     const pendingReviewShortcut = document.querySelector("[data-ie-pending-review-shortcut]");
+    const selectAllCheckbox = document.querySelector("[data-ie-candidates-select-all]");
+    const bulkBar = document.querySelector("[data-ie-candidates-bulkbar]");
+    const bulkCountEl = document.querySelector("[data-ie-candidates-bulk-count]");
+    const bulkStatusSelect = document.querySelector("[data-ie-candidates-bulk-status]");
 
     function showPendingReviewBanner() {
       if (!pendingReviewBanner) return;
@@ -846,7 +961,117 @@
       }
     });
 
+    // Row checkbox selection wiring (delegated to tbody)
+    tbody.addEventListener("change", function (event) {
+      var checkbox = event.target.closest("[data-ie-candidate-select]");
+      if (!checkbox) return;
+      var id = checkbox.getAttribute("data-id");
+      if (!id) return;
+      setCandidateSelected(id, checkbox.checked);
+    });
+
     const CANDIDATE_SIGNED_PHOTO_CACHE = {};
+
+    function getSelectedCandidateIds() {
+      if (!window.IEListsRuntime || typeof window.IEListsRuntime.getCandidateSelectionState !== "function") {
+        return [];
+      }
+      try {
+        var snapshot = window.IEListsRuntime.getCandidateSelectionState() || {};
+        return Array.isArray(snapshot.ids) ? snapshot.ids.slice() : [];
+      } catch (err) {
+        console.error("[IEListsRuntime] getSelectedCandidateIds error:", err);
+        return [];
+      }
+    }
+
+    function showBulkSummaryMessage(kind, message) {
+      try {
+        if (window.IESupabase && typeof window.IESupabase.showSuccess === "function" && kind === "success") {
+          window.IESupabase.showSuccess(message);
+          return;
+        }
+        if (window.IESupabase && typeof window.IESupabase.showError === "function" && kind === "error") {
+          window.IESupabase.showError(message, "candidatesBulk");
+          return;
+        }
+      } catch (err) {
+        console.error("[IEListsRuntime] bulk summary message error:", err);
+      }
+      if (kind === "error") {
+        window.alert(message);
+      } else {
+        console.log(message);
+      }
+    }
+
+    async function runCandidateBulkArchive(selectedIds) {
+      var ids = Array.isArray(selectedIds) ? selectedIds : [];
+      if (!ids.length) return;
+      if (!window.IESupabase || typeof window.IESupabase.archiveCandidate !== "function") {
+        showBulkSummaryMessage("error", "Archive operation is not available.");
+        return;
+      }
+      var success = 0;
+      var failed = 0;
+      for (var i = 0; i < ids.length; i++) {
+        var id = ids[i];
+        try {
+          var res = await window.IESupabase.archiveCandidate(id);
+          if (res && !res.error) {
+            success++;
+          } else {
+            failed++;
+          }
+        } catch (err) {
+          console.error("[IEListsRuntime] archiveCandidate bulk error:", err);
+          failed++;
+        }
+      }
+      if (success && !failed) {
+        showBulkSummaryMessage("success", "Archived " + success + " candidates.");
+      } else if (success && failed) {
+        showBulkSummaryMessage("error", "Archived " + success + " candidates, " + failed + " failed.");
+      } else {
+        showBulkSummaryMessage("error", "Failed to archive selected candidates.");
+      }
+      clearCandidateSelection();
+      renderCandidates();
+    }
+
+    async function runCandidateBulkChangeStatus(selectedIds, newStatus) {
+      var ids = Array.isArray(selectedIds) ? selectedIds : [];
+      if (!ids.length || !newStatus) return;
+      if (!window.IESupabase || typeof window.IESupabase.updateCandidateProfileStatus !== "function") {
+        showBulkSummaryMessage("error", "Status update operation is not available.");
+        return;
+      }
+      var success = 0;
+      var failed = 0;
+      for (var i = 0; i < ids.length; i++) {
+        var id = ids[i];
+        try {
+          var res = await window.IESupabase.updateCandidateProfileStatus(id, newStatus);
+          if (res && !res.error) {
+            success++;
+          } else {
+            failed++;
+          }
+        } catch (err) {
+          console.error("[IEListsRuntime] updateCandidateProfileStatus bulk error:", err);
+          failed++;
+        }
+      }
+      if (success && !failed) {
+        showBulkSummaryMessage("success", "Updated status for " + success + " candidates.");
+      } else if (success && failed) {
+        showBulkSummaryMessage("error", "Updated status for " + success + " candidates, " + failed + " failed.");
+      } else {
+        showBulkSummaryMessage("error", "Failed to update status for selected candidates.");
+      }
+      clearCandidateSelection();
+      renderCandidates();
+    }
 
     function mapCandidateRow(r) {
       const first_name = r.first_name ?? "";
@@ -899,8 +1124,11 @@
         ?.closest(".glass-card")
         ?.querySelector("[data-ie-pagination]");
 
+      // Reset selection whenever the list is being (re)loaded
+      clearCandidateSelection();
+
       if (window.IESupabase && window.IESupabase.fetchCandidatesPaginated) {
-        tbody.innerHTML = "<tr><td colspan=\"9\" class=\"px-6 py-8 text-center text-gray-400\">Loading...</td></tr>";
+        tbody.innerHTML = "<tr><td colspan=\"10\" class=\"px-6 py-8 text-center text-gray-400\">Loading...</td></tr>";
         window.IESupabase.fetchCandidatesPaginated({
           filters,
           page: currentPage,
@@ -918,7 +1146,7 @@
           updatePaginationUI(paginationContainer, totalCount, currentPage, limit, rows.length);
         }).catch(function (err) {
           console.error("[ItalianExperience] fetchCandidatesPaginated error:", err);
-          tbody.innerHTML = "<tr><td colspan=\"9\" class=\"px-6 py-8 text-center text-red-500\">Loading error. Please try again later.</td></tr>";
+          tbody.innerHTML = "<tr><td colspan=\"10\" class=\"px-6 py-8 text-center text-red-500\">Loading error. Please try again later.</td></tr>";
           updatePaginationUI(paginationContainer, 0, 1, limit, 0);
         });
         return;
@@ -942,9 +1170,18 @@
       const targetBody = tbodyEl || tbody;
       targetBody.innerHTML = "";
       if (!rows.length) {
-        targetBody.innerHTML = "<tr><td colspan=\"9\" class=\"px-6 py-8 text-center text-gray-400\">No candidates found.</td></tr>";
+        targetBody.innerHTML = "<tr><td colspan=\"10\" class=\"px-6 py-8 text-center text-gray-400\">No candidates found.</td></tr>";
+        // When no rows are present on the current page, clear selection and page IDs.
+        setCandidatePageIds([]);
         return;
       }
+
+      // Keep track of which candidates are on the current page; selection is page-local.
+      setCandidatePageIds(
+        rows
+          .map(function (row) { return row && row.id; })
+          .filter(function (id) { return id != null; })
+      );
       rows.forEach(function (row) {
         const clientName = typeof findClientNameForCandidate === "function"
           ? findClientNameForCandidate(row)
@@ -1003,6 +1240,12 @@
           '" class="w-10 h-10 rounded-full border-2 border-white shadow-sm" alt="' +
           (window.escapeHtml ? window.escapeHtml((row.first_name || "") + " " + (row.last_name || "")) : ((row.first_name || "") + " " + (row.last_name || ""))) +
           '">';
+        var selectionCellHtml =
+          '<input type="checkbox" class="ie-table-checkbox" data-ie-candidate-select data-id="' +
+          (window.escapeHtml ? window.escapeHtml(String(row.id != null ? row.id : "")) : String(row.id != null ? row.id : "")) +
+          '"' +
+          (isCandidateSelected(row.id) ? " checked" : "") +
+          ">";
         const candidateViewUrl = (window.IEPortal && window.IEPortal.links && window.IEPortal.links.candidateView) ? window.IEPortal.links.candidateView(row.id) : "candidate.html?id=" + encodeURIComponent(String(row.id));
         const tr = renderEntityRow({
           entityType: "candidate",
@@ -1013,7 +1256,7 @@
           isArchived: row.is_archived,
           archivedList: false,
           actionCellOpts: { showPreviewButton: false, editTitle: "Edit candidate", archiveTitle: "Archive candidate" },
-          leadingCells: [photoHtml],
+          leadingCells: [selectionCellHtml, photoHtml],
           middleCells: [
             positionCellHtml,
             assignmentHtml,
@@ -1032,6 +1275,89 @@
         });
         targetBody.appendChild(tr);
         resolveCandidatePhoto(row, targetBody, CANDIDATE_SIGNED_PHOTO_CACHE);
+      });
+    }
+
+    // Keep header "select all" checkbox and bulk toolbar in sync with current page selection
+    onCandidateSelectionChange(function (snapshot) {
+      var pageIds = snapshot.pageIds || [];
+      var selectedIds = snapshot.ids || [];
+
+      if (selectAllCheckbox) {
+        if (!pageIds.length) {
+          selectAllCheckbox.checked = false;
+          selectAllCheckbox.indeterminate = false;
+        } else {
+          var selectedSet = new Set((selectedIds || []).map(function (id) { return String(id); }));
+          var allOnPageSelected = pageIds.every(function (id) {
+            return selectedSet.has(String(id));
+          });
+          var anyOnPageSelected = pageIds.some(function (id) {
+            return selectedSet.has(String(id));
+          });
+          selectAllCheckbox.checked = allOnPageSelected;
+          // Use indeterminate state when some but not all rows on the page are selected
+          selectAllCheckbox.indeterminate = !allOnPageSelected && anyOnPageSelected;
+        }
+      }
+
+      var count = Array.isArray(selectedIds) ? selectedIds.length : 0;
+      if (bulkBar) {
+        if (count > 0) {
+          bulkBar.classList.remove("hidden");
+        } else {
+          bulkBar.classList.add("hidden");
+        }
+      }
+      if (bulkCountEl) {
+        bulkCountEl.textContent = String(count);
+      }
+    });
+
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener("change", function () {
+        if (selectAllCheckbox.checked) {
+          selectAllCandidatesOnCurrentPage();
+        } else {
+          clearCandidateSelection();
+        }
+      });
+    }
+
+    if (bulkBar) {
+      bulkBar.addEventListener("click", function (event) {
+        var archiveBtn = event.target.closest("[data-action='candidates-bulk-archive']");
+        var clearBtn = event.target.closest("[data-action='candidates-bulk-clear']");
+        var applyStatusBtn = event.target.closest("[data-action='candidates-bulk-apply-status']");
+
+        if (archiveBtn) {
+          var idsForArchive = getSelectedCandidateIds();
+          if (!idsForArchive.length) return;
+          archiveBtn.disabled = true;
+          runCandidateBulkArchive(idsForArchive).finally(function () {
+            archiveBtn.disabled = false;
+          });
+          return;
+        }
+
+        if (clearBtn) {
+          clearCandidateSelection();
+          return;
+        }
+
+        if (applyStatusBtn) {
+          var statusValue = bulkStatusSelect ? bulkStatusSelect.value : "";
+          if (!statusValue) {
+            showBulkSummaryMessage("error", "Please select a status to apply.");
+            return;
+          }
+          var idsForStatus = getSelectedCandidateIds();
+          if (!idsForStatus.length) return;
+          applyStatusBtn.disabled = true;
+          runCandidateBulkChangeStatus(idsForStatus, statusValue).finally(function () {
+            applyStatusBtn.disabled = false;
+          });
+        }
       });
     }
 
@@ -1395,9 +1721,9 @@
           "</span>";
 
         var jobTitleViewUrl =
-          "add-job-offer.html?id=" +
-          encodeURIComponent(String(row.id)) +
-          "&mode=view";
+          window.IEPortal && window.IEPortal.links && typeof window.IEPortal.links.offerView === "function"
+            ? window.IEPortal.links.offerView(row.id)
+            : "job-offer.html?id=" + encodeURIComponent(String(row.id)) + "&mode=view";
         var clientCellHtml = row.client_id
           ? '<span class="entity-link ie-text-muted" data-entity-type="client" data-entity-id="' + (window.escapeHtml ? window.escapeHtml(String(row.client_id)) : String(row.client_id)) + '">' + (window.escapeHtml ? window.escapeHtml(clientValue) : clientValue) + "</span>"
           : '<span class="ie-text-muted">' + (window.escapeHtml ? window.escapeHtml(clientValue) : clientValue) + "</span>";
@@ -1846,14 +2172,15 @@
                   ? '<button type="button" data-action="view-client-offers" data-id="' + (window.escapeHtml ? window.escapeHtml(row.id) : row.id) + '" class="ie-btn ie-btn-secondary !py-1 !px-2 min-w-0 font-semibold">' + (window.escapeHtml ? window.escapeHtml(String(activeOffersCount)) : String(activeOffersCount)) + "</button>"
                   : "0";
 
-const tr = renderEntityRow({
+              const tr = renderEntityRow({
           entityType: "client",
           id: row.id,
-          viewUrl:
-            "add-client.html?id=" +
-            encodeURIComponent(row.id) +
-            "&mode=view",
-          editUrl: "add-client.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+          viewUrl: window.IEPortal && window.IEPortal.links && typeof window.IEPortal.links.clientView === "function"
+            ? window.IEPortal.links.clientView(row.id)
+            : "client.html?id=" + encodeURIComponent(String(row.id)) + "&mode=view",
+          editUrl: window.IEPortal && window.IEPortal.links && typeof window.IEPortal.links.clientEdit === "function"
+            ? window.IEPortal.links.clientEdit(row.id)
+            : "client.html?id=" + encodeURIComponent(String(row.id)) + "&mode=edit",
           title: row.name || "—",
           isArchived: row.is_archived,
           archivedList: false,
@@ -1917,11 +2244,12 @@ const tr = renderEntityRow({
             const tr = renderEntityRow({
               entityType: "client",
               id: row.id,
-              viewUrl:
-                "add-client.html?id=" +
-                encodeURIComponent(row.id) +
-                "&mode=view",
-              editUrl: "add-client.html?id=" + encodeURIComponent(row.id) + "&mode=edit",
+              viewUrl: window.IEPortal && window.IEPortal.links && typeof window.IEPortal.links.clientView === "function"
+                ? window.IEPortal.links.clientView(row.id)
+                : "client.html?id=" + encodeURIComponent(String(row.id)) + "&mode=view",
+              editUrl: window.IEPortal && window.IEPortal.links && typeof window.IEPortal.links.clientEdit === "function"
+                ? window.IEPortal.links.clientEdit(row.id)
+                : "client.html?id=" + encodeURIComponent(String(row.id)) + "&mode=edit",
               title: row.name || "—",
               isArchived: row.is_archived,
               archivedList: false,
@@ -1962,5 +2290,10 @@ const tr = renderEntityRow({
   window.IEListsRuntime.applyJobOfferFilters = applyJobOfferFilters;
   window.IEListsRuntime.applyClientFilters = applyClientFilters;
   window.IEListsRuntime.renderEntityRow = renderEntityRow;
+  // Minimal candidate selection API for bulk MVP
+  window.IEListsRuntime.getCandidateSelectionState = getCandidateSelectionSnapshot;
+  window.IEListsRuntime.onCandidateSelectionChange = onCandidateSelectionChange;
+  window.IEListsRuntime.clearCandidateSelection = clearCandidateSelection;
+  window.IEListsRuntime.setCandidateSelected = setCandidateSelected;
 })();
 

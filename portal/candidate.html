@@ -22,12 +22,12 @@
         <div class="page-container">
         <div class="portal-content p-8">
             <!-- Candidate page: controlled width, clear hierarchy Hero → Associated Offers → Grid -->
-            <div class="candidate-page-layout max-w-6xl mx-auto w-full space-y-6">
+            <div class="candidate-page-layout max-w-6xl mx-auto w-full space-y-5 lg:space-y-6">
 
             <!-- Entity hero: compact three-area layout; profile status as small top-right ribbon -->
-            <section class="candidate-hero-section ie-card glass-card p-4 md:p-5 rounded-3xl relative">
+            <section class="candidate-hero-section ie-card glass-card p-5 md:p-6 rounded-3xl relative">
                 <div class="candidate-hero-status-ribbon absolute top-2.5 right-2.5 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-medium bg-gray-100/90 text-gray-600 border border-gray-200/80 z-10 pointer-events-none" data-field="status-ribbon" aria-label="Profile status">—</div>
-                <div class="candidate-hero-inner flex flex-col md:flex-row md:items-center gap-3 md:gap-4 pr-20">
+                <div class="candidate-hero-inner flex flex-col gap-3 md:grid md:grid-cols-[auto,minmax(0,1.4fr),auto] md:items-center md:gap-4 pr-20">
                     <!-- Left: avatar, name, role -->
                     <div class="flex items-center gap-2.5 shrink-0 min-w-0">
                         <div class="candidate-hero-avatar w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden bg-gray-100 border border-gray-200 flex items-center justify-center flex-shrink-0">
@@ -35,31 +35,68 @@
                                 src="https://ui-avatars.com/api/?name=Candidate&background=1b4332&color=fff"
                                 alt="Candidate photo"
                                 class="w-full h-full object-cover"
+                                id="candidatePhotoPreview"
                                 data-doc-photo
                             >
                         </div>
                         <div class="min-w-0">
-                            <input type="text" class="form-input field-display serif text-lg md:text-xl font-bold text-[#1b4332] w-full" data-field="full-name" readonly value="—">
-                            <input type="text" class="form-input field-display text-xs md:text-sm text-gray-500 w-full" data-field="position" readonly value="—">
+                            <div data-hero-name-view>
+                                <input type="text" class="form-input field-display serif text-lg md:text-xl font-bold text-[#1b4332] w-full" data-field="full-name" readonly value="—">
+                            </div>
+                            <div data-hero-name-edit class="hidden space-y-1">
+                                <input type="text" class="form-input field-display serif text-lg md:text-xl font-bold text-[#1b4332] w-full" data-field="first_name" readonly value="—" placeholder="First name">
+                                <input type="text" class="form-input field-display serif text-lg md:text-xl font-bold text-[#1b4332] w-full" data-field="last_name" readonly value="—" placeholder="Last name">
+                            </div>
+                            <input type="text" class="form-input field-display text-xs md:text-sm text-gray-500 w-full" data-field="position" readonly value="—" placeholder="Role / Position">
                         </div>
                     </div>
                     <!-- Center: email, phone, optional source -->
-                    <div class="candidate-hero-meta flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-600 min-w-0 md:flex-1 md:justify-center">
+                    <div class="candidate-hero-meta flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-600 min-w-0 md:justify-center md:mx-auto">
                         <span class="inline-flex items-center gap-1 truncate" data-hero-email-wrap>
                             <span class="text-gray-400 shrink-0">Email</span>
-                            <a href="#" class="text-[#1b4332] hover:underline truncate" data-field="hero-email" data-hero-email>—</a>
+                            <span data-hero-email-view class="truncate">
+                                <a href="#" class="text-[#1b4332] hover:underline truncate" data-field="hero-email" data-hero-email>—</a>
+                            </span>
+                            <input
+                                type="email"
+                                class="form-input field-display text-xs md:text-sm text-gray-700 w-40 md:w-52 hidden"
+                                data-field="email"
+                                data-hero-email-input
+                                placeholder="Email address"
+                                readonly
+                            >
                         </span>
                         <span class="inline-flex items-center gap-1 shrink-0" data-hero-phone-wrap>
                             <span class="text-gray-400 shrink-0">Phone</span>
-                            <span data-field="hero-phone" data-hero-phone>—</span>
+                            <span data-hero-phone-view>
+                                <span data-field="hero-phone" data-hero-phone>—</span>
+                            </span>
+                            <input
+                                type="text"
+                                class="form-input field-display text-xs md:text-sm text-gray-700 w-32 md:w-40 hidden"
+                                data-field="phone"
+                                data-hero-phone-input
+                                placeholder="Phone number"
+                                readonly
+                            >
                         </span>
                         <span class="inline-flex items-center gap-1 text-gray-400 shrink-0" data-hero-source-wrap>
                             <span class="text-gray-400">Source</span>
-                            <span data-field="hero-source" data-hero-source>—</span>
+                            <span data-hero-source-view>
+                                <span data-field="hero-source" data-hero-source>—</span>
+                            </span>
+                            <input
+                                type="text"
+                                class="form-input field-display text-xs md:text-sm text-gray-700 w-32 md:w-40 hidden"
+                                data-field="source"
+                                data-hero-source-input
+                                placeholder="Source"
+                                readonly
+                            >
                         </span>
                     </div>
                     <!-- Right: availability, action buttons -->
-                    <div class="flex flex-col items-start md:items-end gap-1.5 shrink-0">
+                    <div class="flex flex-col items-start md:items-end gap-1.5 shrink-0 md:justify-self-end">
                         <div class="candidate-hero-availability flex items-center gap-1.5">
                             <span class="text-[10px] uppercase tracking-widest text-gray-400 font-semibold">Availability</span>
                             <span class="availability-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-50 text-gray-600 border border-gray-100" data-availability-pill>
@@ -81,8 +118,8 @@
             </div>
 
             <!-- Associated Offers: same width as hero, primary operational section -->
-            <section class="glass-card ie-card p-5 md:p-6 rounded-3xl w-full">
-                <div class="flex items-center justify-between gap-4 flex-wrap">
+            <section class="candidate-associated-offers glass-card ie-card p-5 md:p-6 rounded-3xl w-full">
+                <div class="flex items-center justify-between gap-3 md:gap-4 flex-wrap">
                     <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Associated Offers</h3>
                     <button
                         type="button"
@@ -110,98 +147,409 @@
 
             <!-- Main content grid: left (2/3) + right (1/3) -->
             <div id="candidateProfileRoot" data-candidate-root class="w-full">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Left column: Candidate Information, Summary, Experience, Education, etc. -->
-                    <div class="lg:col-span-2 space-y-6">
-                        <!-- Candidate Information (email/phone in hero only) -->
+                <div class="candidate-main-grid grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-6">
+                    <!-- Left column: Candidate Profile (single large card with subsections) -->
+                    <div class="lg:col-span-2">
                         <section class="glass-card ie-card p-6 rounded-3xl">
-                            <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Candidate Information</h3>
-                            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Candidate Profile</h3>
+
+                            <div id="candidateInlineProfileForm" class="mt-4 space-y-8">
+                                <!-- Candidate Information -->
                                 <div>
-                                    <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">LinkedIn</p>
-                                    <input type="text" class="form-input field-display text-gray-800 text-sm break-all w-full" data-field="linkedin_url" readonly value="—">
-                                </div>
-                                <div>
-                                    <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Date of Birth</p>
-                                    <input type="text" class="form-input field-display text-gray-800 text-sm w-full" data-field="date_of_birth" readonly value="—">
-                                </div>
-                                <div>
-                                    <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Address</p>
-                                    <input type="text" class="form-input field-display text-gray-800 text-sm w-full" data-field="address" readonly value="—">
-                                </div>
-                            </div>
-                        </section>
+                                    <h4 class="serif text-base font-semibold text-[#1b4332]">Candidate Information</h4>
+                                    <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">LinkedIn</p>
+                                            <input type="text" class="form-input field-display text-gray-800 text-sm break-all w-full" data-field="linkedin_url" readonly value="—">
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Date of Birth</p>
+                                            <input type="text" class="form-input field-display text-gray-800 text-sm w-full" data-field="date_of_birth" readonly value="—">
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Address</p>
+                                            <input type="text" class="form-input field-display text-gray-800 text-sm w-full" data-field="address" readonly value="—">
+                                        </div>
+                                    </div>
 
-                        <!-- Professional Summary -->
-                        <section class="glass-card ie-card p-6 rounded-3xl">
-                            <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Professional Summary</h3>
-                            <textarea class="form-input field-display mt-3 text-gray-800 text-sm leading-relaxed whitespace-pre-line w-full resize-none" data-field="summary" rows="4" readonly>—</textarea>
-                        </section>
-
-                        <!-- Experience -->
-                        <section class="glass-card ie-card p-6 rounded-3xl">
-                            <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Experience</h3>
-                            <div class="mt-3 space-y-4" data-list="experience"></div>
-                            <p class="text-sm text-gray-400 italic mt-2" data-empty="experience">No experience recorded</p>
-                        </section>
-
-                        <!-- Education -->
-                        <section class="glass-card ie-card p-6 rounded-3xl">
-                            <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Education</h3>
-                            <div class="mt-3 space-y-4" data-list="education"></div>
-                            <p class="text-sm text-gray-400 italic mt-2" data-empty="education">No education recorded</p>
-                        </section>
-
-                        <!-- Skills -->
-                        <section class="glass-card ie-card p-6 rounded-3xl">
-                            <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Skills</h3>
-                            <ul class="list-disc ml-6 mt-3 space-y-1 text-sm text-gray-800" data-list="skills"></ul>
-                            <p class="text-sm text-gray-400 italic mt-2" data-empty="skills">No skills recorded</p>
-                        </section>
-
-                        <!-- Hobbies & Interests -->
-                        <section class="glass-card ie-card p-6 rounded-3xl">
-                            <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Hobbies &amp; Interests</h3>
-                            <ul class="list-disc ml-6 mt-3 space-y-1 text-sm text-gray-800" data-list="hobbies"></ul>
-                            <p class="text-sm text-gray-400 italic mt-2" data-empty="hobbies">No hobbies recorded</p>
-                        </section>
-
-                        <!-- Languages -->
-                        <section class="glass-card ie-card p-6 rounded-3xl">
-                            <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Languages</h3>
-                            <ul class="list-disc ml-6 mt-3 space-y-1 text-sm text-gray-800" data-list="languages"></ul>
-                            <p class="text-sm text-gray-400 italic mt-2" data-empty="languages">No languages recorded</p>
-                        </section>
-
-                        <!-- Certifications -->
-                        <section class="glass-card ie-card p-6 rounded-3xl">
-                            <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Certifications</h3>
-                            <ul class="list-disc ml-6 mt-3 space-y-1 text-sm text-gray-800" data-list="certifications"></ul>
-                            <p class="text-sm text-gray-400 italic mt-2" data-empty="certifications">No certifications recorded</p>
-                        </section>
-
-                        <!-- Documents -->
-                        <section class="glass-card ie-card p-6 rounded-3xl">
-                            <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Documents</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
-                                <div>
-                                    <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Curriculum Vitae</p>
-                                    <div>
-                                        <a
-                                            href="#"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="hidden ie-btn ie-btn-primary"
-                                            data-doc-link="cv"
+                                    <!-- JSON import controls (edit mode only; wired from candidate JS) -->
+                                    <div
+                                        id="candidateJsonImportControls"
+                                        class="mt-4 pt-4 border-t border-gray-100 hidden"
+                                    >
+                                        <div class="flex items-center justify-between gap-4 flex-wrap">
+                                            <div>
+                                                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">
+                                                    Parser JSON Import
+                                                </p>
+                                                <p class="text-xs text-gray-500">
+                                                    Prefill this profile from a CV parser JSON file. Data is only saved after you click Save.
+                                                </p>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <label
+                                                    id="candidateImportJsonButtonInline"
+                                                    for="candidateParserJsonInput"
+                                                    class="ie-btn ie-btn-secondary cursor-pointer"
+                                                >
+                                                    Import JSON
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <input
+                                            type="file"
+                                            id="candidateParserJsonInput"
+                                            accept="application/json,.json"
+                                            class="sr-only"
+                                            data-role="candidate-parser-json-input"
                                         >
-                                            View CV
-                                        </a>
-                                        <p class="text-sm text-gray-400 italic" data-doc-empty="cv">No CV uploaded</p>
                                     </div>
                                 </div>
-                                <div>
-                                    <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Photo</p>
-                                    <p class="text-sm text-gray-400 italic" data-doc-empty="photo">No photo uploaded</p>
+
+                                <!-- Professional Summary -->
+                                <div class="border-t border-gray-100 pt-6">
+                                    <h4 class="serif text-base font-semibold text-[#1b4332]">Professional Summary</h4>
+                                    <textarea class="form-input field-display mt-3 text-gray-800 text-sm leading-relaxed whitespace-pre-line w-full resize-none" data-field="summary" rows="4" readonly>—</textarea>
+                                </div>
+
+                                <!-- Experience -->
+                                <div class="border-t border-gray-100 pt-6">
+                                    <h4 class="serif text-base font-semibold text-[#1b4332]">Experience</h4>
+                                    <div class="mt-3 space-y-4" data-list="experience"></div>
+                                    <p class="text-sm text-gray-400 italic mt-2" data-empty="experience">No experience recorded</p>
+
+                                    <div class="mt-4" data-repeatable-section="experience">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <button type="button" data-action="add-experience" class="ie-btn ie-btn-secondary">
+                                                Add Experience
+                                            </button>
+                                        </div>
+                                        <div data-items="experience" class="space-y-6"></div>
+                                        <p class="empty-state text-sm text-gray-400 italic mt-2">No experience added yet</p>
+                                        <template id="experienceItemTemplate">
+                                            <div class="space-y-4 border border-gray-100 rounded-2xl p-4" data-item-section="experience">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <p class="form-label text-xs mb-1">Role Title</p>
+                                                        <input type="text" data-field="title" class="form-input" placeholder="e.g. Sommelier">
+                                                    </div>
+                                                    <div>
+                                                        <p class="form-label text-xs mb-1">Company</p>
+                                                        <input type="text" data-field="company" class="form-input" placeholder="e.g. Grand Hotel Milano">
+                                                    </div>
+                                                    <div>
+                                                        <p class="form-label text-xs mb-1">Location</p>
+                                                        <input type="text" data-field="location" class="form-input" placeholder="e.g. Milan, Italy">
+                                                    </div>
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div>
+                                                            <p class="form-label text-xs mb-1">Start Date</p>
+                                                            <input type="month" data-field="start_date" class="form-input">
+                                                        </div>
+                                                        <div>
+                                                            <p class="form-label text-xs mb-1">End Date</p>
+                                                            <input type="month" data-field="end_date" class="form-input">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <p class="form-label text-xs mb-1">Description</p>
+                                                    <textarea data-field="description" rows="3" class="form-input resize-none" placeholder="Short description of responsibilities and key achievements..."></textarea>
+                                                </div>
+                                                <div class="flex justify-end">
+                                                    <button type="button" data-action="remove-experience" class="ie-btn ie-btn-secondary">
+                                                        Remove Experience
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <!-- Education -->
+                                <div class="border-t border-gray-100 pt-6">
+                                    <h4 class="serif text-base font-semibold text-[#1b4332]">Education</h4>
+                                    <div class="mt-3 space-y-4" data-list="education"></div>
+                                    <p class="text-sm text-gray-400 italic mt-2" data-empty="education">No education recorded</p>
+
+                                    <div class="mt-4" data-repeatable-section="education">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <button type="button" data-action="add-education" class="ie-btn ie-btn-secondary">
+                                                Add Education
+                                            </button>
+                                        </div>
+                                        <div data-items="education" class="space-y-6"></div>
+                                        <p class="empty-state text-sm text-gray-400 italic mt-2">No education entries added yet</p>
+                                        <template id="educationItemTemplate">
+                                            <div class="space-y-4 border border-gray-100 rounded-2xl p-4" data-item-section="education">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <p class="form-label text-xs mb-1">Institution</p>
+                                                        <input type="text" data-field="institution" class="form-input" placeholder="e.g. University of Milan">
+                                                    </div>
+                                                    <div>
+                                                        <p class="form-label text-xs mb-1">Degree</p>
+                                                        <input type="text" data-field="degree" class="form-input" placeholder="e.g. Degree in Enology">
+                                                    </div>
+                                                    <div>
+                                                        <p class="form-label text-xs mb-1">Field of Study</p>
+                                                        <input type="text" data-field="field_of_study" class="form-input" placeholder="e.g. Hospitality Management">
+                                                    </div>
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div>
+                                                            <p class="form-label text-xs mb-1">Start Year</p>
+                                                            <input type="number" data-field="start_year" class="form-input" placeholder="e.g. 2018">
+                                                        </div>
+                                                        <div>
+                                                            <p class="form-label text-xs mb-1">End Year</p>
+                                                            <input type="number" data-field="end_year" class="form-input" placeholder="e.g. 2021">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex justify-end">
+                                                    <button type="button" data-action="remove-education" class="ie-btn ie-btn-secondary">
+                                                        Remove Education
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <!-- Skills -->
+                                <div class="border-t border-gray-100 pt-6">
+                                    <h4 class="serif text-base font-semibold text-[#1b4332]">Skills</h4>
+                                    <ul class="list-disc ml-6 mt-3 space-y-1 text-sm text-gray-800" data-list="skills"></ul>
+                                    <p class="text-sm text-gray-400 italic mt-2" data-empty="skills">No skills recorded</p>
+
+                                    <div class="mt-4" data-repeatable-section="skills">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <button
+                                                type="button"
+                                                data-action="add-skill"
+                                                class="ie-btn ie-btn-secondary"
+                                            >
+                                                + Add Skill
+                                            </button>
+                                        </div>
+                                        <div data-items="skills" class="space-y-4"></div>
+                                        <p class="empty-state text-sm text-gray-400 italic mt-2">No skills added yet</p>
+                                        <template id="skillItemTemplate">
+                                            <div class="flex items-center gap-3 mb-3" data-item-section="skills">
+                                                <input
+                                                    type="text"
+                                                    data-field="skill"
+                                                    placeholder="e.g. Wine pairing"
+                                                    class="form-input flex-1"
+                                                >
+                                                <button
+                                                    type="button"
+                                                    data-action="remove-skill"
+                                                    class="ie-btn ie-btn-secondary"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <!-- Hobbies & Interests -->
+                                <div class="border-t border-gray-100 pt-6">
+                                    <h4 class="serif text-base font-semibold text-[#1b4332]">Hobbies &amp; Interests</h4>
+                                    <ul class="list-disc ml-6 mt-3 space-y-1 text-sm text-gray-800" data-list="hobbies"></ul>
+                                    <p class="text-sm text-gray-400 italic mt-2" data-empty="hobbies">No hobbies recorded</p>
+
+                                    <div class="mt-4" data-repeatable-section="hobbies">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <button
+                                                type="button"
+                                                data-action="add-hobby"
+                                                class="ie-btn ie-btn-secondary"
+                                            >
+                                                + Add Hobby
+                                            </button>
+                                        </div>
+                                        <div data-items="hobbies" class="space-y-4"></div>
+                                        <p class="empty-state text-sm text-gray-400 italic mt-2">No hobbies added yet</p>
+                                        <template id="hobbyItemTemplate">
+                                            <div class="flex items-center gap-3 mb-3" data-item-section="hobbies">
+                                                <input
+                                                    type="text"
+                                                    data-field="hobby"
+                                                    placeholder="e.g. Hiking, photography"
+                                                    class="form-input flex-1"
+                                                >
+                                                <button
+                                                    type="button"
+                                                    data-action="remove-hobby"
+                                                    class="ie-btn ie-btn-secondary"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <!-- Languages -->
+                                <div class="border-t border-gray-100 pt-6">
+                                    <h4 class="serif text-base font-semibold text-[#1b4332]">Languages</h4>
+                                    <ul class="list-disc ml-6 mt-3 space-y-1 text-sm text-gray-800" data-list="languages"></ul>
+                                    <p class="text-sm text-gray-400 italic mt-2" data-empty="languages">No languages recorded</p>
+
+                                    <div class="mt-4" data-repeatable-section="languages">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <button
+                                                type="button"
+                                                data-action="add-language"
+                                                class="ie-btn ie-btn-secondary"
+                                            >
+                                                + Add Language
+                                            </button>
+                                        </div>
+                                        <div data-items="languages" class="space-y-4"></div>
+                                        <p class="empty-state text-sm text-gray-400 italic mt-2">No languages added yet</p>
+                                        <template id="languageItemTemplate">
+                                            <div class="flex items-center gap-3 mb-3 flex-wrap" data-item-section="languages">
+                                                <input
+                                                    type="text"
+                                                    data-field="language"
+                                                    placeholder="e.g. English"
+                                                    class="form-input flex-1 min-w-[140px]"
+                                                >
+                                                <input
+                                                    type="text"
+                                                    data-field="proficiency"
+                                                    placeholder="e.g. C1, Native"
+                                                    class="form-input w-[140px]"
+                                                >
+                                                <button
+                                                    type="button"
+                                                    data-action="remove-language"
+                                                    class="ie-btn ie-btn-secondary"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <!-- Certifications -->
+                                <div class="border-t border-gray-100 pt-6">
+                                    <h4 class="serif text-base font-semibold text-[#1b4332]">Certifications</h4>
+                                    <ul class="list-disc ml-6 mt-3 space-y-1 text-sm text-gray-800" data-list="certifications"></ul>
+                                    <p class="text-sm text-gray-400 italic mt-2" data-empty="certifications">No certifications recorded</p>
+
+                                    <div class="mt-4" data-repeatable-section="certifications">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <button
+                                                type="button"
+                                                data-action="add-certification"
+                                                class="ie-btn ie-btn-secondary"
+                                            >
+                                                + Add Certification
+                                            </button>
+                                        </div>
+                                        <div data-items="certifications" class="space-y-6"></div>
+                                        <p class="empty-state text-sm text-gray-400 italic mt-2">No certifications added yet</p>
+                                        <template id="certificationItemTemplate">
+                                            <div class="flex items-center gap-3 mb-3 flex-wrap" data-item-section="certifications">
+                                                <input
+                                                    type="text"
+                                                    data-field="name"
+                                                    placeholder="e.g. WSET Level 3"
+                                                    class="form-input flex-1 min-w-[160px]"
+                                                >
+                                                <input
+                                                    type="text"
+                                                    data-field="issuer"
+                                                    placeholder="e.g. WSET"
+                                                    class="form-input flex-1 min-w-[140px]"
+                                                >
+                                                <input
+                                                    type="date"
+                                                    data-field="issue_date"
+                                                    class="form-input w-[150px]"
+                                                >
+                                                <input
+                                                    type="date"
+                                                    data-field="expiry_date"
+                                                    class="form-input w-[150px]"
+                                                >
+                                                <button
+                                                    type="button"
+                                                    data-action="remove-certification"
+                                                    class="ie-btn ie-btn-secondary"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <!-- Documents -->
+                                <div class="border-t border-gray-100 pt-6">
+                                    <h4 class="serif text-base font-semibold text-[#1b4332]">Documents</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+                                        <div>
+                                            <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Curriculum Vitae</p>
+                                            <div>
+                                                <a
+                                                    href="#"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    class="hidden ie-btn ie-btn-primary"
+                                                    data-doc-link="cv"
+                                                >
+                                                    View CV
+                                                </a>
+                                                <p class="text-sm text-gray-400 italic" data-doc-empty="cv">No CV uploaded</p>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Photo</p>
+                                            <p class="text-sm text-gray-400 italic" data-doc-empty="photo">No photo uploaded</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Inline document edit controls (edit mode only, driven by IECandidateRuntime) -->
+                                    <div
+                                        id="candidateDocumentsSection"
+                                        class="mt-6 hidden"
+                                        data-documents-edit
+                                    >
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <div>
+                                                <p class="form-label text-xs mb-1">Manage CV</p>
+                                                <div class="candidate-file-block" data-file-type="cv">
+                                                    <div class="file-state text-xs text-gray-500"></div>
+                                                    <div class="file-actions mt-2 flex flex-wrap gap-2"></div>
+                                                    <input
+                                                        type="file"
+                                                        name="cv_file"
+                                                        accept=".pdf"
+                                                        class="hidden"
+                                                    >
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p class="form-label text-xs mb-1">Manage Photo</p>
+                                                <div class="candidate-file-block" data-file-type="photo">
+                                                    <div class="file-state text-xs text-gray-500"></div>
+                                                    <div class="file-actions mt-2 flex flex-wrap gap-2"></div>
+                                                    <input
+                                                        type="file"
+                                                        name="foto_file"
+                                                        accept="image/*"
+                                                        class="hidden"
+                                                    >
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </section>
@@ -223,32 +571,7 @@
                         <!-- Activity -->
                         <section id="candidateActivityLog" class="glass-card ie-card p-6 rounded-3xl">
                             <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Activity Log</h3>
-
-                            <div class="entity-activity">
-                                <div class="entity-activity__composer mt-4">
-                                    <textarea
-                                        id="candidateLogInput"
-                                        class="entity-activity__textarea w-full border border-gray-200 rounded-lg p-3 text-sm"
-                                        rows="3"
-                                        placeholder="Add a note about this candidate..."
-                                    ></textarea>
-                                    <div class="entity-activity__composerRow mt-2 flex justify-end">
-                                        <button
-                                            id="candidateAddLogBtn"
-                                            type="button"
-                                            class="ie-btn ie-btn-success entity-activity__addBtn"
-                                        >
-                                            Add Note
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div id="candidateLogList" class="entity-activity__timeline mt-4 space-y-3"></div>
-
-                                <div id="candidateLogEmpty" class="entity-activity__empty mt-2 hidden">
-                                    No activity yet.
-                                </div>
-                            </div>
+                            <div id="activity-container" class="mt-4"></div>
                         </section>
                     </div>
                 </div>
@@ -275,7 +598,7 @@
     </script>
     <script src="shared/header-loader.js"></script>
     <script src="core/debug.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="core/supabase-client.js"></script>
     <script src="core/data/candidates.js"></script>
     <script src="core/data/clients.js"></script>
@@ -293,6 +616,7 @@
     <script src="runtime/status-runtime.js"></script>
     <script src="runtime/associations-runtime.js"></script>
     <script src="runtime/candidate-profile-runtime.js"></script>
+    <script src="runtime/candidate-import-runtime.js"></script>
     <script src="runtime/candidate-runtime.js"></script>
     <script src="runtime/client-runtime.js"></script>
     <script src="runtime/job-offer-runtime.js"></script>
@@ -307,6 +631,10 @@
     <script src="core/ui/modals.js"></script>
     <script src="core/ui/previews.js"></script>
     <script src="core/app-shell.js"></script>
+    <script src="core/entity-page/entity-field-mapper.js"></script>
+    <script src="core/entity-page/entity-page-shell.js"></script>
+    <script src="features/candidates/candidate-entity-config.js"></script>
+    <script src="shared/activity-section.js"></script>
     <script src="features/candidates/candidate.js"></script>
 </body>
 </html>

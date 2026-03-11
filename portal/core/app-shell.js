@@ -828,29 +828,39 @@
     },
     candidateEdit: function (id) {
       return (
-        "add-candidate.html?id=" + encodeURIComponent(String(id || "")) + "&mode=edit"
+        "candidate.html?id=" + encodeURIComponent(String(id || "")) + "&mode=edit"
       );
     },
     clientView: function (id) {
       return (
-        "add-client.html?id=" +
+        "client.html?id=" +
         encodeURIComponent(String(id || "")) +
         "&mode=view"
       );
     },
     clientEdit: function (id) {
       return (
-        "add-client.html?id=" + encodeURIComponent(String(id || "")) + "&mode=edit"
+        "client.html?id=" + encodeURIComponent(String(id || "")) + "&mode=edit"
       );
     },
     offerView: function (id) {
       return (
-        "add-job-offer.html?id=" + encodeURIComponent(String(id || "")) + "&mode=view"
+        "job-offer.html?id=" + encodeURIComponent(String(id || "")) + "&mode=view"
       );
     },
     offerEdit: function (id) {
       return (
-        "add-job-offer.html?id=" + encodeURIComponent(String(id || "")) + "&mode=edit"
+        "job-offer.html?id=" + encodeURIComponent(String(id || "")) + "&mode=edit"
+      );
+    },
+    applicationView: function (id) {
+      return "application.html?id=" + encodeURIComponent(String(id || ""));
+    },
+    applicationEdit: function (id) {
+      return (
+        "application.html?id=" +
+        encodeURIComponent(String(id || "")) +
+        "&mode=edit"
       );
     }
   };

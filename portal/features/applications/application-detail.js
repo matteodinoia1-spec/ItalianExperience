@@ -299,9 +299,13 @@
 
     if (offerLink && app.job_offer_id) {
       var oHref =
-        "add-job-offer.html?id=" +
-        encodeURIComponent(String(app.job_offer_id)) +
-        "&mode=view";
+        window.IEPortal &&
+        window.IEPortal.links &&
+        typeof window.IEPortal.links.offerView === "function"
+          ? window.IEPortal.links.offerView(app.job_offer_id)
+          : "job-offer.html?id=" +
+            encodeURIComponent(String(app.job_offer_id)) +
+            "&mode=view";
       offerLink.href = oHref;
       offerLink.addEventListener("click", function (event) {
         if (

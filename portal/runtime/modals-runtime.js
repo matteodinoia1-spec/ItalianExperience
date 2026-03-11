@@ -439,9 +439,17 @@
     }
     if (entity === "client") {
       if (window.IERouter) {
-        window.IERouter.navigateTo(
-          "add-client.html?id=" + encodeURIComponent(id) + "&mode=view"
-        );
+        var href;
+        if (
+          window.IEPortal &&
+          window.IEPortal.links &&
+          typeof window.IEPortal.links.clientView === "function"
+        ) {
+          href = window.IEPortal.links.clientView(id);
+        } else {
+          href = "client.html?id=" + encodeURIComponent(id) + "&mode=view";
+        }
+        window.IERouter.navigateTo(href);
       }
     }
   }

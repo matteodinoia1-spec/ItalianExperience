@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Client Profile | Italian Experience Recruitment</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="styles/ui.css">
+</head>
+<body class="flex min-h-screen" style="visibility: hidden;">
+
+  <div class="portal-shell">
+    <!-- MAIN CONTENT -->
+    <main class="portal-main portal-main--no-toolbar flex-1 flex flex-col min-w-0">
+      <div id="portal-header"></div>
+
+      <!-- Page Content -->
+      <div class="page-container">
+        <div class="portal-content p-8">
+          <div class="client-page-layout max-w-5xl mx-auto w-full space-y-6">
+
+            <!-- Entity hero -->
+            <section class="ie-card glass-card p-5 md:p-6 rounded-3xl relative">
+              <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <!-- Left: name + location -->
+                <div class="min-w-0 space-y-1">
+                  <h1 class="serif text-2xl md:text-3xl font-bold text-[#1b4332] truncate">
+                    <input
+                      type="text"
+                      class="form-input field-display serif text-2xl md:text-3xl font-bold text-[#1b4332] w-full"
+                      data-field="name"
+                      readonly
+                      value="Client"
+                    >
+                  </h1>
+                  <p class="text-sm text-gray-500 flex flex-wrap items-center gap-2">
+                    <span class="inline-flex items-center gap-1">
+                      <span class="text-gray-400 text-xs uppercase tracking-widest font-semibold">City</span>
+                      <span data-field="city">—</span>
+                    </span>
+                    <span class="hidden md:inline text-gray-300">•</span>
+                    <span class="inline-flex items-center gap-1">
+                      <span class="text-gray-400 text-xs uppercase tracking-widest font-semibold">State</span>
+                      <span data-field="state">—</span>
+                    </span>
+                    <span class="hidden md:inline text-gray-300">•</span>
+                    <span class="inline-flex items-center gap-1">
+                      <span class="text-gray-400 text-xs uppercase tracking-widest font-semibold">Country</span>
+                      <span data-field="country">—</span>
+                    </span>
+                  </p>
+                </div>
+
+                <!-- Right: toolbar -->
+                <div class="flex flex-col items-start md:items-end gap-2 shrink-0">
+                  <div id="clientActions" class="page-detail-actions mt-0.5"></div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Main grid: left info + right notes/activity -->
+            <div id="clientProfileRoot" class="w-full">
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-6">
+                <!-- Left: core company info -->
+                <div class="lg:col-span-2 space-y-6">
+                  <section class="ie-card glass-card p-6 rounded-3xl">
+                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Company Information</h3>
+                    <div class="mt-4 space-y-6">
+                      <div>
+                        <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Company Name</p>
+                        <input
+                          type="text"
+                          class="form-input field-display text-gray-800 text-sm w-full"
+                          data-field="name"
+                          readonly
+                          placeholder="e.g. Grand Hotel Milano"
+                        >
+                      </div>
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">City</p>
+                          <input
+                            type="text"
+                            class="form-input field-display text-gray-800 text-sm w-full"
+                            data-field="city"
+                            readonly
+                            placeholder="e.g. Milan"
+                          >
+                        </div>
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">State / Region</p>
+                          <input
+                            type="text"
+                            class="form-input field-display text-gray-800 text-sm w-full"
+                            data-field="state"
+                            readonly
+                            placeholder="e.g. Lombardy"
+                          >
+                        </div>
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Country</p>
+                          <input
+                            type="text"
+                            class="form-input field-display text-gray-800 text-sm w-full"
+                            data-field="country"
+                            readonly
+                            placeholder="e.g. Italy"
+                          >
+                        </div>
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Address</p>
+                          <input
+                            type="text"
+                            class="form-input field-display text-gray-800 text-sm w-full"
+                            data-field="address"
+                            readonly
+                            placeholder="Street and number"
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="ie-card glass-card p-6 rounded-3xl">
+                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Contact</h3>
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Contact Name</p>
+                        <input
+                          type="text"
+                          class="form-input field-display text-gray-800 text-sm w-full"
+                          data-field="contact_name"
+                          readonly
+                          placeholder="Main contact person"
+                        >
+                      </div>
+                      <div>
+                        <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Email</p>
+                        <input
+                          type="email"
+                          class="form-input field-display text-gray-800 text-sm w-full"
+                          data-field="email"
+                          readonly
+                          placeholder="contact@company.com"
+                        >
+                      </div>
+                      <div>
+                        <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Phone</p>
+                        <input
+                          type="text"
+                          class="form-input field-display text-gray-800 text-sm w-full"
+                          data-field="phone"
+                          readonly
+                          placeholder="+39 02 1234567"
+                        >
+                      </div>
+                    </div>
+                  </section>
+                </div>
+
+                <!-- Right: notes + activity -->
+                <div class="space-y-6">
+                  <section class="ie-card glass-card p-6 rounded-3xl">
+                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Internal Notes</h3>
+                    <textarea
+                      class="form-input field-display mt-3 text-gray-800 text-sm leading-relaxed whitespace-pre-line w-full resize-none"
+                      data-field="notes"
+                      rows="6"
+                      readonly
+                    >—</textarea>
+                  </section>
+
+                  <section class="ie-card glass-card p-6 rounded-3xl">
+                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Activity Log</h3>
+                    <div id="activity-container" class="mt-4"></div>
+                  </section>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    window.pageMeta = {
+      title: "Client",
+      subtitle: "Client profile",
+      breadcrumbs: [
+        { label: "Dashboard", entity: "dashboard" },
+        { label: "Clients", entity: "clients" },
+        { label: "Client" }
+      ]
+    };
+  </script>
+
+  <script src="shared/header-loader.js"></script>
+  <script src="core/debug.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="core/supabase-client.js"></script>
+  <script src="core/data/candidates.js"></script>
+  <script src="core/data/clients.js"></script>
+  <script src="core/data/job-offers.js"></script>
+  <script src="core/data/applications.js"></script>
+  <script src="core/data/activity.js"></script>
+  <script src="core/supabase.js"></script>
+  <script src="core/auth.js"></script>
+  <script src="core/session-ready.js"></script>
+  <script src="core/router.js"></script>
+  <script src="runtime/router-runtime.js"></script>
+  <script src="runtime/forms-runtime.js"></script>
+  <script src="runtime/modals-runtime.js"></script>
+  <script src="runtime/profile-runtime.js"></script>
+  <script src="runtime/status-runtime.js"></script>
+  <script src="runtime/associations-runtime.js"></script>
+  <script src="runtime/client-runtime.js"></script>
+  <script src="runtime/job-offer-runtime.js"></script>
+  <script src="runtime/header-runtime.js"></script>
+  <script src="runtime/global-header-actions-runtime.js"></script>
+  <script src="runtime/entity-actions-runtime.js"></script>
+  <script src="runtime/page-bootstrap.js"></script>
+  <script src="components/page-header.js"></script>
+  <script src="core/entity-toolbar.js"></script>
+  <script src="core/lists-runtime.js"></script>
+  <script src="core/session/session.js"></script>
+  <script src="core/ui/modals.js"></script>
+  <script src="core/ui/previews.js"></script>
+  <script src="core/app-shell.js"></script>
+  <script src="core/entity-page/entity-field-mapper.js"></script>
+  <script src="core/entity-page/entity-page-shell.js"></script>
+  <script src="features/clients/client-entity-config.js"></script>
+  <script src="shared/activity-section.js"></script>
+  <script src="features/clients/client.js"></script>
+</body>
+</html>
+

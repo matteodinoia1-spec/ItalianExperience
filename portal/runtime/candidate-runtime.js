@@ -49,6 +49,142 @@
     pendingCandidateCvPath = null;
   }
 
+  /**
+   * Remove a candidate file (photo or CV) for the current page context.
+   * For existing candidates it clears the corresponding DB column via updateCandidateFiles.
+   * For create flows it just clears the pending temp path and local UI state.
+   */
+  async function removeCandidateFile(type) {
+    var isPhoto = type === "photo";
+
+    var section = document.getElementById("candidateDocumentsSection");
+    if (!section) return;
+
+    var block = section.querySelector(
+      '.candidate-file-block[data-file-type="' + type + '"]'
+    );
+    if (!block) return;
+
+    var input =
+      isPhoto
+        ? block.querySelector('input[name="foto_file"]')
+        : block.querySelector('input[name="cv_file"]');
+
+    if (!input) return;
+
+    var candidateId = null;
+    try {
+      if (
+        window.IERouter &&
+        typeof window.IERouter.getCandidatePageParams === "function"
+      ) {
+        var params = window.IERouter.getCandidatePageParams();
+        if (params && params.id) {
+          candidateId = params.id;
+        }
+      }
+    } catch (e) {
+      candidateId = null;
+    }
+
+    if (candidateId && window.IESupabase && window.IESupabase.updateCandidateFiles) {
+      var confirmMessage = isPhoto
+        ? "Remove the existing candidate photo?"
+        : "Remove the existing candidate CV?";
+      var proceed = window.confirm(confirmMessage);
+      if (!proceed) return;
+
+      try {
+        var payload = isPhoto ? { photo_url: null } : { cv_url: null };
+        var result = await window.IESupabase.updateCandidateFiles(
+          candidateId,
+          payload
+        );
+        if (result && result.error) {
+          if (window.IESupabase.showError) {
+            window.IESupabase.showError(
+              result.error.message || "Error removing file.",
+              "removeCandidateFile"
+            );
+          }
+          return;
+        }
+
+        // Clear current path so subsequent uploads use a clean state.
+        input.dataset.currentPath = "";
+        input.value = "";
+
+        // Update inline file state UI in edit mode.
+        if (typeof renderCandidateFileState === "function") {
+          var candidateForState = isPhoto
+            ? { photo_url: null }
+            : { cv_url: null };
+          renderCandidateFileState(type, candidateForState, "edit");
+        }
+
+        // Reset hero photo preview to a neutral avatar when photo is removed.
+        if (isPhoto) {
+          var previewImg = document.getElementById("candidatePhotoPreview");
+          if (previewImg) {
+            var fallbackSrc =
+              previewImg.dataset &&
+              previewImg.dataset.originalSrc
+                ? previewImg.dataset.originalSrc
+                : "https://ui-avatars.com/api/?name=Candidate&background=1b4332&color=fff";
+            previewImg.src = fallbackSrc;
+            if (previewImg.dataset) {
+              previewImg.dataset.storagePath = "";
+            }
+          }
+        }
+      } catch (err) {
+        if (window.IESupabase && window.IESupabase.showError) {
+          window.IESupabase.showError(
+            "Error while removing file.",
+            "removeCandidateFile"
+          );
+        } else {
+          // eslint-disable-next-line no-console
+          console.error(
+            "[ItalianExperience] removeCandidateFile exception:",
+            err
+          );
+        }
+      }
+      return;
+    }
+
+    // Create mode (no candidate id yet): just clear pending temp state and UI.
+    if (isPhoto) {
+      pendingCandidatePhotoPath = null;
+    } else {
+      pendingCandidateCvPath = null;
+    }
+    input.dataset.currentPath = "";
+    input.value = "";
+
+    if (typeof renderCandidateFileState === "function") {
+      var candidateForCreateState = isPhoto
+        ? { photo_url: null }
+        : { cv_url: null };
+      renderCandidateFileState(type, candidateForCreateState, "edit");
+    }
+
+    if (isPhoto) {
+      var previewImgCreate = document.getElementById("candidatePhotoPreview");
+      if (previewImgCreate) {
+        var createFallbackSrc =
+          previewImgCreate.dataset && previewImgCreate.dataset.originalSrc
+            ? previewImgCreate.dataset.originalSrc
+            : "https://ui-avatars.com/api/?name=Candidate&background=1b4332&color=fff";
+        previewImgCreate.src = createFallbackSrc;
+        if (previewImgCreate.dataset) {
+          previewImgCreate.dataset.storagePath = "";
+        }
+      }
+    }
+  }
+
   function renderCandidateFileState(type, candidate, mode) {
     var section = document.getElementById("candidateDocumentsSection");
     if (!section) return;
@@ -717,6 +853,7 @@
     handleCandidateFileChange: handleCandidateFileChange,
     getPendingCandidateFileState: getPendingCandidateFileState,
     clearPendingCandidateFileState: clearPendingCandidateFileState,
+    removeCandidateFile: removeCandidateFile,
   };
 })();
 

@@ -66,6 +66,24 @@
   }
 }
 
+/* Candidate profile layout: keep hero, associated offers, and grid visually tied */
+.candidate-page-layout {
+  /* Use Tailwind spacing for most rhythm; this keeps a shared max-width container */
+}
+
+.candidate-hero-section,
+.candidate-associated-offers,
+.candidate-main-grid > * {
+  /* Align cards to the same horizontal boundaries and reduce the “floating card” feeling */
+  margin-inline: 0;
+}
+
+@media (min-width: 1024px) {
+  .candidate-main-grid {
+    align-items: flex-start;
+  }
+}
+
 /* When ribbon is hidden (e.g. approved), remove reserved right padding so right block aligns to edge */
 .candidate-hero-inner.candidate-hero-inner--no-ribbon {
   padding-right: 0;
