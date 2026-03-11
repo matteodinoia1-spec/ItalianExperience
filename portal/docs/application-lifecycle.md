@@ -1,6 +1,6 @@
 ## Application lifecycle
 
-Applications are stored in `candidate_job_associations` and drive the recruiting pipeline.
+Applications are stored in `candidate_job_associations` and drive the recruiting pipeline. Candidate **profile status** (`candidates.status`: pending_review, approved, rejected, archived) is separate and not part of this lifecycle; see portal docs (STATUS-AUDIT.md, pipeline-statuses.md).
 
 ### Active pipeline stages
 

@@ -137,7 +137,38 @@
   }
 
   /**
-   * Count of candidates with status 'hired' (or similar) created/updated this month.
+   * Count of candidates awaiting internal approval (pending_review and legacy 'new'), non-archived.
+   * Source of truth for dashboard "Pending Review" card.
+   * @returns {Promise<{ data: number, error: object | null }>}
+   */
+  async function getPendingReviewCount() {
+    try {
+      var q = supabase
+        .from("candidates")
+        .select("*", { count: "exact", head: true })
+        .in("status", ["pending_review", "new"])
+        .eq("is_archived", false);
+      var result = await q;
+      var count = result && typeof result.count === "number" ? result.count : 0;
+      var error = result ? result.error : null;
+      if (error) {
+        console.error(
+          "[Supabase] getPendingReviewCount error:",
+          error.message || error,
+          error
+        );
+        return { data: 0, error: error };
+      }
+      return { data: count, error: null };
+    } catch (err) {
+      console.error("[Supabase] getPendingReviewCount exception:", err);
+      return { data: 0, error: err };
+    }
+  }
+
+  /**
+   * Count of applications (candidate_job_associations) with status 'hired' updated this month.
+   * Recruitment pipeline metric; source of truth is candidate_job_associations.status.
    * @returns {Promise<{ data: number, error: object | null }>}
    */
   async function getHiredThisMonth() {
@@ -154,11 +185,11 @@
         1
       ).toISOString();
       var result = await supabase
-        .from("candidates")
+        .from("candidate_job_associations")
         .select("id")
         .eq("status", "hired")
-        .gte("created_at", startOfMonth)
-        .lt("created_at", endOfMonth);
+        .gte("updated_at", startOfMonth)
+        .lt("updated_at", endOfMonth);
       var data = result ? result.data : null;
       var error = result ? result.error : null;
       if (error) {
@@ -206,6 +237,40 @@
       return { data: data || [], error: null };
     } catch (err) {
       console.error("[Supabase] getRecentCandidates exception:", err);
+      return { data: [], error: err };
+    }
+  }
+
+  /**
+   * Pending review queue: candidates with profile status pending_review (and legacy 'new'),
+   * non-archived, latest first. Used for dashboard approval queue.
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function getPendingReviewCandidates() {
+    try {
+      var q = supabase
+        .from("candidates")
+        .select(
+          "id, first_name, last_name, position, status, source, created_at, email, phone"
+        )
+        .in("status", ["pending_review", "new"])
+        .eq("is_archived", false)
+        .order("created_at", { ascending: false })
+        .limit(30);
+      var result = await q;
+      var data = result ? result.data : null;
+      var error = result ? result.error : null;
+      if (error) {
+        console.error(
+          "[Supabase] getPendingReviewCandidates error:",
+          error.message || error,
+          error
+        );
+        return { data: [], error: error };
+      }
+      return { data: data || [], error: null };
+    } catch (err) {
+      console.error("[Supabase] getPendingReviewCandidates exception:", err);
       return { data: [], error: err };
     }
   }
@@ -264,8 +329,10 @@
     getTotalCandidates: getTotalCandidates,
     getActiveJobOffers: getActiveJobOffers,
     getNewCandidatesToday: getNewCandidatesToday,
+    getPendingReviewCount: getPendingReviewCount,
     getHiredThisMonth: getHiredThisMonth,
     getRecentCandidates: getRecentCandidates,
+    getPendingReviewCandidates: getPendingReviewCandidates,
     getCandidatesBySource: getCandidatesBySource,
   };
 })();

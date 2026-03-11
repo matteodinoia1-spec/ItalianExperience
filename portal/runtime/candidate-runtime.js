@@ -498,7 +498,15 @@
       if (lastNameEl) lastNameEl.value = candidate.last_name || "";
       if (addressEl) addressEl.value = candidate.address || "";
       if (positionEl) positionEl.value = candidate.position || "";
-      if (statusEl) statusEl.value = candidate.status || "new";
+      if (statusEl) {
+        var raw = candidate.status || "";
+        var profileStatus = (window.IEStatusRuntime && typeof window.IEStatusRuntime.normalizeProfileStatusFromLegacy === "function")
+          ? window.IEStatusRuntime.normalizeProfileStatusFromLegacy(raw)
+          : (raw || "pending_review");
+        // Archived is not a profile status option in the form; show Rejected for legacy archived
+        if (profileStatus === "archived") profileStatus = "rejected";
+        statusEl.value = profileStatus;
+      }
       if (sourceEl) sourceEl.value = candidate.source || "";
       if (notesEl) notesEl.value = candidate.notes || "";
 
@@ -680,12 +688,19 @@
         });
       }
 
-      if (window.ActivitySection && typeof window.ActivitySection.init === "function") {
-        window.ActivitySection.init({
-          entityType: "candidate",
-          entityId: candidateId,
-          container: document.getElementById("activity-container"),
-        });
+      var activityWrap = document.getElementById("candidate-activity-section-wrap");
+      var activityContainer = document.getElementById("activity-container");
+      if (effectiveMode === "edit") {
+        if (activityWrap) activityWrap.style.display = "none";
+      } else {
+        if (activityWrap) activityWrap.style.display = "";
+        if (window.ActivitySection && typeof window.ActivitySection.init === "function" && activityContainer) {
+          window.ActivitySection.init({
+            entityType: "candidate",
+            entityId: candidateId,
+            container: activityContainer,
+          });
+        }
       }
     });
   }

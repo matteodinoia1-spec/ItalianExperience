@@ -9,7 +9,9 @@ The authoritative pipeline status for applications is:
 - `candidate_job_associations.status`
 
 All pipeline views, counts, and filters must derive from this column.  
-Statuses on other tables (for example `candidates.status` or `job_offers.status`) must **not** be used for application pipeline logic.
+Statuses on other tables (for example `job_offers.status`) must **not** be used for application pipeline logic.
+
+**Candidate profile status** (`candidates.status`) is separate from the application pipeline. It represents the **profile lifecycle** inside the internal database: `pending_review`, `approved`, `rejected`, `archived`. It is **not** used for pipeline stages (applied, screening, interview, offer, hired, etc.); those exist only on `candidate_job_associations.status`.
 
 ### Active pipeline vs terminal statuses
 

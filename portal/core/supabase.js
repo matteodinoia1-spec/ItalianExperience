@@ -389,6 +389,14 @@
     return mod.updateCandidate(id, payload);
   }
 
+  async function updateCandidateProfileStatus(id, status) {
+    const mod = getCandidatesModule();
+    if (!mod || typeof mod.updateCandidateProfileStatus !== "function") {
+      return { data: null, error: new Error("Candidates module not available") };
+    }
+    return mod.updateCandidateProfileStatus(id, status);
+  }
+
   async function fetchMyCandidates() {
     const mod = getCandidatesModule();
     if (!mod || typeof mod.fetchMyCandidates !== "function") {
@@ -1152,7 +1160,20 @@
   }
 
   /**
-   * Count of candidates with status 'hired' (or similar) created/updated this month.
+   * Count of candidates awaiting internal approval (pending_review and legacy 'new'), non-archived.
+   * @returns {Promise<{ data: number, error: object | null }>}
+   */
+  async function getPendingReviewCount() {
+    const mod = getDashboardModule();
+    if (!mod || typeof mod.getPendingReviewCount !== "function") {
+      return { data: 0, error: new Error("Dashboard module not available") };
+    }
+    return mod.getPendingReviewCount();
+  }
+
+  /**
+   * Count of applications (candidate_job_associations) with status 'hired' updated this month.
+   * Recruitment pipeline metric; source of truth is candidate_job_associations.status.
    * @returns {Promise<{ data: number, error: object | null }>}
    */
   async function getHiredThisMonth() {
@@ -1173,6 +1194,18 @@
       return { data: [], error: new Error("Dashboard module not available") };
     }
     return mod.getRecentCandidates();
+  }
+
+  /**
+   * Pending review queue: candidates with profile status pending_review (and legacy 'new'), non-archived.
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function getPendingReviewCandidates() {
+    const mod = getDashboardModule();
+    if (!mod || typeof mod.getPendingReviewCandidates !== "function") {
+      return { data: [], error: new Error("Dashboard module not available") };
+    }
+    return mod.getPendingReviewCandidates();
   }
 
   /**
@@ -1474,6 +1507,7 @@
     insertCandidate,
     getCandidateById,
     updateCandidate,
+    updateCandidateProfileStatus,
     archiveCandidate,
     fetchMyCandidates,
     fetchCandidatesPaginated,
@@ -1543,8 +1577,10 @@
     getTotalCandidates,
     getActiveJobOffers,
     getNewCandidatesToday,
+    getPendingReviewCount,
     getHiredThisMonth,
     getRecentCandidates,
+    getPendingReviewCandidates,
     getCandidatesBySource,
     // Deletes / archive helpers
     deletePermanentRecord: deletePermanentRecord,

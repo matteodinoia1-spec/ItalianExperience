@@ -52,17 +52,22 @@
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
 }
 
-/* Candidate hero avatar: never squeeze when viewport shrinks */
+/* Candidate hero avatar: never squeeze when viewport shrinks (compact hero) */
 .candidate-hero-avatar {
   flex-shrink: 0;
-  min-width: 4rem;
-  min-height: 4rem;
+  min-width: 3rem;
+  min-height: 3rem;
 }
 
 @media (min-width: 768px) {
   .candidate-hero-avatar {
-    min-width: 5rem;
-    min-height: 5rem;
+    min-width: 3.5rem;
+    min-height: 3.5rem;
   }
+}
+
+/* When ribbon is hidden (e.g. approved), remove reserved right padding so right block aligns to edge */
+.candidate-hero-inner.candidate-hero-inner--no-ribbon {
+  padding-right: 0;
 }
 

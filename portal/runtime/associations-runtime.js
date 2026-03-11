@@ -37,12 +37,11 @@
 
   function renderInlineCandidateRow(candidate, opts) {
     if (!candidate) return null;
-    if (window.IEStatusRuntime && window.IEStatusRuntime.isCandidateHired(candidate)) return null;
 
     var fullName =
       ((candidate.first_name || "") + " " + (candidate.last_name || "")).trim() || "—";
     var position = (candidate.position || "").toString().trim();
-    var status = (candidate.status || "new").toString().toLowerCase();
+    var profileStatus = (candidate.status || "").toString();
     var availability =
       window.IEStatusRuntime && typeof window.IEStatusRuntime.computeCandidateAvailability === "function"
         ? window.IEStatusRuntime.computeCandidateAvailability(candidate)
@@ -71,8 +70,8 @@
     right.className = "flex items-center gap-2 flex-shrink-0";
     right.appendChild(
       createInlineBadge(
-        window.IEStatusRuntime ? window.IEStatusRuntime.formatCandidateStatusLabel(status) : status,
-        window.IEStatusRuntime ? window.IEStatusRuntime.getCandidateStatusBadgeClass(status) : ""
+        window.IEStatusRuntime ? window.IEStatusRuntime.formatProfileStatusLabel(profileStatus) : profileStatus,
+        window.IEStatusRuntime ? window.IEStatusRuntime.getProfileStatusBadgeClass(profileStatus) : ""
       )
     );
     right.appendChild(
@@ -675,7 +674,7 @@
 
               try {
                 var res = await window.IESupabase.fetchCandidatesPaginated({
-                  filters: { archived: "active", name: (term || "").toString() },
+                  filters: { archived: "active", status: "approved", name: (term || "").toString() },
                   page: 1,
                   limit: 20,
                 });
@@ -688,7 +687,7 @@
                 var filtered = rows.filter(function (c) {
                   if (!c || !c.id) return false;
                   if (excluded[String(c.id)]) return false;
-                  if (window.IEStatusRuntime && window.IEStatusRuntime.isCandidateHired(c)) return false;
+                  if (!(window.IEStatusRuntime && window.IEStatusRuntime.isCandidateProfileRecruitmentUsable(c.status))) return false;
                   return window.IEStatusRuntime && window.IEStatusRuntime.computeCandidateAvailability(c) === "available";
                 });
 
@@ -1156,7 +1155,7 @@
 
       try {
         var result = await window.IESupabase.fetchCandidatesPaginated({
-          filters: { archived: "active", name: lastTerm },
+          filters: { archived: "active", status: "approved", name: lastTerm },
           page: 1,
           limit: 20,
         });
@@ -1170,7 +1169,7 @@
         var filtered = rows.filter(function (c) {
           if (!c || !c.id) return false;
           if (excluded[String(c.id)]) return false;
-          if (window.IEStatusRuntime && window.IEStatusRuntime.isCandidateHired(c)) return false;
+          if (!(window.IEStatusRuntime && window.IEStatusRuntime.isCandidateProfileRecruitmentUsable(c.status))) return false;
           return window.IEStatusRuntime && window.IEStatusRuntime.computeCandidateAvailability(c) === "available";
         });
 

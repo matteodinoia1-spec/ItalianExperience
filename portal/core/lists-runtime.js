@@ -7,6 +7,8 @@
 (function () {
   "use strict";
 
+  var _dashboardPreviewCache = {};
+
   // ---------------------------------------------------------------------------
   // Filtering + archive helpers
   // ---------------------------------------------------------------------------
@@ -37,14 +39,12 @@
       })
       .filter((item) => {
         if (!filters.status) return true;
-        const effectiveStatus =
-          window.IEStatusRuntime && typeof window.IEStatusRuntime.getEffectiveCandidateStatus === "function"
-            ? window.IEStatusRuntime.getEffectiveCandidateStatus(item)
-            : item.status;
-        if (filters.status === "new") {
-          return effectiveStatus === "new" || effectiveStatus === "applied";
-        }
-        return effectiveStatus === filters.status;
+        const profileStatus =
+          window.IEStatusRuntime && typeof window.IEStatusRuntime.normalizeProfileStatusFromLegacy === "function"
+            ? window.IEStatusRuntime.normalizeProfileStatusFromLegacy(item.status)
+            : (item.status || "pending_review");
+        const filterStatus = (filters.status === "new") ? "pending_review" : filters.status;
+        return profileStatus === filterStatus;
       })
       .filter((item) => {
         if (!filters.source) return true;
@@ -134,7 +134,7 @@
       setDashboardCardValues({
         totalCandidates: 0,
         activeJobOffers: 0,
-        newCandidatesToday: 0,
+        pendingReviewCount: 0,
         hiredThisMonth: 0,
       });
       renderDashboardRecentCandidates([]);
@@ -148,38 +148,41 @@
       const [
         totalRes,
         activeOffersRes,
-        newTodayRes,
+        pendingCountRes,
         hiredRes,
-        recentRes,
+        pendingReviewRes,
         bySourceRes,
       ] = await Promise.all([
         api.getTotalCandidates(),
         api.getActiveJobOffers(),
-        api.getNewCandidatesToday(),
+        api.getPendingReviewCount(),
         api.getHiredThisMonth(),
-        api.getRecentCandidates(),
+        api.getPendingReviewCandidates(),
         api.getCandidatesBySource(),
       ]);
 
       setDashboardCardValues({
         totalCandidates: totalRes.error ? 0 : totalRes.data,
         activeJobOffers: activeOffersRes.error ? 0 : activeOffersRes.data,
-        newCandidatesToday: newTodayRes.error ? 0 : newTodayRes.data,
+        pendingReviewCount: pendingCountRes.error ? 0 : pendingCountRes.data,
         hiredThisMonth: hiredRes.error ? 0 : hiredRes.data,
       });
 
-      const recentList = recentRes.error ? [] : (recentRes.data || []);
-      const mappedRecent = recentList.map(function (r) {
+      const pendingList = pendingReviewRes.error ? [] : (pendingReviewRes.data || []);
+      const mappedPending = pendingList.map(function (r) {
         return {
           id: r.id,
           first_name: r.first_name || "",
           last_name: r.last_name || "",
           position: r.position || "",
-          status: r.status || "new",
+          status: r.status || "pending_review",
+          source: r.source || "",
           created_at: r.created_at,
+          email: r.email || "",
+          phone: r.phone || "",
         };
       });
-      renderDashboardRecentCandidates(mappedRecent);
+      renderDashboardPendingReviewQueue(mappedPending);
 
       const sourceList = bySourceRes.error ? [] : (bySourceRes.data || []);
       renderDashboardSources(sourceList);
@@ -188,10 +191,10 @@
       setDashboardCardValues({
         totalCandidates: 0,
         activeJobOffers: 0,
-        newCandidatesToday: 0,
+        pendingReviewCount: 0,
         hiredThisMonth: 0,
       });
-      renderDashboardRecentCandidates([]);
+      renderDashboardPendingReviewQueue([]);
       renderDashboardSources([]);
     } finally {
       setDashboardLoading(false);
@@ -203,7 +206,7 @@
       var val = el.querySelector(".dashboard-value");
       if (val) val.textContent = loading ? "…" : (val.textContent || "—");
     });
-    var tbody = document.querySelector("[data-dashboard='recentCandidates']");
+    var tbody = document.querySelector("[data-dashboard='pendingReviewQueue']");
     if (tbody) {
       var placeholder = tbody.querySelector("[data-dashboard-placeholder]");
       if (placeholder) placeholder.style.display = loading ? "" : "none";
@@ -226,10 +229,10 @@
       var v = activeEl.querySelector(".dashboard-value");
       if (v) v.textContent = formatInteger(values.activeJobOffers);
     }
-    var newEl = document.querySelector("[data-dashboard-value='newCandidatesToday']");
-    if (newEl) {
-      var v = newEl.querySelector(".dashboard-value");
-      if (v) v.textContent = formatInteger(values.newCandidatesToday);
+    var pendingEl = document.querySelector("[data-dashboard-value='pendingReviewCount']");
+    if (pendingEl) {
+      var v = pendingEl.querySelector(".dashboard-value");
+      if (v) v.textContent = formatInteger(values.pendingReviewCount);
     }
     var hiredEl = document.querySelector("[data-dashboard-value='hiredThisMonth']");
     if (hiredEl) {
@@ -243,61 +246,207 @@
     return Number(n).toLocaleString("it-IT");
   }
 
-  function renderDashboardRecentCandidates(rows) {
-    var tbody = document.querySelector("[data-dashboard='recentCandidates']");
+  function ensureDashboardPreviewPopover() {
+    var id = "ie-dashboard-candidate-preview-popover";
+    var root = document.getElementById(id);
+    if (root) return root;
+    root = document.createElement("div");
+    root.id = id;
+    root.setAttribute("role", "dialog");
+    root.setAttribute("aria-label", "Candidate preview");
+    root.className = "ie-dashboard-preview-popover fixed z-[100] hidden min-w-[280px] max-w-[360px] bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden";
+    root.innerHTML =
+      "<div class=\"p-4 space-y-2\">" +
+      "<p class=\"font-semibold text-[#1b4332] text-base\" data-ie-preview-name></p>" +
+      "<div class=\"text-sm text-gray-600 space-y-1\">" +
+      "<p data-ie-preview-role></p>" +
+      "<p data-ie-preview-source></p>" +
+      "<p data-ie-preview-status></p>" +
+      "<p data-ie-preview-date></p>" +
+      "<p data-ie-preview-email></p>" +
+      "<p data-ie-preview-phone></p>" +
+      "</div>" +
+      "<div class=\"pt-2 flex justify-end\">" +
+      "<button type=\"button\" data-ie-preview-close class=\"ie-btn ie-btn-secondary !py-1.5 !px-3 text-sm\">Close</button>" +
+      "</div>" +
+      "</div>";
+    document.body.appendChild(root);
+    var closeBtn = root.querySelector("[data-ie-preview-close]");
+    function close() {
+      root.classList.add("hidden");
+      root.removeAttribute("data-ie-preview-anchor");
+    }
+    if (closeBtn) closeBtn.addEventListener("click", close);
+    root.addEventListener("click", function (e) { if (e.target === root) close(); });
+    document.addEventListener("keydown", function onKey(e) {
+      if (e.key !== "Escape" || root.classList.contains("hidden")) return;
+      close();
+      document.removeEventListener("keydown", onKey);
+    });
+    root._close = close;
+    return root;
+  }
+
+  function showDashboardCandidatePreview(row, anchorEl) {
+    if (!row || !anchorEl) return;
+    var popover = ensureDashboardPreviewPopover();
+    var fullName = [row.first_name, row.last_name].filter(Boolean).join(" ").trim() || "—";
+    var role = (row.position || "").trim() || "—";
+    var source = (row.source || "").trim() || "—";
+    var statusLabel = window.IEStatusRuntime && typeof window.IEStatusRuntime.formatProfileStatusLabel === "function"
+      ? window.IEStatusRuntime.formatProfileStatusLabel(row.status)
+      : (row.status ? String(row.status) : "Pending Review");
+    var date = row.created_at ? new Date(row.created_at).toLocaleDateString("it-IT") : "—";
+    var email = (row.email || "").trim() || "—";
+    var phone = (row.phone || "").trim() || "—";
+    var escape = window.escapeHtml || function (s) { return String(s); };
+    var set = function (sel, text) {
+      var el = popover.querySelector(sel);
+      if (el) el.textContent = text;
+    };
+    set("[data-ie-preview-name]", fullName);
+    set("[data-ie-preview-role]", "Role: " + escape(role));
+    set("[data-ie-preview-source]", "Source: " + escape(source));
+    set("[data-ie-preview-status]", "Status: " + escape(statusLabel));
+    set("[data-ie-preview-date]", "Date: " + date);
+    set("[data-ie-preview-email]", "Email: " + escape(email));
+    set("[data-ie-preview-phone]", "Phone: " + escape(phone));
+    var rect = anchorEl.getBoundingClientRect();
+    var scrollY = window.scrollY || document.documentElement.scrollTop;
+    var scrollX = window.scrollX || document.documentElement.scrollLeft;
+    popover.style.left = (scrollX + rect.left) + "px";
+    popover.style.top = (scrollY + rect.bottom + 6) + "px";
+    popover.classList.remove("hidden");
+  }
+
+  function renderDashboardPendingReviewQueue(rows) {
+    var tbody = document.querySelector("[data-dashboard='pendingReviewQueue']");
     if (!tbody) return;
     var placeholder = tbody.querySelector("[data-dashboard-placeholder]");
     if (placeholder) placeholder.remove();
     tbody.innerHTML = "";
+    _dashboardPreviewCache = {};
     if (!rows.length) {
       var tr = document.createElement("tr");
-      tr.innerHTML = "<td colspan=\"4\" class=\"px-6 py-8 text-center text-gray-400\">No recent candidates.</td>";
+      tr.innerHTML = "<td colspan=\"5\" class=\"px-6 py-8 text-center text-gray-400\">No candidates pending review.</td>";
       tbody.appendChild(tr);
       return;
     }
+    var statusLabelFn = window.IEStatusRuntime && typeof window.IEStatusRuntime.formatProfileStatusLabel === "function"
+      ? window.IEStatusRuntime.formatProfileStatusLabel
+      : function (s) { return (s ? String(s) : "Pending Review"); };
+    var statusClassFn = window.IEStatusRuntime && typeof window.IEStatusRuntime.getProfileStatusBadgeClass === "function"
+      ? window.IEStatusRuntime.getProfileStatusBadgeClass
+      : function () { return "badge-new"; };
     rows.forEach(function (row) {
+      _dashboardPreviewCache[row.id] = row;
       var tr = document.createElement("tr");
       tr.className = "clickable-row table-row transition";
       tr.setAttribute("data-entity", "candidate");
       tr.setAttribute("data-id", String(row.id || ""));
       var fullName = [row.first_name, row.last_name].filter(Boolean).join(" ").trim() || "—";
+      var role = (row.position || "").trim() || "—";
+      var source = (row.source || "").trim() || "—";
+      var statusLabel = statusLabelFn(row.status);
+      tr.title = fullName + (role !== "—" ? " · " + role : "") + (source ? " · " + source : "") + " · " + statusLabel;
       var candidateHref = window.IEPortal && window.IEPortal.links
         ? window.IEPortal.links.candidateView(row.id)
         : "#";
       var createdDate = row.created_at
         ? new Date(row.created_at).toLocaleDateString("it-IT")
         : "";
-      var statusClass =
-        window.IEStatusRuntime && typeof window.IEStatusRuntime.getDashboardCandidateStatusBadgeClass === "function"
-          ? window.IEStatusRuntime.getDashboardCandidateStatusBadgeClass(row.status)
-          : "badge-new";
-      var statusLabel =
-        window.IEStatusRuntime && typeof window.IEStatusRuntime.formatDashboardCandidateStatusLabel === "function"
-          ? window.IEStatusRuntime.formatDashboardCandidateStatusLabel(row.status)
-          : (row.status ? String(row.status) : "New");
+      var statusClass = statusClassFn(row.status);
+      var idEsc = window.escapeHtml ? window.escapeHtml(String(row.id || "")) : String(row.id || "");
+      var nameEsc = window.escapeHtml ? window.escapeHtml(fullName) : fullName;
+      var roleEsc = window.escapeHtml ? window.escapeHtml(row.position || "—") : (row.position || "—");
       tr.innerHTML =
         "<td class=\"ie-table-cell ie-table-cell--primary\">" +
-        "<a href=\"" + candidateHref + "\" data-action=\"dashboard-open-candidate\" data-id=\"" + (window.escapeHtml ? window.escapeHtml(String(row.id || "")) : String(row.id || "")) + "\" class=\"table-link\">" +
-        (window.escapeHtml ? window.escapeHtml(fullName) : fullName) +
-        "</a>" +
+        "<a href=\"" + candidateHref + "\" data-action=\"dashboard-open-candidate\" data-id=\"" + idEsc + "\" class=\"table-link\">" + nameEsc + "</a>" +
         "</td>" +
-        "<td class=\"ie-table-cell ie-table-cell--secondary\">" + (window.escapeHtml ? window.escapeHtml(row.position || "—") : (row.position || "—")) + "</td>" +
+        "<td class=\"ie-table-cell ie-table-cell--secondary\">" + roleEsc + "</td>" +
         "<td class=\"ie-table-cell ie-table-cell--date\">" + (window.escapeHtml ? window.escapeHtml(createdDate) : createdDate) + "</td>" +
-        "<td class=\"ie-table-cell\"><span class=\"badge " + statusClass + "\">" + (window.escapeHtml ? window.escapeHtml(statusLabel) : statusLabel) + "</span></td>";
+        "<td class=\"ie-table-cell\"><span class=\"badge " + statusClass + "\">" + (window.escapeHtml ? window.escapeHtml(statusLabel) : statusLabel) + "</span></td>" +
+        "<td class=\"ie-table-cell ie-table-actions\">" +
+        "<div class=\"flex items-center gap-2\">" +
+        "<button type=\"button\" data-action=\"dashboard-preview-candidate\" data-id=\"" + idEsc + "\" class=\"ie-btn ie-btn-secondary !py-1.5 !px-2 text-sm\" title=\"Quick preview\">Preview</button>" +
+        "<button type=\"button\" data-action=\"dashboard-approve-candidate\" data-id=\"" + idEsc + "\" class=\"ie-btn ie-btn-success !py-1.5 !px-2 text-sm\">Approve</button>" +
+        "<button type=\"button\" data-action=\"dashboard-reject-candidate\" data-id=\"" + idEsc + "\" class=\"ie-btn ie-btn-secondary !py-1.5 !px-2 text-sm\">Reject</button>" +
+        "</div></td>";
       tbody.appendChild(tr);
     });
-    if (!tbody.__ieDashboardRecentBound) {
+    if (!tbody.__ieDashboardPendingReviewBound) {
       tbody.addEventListener("click", function (event) {
-        var link = event.target.closest("[data-action='dashboard-open-candidate']");
-        if (!link) return;
-        event.preventDefault();
-        var id = link.getAttribute("data-id");
-        if (!id) return;
-        if (typeof IERouter !== "undefined" && IERouter && typeof IERouter.navigateTo === "function" && window.IEPortal && window.IEPortal.links) {
-          IERouter.navigateTo(window.IEPortal.links.candidateView(id));
+        var target = event.target;
+        var previewBtn = target.closest("[data-action='dashboard-preview-candidate']");
+        var approveBtn = target.closest("[data-action='dashboard-approve-candidate']");
+        var rejectBtn = target.closest("[data-action='dashboard-reject-candidate']");
+        var link = target.closest("[data-action='dashboard-open-candidate']");
+        if (previewBtn) {
+          event.preventDefault();
+          event.stopPropagation();
+          var previewId = previewBtn.getAttribute("data-id");
+          var previewRow = previewId ? _dashboardPreviewCache[previewId] : null;
+          if (previewRow) showDashboardCandidatePreview(previewRow, previewBtn);
+          return;
+        }
+        if (approveBtn) {
+          event.preventDefault();
+          event.stopPropagation();
+          var id = approveBtn.getAttribute("data-id");
+          if (!id) return;
+          if (approveBtn.disabled) return;
+          approveBtn.disabled = true;
+          if (window.IESupabase && typeof window.IESupabase.updateCandidateProfileStatus === "function") {
+            window.IESupabase.updateCandidateProfileStatus(id, "approved").then(function (result) {
+              if (result && !result.error) {
+                initDashboardPage();
+              } else {
+                approveBtn.disabled = false;
+              }
+            }).catch(function () { approveBtn.disabled = false; });
+          } else {
+            approveBtn.disabled = false;
+          }
+          return;
+        }
+        if (rejectBtn) {
+          event.preventDefault();
+          event.stopPropagation();
+          var idR = rejectBtn.getAttribute("data-id");
+          if (!idR) return;
+          if (rejectBtn.disabled) return;
+          rejectBtn.disabled = true;
+          if (window.IESupabase && typeof window.IESupabase.updateCandidateProfileStatus === "function") {
+            window.IESupabase.updateCandidateProfileStatus(idR, "rejected").then(function (result) {
+              if (result && !result.error) {
+                initDashboardPage();
+              } else {
+                rejectBtn.disabled = false;
+              }
+            }).catch(function () { rejectBtn.disabled = false; });
+          } else {
+            rejectBtn.disabled = false;
+          }
+          return;
+        }
+        if (link) {
+          event.preventDefault();
+          var idL = link.getAttribute("data-id");
+          if (!idL) return;
+          if (typeof IERouter !== "undefined" && IERouter && typeof IERouter.navigateTo === "function" && window.IEPortal && window.IEPortal.links) {
+            IERouter.navigateTo(window.IEPortal.links.candidateView(idL));
+          }
+          return;
+        }
+        var row = target.closest("tr[data-entity='candidate'][data-id]");
+        if (row) {
+          var rowId = row.getAttribute("data-id");
+          if (rowId && typeof IERouter !== "undefined" && IERouter && typeof IERouter.navigateTo === "function" && window.IEPortal && window.IEPortal.links) {
+            IERouter.navigateTo(window.IEPortal.links.candidateView(rowId));
+          }
         }
       });
-      tbody.__ieDashboardRecentBound = true;
+      tbody.__ieDashboardPendingReviewBound = true;
     }
   }
 
@@ -539,8 +688,21 @@
     }
     const statusParam = params.get("status");
     if (statusParam && statusSelect) {
-      filters.status = statusParam;
-      statusSelect.value = statusParam;
+      var normalizedParam = statusParam === "new" ? "pending_review" : statusParam;
+      filters.status = normalizedParam;
+      statusSelect.value = normalizedParam;
+    }
+
+    const pendingReviewBanner = document.querySelector("[data-ie-pending-review-banner]");
+    const pendingReviewShortcut = document.querySelector("[data-ie-pending-review-shortcut]");
+
+    function showPendingReviewBanner() {
+      if (!pendingReviewBanner) return;
+      if (filters.status === "pending_review") {
+        pendingReviewBanner.classList.remove("hidden");
+      } else {
+        pendingReviewBanner.classList.add("hidden");
+      }
     }
 
     function showOfferFilterBanner() {
@@ -591,7 +753,33 @@
       statusSelect.addEventListener("change", function () {
         filters.status = this.value || "";
         currentPage = 1;
+        showPendingReviewBanner();
         renderCandidates();
+      });
+    }
+
+    const clearPendingReviewBtn = document.querySelector("[data-action='clear-pending-review-filter']");
+    if (clearPendingReviewBtn) {
+      clearPendingReviewBtn.addEventListener("click", function () {
+        filters.status = "";
+        if (statusSelect) statusSelect.value = "";
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.delete("status");
+        const newUrl =
+          window.location.pathname +
+          (urlParams.toString() ? "?" + urlParams.toString() : "") +
+          window.location.hash;
+        window.history.replaceState({}, "", newUrl);
+        pendingReviewBanner && pendingReviewBanner.classList.add("hidden");
+        currentPage = 1;
+        renderCandidates();
+      });
+    }
+
+    if (pendingReviewShortcut && window.IERouter && typeof window.IERouter.navigateTo === "function") {
+      pendingReviewShortcut.addEventListener("click", function (e) {
+        e.preventDefault();
+        window.IERouter.navigateTo("candidates", { status: "pending_review" });
       });
     }
     if (sourceSelect) {
@@ -644,6 +832,7 @@
     if (hasOfferFilter) {
       showOfferFilterBanner();
     }
+    showPendingReviewBanner();
 
     tbody.addEventListener("click", function (event) {
       const cvBtn = event.target.closest("[data-action='view-cv']");
@@ -762,18 +951,14 @@
           : row.client_name || null;
         const latestAssoc = row.latest_association || null;
         const availability = row.availability || "available";
-        var availabilityBadgeClass = "";
-        switch (availability) {
-          case "working":
-            availabilityBadgeClass = "badge-hired";
-            break;
-          case "in_process":
-            availabilityBadgeClass = "badge-applied";
-            break;
-          default:
-            availabilityBadgeClass = "badge-open";
-            break;
-        }
+        const availabilityLabel =
+          window.IEStatusRuntime && typeof window.IEStatusRuntime.formatAvailabilityLabel === "function"
+            ? window.IEStatusRuntime.formatAvailabilityLabel(availability)
+            : (availability === "working" ? "Working" : availability === "in_process" ? "In process" : "Available");
+        const availabilityBadgeClass =
+          window.IEStatusRuntime && typeof window.IEStatusRuntime.getAvailabilityBadgeClass === "function"
+            ? window.IEStatusRuntime.getAvailabilityBadgeClass(availability)
+            : (availability === "working" ? "badge-hired" : availability === "in_process" ? "badge-inprogress" : "badge-open");
         const sourceLabel = (row.source || "").toUpperCase();
         const createdDate = row.created_at
           ? new Date(row.created_at).toLocaleDateString("it-IT")
@@ -835,10 +1020,10 @@
             (row.address || "—"),
             '<span class="badge ' +
               availabilityBadgeClass +
-              '">' +
+              '" title="Availability">' +
               (window.escapeHtml
-                ? window.escapeHtml(availability)
-                : availability) +
+                ? window.escapeHtml(availabilityLabel)
+                : availabilityLabel) +
               "</span>",
             '<span class="ie-text-muted text-xs font-medium">' + (window.escapeHtml ? window.escapeHtml(sourceLabel || "—") : (sourceLabel || "—")) + "</span>",
             '<span class="ie-table-cell--date">' + (window.escapeHtml ? window.escapeHtml(createdDate) : createdDate) + "</span>",
@@ -1317,6 +1502,13 @@
     const candidateInput = document.querySelector('[data-filter="application-candidate"]');
     const dateFromInput = document.querySelector('[data-filter="application-date-from"]');
     const dateToInput = document.querySelector('[data-filter="application-date-to"]');
+
+    var applicationsParams = new URLSearchParams(window.location.search);
+    var statusParam = applicationsParams.get("status");
+    if (statusParam && statusSelect) {
+      filters.status = statusParam;
+      statusSelect.value = statusParam;
+    }
 
     function getApplicationStatusBadgeClass(status) {
       if (window.IEStatusRuntime && typeof window.IEStatusRuntime.getApplicationStatusBadgeClass === "function") {
