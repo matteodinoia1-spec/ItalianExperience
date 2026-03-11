@@ -323,7 +323,7 @@
   /**
    * Search available, non-archived candidates for association.
    * Primary source of truth for operational availability is availability_status.
-   * Excludes candidates with status = 'hired'.
+   * Hired candidates are not excluded; they may be added to another job offer.
    * @param {object} opts - { term: string, limit?: number, clientId?: string | null, jobOfferId?: string | null }
    * @returns {Promise<{ data: array, error: object | null }>}
    */
@@ -357,7 +357,6 @@
         )
         .or("is_archived.is.null,is_archived.eq.false")
         .eq("availability_status", "available")
-        .not("status", "eq", "hired")
         .order("first_name", { ascending: true })
         .order("last_name", { ascending: true })
         .limit(limit);
@@ -929,24 +928,6 @@
           error
         );
         return { data: null, error: error };
-      }
-
-      // Sync candidate status when hired (pipeline logic only; do not change)
-      if (status === "hired" && oldRow.candidate_id) {
-        var candUpdateResult = await supabase
-          .from("candidates")
-          .update({ status: "hired" })
-          .eq("id", oldRow.candidate_id);
-        var candidateUpdateError = candUpdateResult
-          ? candUpdateResult.error
-          : null;
-
-        if (candidateUpdateError) {
-          console.error(
-            "[Supabase] Failed to sync candidate status to hired:",
-            candidateUpdateError.message
-          );
-        }
       }
 
       // Recalculate candidate availability based on all associations.

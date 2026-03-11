@@ -71,7 +71,7 @@
                                 </div>
                                 <div class="md:col-span-2">
                                     <label class="form-label">LinkedIn</label>
-                                    <input type="url" name="linkedin_url" class="form-input">
+                                    <input type="text" name="linkedin_url" class="form-input" placeholder="Profile URL or reference">
                                 </div>
                             </div>
                         </div>
@@ -85,17 +85,17 @@
                                     <input type="text" name="position" placeholder="e.g. Senior Sommelier" class="form-input">
                                 </div>
                                 <div>
-                                    <label class="form-label">Status</label>
+                                    <label class="form-label">Profile Status</label>
                                     <select name="status" class="form-input appearance-none">
-                                        <option value="new">New</option>
-                                        <option value="interview">Interview</option>
-                                        <option value="hired">Hired</option>
+                                        <option value="approved" selected>Approved</option>
+                                        <option value="pending_review">Pending Review</option>
                                         <option value="rejected">Rejected</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="form-label">Source</label>
                                     <select name="source" class="form-input appearance-none">
+                                        <option value="">Select source</option>
                                         <option value="linkedin">LinkedIn</option>
                                         <option value="email">Email</option>
                                         <option value="facebook">Facebook</option>
@@ -422,8 +422,10 @@
                             </div>
                         </div>
 
-                        <!-- Activity placeholder -->
-                        <div id="activity-container"></div>
+                        <!-- Activity: visible on view only; hidden on edit -->
+                        <div id="candidate-activity-section-wrap">
+                            <div id="activity-container"></div>
+                        </div>
 
                     </div>
 

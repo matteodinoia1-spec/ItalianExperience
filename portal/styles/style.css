@@ -55,6 +55,18 @@ textarea {
   --ie-radius-pill: 999px;
 }
 
+/* Pending profile approval cue: soft, non-alarming workflow prompt (candidate page) */
+.pending-review-cue {
+  background: var(--ie-color-accent-soft);
+  border: 1px solid rgba(197, 160, 89, 0.28);
+}
+
+/* Dashboard pending-review queue: lightweight candidate preview popover */
+.ie-dashboard-preview-popover {
+  z-index: 100;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+}
+
 /* ------------------------------ Base Text ------------------------------- */
 
 body {

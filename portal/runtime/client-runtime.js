@@ -218,12 +218,19 @@
         });
       }
 
-      if (window.ActivitySection && typeof window.ActivitySection.init === "function") {
-        window.ActivitySection.init({
-          entityType: "client",
-          entityId: clientId,
-          container: document.getElementById("activity-container"),
-        });
+      var activityWrap = document.getElementById("client-activity-section-wrap");
+      var activityContainer = document.getElementById("activity-container");
+      if (effectiveMode === "edit") {
+        if (activityWrap) activityWrap.style.display = "none";
+      } else {
+        if (activityWrap) activityWrap.style.display = "";
+        if (window.ActivitySection && typeof window.ActivitySection.init === "function" && activityContainer) {
+          window.ActivitySection.init({
+            entityType: "client",
+            entityId: clientId,
+            container: activityContainer,
+          });
+        }
       }
     });
   }

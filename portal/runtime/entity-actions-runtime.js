@@ -44,7 +44,16 @@
     const last_name = (formData.get("last_name") || "").toString().trim();
     const position = (formData.get("position") || "").toString().trim();
     const address = (formData.get("address") || "").toString().trim();
-    const status = (formData.get("status") || "new").toString();
+    // Manual portal creation: default profile status to approved (external/intake defaults to pending_review in data layer).
+    var rawStatus = (formData.get("status") || "").toString().trim();
+    var defaultStatus = "approved";
+    var status = rawStatus
+      ? (window.IEStatusRuntime && typeof window.IEStatusRuntime.normalizeProfileStatusFromLegacy === "function"
+          ? window.IEStatusRuntime.normalizeProfileStatusFromLegacy(rawStatus)
+          : rawStatus)
+      : defaultStatus;
+    // Do not persist archived as profile status; use rejected for backward compatibility
+    if (status === "archived") status = "rejected";
     const notes = (formData.get("notes") || "").toString();
     const source = (formData.get("source") || "").toString();
 
@@ -298,12 +307,18 @@
         ? window.IECandidateProfileRuntime.collectCandidateProfileData(form)
         : {};
 
+    var rawStatusEdit = (formData.get("status") || "pending_review").toString();
+    var normalizedStatusEdit = (window.IEStatusRuntime && typeof window.IEStatusRuntime.normalizeProfileStatusFromLegacy === "function")
+      ? window.IEStatusRuntime.normalizeProfileStatusFromLegacy(rawStatusEdit)
+      : rawStatusEdit;
+    // Do not persist archived as profile status; use rejected for backward compatibility
+    if (normalizedStatusEdit === "archived") normalizedStatusEdit = "rejected";
     const payload = {
       first_name: (formData.get("first_name") || "").toString().trim(),
       last_name: (formData.get("last_name") || "").toString().trim(),
       address: (formData.get("address") || "").toString().trim(),
       position: (formData.get("position") || "").toString().trim(),
-      status: (formData.get("status") || "new").toString(),
+      status: normalizedStatusEdit,
       source: (formData.get("source") || "").toString(),
       notes: (formData.get("notes") || "").toString(),
       email: profile.email || null,

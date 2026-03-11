@@ -50,20 +50,20 @@
                     <p class="text-3xl font-bold serif text-[#1b4332]" data-dashboard-value="activeJobOffers" data-dashboard-loading><span class="dashboard-value">—</span></p>
                 </div>
 
-                <div class="glass-card ie-card dashboard-metric clickable p-6 rounded-2xl" onclick="IERouter.navigateTo('candidates', { status: 'new' })" role="button" tabindex="0">
+                <div class="glass-card ie-card dashboard-metric clickable p-6 rounded-2xl" onclick="IERouter.navigateTo('candidates', { status: 'pending_review' })" role="button" tabindex="0">
                     <div class="flex justify-between items-start mb-4">
                         <div class="p-3 bg-blue-50 rounded-xl text-blue-600">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                             </svg>
                         </div>
-                        <span class="dashboard-percentage text-xs font-bold" data-dashboard-percentage="newCandidatesToday">—</span>
+                        <span class="dashboard-percentage text-xs font-bold" data-dashboard-percentage="pendingReviewCount">—</span>
                     </div>
-                    <h3 class="ie-label-caps mb-1">New candidates</h3>
-                    <p class="text-3xl font-bold serif text-[#1b4332]" data-dashboard-value="newCandidatesToday" data-dashboard-loading><span class="dashboard-value">—</span></p>
+                    <h3 class="ie-label-caps mb-1">Pending Review</h3>
+                    <p class="text-3xl font-bold serif text-[#1b4332]" data-dashboard-value="pendingReviewCount" data-dashboard-loading><span class="dashboard-value">—</span></p>
                 </div>
 
-                <div class="glass-card ie-card dashboard-metric clickable p-6 rounded-2xl" onclick="IERouter.navigateTo('candidates', { status: 'hired' })" role="button" tabindex="0">
+                <div class="glass-card ie-card dashboard-metric clickable p-6 rounded-2xl" onclick="IERouter.navigateTo('applications', { status: 'hired' })" role="button" tabindex="0">
                     <div class="flex justify-between items-start mb-4">
                         <div class="p-3 bg-purple-50 rounded-xl text-purple-600">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -80,10 +80,13 @@
             <!-- Table and Distribution -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
-                <!-- Recent Candidates Table -->
+                <!-- Pending Review Queue (profile approval to-do list) -->
                 <div class="lg:col-span-2 glass-card ie-card rounded-2xl overflow-hidden">
                     <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white/50">
-                        <h2 class="ie-section-title">Recent candidates</h2>
+                        <div>
+                            <h2 class="ie-section-title">Pending review</h2>
+                            <p class="text-sm text-gray-500 mt-0.5">Candidates awaiting an approval decision.</p>
+                        </div>
                         <button data-action="view-all-candidates" class="ie-btn ie-btn-primary">View all</button>
                     </div>
                     <div class="overflow-x-auto">
@@ -93,11 +96,12 @@
                                     <th class="ie-table-th">Name</th>
                                     <th class="ie-table-th">Desired role</th>
                                     <th class="ie-table-th">Date</th>
-                                    <th class="ie-table-th">Status</th>
+                                    <th class="ie-table-th">Profile Status</th>
+                                    <th class="ie-table-th ie-table-actions">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-100" data-dashboard="recentCandidates">
-                                <tr data-dashboard-placeholder><td colspan="4" class="px-6 py-8 text-center text-gray-400">Loading...</td></tr>
+                            <tbody class="divide-y divide-gray-100" data-dashboard="pendingReviewQueue">
+                                <tr data-dashboard-placeholder><td colspan="5" class="px-6 py-8 text-center text-gray-400">Loading...</td></tr>
                             </tbody>
                         </table>
                     </div>

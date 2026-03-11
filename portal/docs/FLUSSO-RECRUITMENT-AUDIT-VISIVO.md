@@ -8,7 +8,7 @@ Documento di riferimento per disegnare il processo (diagrammi di flusso, swimlan
 
 | Entità | Tabella DB | Colonne stato | Significato |
 |--------|------------|---------------|-------------|
-| **Candidato** | `candidates` | `status` | Stato pipeline globale: New / Interview / Hired / Rejected |
+| **Candidato** | `candidates` | `status` | Stato **profilo** (ciclo vita): Pending Review / Approved / Rejected / Archived (non pipeline) |
 | **Candidato** | `candidates` | `availability_status` | Disponibilità: `available` \| `unavailable` (derivato, ricalcolato) |
 | **Candidato** | `candidates` | `is_archived` | Archiviato sì/no (lista attivi vs archived) |
 | **Offerta** | `job_offers` | `status` | Ciclo vita: open / inprogress / active / closed / archived |
@@ -53,17 +53,18 @@ Documento di riferimento per disegnare il processo (diagrammi di flusso, swimlan
 
 ## 3. Stati candidato – `candidates.status` e `candidates.availability_status`
 
-### 3.1 `candidates.status` (pipeline candidato)
+### 3.1 `candidates.status` (stato profilo – ciclo vita)
 
 | Valore | Significato |
 |--------|-------------|
-| `new` | Nuovo (default creazione) |
-| `interview` | In colloquio (impostabile a mano) |
-| `hired` | Assunto (sincronizzato quando un’associazione va a hired) |
-| `rejected` | Rifiutato (impostabile a mano) |
+| `pending_review` | In attesa di revisione (default creazione) |
+| `approved` | Profilo approvato, utilizzabile nei workflow di recruitment |
+| `rejected` | Profilo non accettato |
+| `archived` | Nascosto dalle viste attive |
 
-- **Dove si vede:** scheda candidato, sezione “Candidate Information” → campo **Status**.
-- **Quando si aggiorna:** creazione/modifica candidato (select Status); **sync automatico:** quando un’associazione passa a `hired` → `candidates.status` = `hired` per quel candidato.
+- **Dove si vede:** scheda candidato, sezione “Candidate Information” → campo **Profile Status**.
+- **Quando si aggiorna:** solo in creazione/modifica candidato (select Profile Status). **Non** esiste più sync da associazione → hired su `candidates.status`.
+- **Legacy (mappatura runtime):** `new` → pending_review; `interview` / `hired` → approved; `rejected` → rejected.
 
 ### 3.2 `candidates.availability_status` (disponibilità)
 
@@ -122,11 +123,11 @@ La creazione **non** modifica `candidates.status` né `job_offers.status`. Solo 
 | Step | Azione | Effetto |
 |------|--------|---------|
 | 1 | `updateCandidateAssociationStatus(associationId, newStatus)` | `candidate_job_associations.status` = newStatus |
-| 2 | Se newStatus === `hired`: | `candidates.status` = `hired` (sync) |
+| 2 | (Nessun update su candidates.status) | Lo stato profilo non viene più sincronizzato con hired |
 | 3 | Sempre | `recalculateCandidateAvailability(candidate_id)` → aggiorna `candidates.availability_status` |
 | 4 | Sempre | `syncJobOfferStatusFromHired(job_offer_id)` → se hired_count >= positions_required, offerta → closed e altre associazioni → not_selected, poi ricalcolo availability per quei candidati |
 
-Quindi: **un solo** cambio stato candidatura può aggiornare candidato (status + availability) e offerta (chiusura + altre candidature + availability di altri candidati).
+Quindi: **un solo** cambio stato candidatura può aggiornare candidato (availability) e offerta (chiusura + altre candidature + availability di altri candidati). Lo stato profilo (`candidates.status`) non viene più modificato.
 
 ### 5.3 Rimozione candidato da offerta (ritiro)
 

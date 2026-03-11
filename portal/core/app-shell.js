@@ -234,7 +234,11 @@
     if (viewAllCandidatesBtn) {
       viewAllCandidatesBtn.addEventListener("click", function (event) {
         event.preventDefault();
-        IERouter.navigateTo("candidates.html");
+        if (IERouter && typeof IERouter.navigateTo === "function") {
+          IERouter.navigateTo("candidates", { status: "pending_review" });
+        } else {
+          window.location.href = "candidates.html?status=pending_review";
+        }
       });
     }
 

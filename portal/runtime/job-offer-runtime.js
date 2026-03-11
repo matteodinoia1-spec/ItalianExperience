@@ -809,12 +809,19 @@
             metadataContainer.innerHTML = "";
           }
 
-          if (window.ActivitySection && typeof window.ActivitySection.init === "function") {
-            window.ActivitySection.init({
-              entityType: "job_offer",
-              entityId: offerId,
-              container: document.getElementById("activity-container"),
-            });
+          var activityWrap = document.getElementById("job-offer-activity-section-wrap");
+          var activityContainer = document.getElementById("activity-container");
+          if (isViewModeForOffer) {
+            if (activityWrap) activityWrap.style.display = "";
+            if (window.ActivitySection && typeof window.ActivitySection.init === "function" && activityContainer) {
+              window.ActivitySection.init({
+                entityType: "job_offer",
+                entityId: offerId,
+                container: activityContainer,
+              });
+            }
+          } else {
+            if (activityWrap) activityWrap.style.display = "none";
           }
 
           if (isViewModeForOffer) {

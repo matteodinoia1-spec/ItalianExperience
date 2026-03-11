@@ -326,6 +326,9 @@
         closeSearchPanel();
       } else {
         closeAddDropdown();
+        if (window.IEHeaderRuntime && typeof window.IEHeaderRuntime.closeCandidatesSubmenu === "function") {
+          window.IEHeaderRuntime.closeCandidatesSubmenu();
+        }
         openSearchPanel();
       }
     });

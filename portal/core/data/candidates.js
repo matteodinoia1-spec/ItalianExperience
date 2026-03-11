@@ -139,7 +139,7 @@
         last_name: payload.last_name || "",
         position: payload.position || null,
         address: payload.address || null,
-        status: payload.status || "new",
+        status: payload.status || "pending_review",
         source: payload.source || null,
         notes: payload.notes || null,
         email: payload.email || null,
@@ -233,7 +233,7 @@
         last_name: payload.last_name ?? "",
         position: payload.position ?? null,
         address: payload.address ?? null,
-        status: payload.status ?? "new",
+        status: payload.status ?? "pending_review",
         source: payload.source ?? null,
         notes: payload.notes ?? null,
         email: payload.email ?? null,
@@ -256,6 +256,38 @@
       return { data, error: null };
     } catch (err) {
       console.error("[Supabase] updateCandidate exception:", err);
+      return { data: null, error: err };
+    }
+  }
+
+  /**
+   * Update only the profile status of a candidate (candidates.status).
+   * Allowed values: pending_review, approved, rejected. Archive is via is_archived lifecycle only.
+   * @param {string} id - candidate id
+   * @param {string} status - one of pending_review, approved, rejected
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function updateCandidateProfileStatus(id, status) {
+    if (!id) return { data: null, error: new Error("Missing id") };
+    var canonical = ["pending_review", "approved", "rejected"].indexOf(String(status).toLowerCase()) !== -1
+      ? String(status).toLowerCase()
+      : null;
+    if (!canonical) return { data: null, error: new Error("Invalid profile status") };
+    try {
+      const updates = await withUpdateAuditFields({ status: canonical });
+      const { data, error } = await supabase
+        .from("candidates")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) {
+        console.error("[Supabase] updateCandidateProfileStatus error:", error.message, error);
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error("[Supabase] updateCandidateProfileStatus exception:", err);
       return { data: null, error: err };
     }
   }
@@ -392,7 +424,17 @@
     let q = supabaseQuery;
     if (filters.archived === "active") q = q.eq("is_archived", false);
     if (filters.archived === "archived") q = q.eq("is_archived", true);
-    if (filters.status) q = q.eq("status", filters.status);
+    if (filters.status) {
+      var statusFilter = filters.status;
+      if (statusFilter === "new") statusFilter = "pending_review";
+      if (statusFilter === "pending_review") {
+        q = q.in("status", ["pending_review", "new"]);
+      } else if (statusFilter === "approved") {
+        q = q.in("status", ["approved", "interview", "hired"]);
+      } else {
+        q = q.eq("status", statusFilter);
+      }
+    }
     if (filters.source) q = q.eq("source", filters.source);
     const nameTerm = (filters.name || "").trim().replace(/,/g, " ");
     if (nameTerm) {
@@ -1523,6 +1565,7 @@
     insertCandidate,
     getCandidateById,
     updateCandidate,
+    updateCandidateProfileStatus,
     archiveCandidate,
     unarchiveCandidate,
     fetchMyCandidates,

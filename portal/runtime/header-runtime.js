@@ -217,7 +217,8 @@
     var links = document.querySelectorAll(".portal-header-nav__link[data-nav-group]");
     links.forEach(function (link) {
       var linkGroup = link.getAttribute("data-nav-group");
-      if (linkGroup && linkGroup === group) {
+      var active = linkGroup && linkGroup === group;
+      if (active) {
         link.classList.add("portal-header-nav__link--active");
         link.setAttribute("aria-current", "page");
       } else {
@@ -235,6 +236,7 @@
     var linkMap = {
       "dashboard.html": "dashboard.html",
       "candidates.html": "candidates.html",
+      "candidates.html?status=pending_review": "candidates.html?status=pending_review",
       "add-candidate.html": "add-candidate.html",
       "job-offers.html": "job-offers.html",
       "add-job-offer.html": "add-job-offer.html",
@@ -262,8 +264,17 @@
     }
   }
 
+  function closeCandidatesSubmenu() {
+    var wrap = document.querySelector("[data-nav-candidates-wrap]");
+    if (wrap) {
+      wrap.classList.remove("portal-header-nav__item-with-sub--open");
+      wrap.setAttribute("aria-expanded", "false");
+    }
+  }
+
   function closeAllMenus() {
     closeUserMenu();
+    closeCandidatesSubmenu();
   }
 
   var headerNavGlobalListenersBound = false;
@@ -276,12 +287,13 @@
       if (!e.target || !e.target.closest) return;
       var insideHeader = e.target.closest(".portal-header");
       var insideUserArea = e.target.closest(".portal-header-user-area");
+      var insideCandidatesWrap = e.target.closest("[data-nav-candidates-wrap]");
       if (!insideHeader) {
         closeAllMenus();
         return;
       }
       if (insideUserArea) return;
-      closeAllMenus();
+      if (!insideCandidatesWrap) closeCandidatesSubmenu();
     });
 
     document.addEventListener("keydown", function (e) {
@@ -344,9 +356,22 @@
     });
   }
 
+  function initCandidatesSubmenu() {
+    var wrap = document.querySelector("[data-nav-candidates-wrap]");
+    var menu = document.querySelector("[data-nav-candidates-menu]");
+    if (!wrap || !menu) return;
+
+    menu.querySelectorAll("[data-nav-submenu-item]").forEach(function (link) {
+      link.addEventListener("click", function () {
+        closeCandidatesSubmenu();
+      });
+    });
+  }
+
   function initHeaderNavBehavior() {
     normalizeHeaderLinks();
     applyHeaderActiveState();
+    initCandidatesSubmenu();
     initUserMenu();
     initHeaderLogout();
     ensureGlobalMenuListeners();
@@ -422,6 +447,7 @@
     getDefaultSubtitle: getDefaultSubtitle,
     getDefaultBreadcrumbs: getDefaultBreadcrumbs,
     applyHeaderActiveState: applyHeaderActiveState,
+    closeCandidatesSubmenu: closeCandidatesSubmenu,
   };
 
   // Ensure header behavior is wired even when the header

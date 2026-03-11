@@ -13,7 +13,75 @@
   "use strict";
 
   // ---------------------------------------------------------------------------
-  // Candidate status
+  // Candidate profile status (candidates.status = profile lifecycle, not pipeline)
+  // ---------------------------------------------------------------------------
+
+  /** Canonical profile statuses (active UI model). Legacy: new→pending_review, interview→approved, hired→approved. Archived is not a profile status; use is_archived lifecycle only. */
+  var PROFILE_STATUS_CANONICAL = ["pending_review", "approved", "rejected"];
+
+  /**
+   * Normalize legacy candidates.status to profile status for display/filter.
+   * @param {string} value - raw value from candidates.status
+   * @returns {string} canonical profile status
+   */
+  function normalizeProfileStatusFromLegacy(value) {
+    if (value == null || value === "") return "pending_review";
+    var s = String(value).trim().toLowerCase();
+    if (s === "new") return "pending_review";
+    if (s === "interview") return "approved";
+    if (s === "hired") return "approved";
+    if (s === "rejected") return "rejected";
+    if (s === "archived") return "archived";
+    if (s === "pending_review" || s === "approved") return s;
+    return "pending_review";
+  }
+
+  function getProfileStatusBadgeClass(status) {
+    var s = normalizeProfileStatusFromLegacy(status);
+    switch (s) {
+      case "pending_review":
+        return "badge-new";
+      case "approved":
+        return "badge-interview";
+      case "rejected":
+        return "badge-rejected";
+      case "archived":
+        return "badge-neutral";
+      default:
+        return "badge-new";
+    }
+  }
+
+  function formatProfileStatusLabel(status) {
+    var s = normalizeProfileStatusFromLegacy(status);
+    switch (s) {
+      case "pending_review":
+        return "Pending Review";
+      case "approved":
+        return "Approved";
+      case "rejected":
+        return "Rejected";
+      case "archived":
+        return "Archived";
+      default:
+        return "Pending Review";
+    }
+  }
+
+  /**
+   * True if candidate profile status is recruitment-usable (only approved profiles).
+   * pending_review, rejected, archived = not usable for recruitment selection.
+   * Uses legacy mapping (interview/hired → approved).
+   * @param {string} status - raw candidates.status
+   * @returns {boolean}
+   */
+  function isCandidateProfileRecruitmentUsable(status) {
+    var s = normalizeProfileStatusFromLegacy(status);
+    return s === "approved";
+  }
+
+  // ---------------------------------------------------------------------------
+  // Candidate status (legacy pipeline-style; use for application context only)
   // ---------------------------------------------------------------------------
 
   function getCandidateStatusBadgeClass(status) {
@@ -87,40 +155,32 @@
     return "new";
   }
 
+  /**
+   * True if candidate has at least one application with status 'hired'.
+   * Based on applications (candidate_job_associations), not candidates.status.
+   */
   function isCandidateHired(candidate) {
-    var s = candidate && candidate.status != null ? String(candidate.status).toLowerCase() : "";
-    return s === "hired";
+    if (!candidate) return false;
+    var assocs = candidate.candidate_job_associations;
+    if (assocs && Array.isArray(assocs)) {
+      return assocs.some(function (a) {
+        return (a && String(a.status || "").toLowerCase()) === "hired";
+      });
+    }
+    var latest = candidate.latest_association;
+    if (latest && latest.status) {
+      return String(latest.status).toLowerCase() === "hired";
+    }
+    return false;
   }
 
-  // Dashboard-only candidate status helpers (legacy, from lists-runtime).
+  // Dashboard/profile: show profile status (with legacy mapping).
   function getDashboardCandidateStatusBadgeClass(status) {
-    switch (status) {
-      case "new":
-        return "badge-new";
-      case "interview":
-        return "badge-interview";
-      case "hired":
-        return "badge-hired";
-      case "rejected":
-        return "badge-rejected";
-      default:
-        return "badge-new";
-    }
+    return getProfileStatusBadgeClass(status);
   }
 
   function formatDashboardCandidateStatusLabel(status) {
-    switch (status) {
-      case "new":
-        return "New";
-      case "interview":
-        return "Interview";
-      case "hired":
-        return "Hired";
-      case "rejected":
-        return "Rejected";
-      default:
-        return status ? String(status) : "New";
-    }
+    return formatProfileStatusLabel(status);
   }
 
   // ---------------------------------------------------------------------------
@@ -350,12 +410,18 @@
   }
 
   window.IEStatusRuntime = {
-    // Candidate
+    // Profile status (candidates.status)
+    PROFILE_STATUS_CANONICAL: PROFILE_STATUS_CANONICAL,
+    normalizeProfileStatusFromLegacy: normalizeProfileStatusFromLegacy,
+    getProfileStatusBadgeClass: getProfileStatusBadgeClass,
+    formatProfileStatusLabel: formatProfileStatusLabel,
+    isCandidateProfileRecruitmentUsable: isCandidateProfileRecruitmentUsable,
+    // Candidate (legacy / application context)
     getCandidateStatusBadgeClass: getCandidateStatusBadgeClass,
     formatCandidateStatusLabel: formatCandidateStatusLabel,
     getEffectiveCandidateStatus: getEffectiveCandidateStatus,
     isCandidateHired: isCandidateHired,
-    // Dashboard candidate
+    // Dashboard candidate (profile status with legacy mapping)
     getDashboardCandidateStatusBadgeClass: getDashboardCandidateStatusBadgeClass,
     formatDashboardCandidateStatusLabel: formatDashboardCandidateStatusLabel,
     // Applications

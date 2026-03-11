@@ -61,36 +61,13 @@
     return String(n);
   }
 
-  function getStatusBadgeClasses(status) {
-    var base =
-      "px-3 py-1 rounded-full text-xs font-semibold border inline-flex items-center justify-center ";
-    switch ((status || "").toString()) {
-      case "new":
-        return (
-          base +
-          "bg-blue-50 text-blue-700 border-blue-100"
-        );
-      case "interview":
-        return (
-          base +
-          "bg-amber-50 text-amber-800 border-amber-100"
-        );
-      case "hired":
-        return (
-          base +
-          "bg-emerald-50 text-emerald-800 border-emerald-100"
-        );
-      case "rejected":
-        return (
-          base +
-          "bg-rose-50 text-rose-800 border-rose-100"
-        );
-      default:
-        return (
-          base +
-          "bg-gray-50 text-gray-700 border-gray-200"
-        );
+  function getProfileStatusBadgeClasses(status) {
+    if (window.IEStatusRuntime && typeof window.IEStatusRuntime.getProfileStatusBadgeClass === "function") {
+      var cls = window.IEStatusRuntime.getProfileStatusBadgeClass(status);
+      var base = "px-3 py-1 rounded-full text-xs font-semibold border inline-flex items-center justify-center badge " + cls;
+      return base;
     }
+    return "px-3 py-1 rounded-full text-xs font-semibold border inline-flex items-center justify-center bg-gray-50 text-gray-700 border-gray-200";
   }
 
   function navigateToCandidates() {
@@ -176,8 +153,7 @@
       window.IEPortal.mountPageHeader();
     }
     setField("position", candidate.position || "");
-    setField("email", candidate.email || "");
-    setField("phone", candidate.phone || "");
+    // Email/phone shown in hero only; not duplicated in Candidate Information card
     setField("linkedin_url", candidate.linkedin_url || "");
     setField("address", candidate.address || "");
     setField("summary", candidate.summary || "");
@@ -187,10 +163,73 @@
     var dobText = candidate.date_of_birth ? formatDate(candidate.date_of_birth) : "";
     setField("date_of_birth", dobText || "");
 
-    // Pipeline status (new / interview / hired / rejected), not availability
-    var pipelineStatus = (candidate.status || "new").toString().toLowerCase();
-    var statusLabels = { new: "New", interview: "Interview", hired: "Hired", rejected: "Rejected" };
-    setField("status-text", statusLabels[pipelineStatus] || pipelineStatus.charAt(0).toUpperCase() + pipelineStatus.slice(1));
+    // Profile status: discreet ribbon in hero top-right (hidden when approved — no need to emphasize)
+    var normalizedStatus =
+      window.IEStatusRuntime && typeof window.IEStatusRuntime.normalizeProfileStatusFromLegacy === "function"
+        ? window.IEStatusRuntime.normalizeProfileStatusFromLegacy(candidate.status)
+        : String(candidate.status || "").toLowerCase();
+    var statusRibbonEl = document.querySelector("[data-field=\"status-ribbon\"]");
+    var heroInner = document.querySelector(".candidate-hero-inner");
+    if (statusRibbonEl) {
+      if (normalizedStatus === "approved") {
+        statusRibbonEl.hidden = true;
+        if (heroInner) heroInner.classList.add("candidate-hero-inner--no-ribbon");
+      } else {
+        statusRibbonEl.hidden = false;
+        if (heroInner) heroInner.classList.remove("candidate-hero-inner--no-ribbon");
+        var profileStatusLabel =
+          window.IEStatusRuntime && typeof window.IEStatusRuntime.formatProfileStatusLabel === "function"
+            ? window.IEStatusRuntime.formatProfileStatusLabel(candidate.status)
+            : (candidate.status || "Pending Review").toString();
+        statusRibbonEl.textContent = profileStatusLabel;
+        var ribbonClass =
+          window.IEStatusRuntime && typeof window.IEStatusRuntime.getProfileStatusBadgeClass === "function"
+            ? window.IEStatusRuntime.getProfileStatusBadgeClass(candidate.status)
+            : "";
+        statusRibbonEl.className =
+          "candidate-hero-status-ribbon absolute top-3 right-3 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-medium border z-10 pointer-events-none " +
+          (ribbonClass ? ribbonClass.replace(/rounded-full|text-xs|px-3|py-1/gi, "").trim() : "bg-gray-100/90 text-gray-600 border-gray-200/80");
+      }
+    }
+
+    // Compact contact in hero: email (mailto), phone, optional source
+    var heroEmailEl = document.querySelector("[data-hero-email]");
+    var heroPhoneEl = document.querySelector("[data-hero-phone]");
+    var heroEmailWrap = document.querySelector("[data-hero-email-wrap]");
+    var heroPhoneWrap = document.querySelector("[data-hero-phone-wrap]");
+    var heroSourceEl = document.querySelector("[data-hero-source]");
+    var heroSourceWrap = document.querySelector("[data-hero-source-wrap]");
+    if (heroEmailEl && heroEmailWrap) {
+      var email = safeString(candidate.email).trim();
+      if (email) {
+        heroEmailEl.href = "mailto:" + email;
+        heroEmailEl.textContent = email;
+        heroEmailWrap.style.display = "";
+      } else {
+        heroEmailEl.textContent = "—";
+        heroEmailEl.removeAttribute("href");
+        heroEmailWrap.style.display = "none";
+      }
+    }
+    if (heroPhoneEl && heroPhoneWrap) {
+      var phone = safeString(candidate.phone).trim();
+      if (phone) {
+        heroPhoneEl.textContent = phone;
+        heroPhoneWrap.style.display = "";
+      } else {
+        heroPhoneEl.textContent = "—";
+        heroPhoneWrap.style.display = "none";
+      }
+    }
+    if (heroSourceEl && heroSourceWrap) {
+      var source = safeString(candidate.source).trim();
+      if (source) {
+        heroSourceEl.textContent = source;
+        heroSourceWrap.style.display = "";
+      } else {
+        heroSourceWrap.style.display = "none";
+      }
+    }
 
     // Buttons
     var editBtn = document.querySelector('[data-action="edit-candidate"]');
@@ -220,22 +259,30 @@
   }
 
   function applyAvailabilityToHeader(availability) {
-    var value = (availability || "available").toString();
-    var badge = document.querySelector('[data-field="status-badge"]');
-    // Only update the hero badge; "Status" in Candidate Information is pipeline status (set in renderCandidateCore)
-    if (badge) {
-      if ("value" in badge) {
-        badge.value = value;
-      } else {
-        badge.textContent = value;
-      }
-      badge.className =
-        "form-input px-3 py-1 rounded-full text-xs font-semibold w-auto inline-block " +
+    var value = (availability || "available").toString().toLowerCase();
+    var label =
+      window.IEStatusRuntime && typeof window.IEStatusRuntime.formatAvailabilityLabel === "function"
+        ? window.IEStatusRuntime.formatAvailabilityLabel(value)
+        : (value === "working" ? "Working" : value === "in_process" ? "In process" : "Available");
+    var dotEl = document.querySelector("[data-availability-dot]");
+    var labelEl = document.querySelector("[data-availability-label]");
+    var pillEl = document.querySelector("[data-availability-pill]");
+    if (labelEl) labelEl.textContent = label;
+    if (dotEl) {
+      dotEl.className = "availability-dot w-2 h-2 rounded-full " +
         (value === "working"
-          ? "bg-emerald-50 text-emerald-800 border border-emerald-100"
+          ? "bg-emerald-500"
           : value === "in_process"
-          ? "bg-amber-50 text-amber-800 border border-amber-100"
-          : "bg-gray-50 text-gray-700 border border-gray-200");
+          ? "bg-amber-500"
+          : "bg-sky-500");
+    }
+    if (pillEl) {
+      pillEl.className = "availability-pill inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border " +
+        (value === "working"
+          ? "bg-emerald-50 text-emerald-800 border-emerald-100"
+          : value === "in_process"
+          ? "bg-amber-50 text-amber-800 border-amber-100"
+          : "bg-sky-50 text-sky-800 border-sky-100");
     }
   }
 
@@ -514,15 +561,151 @@
     }
   }
 
-  function setDerivedAvailabilityFromAssociations(applications) {
-    var label = "Available";
-    if (window.IEPortal && typeof window.IEPortal.computeDerivedAvailability === "function") {
-      var state = window.IEPortal.computeDerivedAvailability(applications);
-      label = window.IEPortal.formatAvailabilityLabel && typeof window.IEPortal.formatAvailabilityLabel === "function"
-        ? window.IEPortal.formatAvailabilityLabel(state)
-        : (state === "working" ? "Working" : state === "in_process" ? "In process" : "Available");
+  /**
+   * Show or hide the pending-review visual cue based on normalized profile status.
+   * Cue is shown only when status is pending_review; hidden for approved, rejected, or legacy archived.
+   */
+  function setPendingReviewCueVisibility(normalizedStatus) {
+    var cueEl = document.getElementById("candidatePendingReviewCue");
+    if (!cueEl) return;
+    var isPending =
+      normalizedStatus != null &&
+      String(normalizedStatus).toLowerCase() === "pending_review";
+    if (isPending) {
+      cueEl.classList.remove("hidden");
+    } else {
+      cueEl.classList.add("hidden");
     }
-    setField("availability-text", label);
+  }
+
+  /**
+   * Returns which profile-status actions to show. Approve/Reject only when pending_review (initial review).
+   * Once approved or rejected, no quick-action buttons; changes via Edit. No profile-status "Archive" (use toolbar is_archived).
+   * @param {string} normalizedStatus - one of pending_review, approved, rejected (legacy: archived)
+   * @returns {{ approve: boolean, reject: boolean }}
+   */
+  function getProfileStatusActionsForStatus(normalizedStatus) {
+    switch (normalizedStatus) {
+      case "pending_review":
+        return { approve: true, reject: true };
+      case "archived":
+        // Legacy: allow Approve/Reject so recruiter can fix without going to Edit
+        return { approve: true, reject: true };
+      case "approved":
+      case "rejected":
+      default:
+        return { approve: false, reject: false };
+    }
+  }
+
+  /**
+   * Renders Approve / Reject Candidate buttons only when profile status is pending_review (initial review).
+   * Updates candidates.status only; does not touch application pipeline or is_archived. No Archive button (use toolbar).
+   */
+  function renderProfileStatusActions(candidateId, currentStatus, onStatusUpdated) {
+    var container = document.getElementById("candidateProfileStatusActions");
+    if (!container) return;
+
+    container.innerHTML = "";
+    var normalized =
+      window.IEStatusRuntime &&
+      typeof window.IEStatusRuntime.normalizeProfileStatusFromLegacy === "function"
+        ? window.IEStatusRuntime.normalizeProfileStatusFromLegacy(currentStatus)
+        : (currentStatus || "pending_review").toString().toLowerCase();
+    var actions = getProfileStatusActionsForStatus(normalized);
+    if (!actions.approve && !actions.reject) return;
+
+    function makeButton(label, newStatus, btnClass) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = btnClass || "ie-btn ie-btn-secondary";
+      btn.textContent = label;
+      return btn;
+    }
+
+    function runUpdate(newStatus, label) {
+      if (
+        !window.IESupabase ||
+        typeof window.IESupabase.updateCandidateProfileStatus !== "function"
+      ) {
+        if (window.IESupabase && window.IESupabase.showError) {
+          window.IESupabase.showError(
+            "Profile status update is not available.",
+            "candidateProfileStatus"
+          );
+        }
+        return Promise.resolve(null);
+      }
+      return window.IESupabase
+        .updateCandidateProfileStatus(candidateId, newStatus)
+        .then(function (result) {
+          if (result && result.error) {
+            if (
+              window.IESupabase &&
+              typeof window.IESupabase.showError === "function"
+            ) {
+              window.IESupabase.showError(
+                result.error.message || "Failed to update profile status.",
+                "candidateProfileStatus"
+              );
+            }
+            return null;
+          }
+          if (
+            window.IESupabase &&
+            typeof window.IESupabase.createAutoLog === "function"
+          ) {
+            window.IESupabase
+              .createAutoLog("candidate", candidateId, {
+                event_type: "system_event",
+                message: "Profile status set to " + label,
+                metadata: null,
+              })
+              .catch(function () {});
+          }
+          if (typeof onStatusUpdated === "function") {
+            onStatusUpdated(newStatus);
+          }
+          return result;
+        });
+    }
+
+    if (actions.approve) {
+      var approveBtn = makeButton(
+        "Approve Candidate",
+        "approved",
+        "ie-btn ie-btn-primary"
+      );
+      approveBtn.addEventListener("click", function () {
+        approveBtn.disabled = true;
+        runUpdate("approved", "Approved").finally(function () {
+          approveBtn.disabled = false;
+        });
+      });
+      container.appendChild(approveBtn);
+    }
+    if (actions.reject) {
+      var rejectBtn = makeButton(
+        "Reject Candidate",
+        "rejected",
+        "ie-btn ie-btn-danger"
+      );
+      rejectBtn.addEventListener("click", function () {
+        rejectBtn.disabled = true;
+        runUpdate("rejected", "Rejected").finally(function () {
+          rejectBtn.disabled = false;
+        });
+      });
+      container.appendChild(rejectBtn);
+    }
+  }
+
+  function setDerivedAvailabilityFromAssociations(applications) {
+    var state = "available";
+    if (window.IEPortal && typeof window.IEPortal.computeDerivedAvailability === "function") {
+      state = window.IEPortal.computeDerivedAvailability(applications);
+    }
+    applyAvailabilityToHeader(state);
   }
 
   async function renderAssociatedOffers(candidateId) {
@@ -612,13 +795,17 @@
         tdStatus.className = "px-4 py-2 align-top";
         var rawStatus = (assoc && assoc.status) || (offer && offer.status) || "";
         var badge = document.createElement("span");
-        if (window.IEPortal && typeof window.IEPortal.getApplicationStatusBadgeClass === "function") {
+        if (window.IEStatusRuntime && typeof window.IEStatusRuntime.getApplicationStatusBadgeClass === "function") {
+          var normalized = window.IEStatusRuntime.normalizeApplicationStatusForDisplay(rawStatus || "applied");
+          badge.className = "badge " + window.IEStatusRuntime.getApplicationStatusBadgeClass(normalized);
+          badge.textContent = window.IEStatusRuntime.formatApplicationStatusLabel(normalized);
+        } else if (window.IEPortal && typeof window.IEPortal.getApplicationStatusBadgeClass === "function") {
           var normalized = window.IEPortal.normalizeApplicationStatusForDisplay(rawStatus || "applied");
           badge.className = "badge " + window.IEPortal.getApplicationStatusBadgeClass(normalized);
           badge.textContent = window.IEPortal.formatApplicationStatusLabel(normalized);
         } else {
-          badge.className = getStatusBadgeClasses(rawStatus || "new");
-          badge.textContent = rawStatus || "new";
+          badge.className = "badge badge-applied";
+          badge.textContent = rawStatus || "Applied";
         }
         tdStatus.appendChild(badge);
 
@@ -898,6 +1085,52 @@
           onReopen: onReopen,
         });
       }
+
+      // Profile status actions (Approve / Reject / Archive) — update candidates.status only
+      var currentProfileStatus = candidate.status || "pending_review";
+      var normalizedProfileStatus =
+        window.IEStatusRuntime &&
+        typeof window.IEStatusRuntime.normalizeProfileStatusFromLegacy === "function"
+          ? window.IEStatusRuntime.normalizeProfileStatusFromLegacy(currentProfileStatus)
+          : String(currentProfileStatus).toLowerCase();
+      setPendingReviewCueVisibility(normalizedProfileStatus);
+
+      function onProfileStatusUpdated(newStatus) {
+        currentProfileStatus = newStatus;
+        var normalizedNew =
+          window.IEStatusRuntime &&
+          typeof window.IEStatusRuntime.normalizeProfileStatusFromLegacy === "function"
+            ? window.IEStatusRuntime.normalizeProfileStatusFromLegacy(newStatus)
+            : String(newStatus).toLowerCase();
+        setPendingReviewCueVisibility(normalizedNew);
+        // Update hero status ribbon and inner padding (hidden when approved — no reserved space)
+        var statusRibbonEl = document.querySelector("[data-field=\"status-ribbon\"]");
+        var heroInner = document.querySelector(".candidate-hero-inner");
+        if (statusRibbonEl) {
+          if (normalizedNew === "approved") {
+            statusRibbonEl.hidden = true;
+            if (heroInner) heroInner.classList.add("candidate-hero-inner--no-ribbon");
+          } else {
+            statusRibbonEl.hidden = false;
+            if (heroInner) heroInner.classList.remove("candidate-hero-inner--no-ribbon");
+            var profileStatusLabel =
+              window.IEStatusRuntime &&
+              typeof window.IEStatusRuntime.formatProfileStatusLabel === "function"
+                ? window.IEStatusRuntime.formatProfileStatusLabel(newStatus)
+                : String(newStatus);
+            statusRibbonEl.textContent = profileStatusLabel;
+            var ribbonClass =
+              window.IEStatusRuntime && typeof window.IEStatusRuntime.getProfileStatusBadgeClass === "function"
+                ? window.IEStatusRuntime.getProfileStatusBadgeClass(newStatus)
+                : "";
+            statusRibbonEl.className =
+              "candidate-hero-status-ribbon absolute top-3 right-3 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-medium border z-10 pointer-events-none " +
+              (ribbonClass ? ribbonClass.replace(/rounded-full|text-xs|px-3|py-1/gi, "").trim() : "bg-gray-100/90 text-gray-600 border-gray-200/80");
+          }
+        }
+        renderProfileStatusActions(candidateId, newStatus, onProfileStatusUpdated);
+      }
+      renderProfileStatusActions(candidateId, currentProfileStatus, onProfileStatusUpdated);
     } catch (err) {
       console.error("[Candidate] renderEntityToolbar error:", err);
     }
