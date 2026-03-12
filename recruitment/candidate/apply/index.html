@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Apply | Candidate Journey | Italian Experience</title>
+
+  <meta name="description" content="Submit your application as a candidate for Italian Experience Recruitment. Two-step profile with professional details, skills, and experience." />
+  <meta name="robots" content="index, follow" />
+
+  <link rel="canonical" href="https://www.italianexp.com/recruitment/candidate/apply/" />
+
+  <link rel="stylesheet" href="/ItalianExperience/assets/css/tailwind.css" />
+  <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
+  <link rel="stylesheet" href="/ItalianExperience/assets/css/cookie-banner.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700&family=Inter:wght@300;400;600&family=Great+Vibes&family=Montserrat:wght@900&display=swap" />
+
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--brand-obsidian, #020617);
+      color: #fff;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .apply-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .apply-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(3rem, 7vw, 5rem) 1.5rem;
+    }
+
+    .apply-card {
+      width: 100%;
+      max-width: 960px;
+      background: rgba(10, 10, 10, 0.72);
+      backdrop-filter: blur(22px);
+      border-radius: var(--radius-premium, 28px);
+      border: 1px solid rgba(197, 160, 89, 0.18);
+      box-shadow: 0 38px 120px rgba(0, 0, 0, 0.65);
+      padding: clamp(1.8rem, 4vw, 2.5rem);
+    }
+
+    .apply-header-eyebrow {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      color: var(--brand-gold, #c5a059);
+      margin-bottom: 0.9rem;
+    }
+
+    .apply-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 3vw, 2.4rem);
+      line-height: 1.1;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .apply-subtitle {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.7);
+      max-width: 40rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .apply-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 1.75rem;
+    }
+
+    @media (max-width: 900px) {
+      .apply-main {
+        padding-inline: 1.25rem;
+      }
+
+      .apply-card {
+        padding-inline: 1.5rem;
+        padding-block: 1.75rem 1.9rem;
+        border-radius: 22px;
+      }
+
+      .apply-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .apply-main {
+        padding-inline: 1rem;
+      }
+
+      .apply-card {
+        padding-inline: 1.25rem;
+        border-radius: 20px;
+      }
+    }
+
+    .apply-step-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .apply-steps-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.28em;
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    .apply-steps-badges {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+    }
+
+    .apply-step-pill {
+      padding: 0.18rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: rgba(148, 163, 184, 0.95);
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .apply-step-pill--active {
+      border-color: var(--brand-gold, #c5a059);
+      color: #0f172a;
+      background: linear-gradient(135deg, #facc6b, #c5a059);
+      font-weight: 600;
+    }
+
+    .apply-progress {
+      position: relative;
+      width: 100%;
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      overflow: hidden;
+    }
+
+    .apply-progress-bar {
+      position: absolute;
+      inset: 0;
+      width: 50%;
+      background: linear-gradient(to right, var(--brand-gold, #c5a059), rgba(248, 250, 252, 0.9));
+      transform-origin: left center;
+      transition: transform 220ms ease-out;
+    }
+
+    .apply-section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .apply-section-hint {
+      font-size: 0.75rem;
+      color: rgba(148, 163, 184, 0.9);
+      margin-bottom: 1.1rem;
+    }
+
+    .field-group {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem 1.1rem;
+    }
+
+    .field-group--single {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .field-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      color: rgba(148, 163, 184, 0.95);
+    }
+
+    .field-label span {
+      color: rgba(248, 250, 252, 0.9);
+    }
+
+    .field-label-required {
+      color: var(--brand-gold, #c5a059);
+      margin-left: 0.2rem;
+    }
+
+    .field-input,
+    .field-textarea,
+    .field-select {
+      width: 100%;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.85));
+      padding: 0.7rem 0.9rem;
+      font-size: 0.85rem;
+      color: #e5e7eb;
+      outline: none;
+      transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+    }
+
+    .field-input::placeholder,
+    .field-textarea::placeholder {
+      color: rgba(148, 163, 184, 0.75);
+    }
+
+    .field-input:focus,
+    .field-textarea:focus,
+    .field-select:focus {
+      border-color: var(--brand-gold, #c5a059);
+      box-shadow: 0 0 0 1px rgba(197, 160, 89, 0.4);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .field-textarea {
+      min-height: 120px;
+      resize: vertical;
+      border-radius: 18px;
+      line-height: 1.45;
+    }
+
+    .field-hint {
+      font-size: 0.7rem;
+      color: rgba(148, 163, 184, 0.9);
+    }
+
+    .file-input-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .file-pill {
+      font-size: 0.78rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 999px;
+      border: 1px dashed rgba(148, 163, 184, 0.5);
+      color: rgba(209, 213, 219, 0.95);
+    }
+
+    .file-pill-empty {
+      color: rgba(148, 163, 184, 0.75);
+      border-style: dotted;
+    }
+
+    .apply-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.25rem;
+      margin-top: 1.8rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid rgba(15, 23, 42, 0.9);
+    }
+
+    @media (max-width: 640px) {
+      .apply-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+      }
+    }
+
+    .apply-actions-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.75rem;
+      color: rgba(148, 163, 184, 0.9);
+      flex-wrap: wrap;
+    }
+
+    .apply-actions-right {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .btn-ghost {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      padding: 0.55rem 1.1rem;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      background: transparent;
+      color: rgba(209, 213, 219, 0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+      transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease, transform 90ms ease;
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(248, 250, 252, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      color: #f9fafb;
+    }
+
+    .btn-ghost:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.7rem 1.6rem;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.24em;
+      background: linear-gradient(135deg, #facc6b, #c5a059);
+      color: #111827;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      box-shadow: 0 16px 45px rgba(180, 148, 82, 0.35);
+      transition: transform 90ms ease, box-shadow 90ms ease, filter 120ms ease;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.07);
+      box-shadow: 0 22px 55px rgba(180, 148, 82, 0.5);
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 10px 35px rgba(180, 148, 82, 0.45);
+    }
+
+    .btn-file {
+      border-radius: 999px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      background: rgba(15, 23, 42, 0.9);
+      color: rgba(249, 250, 251, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: border-color 120ms ease, background-color 120ms ease, color 120ms ease, transform 80ms ease;
+    }
+
+    .btn-file:hover {
+      border-color: rgba(248, 250, 252, 0.95);
+      background: rgba(15, 23, 42, 1);
+    }
+
+    .btn-file:active {
+      transform: translateY(1px);
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: 0.78rem;
+      color: rgba(209, 213, 219, 0.95);
+      line-height: 1.5;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      margin-top: 0.1rem;
+      width: 0.95rem;
+      height: 0.95rem;
+      border-radius: 0.3rem;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      background: rgba(15, 23, 42, 0.9);
+      cursor: pointer;
+    }
+
+    .checkbox-row a {
+      color: var(--brand-gold, #c5a059);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .apply-errors {
+      margin-bottom: 1.1rem;
+      padding: 0.7rem 0.85rem;
+      border-radius: 0.9rem;
+      background: rgba(153, 27, 27, 0.08);
+      border: 1px solid rgba(248, 113, 113, 0.5);
+      color: rgb(254, 242, 242);
+      font-size: 0.78rem;
+      display: none;
+    }
+
+    .apply-errors ul {
+      margin: 0.15rem 0 0 1rem;
+      padding: 0;
+      list-style: disc;
+    }
+
+    .apply-errors strong {
+      font-weight: 600;
+    }
+
+    .apply-success {
+      display: none;
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+      color: rgba(34, 197, 94, 0.95);
+    }
+
+    .honeypot-group {
+      position: absolute;
+      left: -9999px;
+      top: auto;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+  <div id="site-header"></div>
+
+  <div class="apply-shell">
+    <main class="apply-main">
+      <section class="apply-card" aria-label="Application form">
+        <header>
+          <div class="apply-header-eyebrow">Italian Experience · Recruitment</div>
+          <h1 class="apply-title">Submit your application</h1>
+          <p class="apply-subtitle">
+            Share your profile with our recruitment team. We review every submission with care and will contact you if there is a strong alignment with our open searches.
+          </p>
+        </header>
+
+        <div class="apply-step-indicator" aria-hidden="true">
+          <div class="apply-steps-label">Two-step application</div>
+          <div class="apply-steps-badges">
+            <span id="pillStep1" class="apply-step-pill apply-step-pill--active">1. Personal</span>
+            <span id="pillStep2" class="apply-step-pill">2. Profile</span>
+          </div>
+        </div>
+        <div class="apply-progress" aria-hidden="true">
+          <div id="stepProgressBar" class="apply-progress-bar"></div>
+        </div>
+
+        <form id="applicationForm" class="mt-6 space-y-6" novalidate>
+          <div id="formErrors" class="apply-errors" role="alert" aria-live="polite"></div>
+
+          <div class="apply-grid">
+            <!-- Step 1: Personal details -->
+            <div data-step="1">
+              <h2 class="apply-section-title">Step 1 · Personal details</h2>
+              <p class="apply-section-hint">
+                Tell us who you are and how we can reach you. Fields marked with <span class="field-label-required">*</span> are required.
+              </p>
+
+              <div class="field-group">
+                <div class="field">
+                  <label class="field-label" for="first_name">
+                    <span>First name</span><span class="field-label-required">*</span>
+                  </label>
+                  <input
+                    id="first_name"
+                    name="first_name"
+                    type="text"
+                    autocomplete="given-name"
+                    class="field-input"
+                    placeholder="e.g. Alessandro"
+                  />
+                </div>
+
+                <div class="field">
+                  <label class="field-label" for="last_name">
+                    <span>Last name</span><span class="field-label-required">*</span>
+                  </label>
+                  <input
+                    id="last_name"
+                    name="last_name"
+                    type="text"
+                    autocomplete="family-name"
+                    class="field-input"
+                    placeholder="e.g. Rossi"
+                  />
+                </div>
+
+                <div class="field">
+                  <label class="field-label" for="email">
+                    <span>Email</span>
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autocomplete="email"
+                    class="field-input"
+                    placeholder="you@example.com"
+                  />
+                  <p class="field-hint">At least one of email or phone is required.</p>
+                </div>
+
+                <div class="field">
+                  <label class="field-label" for="phone">
+                    <span>Phone</span>
+                  </label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    autocomplete="tel"
+                    class="field-input"
+                    placeholder="+39 ..."
+                  />
+                  <p class="field-hint">Include country code if applying from abroad.</p>
+                </div>
+
+                <div class="field field-group--single">
+                  <label class="field-label" for="linkedin_url">
+                    <span>LinkedIn</span>
+                  </label>
+                  <input
+                    id="linkedin_url"
+                    name="linkedin_url"
+                    type="url"
+                    class="field-input"
+                    placeholder="Profile URL (optional)"
+                  />
+                </div>
+
+                <div class="field field-group--single">
+                  <label class="field-label" for="address">
+                    <span>Current base</span>
+                  </label>
+                  <input
+                    id="address"
+                    name="address"
+                    type="text"
+                    autocomplete="street-address"
+                    class="field-input"
+                    placeholder="City, country"
+                  />
+                </div>
+
+                <div class="field">
+                  <label class="field-label" for="date_of_birth">
+                    <span>Date of birth</span>
+                  </label>
+                  <input
+                    id="date_of_birth"
+                    name="date_of_birth"
+                    type="date"
+                    class="field-input"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2: Professional profile -->
+            <div data-step="2" style="display: none;">
+              <h2 class="apply-section-title">Step 2 · Professional profile</h2>
+              <p class="apply-section-hint">
+                Share a short overview of your professional experience and skills. You can keep this concise for now.
+              </p>
+
+              <div class="field-group field-group--single">
+                <div class="field">
+                  <label class="field-label" for="position">
+                    <span>Target position</span>
+                  </label>
+                  <input
+                    id="position"
+                    name="position"
+                    type="text"
+                    class="field-input"
+                    placeholder="e.g. General Manager, Sommelier, Private Chef"
+                  />
+                </div>
+              </div>
+
+              <div class="field-group field-group--single">
+                <div class="field">
+                  <label class="field-label" for="summary">
+                    <span>Short professional summary</span>
+                  </label>
+                  <textarea
+                    id="summary"
+                    name="summary"
+                    class="field-textarea"
+                    placeholder="A short paragraph about your background, specialisations, and type of properties or environments where you thrive."
+                  ></textarea>
+                </div>
+              </div>
+
+              <!-- Experience (repeatable) -->
+              <div class="field-group field-group--single">
+                <div class="field">
+                  <div class="apply-section-title">Experience</div>
+                  <p class="field-hint">
+                    Add your most relevant positions. Start with your current or most recent role.
+                  </p>
+                  <div id="experienceEntries" class="space-y-3"></div>
+                  <button id="btnAddExperience" type="button" class="btn-ghost" style="margin-top: 0.75rem;">
+                    <span aria-hidden="true">＋</span>
+                    <span>Add experience</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Education (repeatable) -->
+              <div class="field-group field-group--single">
+                <div class="field">
+                  <div class="apply-section-title">Education</div>
+                  <p class="field-hint">
+                    Add formal education or key training programs that are relevant to your profile.
+                  </p>
+                  <div id="educationEntries" class="space-y-3"></div>
+                  <button id="btnAddEducation" type="button" class="btn-ghost" style="margin-top: 0.75rem;">
+                    <span aria-hidden="true">＋</span>
+                    <span>Add education</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Languages (repeatable) -->
+              <div class="field-group field-group--single">
+                <div class="field">
+                  <div class="apply-section-title">Languages</div>
+                  <p class="field-hint">
+                    List the languages you are comfortable working in and your level.
+                  </p>
+                  <div id="languageEntries" class="space-y-3"></div>
+                  <button id="btnAddLanguage" type="button" class="btn-ghost" style="margin-top: 0.75rem;">
+                    <span aria-hidden="true">＋</span>
+                    <span>Add language</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Certifications (repeatable) -->
+              <div class="field-group field-group--single">
+                <div class="field">
+                  <div class="apply-section-title">Certifications</div>
+                  <p class="field-hint">
+                    Add any professional certifications or relevant awards.
+                  </p>
+                  <div id="certificationEntries" class="space-y-3"></div>
+                  <button id="btnAddCertification" type="button" class="btn-ghost" style="margin-top: 0.75rem;">
+                    <span aria-hidden="true">＋</span>
+                    <span>Add certification</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Skills (repeatable simple list) -->
+              <div class="field-group field-group--single">
+                <div class="field">
+                  <div class="apply-section-title">Key skills</div>
+                  <p class="field-hint">
+                    Add key skills or specialties that describe your strengths.
+                  </p>
+                  <div id="skillEntries" class="space-y-3"></div>
+                  <button id="btnAddSkill" type="button" class="btn-ghost" style="margin-top: 0.75rem;">
+                    <span aria-hidden="true">＋</span>
+                    <span>Add skill</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <div class="field">
+                  <label class="field-label" for="cv_file">
+                    <span>Curriculum vitae</span><span class="field-label-required">*</span>
+                  </label>
+                  <div class="file-input-row">
+                    <label for="cv_file" class="btn-file">
+                      <span>Upload CV</span>
+                    </label>
+                    <span id="cvFileLabel" class="file-pill file-pill-empty">No file chosen</span>
+                  </div>
+                  <input
+                    id="cv_file"
+                    name="cv_file"
+                    type="file"
+                    accept=".pdf"
+                    class="hidden"
+                  />
+                  <p class="field-hint">PDF preferred. Required for submission.</p>
+                </div>
+
+                <div class="field">
+                  <label class="field-label" for="photo_file">
+                    <span>Photo</span>
+                  </label>
+                  <div class="file-input-row">
+                    <label for="photo_file" class="btn-file">
+                      <span>Upload photo</span>
+                    </label>
+                    <span id="photoFileLabel" class="file-pill file-pill-empty">Optional</span>
+                  </div>
+                  <input
+                    id="photo_file"
+                    name="photo_file"
+                    type="file"
+                    accept="image/*"
+                    class="hidden"
+                  />
+                  <p class="field-hint">A professional portrait can help our team when reviewing your profile.</p>
+                </div>
+              </div>
+
+              <div class="field-group field-group--single">
+                <div class="field">
+                  <div class="checkbox-row">
+                    <input
+                      id="privacy_consent"
+                      name="privacy_consent"
+                      type="checkbox"
+                      value="yes"
+                    />
+                    <label for="privacy_consent">
+                      I have read and agree to the
+                      <a href="/ItalianExperience/privacy/" target="_blank" rel="noopener">privacy policy</a>.
+                      <span class="field-label-required">*</span>
+                    </label>
+                  </div>
+                  <p class="field-hint">Required for us to process and store your data and contact you about opportunities.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hidden context and placeholder file fields -->
+          <input type="hidden" id="context_submission_type" name="context_submission_type" value="spontaneous" />
+          <input type="hidden" id="context_job_offer_id" name="context_job_offer_id" value="" />
+          <input type="hidden" id="context_source" name="context_source" value="website_public_form" />
+
+          <input type="hidden" id="files_resume_path" name="files_resume_path" value="" />
+          <input type="hidden" id="files_photo_path" name="files_photo_path" value="" />
+
+          <!-- Honeypots (spam protection) -->
+          <div class="honeypot-group" aria-hidden="true">
+            <label>
+              Website
+              <input type="text" name="website" autocomplete="off" tabindex="-1" />
+            </label>
+            <label>
+              Privacy Website
+              <input type="text" name="privacy_website" autocomplete="off" tabindex="-1" />
+            </label>
+          </div>
+
+          <div class="apply-actions">
+            <div class="apply-actions-left">
+              <span>Step <span id="stepCounter">1</span> of 2</span>
+              <span aria-hidden="true">·</span>
+              <span>Approx. 3–4 minutes to complete</span>
+            </div>
+
+            <div class="apply-actions-right">
+              <button id="btnBack" type="button" class="btn-ghost" style="display: none;">
+                <span aria-hidden="true">←</span>
+                <span>Back</span>
+              </button>
+              <button id="btnNext" type="button" class="btn-primary">
+                <span>Next</span>
+                <span aria-hidden="true">→</span>
+              </button>
+              <button id="btnSubmit" type="submit" class="btn-primary" style="display: none;">
+                <span>Submit application</span>
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </div>
+
+          <p id="submitSuccess" class="apply-success">
+            Thank you. Your application payload has been assembled. Integration with our submission endpoint will be added here.
+          </p>
+        </form>
+      </section>
+    </main>
+
+    <div id="site-footer"></div>
+  </div>
+
+  <script>
+    (function () {
+      const form = document.getElementById('applicationForm');
+      const stepElements = {
+        1: form.querySelector('[data-step="1"]'),
+        2: form.querySelector('[data-step="2"]')
+      };
+      const pillStep1 = document.getElementById('pillStep1');
+      const pillStep2 = document.getElementById('pillStep2');
+      const progressBar = document.getElementById('stepProgressBar');
+      const btnBack = document.getElementById('btnBack');
+      const btnNext = document.getElementById('btnNext');
+      const btnSubmit = document.getElementById('btnSubmit');
+      const stepCounter = document.getElementById('stepCounter');
+      const errorsBox = document.getElementById('formErrors');
+      const successBox = document.getElementById('submitSuccess');
+
+      const cvInput = document.getElementById('cv_file');
+      const cvLabel = document.getElementById('cvFileLabel');
+      const photoInput = document.getElementById('photo_file');
+      const photoLabel = document.getElementById('photoFileLabel');
+
+      let currentStep = 1;
+
+      function setFileLabel(fileInput, labelEl, emptyText) {
+        if (!fileInput || !labelEl) return;
+        const file = fileInput.files && fileInput.files[0];
+        if (file) {
+          labelEl.textContent = file.name;
+          labelEl.classList.remove('file-pill-empty');
+        } else {
+          labelEl.textContent = emptyText;
+          labelEl.classList.add('file-pill-empty');
+        }
+      }
+
+      if (cvInput) {
+        cvInput.addEventListener('change', () => {
+          setFileLabel(cvInput, cvLabel, 'No file chosen');
+        });
+      }
+      if (photoInput) {
+        photoInput.addEventListener('change', () => {
+          setFileLabel(photoInput, photoLabel, 'Optional');
+        });
+      }
+
+      function showErrors(messages) {
+        if (!errorsBox) return;
+        if (!messages || messages.length === 0) {
+          errorsBox.style.display = 'none';
+          errorsBox.innerHTML = '';
+          return;
+        }
+
+        const items = messages.map(msg => '<li>' + msg + '</li>').join('');
+        errorsBox.innerHTML = '<strong>Please review the form:</strong><ul>' + items + '</ul>';
+        errorsBox.style.display = 'block';
+      }
+
+      function goToStep(step) {
+        currentStep = step === 2 ? 2 : 1;
+
+        stepElements[1].style.display = currentStep === 1 ? '' : 'none';
+        stepElements[2].style.display = currentStep === 2 ? '' : 'none';
+
+        pillStep1.classList.toggle('apply-step-pill--active', currentStep === 1);
+        pillStep2.classList.toggle('apply-step-pill--active', currentStep === 2);
+
+        progressBar.style.transform = currentStep === 1 ? 'scaleX(1)' : 'scaleX(2)';
+
+        btnBack.style.display = currentStep === 2 ? '' : 'none';
+        btnNext.style.display = currentStep === 1 ? '' : 'none';
+        btnSubmit.style.display = currentStep === 2 ? '' : 'none';
+
+        if (stepCounter) {
+          stepCounter.textContent = String(currentStep);
+        }
+      }
+
+      function trimValue(id) {
+        const el = document.getElementById(id);
+        if (!el) return '';
+        return (el.value || '').trim();
+      }
+
+      function validateStep1() {
+        const messages = [];
+        const firstNameEl = document.getElementById('first_name');
+        const lastNameEl = document.getElementById('last_name');
+        const emailEl = document.getElementById('email');
+        const phoneEl = document.getElementById('phone');
+
+        const firstName = trimValue('first_name');
+        const lastName = trimValue('last_name');
+        const email = trimValue('email');
+        const phone = trimValue('phone');
+
+        if (!firstName) {
+          messages.push('First name is required.');
+        }
+        if (!lastName) {
+          messages.push('Last name is required.');
+        }
+        if (!email && !phone) {
+          messages.push('At least one contact method (email or phone) is required.');
+        }
+
+        if (email && emailEl && !emailEl.checkValidity()) {
+          messages.push('Please provide a valid email address.');
+        }
+
+        const valid = messages.length === 0;
+        let focusField = null;
+        if (!valid) {
+          focusField = firstNameEl && !firstName ? firstNameEl
+            : (lastNameEl && !lastName ? lastNameEl
+              : (emailEl && !email && !phone ? emailEl : null));
+        }
+
+        return { valid, messages, focusField };
+      }
+
+      function validateStep2() {
+        const messages = [];
+        const cvInput = document.getElementById('cv_file');
+        const privacyEl = document.getElementById('privacy_consent');
+
+        const hasCv = cvInput && cvInput.files && cvInput.files.length > 0;
+        if (!hasCv) {
+          messages.push('Please upload your CV (required for this version of the form).');
+        }
+
+        const privacyChecked = privacyEl && privacyEl.checked;
+        if (!privacyChecked) {
+          messages.push('Please provide privacy consent in order to submit your application.');
+        }
+
+        const valid = messages.length === 0;
+        let focusField = null;
+        if (!valid) {
+          focusField = !hasCv && cvInput ? cvInput : (!privacyChecked && privacyEl ? privacyEl : null);
+        }
+        return { valid, messages, focusField };
+      }
+
+      function validateAll() {
+        const step1 = validateStep1();
+        if (!step1.valid) {
+          return { valid: false, step: 1, messages: step1.messages, focusField: step1.focusField };
+        }
+        const step2 = validateStep2();
+        if (!step2.valid) {
+          return { valid: false, step: 2, messages: step2.messages, focusField: step2.focusField };
+        }
+        return { valid: true, step: 2, messages: [], focusField: null };
+      }
+
+      function createInputField(wrapper, labelText, placeholder, options) {
+        const id = options.id;
+        const type = options.type || 'text';
+        const isCheckbox = type === 'checkbox';
+        const field = document.createElement('div');
+        field.className = 'field';
+
+        const label = document.createElement('label');
+        label.className = 'field-label';
+        label.htmlFor = id;
+        label.innerHTML = '<span>' + labelText + '</span>';
+
+        let input;
+        if (options.tag === 'textarea') {
+          input = document.createElement('textarea');
+          input.className = 'field-textarea';
+        } else if (options.tag === 'select') {
+          input = document.createElement('select');
+          input.className = 'field-select';
+          (options.choices || []).forEach(function (choice) {
+            const opt = document.createElement('option');
+            opt.value = choice.value;
+            opt.textContent = choice.label;
+            input.appendChild(opt);
+          });
+        } else {
+          input = document.createElement('input');
+          input.type = type;
+          input.className = isCheckbox ? '' : 'field-input';
+        }
+        input.id = id;
+        if (!isCheckbox && placeholder) {
+          input.placeholder = placeholder;
+        }
+        if (options.datasetKey) {
+          input.setAttribute('data-field', options.datasetKey);
+        }
+
+        if (isCheckbox) {
+          const row = document.createElement('div');
+          row.className = 'checkbox-row';
+          row.appendChild(input);
+          const textLabel = document.createElement('label');
+          textLabel.htmlFor = id;
+          textLabel.textContent = labelText;
+          row.appendChild(textLabel);
+          field.appendChild(row);
+        } else {
+          field.appendChild(label);
+          field.appendChild(input);
+        }
+
+        wrapper.appendChild(field);
+        return input;
+      }
+
+      function createExperienceEntry(index) {
+        const container = document.createElement('div');
+        container.className = 'field-group';
+        container.setAttribute('data-entry', 'experience');
+
+        const metaGroup = document.createElement('div');
+        metaGroup.className = 'field-group field-group--single';
+
+        const row1 = document.createElement('div');
+        row1.className = 'field-group';
+        const row2 = document.createElement('div');
+        row2.className = 'field-group';
+
+        const roleId = 'experience_role_' + index;
+        const companyId = 'experience_company_' + index;
+        const locationId = 'experience_location_' + index;
+        const startId = 'experience_start_' + index;
+        const endId = 'experience_end_' + index;
+        const currentId = 'experience_current_' + index;
+        const descId = 'experience_description_' + index;
+
+        createInputField(row1, 'Role', 'e.g. General Manager', {
+          id: roleId,
+          type: 'text',
+          datasetKey: 'role'
+        });
+        createInputField(row1, 'Company', 'e.g. Boutique Hotel', {
+          id: companyId,
+          type: 'text',
+          datasetKey: 'company'
+        });
+
+        createInputField(row2, 'Location', 'City, country', {
+          id: locationId,
+          type: 'text',
+          datasetKey: 'location'
+        });
+        createInputField(row2, 'Start date', '', {
+          id: startId,
+          type: 'month',
+          datasetKey: 'start_date'
+        });
+
+        const fieldCurrentEnd = document.createElement('div');
+        fieldCurrentEnd.className = 'field';
+        const checkboxRow = document.createElement('div');
+        checkboxRow.className = 'checkbox-row';
+        const currentInput = document.createElement('input');
+        currentInput.type = 'checkbox';
+        currentInput.id = currentId;
+        currentInput.setAttribute('data-field', 'current');
+        const currentLabel = document.createElement('label');
+        currentLabel.htmlFor = currentId;
+        currentLabel.textContent = 'This is my current role';
+        checkboxRow.appendChild(currentInput);
+        checkboxRow.appendChild(currentLabel);
+        fieldCurrentEnd.appendChild(checkboxRow);
+
+        const endField = document.createElement('div');
+        endField.className = 'field';
+        const endLabel = document.createElement('label');
+        endLabel.className = 'field-label';
+        endLabel.htmlFor = endId;
+        endLabel.innerHTML = '<span>End date</span>';
+        const endInput = document.createElement('input');
+        endInput.type = 'month';
+        endInput.id = endId;
+        endInput.className = 'field-input';
+        endInput.setAttribute('data-field', 'end_date');
+        endField.appendChild(endLabel);
+        endField.appendChild(endInput);
+
+        const row3 = document.createElement('div');
+        row3.className = 'field-group';
+        row3.appendChild(fieldCurrentEnd);
+        row3.appendChild(endField);
+
+        const descWrapper = document.createElement('div');
+        descWrapper.className = 'field-group field-group--single';
+        const descField = document.createElement('div');
+        descField.className = 'field';
+        const descLabel = document.createElement('label');
+        descLabel.className = 'field-label';
+        descLabel.htmlFor = descId;
+        descLabel.innerHTML = '<span>Description</span>';
+        const descInput = document.createElement('textarea');
+        descInput.id = descId;
+        descInput.className = 'field-textarea';
+        descInput.placeholder = 'Briefly describe your responsibilities and achievements in this role.';
+        descInput.setAttribute('data-field', 'description');
+        descField.appendChild(descLabel);
+        descField.appendChild(descInput);
+        descWrapper.appendChild(descField);
+
+        metaGroup.appendChild(row1);
+        metaGroup.appendChild(row2);
+        metaGroup.appendChild(row3);
+
+        const actions = document.createElement('div');
+        actions.style.textAlign = 'right';
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn-ghost';
+        removeBtn.innerHTML = '<span aria-hidden="true">✕</span><span>Remove</span>';
+        removeBtn.addEventListener('click', function () {
+          container.remove();
+        });
+        actions.appendChild(removeBtn);
+
+        container.appendChild(metaGroup);
+        container.appendChild(descWrapper);
+        container.appendChild(actions);
+
+        return container;
+      }
+
+      function createEducationEntry(index) {
+        const container = document.createElement('div');
+        container.className = 'field-group';
+        container.setAttribute('data-entry', 'education');
+
+        const row1 = document.createElement('div');
+        row1.className = 'field-group';
+        const row2 = document.createElement('div');
+        row2.className = 'field-group';
+
+        const schoolId = 'education_school_' + index;
+        const degreeId = 'education_degree_' + index;
+        const fieldId = 'education_field_' + index;
+        const locationId = 'education_location_' + index;
+        const startId = 'education_start_' + index;
+        const endId = 'education_end_' + index;
+        const descId = 'education_description_' + index;
+
+        createInputField(row1, 'School / Institution', 'e.g. Hospitality School', {
+          id: schoolId,
+          type: 'text',
+          datasetKey: 'school'
+        });
+        createInputField(row1, 'Degree or program', 'e.g. Bachelor in Hospitality Management', {
+          id: degreeId,
+          type: 'text',
+          datasetKey: 'degree'
+        });
+
+        createInputField(row2, 'Field of study', 'e.g. Culinary Arts', {
+          id: fieldId,
+          type: 'text',
+          datasetKey: 'field'
+        });
+        createInputField(row2, 'Location', 'City, country', {
+          id: locationId,
+          type: 'text',
+          datasetKey: 'location'
+        });
+
+        const row3 = document.createElement('div');
+        row3.className = 'field-group';
+        createInputField(row3, 'Start date', '', {
+          id: startId,
+          type: 'month',
+          datasetKey: 'start_date'
+        });
+        createInputField(row3, 'End date', '', {
+          id: endId,
+          type: 'month',
+          datasetKey: 'end_date'
+        });
+
+        const descWrapper = document.createElement('div');
+        descWrapper.className = 'field-group field-group--single';
+        const descField = document.createElement('div');
+        descField.className = 'field';
+        const descLabel = document.createElement('label');
+        descLabel.className = 'field-label';
+        descLabel.htmlFor = descId;
+        descLabel.innerHTML = '<span>Description</span>';
+        const descInput = document.createElement('textarea');
+        descInput.id = descId;
+        descInput.className = 'field-textarea';
+        descInput.placeholder = 'Optional notes about this education or program.';
+        descInput.setAttribute('data-field', 'description');
+        descField.appendChild(descLabel);
+        descField.appendChild(descInput);
+        descWrapper.appendChild(descField);
+
+        const actions = document.createElement('div');
+        actions.style.textAlign = 'right';
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn-ghost';
+        removeBtn.innerHTML = '<span aria-hidden="true">✕</span><span>Remove</span>';
+        removeBtn.addEventListener('click', function () {
+          container.remove();
+        });
+        actions.appendChild(removeBtn);
+
+        container.appendChild(row1);
+        container.appendChild(row2);
+        container.appendChild(row3);
+        container.appendChild(descWrapper);
+        container.appendChild(actions);
+
+        return container;
+      }
+
+      function createLanguageEntry(index) {
+        const container = document.createElement('div');
+        container.className = 'field-group';
+        container.setAttribute('data-entry', 'language');
+
+        const row = document.createElement('div');
+        row.className = 'field-group';
+
+        const languageId = 'language_' + index;
+        const levelId = 'language_level_' + index;
+
+        createInputField(row, 'Language', 'e.g. Italian', {
+          id: languageId,
+          type: 'text',
+          datasetKey: 'language'
+        });
+
+        createInputField(row, 'Level', '', {
+          id: levelId,
+          tag: 'select',
+          datasetKey: 'level',
+          choices: [
+            { value: '', label: 'Select level' },
+            { value: 'basic', label: 'Basic' },
+            { value: 'conversational', label: 'Conversational' },
+            { value: 'fluent', label: 'Fluent' },
+            { value: 'native', label: 'Native / bilingual' }
+          ]
+        });
+
+        const actions = document.createElement('div');
+        actions.style.textAlign = 'right';
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn-ghost';
+        removeBtn.innerHTML = '<span aria-hidden="true">✕</span><span>Remove</span>';
+        removeBtn.addEventListener('click', function () {
+          container.remove();
+        });
+        actions.appendChild(removeBtn);
+
+        container.appendChild(row);
+        container.appendChild(actions);
+
+        return container;
+      }
+
+      function createCertificationEntry(index) {
+        const container = document.createElement('div');
+        container.className = 'field-group';
+        container.setAttribute('data-entry', 'certification');
+
+        const row = document.createElement('div');
+        row.className = 'field-group';
+
+        const nameId = 'cert_name_' + index;
+        const issuerId = 'cert_issuer_' + index;
+        const yearId = 'cert_year_' + index;
+
+        createInputField(row, 'Certification or award', 'e.g. Sommelier certification', {
+          id: nameId,
+          type: 'text',
+          datasetKey: 'name'
+        });
+        createInputField(row, 'Issuer', 'e.g. AIS, WSET', {
+          id: issuerId,
+          type: 'text',
+          datasetKey: 'issuer'
+        });
+        createInputField(row, 'Year', 'e.g. 2023', {
+          id: yearId,
+          type: 'number',
+          datasetKey: 'year'
+        });
+
+        const actions = document.createElement('div');
+        actions.style.textAlign = 'right';
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn-ghost';
+        removeBtn.innerHTML = '<span aria-hidden="true">✕</span><span>Remove</span>';
+        removeBtn.addEventListener('click', function () {
+          container.remove();
+        });
+        actions.appendChild(removeBtn);
+
+        container.appendChild(row);
+        container.appendChild(actions);
+
+        return container;
+      }
+
+      function createSkillEntry(index) {
+        const container = document.createElement('div');
+        container.className = 'field-group';
+        container.setAttribute('data-entry', 'skill');
+
+        const row = document.createElement('div');
+        row.className = 'field-group field-group--single';
+
+        const skillId = 'skill_' + index;
+        createInputField(row, 'Skill', 'e.g. Wine pairing, Team leadership', {
+          id: skillId,
+          type: 'text',
+          datasetKey: 'skill'
+        });
+
+        const actions = document.createElement('div');
+        actions.style.textAlign = 'right';
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn-ghost';
+        removeBtn.innerHTML = '<span aria-hidden="true">✕</span><span>Remove</span>';
+        removeBtn.addEventListener('click', function () {
+          container.remove();
+        });
+        actions.appendChild(removeBtn);
+
+        container.appendChild(row);
+        container.appendChild(actions);
+
+        return container;
+      }
+
+      function collectEntries(containerId, entryType) {
+        const container = document.getElementById(containerId);
+        if (!container) return [];
+        const entries = [];
+        const nodes = container.querySelectorAll('[data-entry="' + entryType + '"]');
+        nodes.forEach(function (node) {
+          if (entryType === 'skill') {
+            const input = node.querySelector('[data-field="skill"]');
+            const value = input && input.value ? input.value.trim() : '';
+            if (value) {
+              entries.push(value);
+            }
+            return;
+          }
+
+          const fields = node.querySelectorAll('[data-field]');
+          const obj = {};
+          fields.forEach(function (field) {
+            const key = field.getAttribute('data-field');
+            if (!key) return;
+            if (field.type === 'checkbox') {
+              obj[key] = !!field.checked;
+            } else {
+              obj[key] = (field.value || '').trim() || null;
+            }
+          });
+
+          const hasContent = Object.keys(obj).some(function (k) {
+            const v = obj[k];
+            return v !== null && v !== '' && v !== false;
+          });
+          if (hasContent) {
+            entries.push(obj);
+          }
+        });
+        return entries;
+      }
+
+      function buildApplicationPayload() {
+        const formData = new FormData(form);
+
+        const firstName = trimValue('first_name');
+        const lastName = trimValue('last_name');
+        const email = trimValue('email') || null;
+        const phone = trimValue('phone') || null;
+        const linkedinUrl = trimValue('linkedin_url') || null;
+        const address = trimValue('address') || null;
+        const dateOfBirth = trimValue('date_of_birth') || null;
+        const position = trimValue('position') || null;
+        const summary = trimValue('summary') || null;
+
+        const experience = collectEntries('experienceEntries', 'experience');
+        const education = collectEntries('educationEntries', 'education');
+        const languages = collectEntries('languageEntries', 'language');
+        const certifications = collectEntries('certificationEntries', 'certification');
+        const skills = collectEntries('skillEntries', 'skill');
+
+        const contextSubmissionType =
+          (formData.get('context_submission_type') || 'spontaneous').toString().trim() ||
+          'spontaneous';
+        const contextJobOfferId =
+          (formData.get('context_job_offer_id') || '').toString().trim() || null;
+        const contextSource =
+          (formData.get('context_source') || 'website_public_form').toString().trim() ||
+          'website_public_form';
+
+        const filesResumePath =
+          (formData.get('files_resume_path') || '').toString().trim() || null;
+        const filesPhotoPath =
+          (formData.get('files_photo_path') || '').toString().trim() || null;
+
+        const privacyConsent = formData.get('privacy_consent') != null;
+
+        const websiteHoneypot =
+          (formData.get('website') || '').toString().trim() || null;
+        const privacyWebsiteHoneypot =
+          (formData.get('privacy_website') || '').toString().trim() || null;
+
+        const payload = {
+          main: {
+            first_name: firstName,
+            last_name: lastName,
+            email,
+            phone,
+            linkedin_url: linkedinUrl,
+            address,
+            date_of_birth: dateOfBirth,
+            position,
+            summary
+          },
+          profile_children: {
+            experience,
+            education,
+            languages,
+            certifications,
+            skills
+          },
+          context: {
+            submission_type: contextSubmissionType,
+            job_offer_id: contextJobOfferId,
+            source: contextSource
+          },
+          privacy: {
+            consent_privacy: privacyConsent,
+            website: privacyWebsiteHoneypot
+          },
+          files: {
+            resume_path: filesResumePath,
+            photo_path: filesPhotoPath
+          },
+          // Top-level website honeypot
+          website: websiteHoneypot
+        };
+
+        return payload;
+      }
+
+      function getRuntimeConfig() {
+        const cfg = window.IEConfig || {};
+        const functionsBase =
+          (cfg && (cfg.SUPABASE_FUNCTIONS_URL || cfg.SUPABASE_FUNCTIONS_BASE_URL)) || null;
+        const anonKey = (cfg && cfg.SUPABASE_ANON_KEY) || null;
+        let supabaseUrl = (cfg && cfg.SUPABASE_URL) || null;
+        if (!supabaseUrl && functionsBase) {
+          supabaseUrl = String(functionsBase).replace(/\/functions\/v\d+\/?$/, '');
+        }
+        return { functionsBase, anonKey, supabaseUrl };
+      }
+
+      async function prepareExternalApplicationUpload(fileKind, file) {
+        const { functionsBase, anonKey } = getRuntimeConfig();
+        if (!functionsBase || !anonKey) {
+          throw new Error(
+            'Configuration error: file upload is temporarily unavailable. Please try again later.'
+          );
+        }
+
+        const trimmedBase = functionsBase.replace(/\/+$/, '');
+        const url = trimmedBase + '/prepare-external-application-upload';
+
+        const body = {
+          file_kind: fileKind,
+          filename: file.name,
+          content_type: file.type || 'application/octet-stream',
+          size_bytes: file.size
+        };
+
+        let response;
+        try {
+          response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: anonKey,
+              Authorization: 'Bearer ' + anonKey
+            },
+            body: JSON.stringify(body)
+          });
+        } catch (networkError) {
+          console.error('Prepare upload network error:', networkError);
+          throw new Error(
+            'Network error while preparing your file upload. Please check your connection and try again.'
+          );
+        }
+
+        let data;
+        if (!response.ok) {
+          let message = 'Unable to prepare your file upload. Please try again.';
+          try {
+            data = await response.json();
+            if (data) {
+              if (typeof data.message === 'string') {
+                message = data.message;
+              } else if (data.error && typeof data.error.message === 'string') {
+                message = data.error.message;
+              }
+            }
+          } catch (_) {
+            try {
+              const text = await response.text();
+              if (text) message = text;
+            } catch (_) {}
+          }
+
+          console.error('Prepare upload backend error:', {
+            status: response.status,
+            statusText: response.statusText,
+          });
+          throw new Error(message);
+        }
+
+        try {
+          data = data || (await response.json());
+        } catch (parseError) {
+          console.error('Prepare upload parse error:', parseError);
+          throw new Error('Unexpected response while preparing file upload. Please try again.');
+        }
+
+        if (!data || data.ok !== true || !data.object_path) {
+          console.error('Prepare upload invalid response:', data);
+          throw new Error('Invalid response while preparing file upload. Please try again.');
+        }
+
+        const hasToken = typeof data.upload_token === 'string' && data.upload_token.length > 0;
+        const hasSignedUrl = typeof data.signed_upload_url === 'string' && data.signed_upload_url.length > 0;
+        if (!hasToken && !hasSignedUrl) {
+          console.error('Prepare upload missing token and signed URL:', data);
+          throw new Error('Invalid response while preparing file upload. Please try again.');
+        }
+
+        return {
+          objectPath: data.object_path,
+          bucket: data.bucket || 'external-candidate-submissions',
+          uploadToken: hasToken ? data.upload_token : null,
+          signedUploadUrl: hasSignedUrl ? data.signed_upload_url : null
+        };
+      }
+
+      function getSupabaseClient() {
+        const { supabaseUrl, anonKey } = getRuntimeConfig();
+        if (!supabaseUrl || !anonKey || typeof window.supabase === 'undefined') {
+          return null;
+        }
+        try {
+          return window.supabase.createClient(supabaseUrl, anonKey);
+        } catch (_) {
+          return null;
+        }
+      }
+
+      async function uploadFileViaSupabaseSignedUrl(bucket, path, token, file) {
+        const supabase = getSupabaseClient();
+        if (!supabase || !token) {
+          return false;
+        }
+        const contentType = file.type || 'application/octet-stream';
+        const { error } = await supabase.storage
+          .from(bucket)
+          .uploadToSignedUrl(path, token, file, { contentType });
+        if (error) {
+          throw new Error(error.message || 'Upload failed.');
+        }
+        return true;
+      }
+
+      async function uploadFileViaSignedUrlFallback(signedUploadUrl, file) {
+        // Fallback: used only when Supabase client or upload_token is unavailable (e.g. script
+        // blocked, or backend returned only signed_upload_url). Prefer uploadToSignedUrl for
+        // official Supabase signed upload semantics.
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await fetch(signedUploadUrl, { method: 'POST', body: formData });
+        if (!response.ok) {
+          let message = 'Unable to upload your file. Please try again.';
+          try {
+            const errorBody = await response.json();
+            if (errorBody && typeof errorBody.message === 'string') {
+              message = errorBody.message;
+            } else if (errorBody.error && typeof errorBody.error.message === 'string') {
+              message = errorBody.error.message;
+            }
+          } catch (_) {
+            try {
+              const text = await response.text();
+              if (text) message = text;
+            } catch (_) {}
+          }
+          throw new Error(message);
+        }
+      }
+
+      async function uploadFileToStorage(prepared, file) {
+        const usedSupabase = await uploadFileViaSupabaseSignedUrl(
+          prepared.bucket,
+          prepared.objectPath,
+          prepared.uploadToken,
+          file
+        );
+        if (usedSupabase) return;
+        if (prepared.signedUploadUrl) {
+          await uploadFileViaSignedUrlFallback(prepared.signedUploadUrl, file);
+          return;
+        }
+        throw new Error(
+          'Upload is unavailable: missing Supabase client or signed upload URL. Please refresh and try again.'
+        );
+      }
+
+      async function prepareAndUploadFile(fileKind, file) {
+        if (!file) return null;
+
+        const prepared = await prepareExternalApplicationUpload(fileKind, file);
+        await uploadFileToStorage(prepared, file);
+        return { objectPath: prepared.objectPath };
+      }
+
+      async function submitExternalApplication(payload) {
+        const { functionsBase, anonKey } = getRuntimeConfig();
+
+        if (!functionsBase || !anonKey) {
+          throw new Error(
+            'Configuration error: application submission is temporarily unavailable. Please try again later.'
+          );
+        }
+
+        const trimmedBase = functionsBase.replace(/\/+$/, '');
+        const url = trimmedBase + '/submit-external-application';
+
+        let response;
+        try {
+          response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: anonKey,
+              Authorization: 'Bearer ' + anonKey,
+            },
+            body: JSON.stringify(payload),
+          });
+        } catch (networkError) {
+          console.error('Application submission network error:', networkError);
+          throw new Error(
+            'Network error while submitting your application. Please check your connection and try again.'
+          );
+        }
+
+        if (!response.ok) {
+          let message = 'Unable to submit your application. Please try again.';
+          try {
+            const errorBody = await response.json();
+            if (errorBody) {
+              if (typeof errorBody.message === 'string') {
+                message = errorBody.message;
+              } else if (typeof errorBody.error === 'string') {
+                message = errorBody.error;
+              } else if (
+                errorBody.error &&
+                typeof errorBody.error.message === 'string'
+              ) {
+                message = errorBody.error.message;
+              }
+            }
+          } catch (_) {
+            try {
+              const text = await response.text();
+              if (text) message = text;
+            } catch (_) {}
+          }
+
+          console.error('Application submission backend error:', {
+            status: response.status,
+            statusText: response.statusText,
+          });
+          throw new Error(message);
+        }
+
+        try {
+          return await response.json();
+        } catch (_) {
+          return null;
+        }
+      }
+
+      function setSubmitting(isSubmitting) {
+        const controls = [btnNext, btnBack, btnSubmit];
+        controls.forEach((btn) => {
+          if (!btn) return;
+          btn.disabled = isSubmitting;
+        });
+
+        if (btnSubmit) {
+          btnSubmit.dataset.originalLabel =
+            btnSubmit.dataset.originalLabel || btnSubmit.textContent;
+          btnSubmit.textContent = isSubmitting
+            ? 'Submitting...'
+            : btnSubmit.dataset.originalLabel;
+        }
+      }
+
+      function resetFormToStep1() {
+        if (!form) return;
+        form.reset();
+        setFileLabel(cvInput, cvLabel, 'No file chosen');
+        setFileLabel(photoInput, photoLabel, 'Optional');
+        goToStep(1);
+      }
+
+      btnNext.addEventListener('click', function (event) {
+        event.preventDefault();
+        successBox.style.display = 'none';
+
+        const { valid, messages, focusField } = validateStep1();
+        if (!valid) {
+          goToStep(1);
+          showErrors(messages);
+          if (focusField && typeof focusField.focus === 'function') {
+            focusField.focus();
+          }
+          return;
+        }
+
+        showErrors([]);
+        goToStep(2);
+      });
+
+      btnBack.addEventListener('click', function (event) {
+        event.preventDefault();
+        successBox.style.display = 'none';
+        showErrors([]);
+        goToStep(1);
+      });
+
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        successBox.style.display = 'none';
+
+        const result = validateAll();
+        if (!result.valid) {
+          goToStep(result.step);
+          showErrors(result.messages);
+          if (result.focusField && typeof result.focusField.focus === 'function') {
+            result.focusField.focus();
+          }
+          return;
+        }
+
+        showErrors([]);
+
+        setSubmitting(true);
+
+        try {
+          const cvFileEl = document.getElementById('cv_file');
+          const photoFileEl = document.getElementById('photo_file');
+          const resumePathInput = document.getElementById('files_resume_path');
+          const photoPathInput = document.getElementById('files_photo_path');
+
+          const cvFile =
+            cvFileEl && cvFileEl.files && cvFileEl.files.length > 0
+              ? cvFileEl.files[0]
+              : null;
+          const photoFile =
+            photoFileEl && photoFileEl.files && photoFileEl.files.length > 0
+              ? photoFileEl.files[0]
+              : null;
+
+          if (!cvFile) {
+            throw new Error('Please upload your CV before submitting the form.');
+          }
+
+          const cvResult = await prepareAndUploadFile('resume', cvFile);
+          if (!cvResult || !cvResult.objectPath) {
+            throw new Error('Unable to upload your CV. Please try again.');
+          }
+          if (resumePathInput) {
+            resumePathInput.value = cvResult.objectPath;
+          }
+
+          if (photoFile) {
+            const photoResult = await prepareAndUploadFile('photo', photoFile);
+            if (!photoResult || !photoResult.objectPath) {
+              throw new Error('Unable to upload your photo. Please try again.');
+            }
+            if (photoPathInput) {
+              photoPathInput.value = photoResult.objectPath;
+            }
+          } else if (photoPathInput) {
+            photoPathInput.value = '';
+          }
+
+          const payload = buildApplicationPayload();
+
+          console.log('Application payload ready to submit:', payload);
+
+          const result = await submitExternalApplication(payload);
+          console.log('Application submission result:', result);
+
+          if (successBox) {
+            successBox.textContent =
+              'Thank you. Your application has been submitted successfully.';
+            successBox.style.display = 'block';
+          }
+
+          // Optional: reset and bring the user back to step 1 for a clean state.
+          resetFormToStep1();
+        } catch (err) {
+          const message =
+            (err && err.message) ||
+            'Unable to submit your application. Please try again.';
+          showErrors([message]);
+        } finally {
+          setSubmitting(false);
+        }
+      });
+
+      // Initialize view and repeatable sections
+      (function initializeRepeatableSections() {
+        const experienceContainer = document.getElementById('experienceEntries');
+        const educationContainer = document.getElementById('educationEntries');
+        const languageContainer = document.getElementById('languageEntries');
+        const certificationContainer = document.getElementById('certificationEntries');
+        const skillContainer = document.getElementById('skillEntries');
+
+        let experienceIndex = 0;
+        let educationIndex = 0;
+        let languageIndex = 0;
+        let certificationIndex = 0;
+        let skillIndex = 0;
+
+        function addInitialEntries() {
+          if (experienceContainer) {
+            experienceContainer.appendChild(createExperienceEntry(experienceIndex++));
+          }
+          if (educationContainer) {
+            educationContainer.appendChild(createEducationEntry(educationIndex++));
+          }
+        }
+
+        const btnAddExperience = document.getElementById('btnAddExperience');
+        if (btnAddExperience && experienceContainer) {
+          btnAddExperience.addEventListener('click', function () {
+            experienceContainer.appendChild(createExperienceEntry(experienceIndex++));
+          });
+        }
+
+        const btnAddEducation = document.getElementById('btnAddEducation');
+        if (btnAddEducation && educationContainer) {
+          btnAddEducation.addEventListener('click', function () {
+            educationContainer.appendChild(createEducationEntry(educationIndex++));
+          });
+        }
+
+        const btnAddLanguage = document.getElementById('btnAddLanguage');
+        if (btnAddLanguage && languageContainer) {
+          btnAddLanguage.addEventListener('click', function () {
+            languageContainer.appendChild(createLanguageEntry(languageIndex++));
+          });
+        }
+
+        const btnAddCertification = document.getElementById('btnAddCertification');
+        if (btnAddCertification && certificationContainer) {
+          btnAddCertification.addEventListener('click', function () {
+            certificationContainer.appendChild(
+              createCertificationEntry(certificationIndex++)
+            );
+          });
+        }
+
+        const btnAddSkill = document.getElementById('btnAddSkill');
+        if (btnAddSkill && skillContainer) {
+          btnAddSkill.addEventListener('click', function () {
+            skillContainer.appendChild(createSkillEntry(skillIndex++));
+          });
+        }
+
+        addInitialEntries();
+      })();
+
+      goToStep(1);
+    })();
+  </script>
+
+  <script src="/ItalianExperience/assets/js/config.js"></script>
+  <script src="/ItalianExperience/assets/js/bootstrap.js"></script>
+  <script defer src="/ItalianExperience/assets/js/cookie-consent.js"></script>
+</body>
+</html>
+

@@ -403,7 +403,7 @@
       last_name: candidate.last_name || "",
       address: candidate.address || null,
       position: candidate.position || null,
-      status: candidate.status || "pending_review",
+      status: candidate.status || "approved",
       source: candidate.source || null,
       notes: candidate.notes || null,
       email: candidate.email || null,
@@ -680,14 +680,6 @@
       change_status: {
         label: "Change status",
         allowedStatuses: [
-          {
-            value: "pending_review",
-            label:
-              (window.IEStatusRuntime &&
-                typeof window.IEStatusRuntime.formatProfileStatusLabel === "function"
-                ? window.IEStatusRuntime.formatProfileStatusLabel("pending_review")
-                : "Pending Review"),
-          },
           {
             value: "approved",
             label:

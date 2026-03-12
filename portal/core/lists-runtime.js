@@ -150,14 +150,12 @@
         activeOffersRes,
         pendingCountRes,
         hiredRes,
-        pendingReviewRes,
         bySourceRes,
       ] = await Promise.all([
         api.getTotalCandidates(),
         api.getActiveJobOffers(),
         api.getPendingReviewCount(),
         api.getHiredThisMonth(),
-        api.getPendingReviewCandidates(),
         api.getCandidatesBySource(),
       ]);
 
@@ -168,24 +166,26 @@
         hiredThisMonth: hiredRes.error ? 0 : hiredRes.data,
       });
 
-      const pendingList = pendingReviewRes.error ? [] : (pendingReviewRes.data || []);
-      const mappedPending = pendingList.map(function (r) {
-        return {
-          id: r.id,
-          first_name: r.first_name || "",
-          last_name: r.last_name || "",
-          position: r.position || "",
-          status: r.status || "pending_review",
-          source: r.source || "",
-          created_at: r.created_at,
-          email: r.email || "",
-          phone: r.phone || "",
-        };
-      });
-      renderDashboardPendingReviewQueue(mappedPending);
-
       const sourceList = bySourceRes.error ? [] : (bySourceRes.data || []);
       renderDashboardSources(sourceList);
+
+      if (
+        typeof api.getPendingExternalSubmissionsPreview === "function"
+      ) {
+        try {
+          const previewRes = await api.getPendingExternalSubmissionsPreview(5);
+          const previewRows = previewRes.error
+            ? []
+            : previewRes.data || [];
+          renderExternalSubmissionsPreview(previewRows, previewRes.error);
+        } catch (previewErr) {
+          console.error(
+            "[ItalianExperience] Dashboard external submissions preview error:",
+            previewErr
+          );
+          renderExternalSubmissionsPreview([], previewErr);
+        }
+      }
     } catch (err) {
       console.error("[ItalianExperience] Dashboard load error:", err);
       setDashboardCardValues({
@@ -194,7 +194,6 @@
         pendingReviewCount: 0,
         hiredThisMonth: 0,
       });
-      renderDashboardPendingReviewQueue([]);
       renderDashboardSources([]);
     } finally {
       setDashboardLoading(false);
@@ -206,11 +205,6 @@
       var val = el.querySelector(".dashboard-value");
       if (val) val.textContent = loading ? "…" : (val.textContent || "—");
     });
-    var tbody = document.querySelector("[data-dashboard='pendingReviewQueue']");
-    if (tbody) {
-      var placeholder = tbody.querySelector("[data-dashboard-placeholder]");
-      if (placeholder) placeholder.style.display = loading ? "" : "none";
-    }
     var sourceContainer = document.querySelector("[data-dashboard='candidatesBySource']");
     if (sourceContainer) {
       var ph = sourceContainer.querySelector("[data-dashboard-placeholder]");
@@ -295,7 +289,7 @@
     var source = (row.source || "").trim() || "—";
     var statusLabel = window.IEStatusRuntime && typeof window.IEStatusRuntime.formatProfileStatusLabel === "function"
       ? window.IEStatusRuntime.formatProfileStatusLabel(row.status)
-      : (row.status ? String(row.status) : "Pending Review");
+      : (row.status ? String(row.status) : "Pending Approval");
     var date = row.created_at ? new Date(row.created_at).toLocaleDateString("it-IT") : "—";
     var email = (row.email || "").trim() || "—";
     var phone = (row.phone || "").trim() || "—";
@@ -328,13 +322,13 @@
     _dashboardPreviewCache = {};
     if (!rows.length) {
       var tr = document.createElement("tr");
-      tr.innerHTML = "<td colspan=\"5\" class=\"px-6 py-8 text-center text-gray-400\">No candidates pending review.</td>";
+      tr.innerHTML = "<td colspan=\"5\" class=\"px-6 py-8 text-center text-gray-400\">No internal candidates awaiting approval.</td>";
       tbody.appendChild(tr);
       return;
     }
     var statusLabelFn = window.IEStatusRuntime && typeof window.IEStatusRuntime.formatProfileStatusLabel === "function"
       ? window.IEStatusRuntime.formatProfileStatusLabel
-      : function (s) { return (s ? String(s) : "Pending Review"); };
+      : function (s) { return (s ? String(s) : "Pending Approval"); };
     var statusClassFn = window.IEStatusRuntime && typeof window.IEStatusRuntime.getProfileStatusBadgeClass === "function"
       ? window.IEStatusRuntime.getProfileStatusBadgeClass
       : function () { return "badge-new"; };
@@ -487,6 +481,180 @@
         "<div class=\"h-full " + color + " rounded-full\" style=\"width:" + (item.percentage || 0) + "%\"></div>" +
         "</div>";
       container.appendChild(div);
+    });
+  }
+
+  function renderExternalSubmissionsPreview(items, error) {
+    var table = document.querySelector(
+      "[data-dashboard='externalSubmissionsPreview']"
+    );
+    if (!table) return;
+    var tbody = table.querySelector("[data-dashboard-body]");
+    var placeholder = table.querySelector("[data-dashboard-placeholder]");
+    if (!tbody) return;
+
+    if (placeholder) {
+      placeholder.remove();
+    }
+
+    tbody.innerHTML = "";
+
+    if (error) {
+      var trError = document.createElement("tr");
+      var tdError = document.createElement("td");
+      tdError.colSpan = 5;
+      tdError.className =
+        "px-6 py-6 text-center text-sm text-red-500 whitespace-pre-line";
+      tdError.textContent =
+        "Error loading inbound submissions preview.\nPlease try again later.";
+      trError.appendChild(tdError);
+      tbody.appendChild(trError);
+      return;
+    }
+
+    var list = Array.isArray(items) ? items : [];
+    if (!list.length) {
+      var trEmpty = document.createElement("tr");
+      var tdEmpty = document.createElement("td");
+      tdEmpty.colSpan = 5;
+      tdEmpty.className =
+        "px-6 py-6 text-center text-sm text-gray-400 whitespace-pre-line";
+      tdEmpty.textContent =
+        "No external submissions are currently awaiting review.";
+      trEmpty.appendChild(tdEmpty);
+      tbody.appendChild(trEmpty);
+      return;
+    }
+
+    function normalizeStatus(status) {
+      var s = (status || "").toString().toLowerCase();
+      return s || "pending_review";
+    }
+
+    function formatStatusLabel(status) {
+      var s = normalizeStatus(status);
+      switch (s) {
+        case "pending_review":
+          return "Pending Review";
+        case "rejected":
+          return "Rejected";
+        case "linked_existing":
+          return "Linked to Existing";
+        case "converted":
+          return "Converted";
+        default:
+          return s;
+      }
+    }
+
+    function getStatusBadgeClass(status) {
+      var s = normalizeStatus(status);
+      if (s === "pending_review") return "badge-open";
+      if (s === "converted") return "badge-hired";
+      if (s === "linked_existing") return "badge-inprogress";
+      if (s === "rejected") return "badge-rejected";
+      return "badge-open";
+    }
+
+    function formatDate(value) {
+      if (!value) return "";
+      try {
+        var d = new Date(value);
+        if (Number.isNaN(d.getTime())) return "";
+        return d.toLocaleDateString("it-IT");
+      } catch (_) {
+        return "";
+      }
+    }
+
+    function navigateToExternalSubmissionDetail(id) {
+      var href =
+        "external-submission.html?id=" + encodeURIComponent(String(id));
+      if (
+        window.IERouter &&
+        typeof window.IERouter.navigateTo === "function"
+      ) {
+        window.IERouter.navigateTo(href);
+      } else {
+        window.location.href = href;
+      }
+    }
+
+    list.forEach(function (row) {
+      var tr = document.createElement("tr");
+      tr.className =
+        "table-row transition hover:bg-gray-50/70 cursor-pointer clickable-row";
+      tr.dataset.id = String(row.id);
+
+      var fullName =
+        (row && row.full_name_computed) ||
+        [row.first_name, row.last_name].filter(Boolean).join(" ") ||
+        "—";
+      var typeLabel =
+        (row && row.submission_type && row.submission_type.toString()) || "—";
+      var createdAt = formatDate(row && row.created_at);
+      var statusNorm = normalizeStatus(row && row.status);
+      var statusLabel = formatStatusLabel(statusNorm);
+      var badgeClass = getStatusBadgeClass(statusNorm);
+
+      var tdName = document.createElement("td");
+      tdName.className = "ie-table-cell ie-table-cell--primary";
+      tdName.textContent = fullName;
+      tr.appendChild(tdName);
+
+      var tdType = document.createElement("td");
+      tdType.className = "ie-table-cell";
+      tdType.textContent = typeLabel;
+      tr.appendChild(tdType);
+
+      var tdDate = document.createElement("td");
+      tdDate.className = "ie-table-cell";
+      tdDate.innerHTML =
+        '<span class="ie-table-cell--date">' +
+        (window.escapeHtml
+          ? window.escapeHtml(createdAt || "")
+          : createdAt || "") +
+        "</span>";
+      tr.appendChild(tdDate);
+
+      var tdStatus = document.createElement("td");
+      tdStatus.className = "ie-table-cell";
+      tdStatus.innerHTML =
+        '<span class="badge ' +
+        badgeClass +
+        '">' +
+        (window.escapeHtml ? window.escapeHtml(statusLabel) : statusLabel) +
+        "</span>";
+      tr.appendChild(tdStatus);
+
+      var tdActions = document.createElement("td");
+      tdActions.className = "ie-table-cell ie-table-actions text-center";
+      tdActions.innerHTML =
+        '<button type="button" class="ie-btn ie-btn-secondary ie-btn-xs" data-action="open-external-submission" data-id="' +
+        String(row.id) +
+        '">Open</button>';
+      tr.appendChild(tdActions);
+
+      tbody.appendChild(tr);
+    });
+
+    tbody.addEventListener("click", function (event) {
+      var target = event.target;
+      var openBtn = target.closest("[data-action='open-external-submission']");
+      if (openBtn) {
+        event.stopPropagation();
+        var idBtn = openBtn.getAttribute("data-id");
+        if (!idBtn) return;
+        navigateToExternalSubmissionDetail(idBtn);
+        return;
+      }
+
+      var row = target.closest("tr[data-id]");
+      if (!row) return;
+      if (target.closest("button, a, svg, path")) return;
+      var id = row.getAttribute("data-id");
+      if (!id) return;
+      navigateToExternalSubmissionDetail(id);
     });
   }
 

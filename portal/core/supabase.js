@@ -1180,7 +1180,7 @@
   }
 
   /**
-   * Count of candidates awaiting internal approval (pending_review and legacy 'new'), non-archived.
+   * Count of external candidate submissions awaiting intake review.
    * @returns {Promise<{ data: number, error: object | null }>}
    */
   async function getPendingReviewCount() {
@@ -1189,6 +1189,23 @@
       return { data: 0, error: new Error("Dashboard module not available") };
     }
     return mod.getPendingReviewCount();
+  }
+
+  /**
+   * Preview rows for external candidate submissions awaiting review.
+   * Used by the dashboard Inbound Submissions table.
+   * @param {number} limit
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function getPendingExternalSubmissionsPreview(limit) {
+    const mod = getDashboardModule();
+    if (
+      !mod ||
+      typeof mod.getPendingExternalSubmissionsPreview !== "function"
+    ) {
+      return { data: [], error: new Error("Dashboard module not available") };
+    }
+    return mod.getPendingExternalSubmissionsPreview(limit);
   }
 
   /**
@@ -1214,18 +1231,6 @@
       return { data: [], error: new Error("Dashboard module not available") };
     }
     return mod.getRecentCandidates();
-  }
-
-  /**
-   * Pending review queue: candidates with profile status pending_review (and legacy 'new'), non-archived.
-   * @returns {Promise<{ data: array, error: object | null }>}
-   */
-  async function getPendingReviewCandidates() {
-    const mod = getDashboardModule();
-    if (!mod || typeof mod.getPendingReviewCandidates !== "function") {
-      return { data: [], error: new Error("Dashboard module not available") };
-    }
-    return mod.getPendingReviewCandidates();
   }
 
   /**
@@ -1607,8 +1612,8 @@
     getPendingReviewCount,
     getHiredThisMonth,
     getRecentCandidates,
-    getPendingReviewCandidates,
     getCandidatesBySource,
+    getPendingExternalSubmissionsPreview,
     // Deletes / archive helpers
     deletePermanentRecord: deletePermanentRecord,
     // Helpers

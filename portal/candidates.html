@@ -33,12 +33,6 @@
                         </button>
                     </div>
                     <div class="filter-bar page-filters-column__bar">
-                        <div class="filter-group filter-group--shortcut">
-                            <a href="candidates.html?status=pending_review" data-ie-pending-review-shortcut class="page-filter-shortcut block w-full py-2 px-3 rounded-lg text-sm font-medium text-[#1b4332] bg-amber-50/80 border border-amber-100 hover:bg-amber-50 hover:border-amber-200 transition-colors no-underline">
-                                Pending Review
-                            </a>
-                            <span class="block mt-1 text-[11px] text-gray-500">Candidates awaiting approval</span>
-                        </div>
                         <div class="filter-group relative">
                             <label class="filter-label">Search by name</label>
                             <div class="relative">
@@ -52,7 +46,6 @@
                             <label class="filter-label">Profile Status</label>
                             <select data-filter="candidate-status" class="filter-select w-full appearance-none cursor-pointer">
                                 <option value="">All</option>
-                                <option value="pending_review">Pending Review</option>
                                 <option value="approved">Approved</option>
                                 <option value="rejected">Rejected</option>
                             </select>
@@ -78,17 +71,6 @@
                             </svg>
                             <span>Filters</span>
                         </button>
-                    </div>
-                    <!-- Pending Review view banner (when filter active) -->
-                    <div class="mb-4 hidden" data-ie-pending-review-banner>
-                        <div class="flex items-center justify-between px-4 py-3 rounded-xl bg-amber-50 border border-amber-100 text-sm">
-                            <p class="text-amber-900">
-                                Viewing: <strong>Pending Review</strong> — profile status (candidates awaiting internal approval).
-                            </p>
-                            <button type="button" data-action="clear-pending-review-filter" class="ie-btn ie-btn-secondary">
-                                Show all
-                            </button>
-                        </div>
                     </div>
                     <!-- Offer Filter Banner (from URL) -->
                     <div class="mb-4 hidden" data-ie-offer-filter-banner>
@@ -116,7 +98,6 @@
                                 <label class="sr-only" for="candidates-bulk-status">Change status</label>
                                 <select id="candidates-bulk-status" data-ie-candidates-bulk-status class="filter-select min-w-[160px] appearance-none cursor-pointer">
                                     <option value="">Change status…</option>
-                                    <option value="pending_review">Pending Review</option>
                                     <option value="approved">Approved</option>
                                     <option value="rejected">Rejected</option>
                                 </select>

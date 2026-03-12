@@ -237,6 +237,7 @@
       "dashboard.html": "dashboard.html",
       "candidates.html": "candidates.html",
       "candidates.html?status=pending_review": "candidates.html?status=pending_review",
+      "external-submissions.html": "external-submissions.html",
       "add-candidate.html": "add-candidate.html",
       "job-offers.html": "job-offers.html",
       "add-job-offer.html": "add-job-offer.html",
@@ -360,6 +361,57 @@
     var wrap = document.querySelector("[data-nav-candidates-wrap]");
     var menu = document.querySelector("[data-nav-candidates-menu]");
     if (!wrap || !menu) return;
+
+    // Make submenu interaction more forgiving: keep it open while cursor is
+    // over the trigger or menu, instead of relying solely on tight hover gaps.
+    var closeTimeout = null;
+
+    function openSubmenu() {
+      if (closeTimeout) {
+        clearTimeout(closeTimeout);
+        closeTimeout = null;
+      }
+      wrap.classList.add("portal-header-nav__item-with-sub--open");
+      wrap.setAttribute("aria-expanded", "true");
+    }
+
+    function scheduleClose() {
+      if (closeTimeout) {
+        clearTimeout(closeTimeout);
+      }
+      closeTimeout = setTimeout(function () {
+        closeCandidatesSubmenu();
+      }, 120);
+    }
+
+    wrap.addEventListener("mouseenter", openSubmenu);
+    menu.addEventListener("mouseenter", openSubmenu);
+    wrap.addEventListener("mouseleave", scheduleClose);
+    menu.addEventListener("mouseleave", scheduleClose);
+
+    // On touch / non-hover devices, support click-to-toggle so the submenu
+    // can be opened and used without relying on hover.
+    var supportsHover =
+      window.matchMedia &&
+      window.matchMedia("(hover: hover)").matches;
+    if (!supportsHover) {
+      var triggerLink = wrap.querySelector(
+        ".portal-header-nav__link[data-nav-group='candidates']"
+      );
+      if (triggerLink) {
+        triggerLink.addEventListener("click", function (e) {
+          e.preventDefault();
+          var isOpen = wrap.classList.contains(
+            "portal-header-nav__item-with-sub--open"
+          );
+          if (isOpen) {
+            closeCandidatesSubmenu();
+          } else {
+            openSubmenu();
+          }
+        });
+      }
+    }
 
     menu.querySelectorAll("[data-nav-submenu-item]").forEach(function (link) {
       link.addEventListener("click", function () {

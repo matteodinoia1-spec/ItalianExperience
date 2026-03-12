@@ -50,7 +50,7 @@
                     <p class="text-3xl font-bold serif text-[#1b4332]" data-dashboard-value="activeJobOffers" data-dashboard-loading><span class="dashboard-value">—</span></p>
                 </div>
 
-                <div class="glass-card ie-card dashboard-metric clickable p-6 rounded-2xl" onclick="IERouter.navigateTo('candidates', { status: 'pending_review' })" role="button" tabindex="0">
+                <div class="glass-card ie-card dashboard-metric clickable p-6 rounded-2xl" onclick="IERouter.navigateTo('external-submissions.html?status=pending_review')" role="button" tabindex="0">
                     <div class="flex justify-between items-start mb-4">
                         <div class="p-3 bg-blue-50 rounded-xl text-blue-600">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -59,7 +59,7 @@
                         </div>
                         <span class="dashboard-percentage text-xs font-bold" data-dashboard-percentage="pendingReviewCount">—</span>
                     </div>
-                    <h3 class="ie-label-caps mb-1">Pending Review</h3>
+                    <h3 class="ie-label-caps mb-1">Inbound Submissions</h3>
                     <p class="text-3xl font-bold serif text-[#1b4332]" data-dashboard-value="pendingReviewCount" data-dashboard-loading><span class="dashboard-value">—</span></p>
                 </div>
 
@@ -77,50 +77,65 @@
                 </div>
             </div>
 
-            <!-- Table and Distribution -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
-                <!-- Pending Review Queue (profile approval to-do list) -->
-                <div class="lg:col-span-2 glass-card ie-card rounded-2xl overflow-hidden">
-                    <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white/50">
-                        <div>
-                            <h2 class="ie-section-title">Pending review</h2>
-                            <p class="text-sm text-gray-500 mt-0.5">Candidates awaiting an approval decision.</p>
+            <!-- Review + Sources row -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- External submissions preview (3/4) -->
+                <div class="lg:col-span-3">
+                    <div class="glass-card ie-card rounded-2xl p-6 h-full">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-xl font-bold serif text-[#1b4332]">Inbound Submissions</h2>
+                                <p class="text-sm text-gray-500 mt-0.5">
+                                    External candidate submissions awaiting review.
+                                </p>
+                            </div>
+                            <button
+                              type="button"
+                              class="ie-btn ie-btn-secondary"
+                              data-action="open-external-submissions-inbox"
+                            >
+                                Open inbox
+                            </button>
                         </div>
-                        <button data-action="view-all-candidates" class="ie-btn ie-btn-primary">View all</button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="ie-table w-full text-left">
-                            <thead class="bg-gray-50/50">
-                                <tr>
-                                    <th class="ie-table-th">Name</th>
-                                    <th class="ie-table-th">Desired role</th>
-                                    <th class="ie-table-th">Date</th>
-                                    <th class="ie-table-th">Profile Status</th>
-                                    <th class="ie-table-th ie-table-actions">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100" data-dashboard="pendingReviewQueue">
-                                <tr data-dashboard-placeholder><td colspan="5" class="px-6 py-8 text-center text-gray-400">Loading...</td></tr>
-                            </tbody>
-                        </table>
+
+                        <div class="overflow-x-auto -mx-4 sm:mx-0">
+                            <table class="ie-table w-full text-left" data-dashboard="externalSubmissionsPreview">
+                                <thead class="bg-gray-50/80">
+                                    <tr>
+                                        <th class="ie-table-th">Name</th>
+                                        <th class="ie-table-th">Submission Type</th>
+                                        <th class="ie-table-th">Date</th>
+                                        <th class="ie-table-th">Status</th>
+                                        <th class="ie-table-th text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 text-sm" data-dashboard-body>
+                                    <tr data-dashboard-placeholder>
+                                        <td colspan="5" class="px-6 py-6 text-center text-gray-400 text-sm">
+                                            Loading latest submissions...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Sources Distribution -->
-                <div class="glass-card ie-card rounded-2xl p-6">
-                    <h2 class="text-xl font-bold serif text-[#1b4332] mb-6">Candidates by source</h2>
-                    
-                    <div class="space-y-6" data-dashboard="candidatesBySource">
-                        <div data-dashboard-placeholder class="text-gray-400 text-sm py-4">Loading...</div>
-                    </div>
+                <!-- Sources Distribution (1/4) -->
+                <div class="lg:col-span-1">
+                    <div class="glass-card ie-card rounded-2xl p-6 h-full flex flex-col">
+                        <h2 class="text-xl font-bold serif text-[#1b4332] mb-6">Candidates by source</h2>
+                        
+                        <div class="space-y-6 flex-1" data-dashboard="candidatesBySource">
+                            <div data-dashboard-placeholder class="text-gray-400 text-sm py-4">Loading...</div>
+                        </div>
 
-                    <div class="mt-8 p-4 bg-[#1b4332] rounded-xl text-white">
-                        <p class="text-[10px] uppercase tracking-widest opacity-60 mb-1">Insights</p>
-                        <p class="text-sm font-light">Data is updated in real time from the database.</p>
+                        <div class="mt-8 p-4 bg-[#1b4332] rounded-xl text-white">
+                            <p class="text-[10px] uppercase tracking-widest opacity-60 mb-1">Insights</p>
+                            <p class="text-sm font-light">Data is updated in real time from the database.</p>
+                        </div>
                     </div>
                 </div>
-
             </div>
 
         </div>

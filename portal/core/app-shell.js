@@ -227,17 +227,19 @@
       });
     }
 
-    // "Vedi Tutti" button on dashboard -> candidates listing
-    const viewAllCandidatesBtn =
-      document.querySelector('[data-action="view-all-candidates"]') ||
-      findButtonByText("vedi tutti");
-    if (viewAllCandidatesBtn) {
-      viewAllCandidatesBtn.addEventListener("click", function (event) {
+    const openExternalInboxBtn = document.querySelector(
+      '[data-action="open-external-submissions-inbox"]'
+    );
+    if (openExternalInboxBtn) {
+      openExternalInboxBtn.addEventListener("click", function (event) {
         event.preventDefault();
-        if (IERouter && typeof IERouter.navigateTo === "function") {
-          IERouter.navigateTo("candidates", { status: "pending_review" });
+        if (window.IERouter && typeof window.IERouter.navigateTo === "function") {
+          window.IERouter.navigateTo(
+            "external-submissions.html?status=pending_review"
+          );
         } else {
-          window.location.href = "candidates.html?status=pending_review";
+          window.location.href =
+            "external-submissions.html?status=pending_review";
         }
       });
     }

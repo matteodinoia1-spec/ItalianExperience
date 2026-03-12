@@ -137,20 +137,21 @@
   }
 
   /**
-   * Count of candidates awaiting internal approval (pending_review and legacy 'new'), non-archived.
-   * Source of truth for dashboard "Pending Review" card.
+   * Count of external candidate submissions awaiting intake review.
+   * Source of truth for dashboard "Inbound Submissions" card.
    * @returns {Promise<{ data: number, error: object | null }>}
    */
   async function getPendingReviewCount() {
     try {
-      var q = supabase
-        .from("candidates")
+      var result = await supabase
+        .from("external_candidate_submissions")
         .select("*", { count: "exact", head: true })
-        .in("status", ["pending_review", "new"])
-        .eq("is_archived", false);
-      var result = await q;
-      var count = result && typeof result.count === "number" ? result.count : 0;
+        .eq("status", "pending_review");
+
+      var count =
+        result && typeof result.count === "number" ? result.count : 0;
       var error = result ? result.error : null;
+
       if (error) {
         console.error(
           "[Supabase] getPendingReviewCount error:",
@@ -159,10 +160,62 @@
         );
         return { data: 0, error: error };
       }
+
       return { data: count, error: null };
     } catch (err) {
       console.error("[Supabase] getPendingReviewCount exception:", err);
       return { data: 0, error: err };
+    }
+  }
+
+  /**
+   * Preview rows for external candidate submissions awaiting review.
+   * Used by the dashboard Inbound Submissions table.
+   * @param {number} limit
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function getPendingExternalSubmissionsPreview(limit) {
+    var rowLimit =
+      typeof limit === "number" && limit > 0 && limit <= 20 ? limit : 5;
+    try {
+      var result = await supabase
+        .from("external_candidate_submissions")
+        .select(
+          "id, first_name, last_name, submission_type, status, created_at"
+        )
+        .eq("status", "pending_review")
+        .order("created_at", { ascending: false })
+        .limit(rowLimit);
+
+      var data = result ? result.data : null;
+      var error = result ? result.error : null;
+      if (error) {
+        console.error(
+          "[Supabase] getPendingExternalSubmissionsPreview error:",
+          error.message || error,
+          error
+        );
+        return { data: [], error: error };
+      }
+
+      var rows = Array.isArray(data) ? data : [];
+      var mapped = rows.map(function (row) {
+        var r = row || {};
+        var first = (r.first_name || "").toString().trim();
+        var last = (r.last_name || "").toString().trim();
+        var fullName = (first + " " + last).trim() || "—";
+        return Object.assign({}, r, {
+          full_name_computed: fullName,
+        });
+      });
+
+      return { data: mapped, error: null };
+    } catch (err) {
+      console.error(
+        "[Supabase] getPendingExternalSubmissionsPreview exception:",
+        err
+      );
+      return { data: [], error: err };
     }
   }
 
@@ -242,40 +295,6 @@
   }
 
   /**
-   * Pending review queue: candidates with profile status pending_review (and legacy 'new'),
-   * non-archived, latest first. Used for dashboard approval queue.
-   * @returns {Promise<{ data: array, error: object | null }>}
-   */
-  async function getPendingReviewCandidates() {
-    try {
-      var q = supabase
-        .from("candidates")
-        .select(
-          "id, first_name, last_name, position, status, source, created_at, email, phone"
-        )
-        .in("status", ["pending_review", "new"])
-        .eq("is_archived", false)
-        .order("created_at", { ascending: false })
-        .limit(30);
-      var result = await q;
-      var data = result ? result.data : null;
-      var error = result ? result.error : null;
-      if (error) {
-        console.error(
-          "[Supabase] getPendingReviewCandidates error:",
-          error.message || error,
-          error
-        );
-        return { data: [], error: error };
-      }
-      return { data: data || [], error: null };
-    } catch (err) {
-      console.error("[Supabase] getPendingReviewCandidates exception:", err);
-      return { data: [], error: err };
-    }
-  }
-
-  /**
    * Candidates grouped by source. Returns array of { source: string, count: number }.
    * @returns {Promise<{ data: array, error: object | null }>}
    */
@@ -332,8 +351,8 @@
     getPendingReviewCount: getPendingReviewCount,
     getHiredThisMonth: getHiredThisMonth,
     getRecentCandidates: getRecentCandidates,
-    getPendingReviewCandidates: getPendingReviewCandidates,
     getCandidatesBySource: getCandidatesBySource,
+    getPendingExternalSubmissionsPreview: getPendingExternalSubmissionsPreview,
   };
 })();
 
