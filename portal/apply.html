@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Apply | Italian Experience Recruitment</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="styles/ui.css">
+  <style>
+    .external-apply-shell {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .external-apply-card {
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.96), rgba(15,23,42,0.92));
+      border-radius: 1.75rem;
+      border: 1px solid rgba(197,160,89,0.22);
+      box-shadow: 0 32px 90px rgba(15,23,42,0.9);
+    }
+    .external-apply-eyebrow {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      color: #c5a059;
+    }
+    .external-apply-title {
+      font-family: "Playfair Display", serif;
+    }
+    .external-apply-subtitle {
+      font-size: 0.9rem;
+      color: rgba(226,232,240,0.9);
+    }
+    .external-apply-step-pill {
+      padding: 0.18rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      color: rgba(148,163,184,0.95);
+      background: rgba(15,23,42,0.8);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+    }
+    .external-apply-step-pill--active {
+      border-color: #c5a059;
+      color: #0f172a;
+      background: linear-gradient(135deg, #facc6b, #c5a059);
+      font-weight: 600;
+    }
+    .external-apply-progress {
+      position: relative;
+      width: 100%;
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      overflow: hidden;
+    }
+    .external-apply-progress-bar {
+      position: absolute;
+      inset: 0;
+      width: 50%;
+      background: linear-gradient(to right, #c5a059, rgba(248,250,252,0.9));
+      transform-origin: left center;
+      transition: transform 220ms ease-out;
+    }
+    .external-apply-errors {
+      display: none;
+    }
+    .external-apply-success {
+      display: none;
+    }
+    .external-apply-honeypot {
+      position: absolute;
+      left: -9999px;
+      top: auto;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="flex min-h-screen" style="visibility: hidden;">
+
+  <div class="portal-shell">
+    <!-- MAIN CONTENT -->
+    <main class="portal-main portal-main--no-toolbar flex-1 flex flex-col min-w-0">
+      <div id="portal-header"></div>
+
+      <!-- Page Content -->
+      <div class="page-container">
+        <div class="portal-content p-8">
+          <div class="external-apply-shell">
+            <section class="ie-card glass-card external-apply-card p-6 md:p-8 rounded-3xl text-slate-50" aria-label="Application form">
+              <header class="space-y-3 mb-6">
+                <div class="external-apply-eyebrow">Italian Experience · Recruitment</div>
+                <h1 class="external-apply-title text-2xl md:text-3xl font-bold text-white">
+                  Submit your application
+                </h1>
+                <p class="external-apply-subtitle max-w-2xl">
+                  Share your profile with our recruitment team. We review every submission with care and will contact you if there is a strong alignment with our open searches.
+                </p>
+              </header>
+
+              <div class="flex items-center justify-between gap-4 mb-4">
+                <div class="text-[0.78rem] uppercase tracking-[0.28em] text-slate-300">
+                  Two-step application
+                </div>
+                <div class="flex items-center gap-2">
+                  <span id="pillStep1" class="external-apply-step-pill external-apply-step-pill--active">1. Personal</span>
+                  <span id="pillStep2" class="external-apply-step-pill">2. Profile</span>
+                </div>
+              </div>
+              <div class="external-apply-progress mb-6" aria-hidden="true">
+                <div id="stepProgressBar" class="external-apply-progress-bar"></div>
+              </div>
+
+              <form id="applicationForm" class="space-y-6" novalidate>
+                <div id="formErrors" class="external-apply-errors rounded-xl border border-red-300/70 bg-red-50/80 px-3.5 py-3 text-[0.8rem] text-red-900" role="alert" aria-live="polite"></div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <!-- Step 1 -->
+                  <div data-step="1" class="space-y-4">
+                    <div>
+                      <h2 class="serif text-lg font-bold text-emerald-900">Step 1 · Personal details</h2>
+                      <p class="text-xs text-slate-300 mt-1">
+                        Tell us who you are and how we can reach you. Fields marked with
+                        <span class="text-amber-300 font-semibold">*</span> are required.
+                      </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label class="form-label text-[0.7rem] tracking-[0.22em] uppercase text-slate-200" for="first_name">
+                          First name <span class="text-amber-300">*</span>
+                        </label>
+                        <input
+                          id="first_name"
+                          name="first_name"
+                          type="text"
+                          autocomplete="given-name"
+                          class="form-input bg-slate-900/60 border-slate-500/60 text-slate-50 placeholder:text-slate-400"
+                          placeholder="e.g. Alessandro"
+                        >
+                      </div>
+                      <div>
+                        <label class="form-label text-[0.7rem] tracking-[0.22em] uppercase text-slate-200" for="last_name">
+                          Last name <span class="text-amber-300">*</span>
+                        </label>
+                        <input
+                          id="last_name"
+                          name="last_name"
+                          type="text"
+                          autocomplete="family-name"
+                          class="form-input bg-slate-900/60 border-slate-500/60 text-slate-50 placeholder:text-slate-400"
+                          placeholder="e.g. Rossi"
+                        >
+                      </div>
+                      <div>
+                        <label class="form-label text-[0.7rem] tracking-[0.22em] uppercase text-slate-200" for="email">
+                          Email
+                        </label>
+                        <input
+                          id="email"
+                          name="email"
+                          type="email"
+                          autocomplete="email"
+                          class="form-input bg-slate-900/60 border-slate-500/60 text-slate-50 placeholder:text-slate-400"
+                          placeholder="you@example.com"
+                        >
+                        <p class="mt-1 text-[0.7rem] text-slate-300">
+                          At least one of email or phone is required.
+                        </p>
+                      </div>
+                      <div>
+                        <label class="form-label text-[0.7rem] tracking-[0.22em] uppercase text-slate-200" for="phone">
+                          Phone
+                        </label>
+                        <input
+                          id="phone"
+                          name="phone"
+                          type="tel"
+                          autocomplete="tel"
+                          class="form-input bg-slate-900/60 border-slate-500/60 text-slate-50 placeholder:text-slate-400"
+                          placeholder="+39 ..."
+                        >
+                        <p class="mt-1 text-[0.7rem] text-slate-300">
+                          Include country code if applying from abroad.
+                        </p>
+                      </div>
+                      <div class="md:col-span-2">
+                        <label class="form-label text-[0.7rem] tracking-[0.22em] uppercase text-slate-200" for="linkedin_url">
+                          LinkedIn
+                        </label>
+                        <input
+                          id="linkedin_url"
+                          name="linkedin_url"
+                          type="url"
+                          class="form-input bg-slate-900/60 border-slate-500/60 text-slate-50 placeholder:text-slate-400"
+                          placeholder="Profile URL (optional)"
+                        >
+                      </div>
+                      <div class="md:col-span-2">
+                        <label class="form-label text-[0.7rem] tracking-[0.22em] uppercase text-slate-200" for="address">
+                          Current base
+                        </label>
+                        <input
+                          id="address"
+                          name="address"
+                          type="text"
+                          autocomplete="street-address"
+                          class="form-input bg-slate-900/60 border-slate-500/60 text-slate-50 placeholder:text-slate-400"
+                          placeholder="City, country"
+                        >
+                      </div>
+                      <div>
+                        <label class="form-label text-[0.7rem] tracking-[0.22em] uppercase text-slate-200" for="date_of_birth">
+                          Date of birth
+                        </label>
+                        <input
+                          id="date_of_birth"
+                          name="date_of_birth"
+                          type="date"
+                          class="form-input bg-slate-900/60 border-slate-500/60 text-slate-50"
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Step 2 -->
+                  <div data-step="2" class="space-y-4 hidden">
+                    <div>
+                      <h2 class="serif text-lg font-bold text-emerald-900">Step 2 · Professional profile</h2>
+                      <p class="text-xs text-slate-300 mt-1">
+                        Share a short overview of your professional experience and skills. You can keep this concise for now.
+                      </p>
+                    </div>
+
+                    <div class="space-y-4">
+                      <div>
+                        <label class="form-label text-[0.7rem] tracking-[0.22em] uppercase text-slate-200" for="position">
+                          Target position
+                        </label>
+                        <input
+                          id="position"
+                          name="position"
+                          type="text"
+                          class="form-input bg-slate-900/60 border-slate-500/60 text-slate-50 placeholder:text-slate-400"
+                          placeholder="e.g. General Manager, Sommelier, Private Chef"
+                        >
+                      </div>
+                      <div>
+                        <label class="form-label text-[0.7rem] tracking-[0.22em] uppercase text-slate-200" for="summary">
+                          Short professional summary
+                        </label>
+                        <textarea
+                          id="summary"
+                          name="summary"
+                          rows="4"
+                          class="form-input resize-none bg-slate-900/60 border-slate-500/60 text-slate-50 placeholder:text-slate-400"
+                          placeholder="A short paragraph about your background, specialisations, and type of properties or environments where you thrive."
+                        ></textarea>
+                      </div>
+                      <div>
+                        <label class="form-label text-[0.7rem] tracking-[0.22em] uppercase text-slate-200" for="skills">
+                          Key skills
+                        </label>
+                        <input
+                          id="skills"
+                          name="skills"
+                          type="text"
+                          class="form-input bg-slate-900/60 border-slate-500/60 text-slate-50 placeholder:text-slate-400"
+                          placeholder="Comma-separated · e.g. Wine pairing, Team leadership, Michelin service"
+                        >
+                        <p class="mt-1 text-[0.7rem] text-slate-300">
+                          We will convert this into a skills list on our side.
+                        </p>
+                      </div>
+                      <div>
+                        <label class="form-label text-[0.7rem] tracking-[0.22em] uppercase text-slate-200" for="languages">
+                          Languages
+                        </label>
+                        <input
+                          id="languages"
+                          name="languages"
+                          type="text"
+                          class="form-input bg-slate-900/60 border-slate-500/60 text-slate-50 placeholder:text-slate-400"
+                          placeholder="Comma-separated · e.g. Italian (native), English (C1), French (B2)"
+                        >
+                        <p class="mt-1 text-[0.7rem] text-slate-300">
+                          We will convert this into a languages list on our side.
+                        </p>
+                      </div>
+                      <div>
+                        <label class="form-label text-[0.7rem] tracking-[0.22em] uppercase text-slate-200" for="experience">
+                          Recent experience
+                        </label>
+                        <textarea
+                          id="experience"
+                          name="experience"
+                          rows="4"
+                          class="form-input resize-none bg-slate-900/60 border-slate-500/60 text-slate-50 placeholder:text-slate-400"
+                          placeholder="Optionally list your most relevant positions, properties, or employers."
+                        ></textarea>
+                        <p class="mt-1 text-[0.7rem] text-slate-300">
+                          For V1 this will be wrapped into a simple one-item experience array.
+                        </p>
+                      </div>
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label class="form-label text-[0.7rem] tracking-[0.22em] uppercase text-slate-200" for="cv_file">
+                            Curriculum vitae <span class="text-amber-300">*</span>
+                          </label>
+                          <div class="flex items-center gap-2 flex-wrap">
+                            <label for="cv_file" class="ie-btn ie-btn-secondary text-[0.7rem] tracking-[0.18em] uppercase">
+                              Upload CV
+                            </label>
+                            <span id="cvFileLabel" class="inline-flex items-center rounded-full border border-dashed border-slate-500/70 px-3 py-1 text-[0.75rem] text-slate-200">
+                              No file chosen
+                            </span>
+                          </div>
+                          <input
+                            id="cv_file"
+                            name="cv_file"
+                            type="file"
+                            accept=".pdf,.doc,.docx,.rtf"
+                            class="hidden"
+                          >
+                          <p class="mt-1 text-[0.7rem] text-slate-300">
+                            PDF preferred. Required for submission.
+                          </p>
+                        </div>
+                        <div>
+                          <label class="form-label text-[0.7rem] tracking-[0.22em] uppercase text-slate-200" for="photo_file">
+                            Photo
+                          </label>
+                          <div class="flex items-center gap-2 flex-wrap">
+                            <label for="photo_file" class="ie-btn ie-btn-secondary text-[0.7rem] tracking-[0.18em] uppercase">
+                              Upload photo
+                            </label>
+                            <span id="photoFileLabel" class="inline-flex items-center rounded-full border border-dashed border-slate-500/70 px-3 py-1 text-[0.75rem] text-slate-200">
+                              Optional
+                            </span>
+                          </div>
+                          <input
+                            id="photo_file"
+                            name="photo_file"
+                            type="file"
+                            accept="image/*"
+                            class="hidden"
+                          >
+                          <p class="mt-1 text-[0.7rem] text-slate-300">
+                            A professional portrait can help our team when reviewing your profile.
+                          </p>
+                        </div>
+                      </div>
+                      <div>
+                        <div class="flex items-start gap-2 text-[0.8rem] text-slate-100">
+                          <input
+                            id="privacy_consent"
+                            name="privacy_consent"
+                            type="checkbox"
+                            value="yes"
+                            class="mt-0.5 h-4 w-4 rounded border-slate-500/80 bg-slate-900/80 text-emerald-500"
+                          >
+                          <label for="privacy_consent">
+                            I have read and agree to the
+                            <a href="/ItalianExperience/privacy/" target="_blank" rel="noopener" class="underline decoration-amber-300/80">
+                              privacy policy
+                            </a>.
+                            <span class="text-amber-300 font-semibold">*</span>
+                          </label>
+                        </div>
+                        <p class="mt-1 text-[0.7rem] text-slate-300">
+                          Required for us to process and store your data and contact you about opportunities.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Hidden context and placeholder file fields -->
+                <input type="hidden" id="context_submission_type" name="context_submission_type" value="spontaneous">
+                <input type="hidden" id="context_job_offer_id" name="context_job_offer_id" value="">
+                <input type="hidden" id="context_source" name="context_source" value="website_public_form">
+
+                <input type="hidden" id="files_resume_path" name="files_resume_path" value="">
+                <input type="hidden" id="files_photo_path" name="files_photo_path" value="">
+
+                <!-- Honeypots (spam protection) -->
+                <div class="external-apply-honeypot" aria-hidden="true">
+                  <label>
+                    Website
+                    <input type="text" name="website" autocomplete="off" tabindex="-1">
+                  </label>
+                  <label>
+                    Privacy Website
+                    <input type="text" name="privacy_website" autocomplete="off" tabindex="-1">
+                  </label>
+                </div>
+
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 pt-4 border-t border-slate-600/60">
+                  <div class="text-[0.78rem] text-slate-300 flex items-center gap-2">
+                    <span>Step <span id="stepCounter">1</span> of 2</span>
+                    <span aria-hidden="true">·</span>
+                    <span>Approx. 3–4 minutes to complete</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button id="btnBack" type="button" class="ie-btn ie-btn-secondary text-[0.7rem] tracking-[0.18em] uppercase hidden">
+                      ← Back
+                    </button>
+                    <button id="btnNext" type="button" class="ie-btn ie-btn-primary text-[0.7rem] tracking-[0.18em] uppercase">
+                      Next →
+                    </button>
+                    <button id="btnSubmit" type="submit" class="ie-btn ie-btn-primary text-[0.7rem] tracking-[0.18em] uppercase hidden">
+                      Submit application →
+                    </button>
+                  </div>
+                </div>
+
+                <p id="submitSuccess" class="external-apply-success mt-3 text-[0.8rem] text-emerald-300">
+                  Thank you. Your application payload has been assembled. Integration with our submission endpoint will be added here.
+                </p>
+              </form>
+            </section>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Supabase (auth + data) -->
+  <script>
+    window.pageMeta = {
+      title: "Public Application",
+      subtitle: "Receive and triage external candidate applications submitted from the public website.",
+      breadcrumbs: [
+        { label: "Dashboard", entity: "dashboard" },
+        { label: "Public Application" }
+      ]
+    };
+  </script>
+  <script src="shared/header-loader.js"></script>
+  <script src="core/debug.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="core/supabase-client.js"></script>
+  <script src="core/data/candidates.js"></script>
+  <script src="core/data/clients.js"></script>
+  <script src="core/data/job-offers.js"></script>
+  <script src="core/data/applications.js"></script>
+  <script src="core/data/activity.js"></script>
+  <script src="core/supabase.js"></script>
+  <script src="core/auth.js"></script>
+  <script src="core/session-ready.js"></script>
+  <script src="core/router.js"></script>
+  <script src="runtime/router-runtime.js"></script>
+  <script src="runtime/forms-runtime.js"></script>
+  <script src="runtime/modals-runtime.js"></script>
+  <script src="runtime/profile-runtime.js"></script>
+  <script src="runtime/status-runtime.js"></script>
+  <script src="runtime/associations-runtime.js"></script>
+  <script src="runtime/candidate-profile-runtime.js"></script>
+  <script src="runtime/candidate-import-runtime.js"></script>
+  <script src="runtime/candidate-runtime.js"></script>
+  <script src="runtime/client-runtime.js"></script>
+  <script src="runtime/job-offer-runtime.js"></script>
+  <script src="runtime/header-runtime.js"></script>
+  <script src="runtime/global-header-actions-runtime.js"></script>
+  <script src="runtime/entity-actions-runtime.js"></script>
+  <script src="runtime/page-bootstrap.js"></script>
+  <script src="components/page-header.js"></script>
+  <script src="core/entity-toolbar.js"></script>
+  <script src="core/lists-runtime.js"></script>
+  <script src="core/session/session.js"></script>
+  <script src="core/ui/modals.js"></script>
+  <script src="core/ui/previews.js"></script>
+  <script src="core/app-shell.js"></script>
+  <script src="shared/activity-section.js"></script>
+
+  <script>
+    (function () {
+      const form = document.getElementById('applicationForm');
+      if (!form) return;
+
+      const stepElements = {
+        1: form.querySelector('[data-step="1"]'),
+        2: form.querySelector('[data-step="2"]')
+      };
+      const pillStep1 = document.getElementById('pillStep1');
+      const pillStep2 = document.getElementById('pillStep2');
+      const progressBar = document.getElementById('stepProgressBar');
+      const btnBack = document.getElementById('btnBack');
+      const btnNext = document.getElementById('btnNext');
+      const btnSubmit = document.getElementById('btnSubmit');
+      const stepCounter = document.getElementById('stepCounter');
+      const errorsBox = document.getElementById('formErrors');
+      const successBox = document.getElementById('submitSuccess');
+
+      const cvInput = document.getElementById('cv_file');
+      const cvLabel = document.getElementById('cvFileLabel');
+      const photoInput = document.getElementById('photo_file');
+      const photoLabel = document.getElementById('photoFileLabel');
+
+      let currentStep = 1;
+
+      function setFileLabel(fileInput, labelEl, emptyText) {
+        if (!fileInput || !labelEl) return;
+        const file = fileInput.files && fileInput.files[0];
+        if (file) {
+          labelEl.textContent = file.name;
+          labelEl.classList.remove('border-dashed');
+        } else {
+          labelEl.textContent = emptyText;
+          labelEl.classList.add('border-dashed');
+        }
+      }
+
+      if (cvInput) {
+        cvInput.addEventListener('change', function () {
+          setFileLabel(cvInput, cvLabel, 'No file chosen');
+        });
+      }
+      if (photoInput) {
+        photoInput.addEventListener('change', function () {
+          setFileLabel(photoInput, photoLabel, 'Optional');
+        });
+      }
+
+      function showErrors(messages) {
+        if (!errorsBox) return;
+        if (!messages || messages.length === 0) {
+          errorsBox.style.display = 'none';
+          errorsBox.innerHTML = '';
+          return;
+        }
+
+        const items = messages.map(function (msg) { return '<li>' + msg + '</li>'; }).join('');
+        errorsBox.innerHTML = '<strong>Please review the form:</strong><ul class="list-disc ml-4 mt-1 space-y-0.5">' + items + '</ul>';
+        errorsBox.style.display = 'block';
+      }
+
+      function goToStep(step) {
+        currentStep = step === 2 ? 2 : 1;
+
+        if (stepElements[1]) stepElements[1].classList.toggle('hidden', currentStep !== 1);
+        if (stepElements[2]) stepElements[2].classList.toggle('hidden', currentStep !== 2);
+
+        if (pillStep1) pillStep1.classList.toggle('external-apply-step-pill--active', currentStep === 1);
+        if (pillStep2) pillStep2.classList.toggle('external-apply-step-pill--active', currentStep === 2);
+
+        if (progressBar) {
+          progressBar.style.transform = currentStep === 1 ? 'scaleX(1)' : 'scaleX(2)';
+        }
+
+        if (btnBack) btnBack.classList.toggle('hidden', currentStep === 1);
+        if (btnNext) btnNext.classList.toggle('hidden', currentStep === 2);
+        if (btnSubmit) btnSubmit.classList.toggle('hidden', currentStep === 1);
+
+        if (stepCounter) {
+          stepCounter.textContent = String(currentStep);
+        }
+      }
+
+      function trimValue(id) {
+        const el = document.getElementById(id);
+        if (!el) return '';
+        return (el.value || '').trim();
+      }
+
+      function validateStep1() {
+        const messages = [];
+        const firstNameEl = document.getElementById('first_name');
+        const lastNameEl = document.getElementById('last_name');
+        const emailEl = document.getElementById('email');
+        const phoneEl = document.getElementById('phone');
+
+        const firstName = trimValue('first_name');
+        const lastName = trimValue('last_name');
+        const email = trimValue('email');
+        const phone = trimValue('phone');
+
+        if (!firstName) messages.push('First name is required.');
+        if (!lastName) messages.push('Last name is required.');
+        if (!email && !phone) messages.push('At least one contact method (email or phone) is required.');
+
+        if (email && emailEl && !emailEl.checkValidity()) {
+          messages.push('Please provide a valid email address.');
+        }
+
+        const valid = messages.length === 0;
+        var focusField = null;
+        if (!valid) {
+          focusField = firstNameEl && !firstName ? firstNameEl
+            : (lastNameEl && !lastName ? lastNameEl
+              : (emailEl && !email && !phone ? emailEl : null));
+        }
+
+        return { valid: valid, messages: messages, focusField: focusField };
+      }
+
+      function validateStep2() {
+        const messages = [];
+        const cvInput = document.getElementById('cv_file');
+        const privacyEl = document.getElementById('privacy_consent');
+
+        const hasCv = cvInput && cvInput.files && cvInput.files.length > 0;
+        if (!hasCv) {
+          messages.push('Please upload your CV (required for this version of the form).');
+        }
+
+        const privacyChecked = privacyEl && privacyEl.checked;
+        if (!privacyChecked) {
+          messages.push('Please provide privacy consent in order to submit your application.');
+        }
+
+        const valid = messages.length === 0;
+        var focusField = null;
+        if (!valid) {
+          focusField = !hasCv && cvInput ? cvInput : (!privacyChecked && privacyEl ? privacyEl : null);
+        }
+
+        return { valid: valid, messages: messages, focusField: focusField };
+      }
+
+      function validateAll() {
+        const step1 = validateStep1();
+        if (!step1.valid) {
+          return { valid: false, step: 1, messages: step1.messages, focusField: step1.focusField };
+        }
+        const step2 = validateStep2();
+        if (!step2.valid) {
+          return { valid: false, step: 2, messages: step2.messages, focusField: step2.focusField };
+        }
+        return { valid: true, step: 2, messages: [], focusField: null };
+      }
+
+      function buildApplicationPayload() {
+        const formData = new FormData(form);
+
+        const firstName = trimValue('first_name');
+        const lastName = trimValue('last_name');
+        const email = trimValue('email') || null;
+        const phone = trimValue('phone') || null;
+        const linkedinUrl = trimValue('linkedin_url') || null;
+        const address = trimValue('address') || null;
+        const dateOfBirth = trimValue('date_of_birth') || null;
+        const position = trimValue('position') || null;
+        const summary = trimValue('summary') || null;
+
+        const skillsRaw = trimValue('skills');
+        const languagesRaw = trimValue('languages');
+        const experienceRaw = trimValue('experience');
+
+        const skills = skillsRaw
+          ? skillsRaw.split(',').map(function (s) { return s.trim(); }).filter(Boolean)
+          : [];
+        const languages = languagesRaw
+          ? languagesRaw.split(',').map(function (s) { return s.trim(); }).filter(Boolean)
+          : [];
+        const experience = experienceRaw ? [experienceRaw] : [];
+
+        const contextSubmissionType = (formData.get('context_submission_type') || 'spontaneous').toString().trim() || 'spontaneous';
+        const contextJobOfferId = (formData.get('context_job_offer_id') || '').toString().trim() || null;
+        const contextSource = (formData.get('context_source') || 'website_public_form').toString().trim() || 'website_public_form';
+
+        const filesResumePath = (formData.get('files_resume_path') || '').toString().trim() || null;
+        const filesPhotoPath = (formData.get('files_photo_path') || '').toString().trim() || null;
+
+        const privacyConsent = formData.get('privacy_consent') != null;
+
+        const websiteHoneypot = (formData.get('website') || '').toString().trim() || null;
+        const privacyWebsiteHoneypot = (formData.get('privacy_website') || '').toString().trim() || null;
+
+        var payload = {
+          main: {
+            first_name: firstName,
+            last_name: lastName,
+            email: email,
+            phone: phone,
+            linkedin_url: linkedinUrl,
+            address: address,
+            date_of_birth: dateOfBirth,
+            position: position,
+            summary: summary
+          },
+          profile_children: {
+            skills: skills,
+            languages: languages,
+            experience: experience
+          },
+          context: {
+            submission_type: contextSubmissionType,
+            job_offer_id: contextJobOfferId,
+            source: contextSource
+          },
+          privacy: {
+            consent_privacy: privacyConsent,
+            website: privacyWebsiteHoneypot
+          },
+          files: {
+            resume_path: filesResumePath,
+            photo_path: filesPhotoPath
+          },
+          // Top-level website honeypot
+          website: websiteHoneypot
+        };
+
+        return payload;
+      }
+
+      if (btnNext) {
+        btnNext.addEventListener('click', function (event) {
+          event.preventDefault();
+          if (successBox) successBox.style.display = 'none';
+
+          const result = validateStep1();
+          if (!result.valid) {
+            goToStep(1);
+            showErrors(result.messages);
+            if (result.focusField && typeof result.focusField.focus === 'function') {
+              result.focusField.focus();
+            }
+            return;
+          }
+
+          showErrors([]);
+          goToStep(2);
+        });
+      }
+
+      if (btnBack) {
+        btnBack.addEventListener('click', function (event) {
+          event.preventDefault();
+          if (successBox) successBox.style.display = 'none';
+          showErrors([]);
+          goToStep(1);
+        });
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (successBox) successBox.style.display = 'none';
+
+        const result = validateAll();
+        if (!result.valid) {
+          goToStep(result.step);
+          showErrors(result.messages);
+          if (result.focusField && typeof result.focusField.focus === 'function') {
+            result.focusField.focus();
+          }
+          return;
+        }
+
+        showErrors([]);
+
+        const payload = buildApplicationPayload();
+        console.log('Application payload ready to submit:', payload);
+
+        // TODO: Integrate submission with Supabase Edge Function.
+        // Option A: Direct HTTP POST to the Edge Function endpoint, for example:
+        //   await fetch('https://<your-project>.functions.supabase.co/submit-external-application', {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify(payload),
+        //   });
+        //
+        // Option B: Use the Supabase JS client and invoke the Edge Function:
+        //   const { data, error } = await supabase.functions.invoke('submit-external-application', {
+        //     body: payload,
+        //   });
+        //
+        // IMPORTANT: do NOT hardcode the anon key in this file. Inject it via a runtime config or separate JS bootstrap instead.
+        //
+        // TODO (uploads): before calling the function, upload cv_file and photo_file
+        // to Supabase Storage (or another storage layer), then populate
+        // files_resume_path and files_photo_path with the final storage paths.
+
+        if (successBox) {
+          successBox.style.display = 'block';
+        }
+      });
+
+      goToStep(1);
+    })();
+  </script>
+</body>
+</html>
+

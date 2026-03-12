@@ -56,7 +56,7 @@
     var s = normalizeProfileStatusFromLegacy(status);
     switch (s) {
       case "pending_review":
-        return "Pending Review";
+        return "Pending Approval";
       case "approved":
         return "Approved";
       case "rejected":
@@ -64,7 +64,7 @@
       case "archived":
         return "Archived";
       default:
-        return "Pending Review";
+        return "Pending Approval";
     }
   }
 

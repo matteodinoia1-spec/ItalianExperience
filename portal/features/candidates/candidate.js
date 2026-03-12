@@ -459,7 +459,7 @@
       last_name: candidate.last_name || "",
       address: candidate.address || null,
       position: candidate.position || null,
-      status: candidate.status || "pending_review",
+      status: candidate.status || "approved",
       source: candidate.source || null,
       notes: candidate.notes || null,
       email: candidate.email || null,
@@ -760,7 +760,7 @@
         var profileStatusLabel =
           window.IEStatusRuntime && typeof window.IEStatusRuntime.formatProfileStatusLabel === "function"
             ? window.IEStatusRuntime.formatProfileStatusLabel(candidate.status)
-            : (candidate.status || "Pending Review").toString();
+            : (candidate.status || "Pending Approval").toString();
         statusRibbonEl.textContent = profileStatusLabel;
         var ribbonClass =
           window.IEStatusRuntime && typeof window.IEStatusRuntime.getProfileStatusBadgeClass === "function"
