@@ -116,12 +116,47 @@
             </div>
 
             <div data-ie-applications-view="list">
+                <!-- Applications Bulk Toolbar (appears when rows are selected) -->
+                <div class="mb-4 hidden" data-ie-applications-bulkbar>
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-3 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-100 text-sm">
+                        <p class="text-emerald-900 font-medium">
+                            <span data-ie-applications-bulk-count>0</span> applications selected
+                        </p>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <label class="sr-only" for="applications-bulk-status">Change status</label>
+                            <select id="applications-bulk-status" data-ie-applications-bulk-status class="filter-select min-w-[160px] appearance-none cursor-pointer">
+                                <option value="">Change status…</option>
+                                <option value="applied">Applied</option>
+                                <option value="screening">Screening</option>
+                                <option value="interview">Interview</option>
+                                <option value="offer">Offer</option>
+                                <option value="hired">Hired</option>
+                                <option value="rejected">Rejected</option>
+                                <option value="withdrawn">Withdrawn</option>
+                                <option value="not_selected">Not Selected</option>
+                            </select>
+                            <button type="button" data-action="applications-bulk-apply-status" class="ie-btn ie-btn-primary">
+                                Change status
+                            </button>
+                            <button type="button" data-action="applications-bulk-archive" class="ie-btn ie-btn-danger">
+                                Archive
+                            </button>
+                            <button type="button" data-action="applications-bulk-clear" class="ie-btn ie-btn-secondary">
+                                Clear selection
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="glass-card ie-card rounded-2xl overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="ie-table">
                             <thead class="bg-gray-50/80">
-                                <tr>
-                                    <th class="ie-table-th">Candidate</th>
+                            <tr>
+                                <th class="ie-table-th w-10">
+                                    <input type="checkbox" class="ie-table-checkbox" data-ie-applications-select-all>
+                                </th>
+                                <th class="ie-table-th">Candidate</th>
                                     <th class="ie-table-th">Job Offer</th>
                                     <th class="ie-table-th">Client</th>
                                     <th class="ie-table-th">Status</th>

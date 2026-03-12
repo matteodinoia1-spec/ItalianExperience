@@ -427,6 +427,250 @@
     }
   }
 
+  function loadJobOfferApplicationsSection(state) {
+    state = state || {};
+    var jobOfferId = state.id;
+    if (!jobOfferId) {
+      return Promise.resolve({ applications: [] });
+    }
+
+    if (
+      window.IEQueries &&
+      window.IEQueries.applications &&
+      typeof window.IEQueries.applications.getApplicationsByJob === "function"
+    ) {
+      return window.IEQueries.applications
+        .getApplicationsByJob(jobOfferId)
+        .then(function (result) {
+          if (!result || result.error || !Array.isArray(result.data)) {
+            return { applications: [] };
+          }
+          return { applications: result.data };
+        })
+        .catch(function (err) {
+          console.error(
+            "[JobOffer] getApplicationsByJob error (related section):",
+            err
+          );
+          return { applications: [] };
+        });
+    }
+
+    return Promise.resolve({ applications: [] });
+  }
+
+  function renderJobOfferApplicationsSection(state, data) {
+    state = state || {};
+    data = data || {};
+    var apps = data.applications || [];
+
+    var sectionEl = document.querySelector(
+      "[data-ie-joboffer-pipeline-section]"
+    );
+    var boardEl = document.querySelector(
+      "[data-ie-joboffer-pipeline-board]"
+    );
+    var summaryEl = document.querySelector(
+      "[data-ie-joboffer-pipeline-summary]"
+    );
+
+    if (!sectionEl || !boardEl || !summaryEl) {
+      return null;
+    }
+
+    if (!apps.length) {
+      sectionEl.style.display = "none";
+      return null;
+    }
+
+    function normalizeStatus(status) {
+      var s = (status || "").toString().toLowerCase();
+      if (s === "new") return "applied";
+      if (s === "offered") return "offer";
+      return s;
+    }
+
+    function renderBoard() {
+      var total = apps.length;
+      summaryEl.textContent =
+        total === 1
+          ? "1 application for this job."
+          : String(total) + " applications for this job.";
+
+      var columns = {
+        applied: [],
+        screening: [],
+        interview: [],
+        offer: [],
+        hired: [],
+      };
+
+      var appById = {};
+      apps.forEach(function (app) {
+        if (!app || !app.id) return;
+        appById[String(app.id)] = app;
+        var s = normalizeStatus(app.status);
+        if (!columns[s]) return;
+        columns[s].push(app);
+      });
+
+      boardEl.innerHTML = "";
+
+      Object.keys(columns).forEach(function (statusKey) {
+        var statusLabel =
+          statusKey.charAt(0).toUpperCase() + statusKey.slice(1);
+        var list = columns[statusKey];
+
+        var col = document.createElement("div");
+        col.className = "space-y-2";
+        col.setAttribute("data-pipeline-status", statusKey);
+
+        var header = document.createElement("div");
+        header.className = "flex items-center justify-between gap-2";
+        var title = document.createElement("p");
+        title.className =
+          "text-[11px] font-semibold uppercase tracking-widest text-gray-500";
+        title.textContent = statusLabel;
+        var countBadge = document.createElement("span");
+        countBadge.className =
+          "inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-gray-100 text-[10px] font-semibold text-gray-700";
+        countBadge.textContent = String(list.length);
+        header.appendChild(title);
+        header.appendChild(countBadge);
+        col.appendChild(header);
+
+        if (!list.length) {
+          var empty = document.createElement("div");
+          empty.className =
+            "text-[11px] text-gray-400 italic border border-dashed border-gray-200 rounded-xl p-2 text-center";
+          empty.textContent = "No candidates";
+          col.appendChild(empty);
+        } else {
+          list.forEach(function (app) {
+            var card = document.createElement("button");
+            card.type = "button";
+            card.className =
+              "w-full text-left bg-white rounded-xl border border-gray-100 p-2.5 shadow-sm cursor-pointer hover:border-emerald-300 hover:shadow-md transition";
+            card.setAttribute("data-application-id", String(app.id));
+            card.setAttribute(
+              "data-application-status",
+              normalizeStatus(app.status)
+            );
+            card.draggable = true;
+
+            var name = document.createElement("div");
+            name.className = "text-xs font-semibold text-gray-900 truncate";
+            name.textContent = app.candidate_name || "—";
+            card.appendChild(name);
+
+            if (app.candidate_position || app.candidate_location) {
+              var meta = document.createElement("div");
+              meta.className = "mt-0.5 text-[11px] text-gray-600 truncate";
+              var parts = [];
+              if (app.candidate_position) parts.push(app.candidate_position);
+              if (app.candidate_location) parts.push(app.candidate_location);
+              meta.textContent = parts.join(" • ");
+              card.appendChild(meta);
+            }
+
+            // Click navigates to application detail (when not dragging).
+            card.addEventListener("click", function (event) {
+              if (event.defaultPrevented) return;
+              var href;
+              if (
+                window.IEPortal &&
+                window.IEPortal.links &&
+                typeof window.IEPortal.links.applicationView === "function"
+              ) {
+                href = window.IEPortal.links.applicationView(app.id);
+              } else {
+                href =
+                  "application.html?id=" + encodeURIComponent(String(app.id));
+              }
+              if (
+                window.IERouter &&
+                typeof window.IERouter.navigateTo === "function"
+              ) {
+                window.IERouter.navigateTo(href);
+              } else {
+                window.location.href = href;
+              }
+            });
+
+            // Drag & drop handlers.
+            card.addEventListener("dragstart", function (e) {
+              try {
+                e.dataTransfer.effectAllowed = "move";
+                e.dataTransfer.setData("text/plain", String(app.id));
+              } catch (_) {}
+              card.classList.add("opacity-60");
+            });
+            card.addEventListener("dragend", function () {
+              card.classList.remove("opacity-60");
+            });
+
+            col.appendChild(card);
+          });
+        }
+
+        // Column drag-over / drop handlers.
+        col.addEventListener("dragover", function (e) {
+          e.preventDefault();
+          if (e.dataTransfer) {
+            e.dataTransfer.dropEffect = "move";
+          }
+          col.classList.add("ring-2", "ring-emerald-300", "ring-offset-1");
+        });
+        col.addEventListener("dragleave", function () {
+          col.classList.remove("ring-2", "ring-emerald-300", "ring-offset-1");
+        });
+        col.addEventListener("drop", function (e) {
+          e.preventDefault();
+          col.classList.remove("ring-2", "ring-emerald-300", "ring-offset-1");
+          var appId = null;
+          try {
+            appId = e.dataTransfer ? e.dataTransfer.getData("text/plain") : null;
+          } catch (_) {}
+          if (!appId) return;
+          var app = appById[String(appId)];
+          if (!app || !app.id) return;
+
+          var currentStatus = normalizeStatus(app.status);
+          var newStatus = statusKey;
+          if (!newStatus || newStatus === currentStatus) return;
+
+          // Optimistic UI update.
+          app.status = newStatus;
+          renderBoard();
+
+          // Persist status change.
+          if (
+            window.IEQueries &&
+            window.IEQueries.applications &&
+            typeof window.IEQueries.applications.updateApplicationStatus ===
+              "function"
+          ) {
+            window.IEQueries.applications
+              .updateApplicationStatus(app.id, newStatus)
+              .catch(function (err) {
+                console.error(
+                  "[JobOffer] updateApplicationStatus error from drag & drop:",
+                  err
+                );
+              });
+          }
+        });
+
+        boardEl.appendChild(col);
+      });
+
+      sectionEl.style.display = "";
+    }
+
+    renderBoard();
+    return null;
+  }
+
   function renderMain(options) {
     options = options || {};
     var entity = options.entity || null;
@@ -486,7 +730,6 @@
         "notes",
       ],
     },
-
     ui: {
       rootId: "jobOfferProfileRoot",
       toolbarContainerId: "jobOfferActions",
@@ -506,9 +749,17 @@
       buildSavePayload: buildSavePayload,
       performSave: performSave,
     },
-
     mode: {
       apply: applyMode,
+    },
+    related: {
+      sections: [
+        {
+          id: "job-offer-applications-pipeline",
+          load: loadJobOfferApplicationsSection,
+          render: renderJobOfferApplicationsSection,
+        },
+      ],
     },
   };
 })();

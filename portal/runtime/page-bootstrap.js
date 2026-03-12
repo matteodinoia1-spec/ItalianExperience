@@ -266,13 +266,27 @@
         window.IEProfileRuntime &&
         typeof window.IEProfileRuntime.loadCurrentUserProfile === "function"
       ) {
-        await window.IEProfileRuntime.loadCurrentUserProfile();
+        try {
+          await window.IEProfileRuntime.loadCurrentUserProfile();
+        } catch (err) {
+          console.error(
+            "[PageBootstrap] loadCurrentUserProfile error (non-blocking):",
+            err
+          );
+        }
       }
       if (
         window.IEPageBootstrapHelpers &&
         typeof window.IEPageBootstrapHelpers.initInactivityTimer === "function"
       ) {
-        window.IEPageBootstrapHelpers.initInactivityTimer();
+        try {
+          window.IEPageBootstrapHelpers.initInactivityTimer();
+        } catch (err2) {
+          console.error(
+            "[PageBootstrap] initInactivityTimer error (non-blocking):",
+            err2
+          );
+        }
       }
     }
 

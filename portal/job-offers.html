@@ -85,12 +85,42 @@
                             </button>
                         </div>
                     </div>
+                    <!-- Job Offers Bulk Toolbar (appears when rows are selected) -->
+                    <div class="mb-4 hidden" data-ie-joboffers-bulkbar>
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-3 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-100 text-sm">
+                            <p class="text-emerald-900 font-medium">
+                                <span data-ie-joboffers-bulk-count>0</span> offers selected
+                            </p>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <label class="sr-only" for="joboffers-bulk-status">Change status</label>
+                                <select id="joboffers-bulk-status" data-ie-joboffers-bulk-status class="filter-select min-w-[160px] appearance-none cursor-pointer">
+                                    <option value="">Change status…</option>
+                                    <option value="open">Open</option>
+                                    <option value="inprogress">In Progress</option>
+                                    <option value="closed">Closed</option>
+                                </select>
+                                <button type="button" data-action="joboffers-bulk-apply-status" class="ie-btn ie-btn-primary">
+                                    Change status
+                                </button>
+                                <button type="button" data-action="joboffers-bulk-archive" class="ie-btn ie-btn-danger">
+                                    Archive
+                                </button>
+                                <button type="button" data-action="joboffers-bulk-clear" class="ie-btn ie-btn-secondary">
+                                    Clear selection
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Job Offers Table Section -->
                     <div class="glass-card ie-card rounded-2xl overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="ie-table">
                         <thead class="bg-gray-50/80">
                             <tr>
+                                <th class="ie-table-th w-10">
+                                    <input type="checkbox" class="ie-table-checkbox" data-ie-joboffers-select-all>
+                                </th>
                                 <th class="ie-table-th">Job Title</th>
                                 <th class="ie-table-th">Position</th>
                                 <th class="ie-table-th">Client / Company</th>

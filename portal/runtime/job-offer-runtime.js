@@ -438,6 +438,142 @@
     });
   }
 
+  function renderCompactApplicationsPipeline(jobOfferId) {
+    if (
+      !jobOfferId ||
+      !window.IEQueries ||
+      !window.IEQueries.applications ||
+      typeof window.IEQueries.applications.getApplicationsByJob !== "function"
+    ) {
+      return;
+    }
+
+    var sectionEl = document.querySelector("[data-ie-joboffer-pipeline-section]");
+    var boardEl = document.querySelector("[data-ie-joboffer-pipeline-board]");
+    var summaryEl = document.querySelector("[data-ie-joboffer-pipeline-summary]");
+    if (!sectionEl || !boardEl || !summaryEl) return;
+
+    window.IEQueries.applications
+      .getApplicationsByJob(jobOfferId)
+      .then(function (result) {
+        if (result.error) {
+          console.error("[JobOffer] getApplicationsByJob error:", result.error);
+          return;
+        }
+        var apps = Array.isArray(result.data) ? result.data : [];
+        if (!apps.length) {
+          sectionEl.style.display = "none";
+          return;
+        }
+
+        var totals = apps.length;
+        summaryEl.textContent =
+          totals === 1
+            ? "1 application for this job."
+            : String(totals) + " applications for this job.";
+
+        var columns = {
+          applied: [],
+          screening: [],
+          interview: [],
+          offer: [],
+          hired: [],
+        };
+
+        apps.forEach(function (app) {
+          var s = (app.status || "").toString().toLowerCase();
+          if (s === "new") s = "applied";
+          if (s === "offered") s = "offer";
+          if (!columns[s]) return;
+          columns[s].push(app);
+        });
+
+        boardEl.innerHTML = "";
+
+        Object.keys(columns).forEach(function (statusKey) {
+          var statusLabel = statusKey.charAt(0).toUpperCase() + statusKey.slice(1);
+          var list = columns[statusKey];
+
+          var col = document.createElement("div");
+          col.className = "space-y-2";
+
+          var header = document.createElement("div");
+          header.className = "flex items-center justify-between gap-2";
+          var title = document.createElement("p");
+          title.className =
+            "text-[11px] font-semibold uppercase tracking-widest text-gray-500";
+          title.textContent = statusLabel;
+          var countBadge = document.createElement("span");
+          countBadge.className =
+            "inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-gray-100 text-[10px] font-semibold text-gray-700";
+          countBadge.textContent = String(list.length);
+          header.appendChild(title);
+          header.appendChild(countBadge);
+          col.appendChild(header);
+
+          if (!list.length) {
+            var empty = document.createElement("div");
+            empty.className =
+              "text-[11px] text-gray-400 italic border border-dashed border-gray-200 rounded-xl p-2 text-center";
+            empty.textContent = "No candidates";
+            col.appendChild(empty);
+          } else {
+            list.forEach(function (app) {
+              var card = document.createElement("button");
+              card.type = "button";
+              card.className =
+                "w-full text-left bg-white rounded-xl border border-gray-100 p-2.5 shadow-sm cursor-pointer hover:border-emerald-300 hover:shadow-md transition";
+
+              var name = document.createElement("div");
+              name.className = "text-xs font-semibold text-gray-900 truncate";
+              name.textContent = app.candidate_name || "—";
+              card.appendChild(name);
+
+              if (app.candidate_position || app.candidate_location) {
+                var meta = document.createElement("div");
+                meta.className = "mt-0.5 text-[11px] text-gray-600 truncate";
+                var parts = [];
+                if (app.candidate_position) parts.push(app.candidate_position);
+                if (app.candidate_location) parts.push(app.candidate_location);
+                meta.textContent = parts.join(" • ");
+                card.appendChild(meta);
+              }
+
+              card.addEventListener("click", function () {
+                var href;
+                if (
+                  window.IEPortal &&
+                  window.IEPortal.links &&
+                  typeof window.IEPortal.links.applicationView === "function"
+                ) {
+                  href = window.IEPortal.links.applicationView(app.id);
+                } else {
+                  href = "application.html?id=" + encodeURIComponent(String(app.id));
+                }
+                if (
+                  window.IERouter &&
+                  typeof window.IERouter.navigateTo === "function"
+                ) {
+                  window.IERouter.navigateTo(href);
+                } else {
+                  window.location.href = href;
+                }
+              });
+
+              col.appendChild(card);
+            });
+          }
+
+          boardEl.appendChild(col);
+        });
+
+        sectionEl.style.display = "";
+      })
+      .catch(function (err) {
+        console.error("[JobOffer] getApplicationsByJob exception:", err);
+      });
+  }
+
   function setPageMode(mode, id) {
     const form = document.querySelector("#jobOfferForm");
     if (!form) return;
@@ -836,6 +972,9 @@
                 renderActionButtons: renderActionButtons,
               });
             }
+            if (typeof renderCompactApplicationsPipeline === "function") {
+              renderCompactApplicationsPipeline(offerId);
+            }
           }
         })
         .catch(function (err) {
@@ -868,6 +1007,7 @@
     openReopenOfferModal: openReopenOfferModal,
     openAssociationRejectionModal: openAssociationRejectionModal,
     hydrateJobOfferClientAutocomplete: hydrateJobOfferClientAutocomplete,
+    renderCompactApplicationsPipeline: renderCompactApplicationsPipeline
   };
 })();
 
