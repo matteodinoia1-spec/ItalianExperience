@@ -354,7 +354,22 @@
         return async function () {
           var payload;
           try {
+            console.log("[CandidateSaveDebug] Save handler invoked", {
+              entityType: config.entityType,
+              id: state.id,
+              mode: state.mode,
+            });
+            console.log("[CandidateSaveDebug] Before buildSavePayload", {
+              stateId: state.id,
+              mode: state.mode,
+            });
             payload = await config.data.buildSavePayload(state);
+            console.log("[CandidateSaveDebug] After buildSavePayload", {
+              id: state.id,
+              mode: state.mode,
+              payloadMain: payload && payload.main,
+              payloadChildren: payload && payload.children,
+            });
           } catch (errBuild) {
             console.error(
               "[EntityPageShell] data.buildSavePayload error:",
@@ -365,7 +380,18 @@
 
           var result;
           try {
+            console.log("[CandidateSaveDebug] Before performSave", {
+              id: state.id,
+              mode: state.mode,
+              payloadMain: payload && payload.main,
+              payloadChildren: payload && payload.children,
+            });
             result = await config.data.performSave(state, payload || {});
+            console.log("[CandidateSaveDebug] After performSave", {
+              id: state.id,
+              mode: state.mode,
+              result: result,
+            });
           } catch (errSave) {
             console.error(
               "[EntityPageShell] data.performSave error:",

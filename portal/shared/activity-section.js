@@ -82,16 +82,6 @@
 
     var section = buildEl("section", "entity-activity");
 
-    var header = buildEl("div", "entity-activity__header");
-    var title = buildEl("h3", "entity-activity__title serif", "Activity");
-    var subtitle = buildEl(
-      "p",
-      "entity-activity__subtitle",
-      "Compact timeline (latest first)"
-    );
-    header.appendChild(title);
-    header.appendChild(subtitle);
-
     var composer = buildEl("div", "entity-activity__composer");
     var textarea = document.createElement("textarea");
     textarea.className = "entity-activity__textarea";
@@ -118,7 +108,8 @@
     var timeline = buildEl("div", "entity-activity__timeline");
     var footer = buildEl("div", "entity-activity__footer");
 
-    section.appendChild(header);
+    // Host pages render their own heading (e.g. "Activity Log").
+    // This component only renders the composer and timeline.
     section.appendChild(composer);
     section.appendChild(timeline);
     section.appendChild(footer);
