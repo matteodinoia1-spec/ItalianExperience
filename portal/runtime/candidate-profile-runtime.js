@@ -270,10 +270,31 @@
     var errorMessage = "Error saving candidate profile.";
 
     try {
+      console.log("[CandidateSaveDebug] saveCandidateProfileChildren called", {
+        candidateId: candidateId,
+        profile: profile,
+      });
+    } catch (_) {}
+
+    try {
       if (typeof api.replaceCandidateSkills === "function") {
+        console.log(
+          "[CandidateSaveDebug] replaceCandidateSkills input",
+          {
+            candidateId: candidateId,
+            skills: (profile && profile.skills) || [],
+          }
+        );
         var skillsResult = await api.replaceCandidateSkills(
           candidateId,
           (profile && profile.skills) || []
+        );
+        console.log(
+          "[CandidateSaveDebug] replaceCandidateSkills result",
+          {
+            candidateId: candidateId,
+            result: skillsResult,
+          }
         );
         if (skillsResult && skillsResult.error) {
           console.error(
@@ -286,9 +307,23 @@
       }
 
       if (typeof api.replaceCandidateLanguages === "function") {
+        console.log(
+          "[CandidateSaveDebug] replaceCandidateLanguages input",
+          {
+            candidateId: candidateId,
+            languages: (profile && profile.languages) || [],
+          }
+        );
         var languagesResult = await api.replaceCandidateLanguages(
           candidateId,
           (profile && profile.languages) || []
+        );
+        console.log(
+          "[CandidateSaveDebug] replaceCandidateLanguages result",
+          {
+            candidateId: candidateId,
+            result: languagesResult,
+          }
         );
         if (languagesResult && languagesResult.error) {
           console.error(
@@ -302,9 +337,23 @@
       }
 
       if (typeof api.replaceCandidateExperience === "function") {
+        console.log(
+          "[CandidateSaveDebug] replaceCandidateExperience input",
+          {
+            candidateId: candidateId,
+            experience: (profile && profile.experience) || [],
+          }
+        );
         var experienceResult = await api.replaceCandidateExperience(
           candidateId,
           (profile && profile.experience) || []
+        );
+        console.log(
+          "[CandidateSaveDebug] replaceCandidateExperience result",
+          {
+            candidateId: candidateId,
+            result: experienceResult,
+          }
         );
         if (experienceResult && experienceResult.error) {
           console.error(
@@ -318,9 +367,23 @@
       }
 
       if (typeof api.replaceCandidateEducation === "function") {
+        console.log(
+          "[CandidateSaveDebug] replaceCandidateEducation input",
+          {
+            candidateId: candidateId,
+            education: (profile && profile.education) || [],
+          }
+        );
         var educationResult = await api.replaceCandidateEducation(
           candidateId,
           (profile && profile.education) || []
+        );
+        console.log(
+          "[CandidateSaveDebug] replaceCandidateEducation result",
+          {
+            candidateId: candidateId,
+            result: educationResult,
+          }
         );
         if (educationResult && educationResult.error) {
           console.error(
@@ -334,9 +397,23 @@
       }
 
       if (typeof api.replaceCandidateCertifications === "function") {
+        console.log(
+          "[CandidateSaveDebug] replaceCandidateCertifications input",
+          {
+            candidateId: candidateId,
+            certifications: (profile && profile.certifications) || [],
+          }
+        );
         var certificationsResult = await api.replaceCandidateCertifications(
           candidateId,
           (profile && profile.certifications) || []
+        );
+        console.log(
+          "[CandidateSaveDebug] replaceCandidateCertifications result",
+          {
+            candidateId: candidateId,
+            result: certificationsResult,
+          }
         );
         if (certificationsResult && certificationsResult.error) {
           console.error(
@@ -350,9 +427,23 @@
       }
 
       if (typeof api.replaceCandidateHobbies === "function") {
+        console.log(
+          "[CandidateSaveDebug] replaceCandidateHobbies input",
+          {
+            candidateId: candidateId,
+            hobbies: (profile && profile.hobbies) || [],
+          }
+        );
         var hobbiesResult = await api.replaceCandidateHobbies(
           candidateId,
           (profile && profile.hobbies) || []
+        );
+        console.log(
+          "[CandidateSaveDebug] replaceCandidateHobbies result",
+          {
+            candidateId: candidateId,
+            result: hobbiesResult,
+          }
         );
         if (hobbiesResult && hobbiesResult.error) {
           console.error(
@@ -369,9 +460,23 @@
         err
       );
       if (api.showError) api.showError(errorMessage, "saveCandidateProfileChildren");
+      try {
+        console.log(
+          "[CandidateSaveDebug] saveCandidateProfileChildren exception result",
+          {
+            candidateId: candidateId,
+            error: err,
+          }
+        );
+      } catch (_) {}
       return { ok: false, error: err };
     }
 
+    try {
+      console.log("[CandidateSaveDebug] saveCandidateProfileChildren success", {
+        candidateId: candidateId,
+      });
+    } catch (_) {}
     return { ok: true };
   }
 
@@ -387,7 +492,7 @@
 
     try {
       await window.IESupabase.createAutoLog("candidate", candidateId, {
-        event_type: "updated",
+        event_type: "system_event",
         message: "Candidate profile updated",
         metadata: null,
       });

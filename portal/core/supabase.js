@@ -386,7 +386,27 @@
     if (!mod || typeof mod.updateCandidate !== "function") {
       return { data: null, error: new Error("Candidates module not available") };
     }
-    return mod.updateCandidate(id, payload);
+    try {
+      console.log("[CandidateSaveDebug] IESupabase.updateCandidate request", {
+        candidateId: id,
+        payloadMain: payload,
+      });
+    } catch (_) {}
+    const result = await mod.updateCandidate(id, payload);
+    try {
+      console.log("[CandidateSaveDebug] IESupabase.updateCandidate response", {
+        candidateId: id,
+        data: result && result.data,
+        error: result && result.error,
+      });
+      if (result && result.error) {
+        console.error(
+          "[CandidateSaveDebug] IESupabase.updateCandidate Supabase error",
+          result.error
+        );
+      }
+    } catch (_) {}
+    return result;
   }
 
   async function updateCandidateProfileStatus(id, status) {
@@ -1467,7 +1487,14 @@
   async function createAutoLog(entityType, entityId, payload) {
     const mod = getActivityModule();
     if (!mod || typeof mod.createAutoLog !== "function") {
-      return { data: null, error: new Error("Activity module not available") };
+      // Auto-logs must never block the main flow (saves/updates).
+      // When the activity module is missing, treat logging as a no-op.
+      if (typeof window.debugLog === "function") {
+        window.debugLog(
+          "[Supabase] Skipping auto activity log; activity module not available."
+        );
+      }
+      return { data: null, error: null };
     }
     return mod.createAutoLog(entityType, entityId, payload);
   }

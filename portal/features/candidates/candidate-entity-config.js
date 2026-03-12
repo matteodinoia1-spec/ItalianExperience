@@ -183,6 +183,8 @@
   function applyMode(mode, context) {
     if (!context || !mode) return;
 
+    var entity = context && context.entity ? context.entity : null;
+
     if (typeof window.applyModeToProfileFields === "function") {
       window.applyModeToProfileFields(mode);
     }
@@ -196,13 +198,50 @@
       window.applyActivityVisibility(mode);
     }
     if (typeof window.applyDocumentsMode === "function") {
-      window.applyDocumentsMode(
-        mode,
-        context && context.entity ? context.entity : null
-      );
+      window.applyDocumentsMode(mode, entity);
     }
     if (typeof window.applyJsonImportVisibility === "function") {
       window.applyJsonImportVisibility(mode);
+    }
+
+    // When the candidate entity page is in edit mode, mount the inline
+    // profile repeatable sections (experience, skills, etc.) and wire
+    // the JSON import controls so that Add/Remove buttons and parser
+    // hydration work as before the entity-page refactor.
+    if (mode === "edit") {
+      try {
+        var profileRoot = document.getElementById("candidateInlineProfileForm");
+        if (
+          profileRoot &&
+          window.IECandidateProfileRuntime &&
+          typeof window.IECandidateProfileRuntime.initCandidateProfileSections ===
+            "function"
+        ) {
+          window.IECandidateProfileRuntime.initCandidateProfileSections(
+            profileRoot,
+            "edit",
+            entity
+          );
+        }
+
+        if (
+          profileRoot &&
+          window.IECandidateImportRuntime &&
+          typeof window.IECandidateImportRuntime.initCandidateJsonImport ===
+            "function"
+        ) {
+          window.IECandidateImportRuntime.initCandidateJsonImport(
+            profileRoot,
+            { allowExistingCandidate: true }
+          );
+        }
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(
+          "[Candidate] mode.apply profile wiring error:",
+          err
+        );
+      }
     }
   }
 
@@ -236,6 +275,30 @@
 
     if (typeof window.renderCandidateCore === "function") {
       window.renderCandidateCore(entity, id, mode);
+    }
+
+    // Hydrate read-only profile sections and documents so that the
+    // entity-page shell preserves the legacy candidate.html behaviour.
+    try {
+      if (typeof window.loadCandidateProfileSections === "function") {
+        window.loadCandidateProfileSections(id);
+      }
+      if (typeof window.renderDocuments === "function") {
+        window.renderDocuments(entity);
+      }
+      if (typeof window.wireAddApplicationButton === "function") {
+        console.log(
+          "[AddApplicationDebug] renderMain wiring Add Application button",
+          {
+            candidateId: id,
+            mode: mode,
+          }
+        );
+        window.wireAddApplicationButton(id);
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[Candidate] renderMain profile wiring error:", err);
     }
   }
 
@@ -388,10 +451,20 @@
       );
     }
 
-    return {
+    var payload = {
       main: payload,
       children: profile,
     };
+
+    try {
+      console.log("[CandidateSaveDebug] buildSavePayload result", {
+        id: state.id,
+        main: payload.main || payload,
+        children: payload.children || profile,
+      });
+    } catch (_) {}
+
+    return payload;
   }
 
   async function performSave(state, payload) {
@@ -416,10 +489,19 @@
     var currentEntity = state.entity || {};
 
     try {
+      console.log("[CandidateSaveDebug] performSave start", {
+        candidateId: candidateId,
+        main: main,
+        children: children,
+      });
       var result = await window.IESupabase.updateCandidate(
         candidateId,
         main
       );
+      console.log("[CandidateSaveDebug] IESupabase.updateCandidate result", {
+        candidateId: candidateId,
+        result: result,
+      });
       if (!result || result.error) {
         console.error(
           "[Candidate] updateCandidate error from inline edit:",
@@ -448,12 +530,33 @@
         typeof window.IECandidateProfileRuntime.saveCandidateProfileChildren ===
           "function"
       ) {
+        console.log(
+          "[CandidateSaveDebug] saveCandidateProfileChildren input",
+          {
+            candidateId: candidateId,
+            children: children,
+          }
+        );
         var childrenResult =
           await window.IECandidateProfileRuntime.saveCandidateProfileChildren(
             candidateId,
             children
           );
+        console.log(
+          "[CandidateSaveDebug] saveCandidateProfileChildren result",
+          {
+            candidateId: candidateId,
+            result: childrenResult,
+          }
+        );
         if (!childrenResult || childrenResult.ok === false) {
+          console.log(
+            "[CandidateSaveDebug] saveCandidateProfileChildren returned not ok; halting redirect",
+            {
+              candidateId: candidateId,
+              result: childrenResult,
+            }
+          );
           return { entity: updatedCandidate, haltRedirect: true };
         }
       }
@@ -475,6 +578,10 @@
         }
       }
 
+      console.log("[CandidateSaveDebug] performSave success", {
+        candidateId: candidateId,
+        updatedEntity: updatedCandidate,
+      });
       return { entity: updatedCandidate, haltRedirect: false };
     } catch (err) {
       console.error(

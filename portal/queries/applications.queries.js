@@ -5,14 +5,19 @@
 (function () {
   "use strict";
 
-  if (!window.IESupabase || !window.IESupabase.supabase) {
-    console.error(
-      "[ApplicationsQueries] IESupabase.supabase is not available. Make sure core/supabase.js is loaded first."
-    );
-    return;
+  function getSupabaseClient() {
+    var client =
+      window.IESupabase && window.IESupabase.supabase
+        ? window.IESupabase.supabase
+        : null;
+    if (!client) {
+      console.error(
+        "[ApplicationsQueries] Supabase client is not available. " +
+          "Ensure core/supabase.js has initialized IESupabase before calling IEQueries.applications.*"
+      );
+    }
+    return client;
   }
-
-  var supabase = window.IESupabase.supabase;
 
   var ACTIVE_STATUSES = ["applied", "screening", "interview", "offer", "hired"];
 
@@ -104,6 +109,10 @@
   }
 
   async function getApplications(opts) {
+    var supabase = getSupabaseClient();
+    if (!supabase) {
+      return { data: [], totalCount: 0, error: new Error("Supabase client not available") };
+    }
     var options = opts || {};
     var page = Math.max(1, parseInt(options.page, 10) || 1);
     var limit = Math.max(1, Math.min(100, parseInt(options.limit, 10) || 25));
@@ -182,6 +191,10 @@
   }
 
   async function getApplicationsByCandidate(candidateId) {
+    var supabase = getSupabaseClient();
+    if (!supabase) {
+      return { data: [], error: new Error("Supabase client not available") };
+    }
     if (!candidateId) {
       return { data: [], error: null };
     }
@@ -227,6 +240,10 @@
   }
 
   async function getApplicationsByJob(jobOfferId) {
+    var supabase = getSupabaseClient();
+    if (!supabase) {
+      return { data: [], error: new Error("Supabase client not available") };
+    }
     if (!jobOfferId) {
       return { data: [], error: null };
     }
@@ -272,6 +289,10 @@
   }
 
   async function getApplicationById(id) {
+    var supabase = getSupabaseClient();
+    if (!supabase) {
+      return { data: null, error: new Error("Supabase client not available") };
+    }
     if (!id) {
       return { data: null, error: new Error("Missing application id") };
     }
@@ -314,6 +335,10 @@
   }
 
   async function getPipelineCounts(filters) {
+    var supabase = getSupabaseClient();
+    if (!supabase) {
+      return { data: {}, error: new Error("Supabase client not available") };
+    }
     var f = filters || {};
     var baseFilters = Object.assign({}, f);
     delete baseFilters.status;
@@ -357,6 +382,10 @@
   }
 
   async function createApplication(candidateId, jobOfferId, options) {
+    var supabase = getSupabaseClient();
+    if (!supabase) {
+      return { data: null, error: new Error("Supabase client not available") };
+    }
     if (!candidateId || !jobOfferId) {
       return {
         data: null,
@@ -513,6 +542,10 @@
   }
 
   async function getArchivedApplications(opts) {
+    var supabase = getSupabaseClient();
+    if (!supabase) {
+      return { data: [], error: new Error("Supabase client not available") };
+    }
     var options = opts || {};
     try {
       var q = supabase
@@ -560,6 +593,11 @@
     if (!id) {
       return { data: null, error: new Error("Missing application id") };
     }
+    var supabase = getSupabaseClient();
+    if (!supabase && !window.IESupabase) {
+      return { data: null, error: new Error("Supabase client not available") };
+    }
+
     try {
       var result;
       if (

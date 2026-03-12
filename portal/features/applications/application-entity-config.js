@@ -148,6 +148,13 @@
     var id = args.id;
     var mode = args.mode || "view";
 
+    try {
+      console.log("[ApplicationHydrationDebug] loadEntity invoked", {
+        id: id,
+        mode: mode,
+      });
+    } catch (_) {}
+
     if (!id) {
       return { entity: null, mode: mode };
     }
@@ -169,6 +176,15 @@
           "applicationEntityPage"
         );
       }
+      try {
+        console.log(
+          "[ApplicationHydrationDebug] loadEntity missing IEQueries.applications.getApplicationById",
+          {
+            id: id,
+            mode: mode,
+          }
+        );
+      } catch (_) {}
       return { entity: null, mode: mode };
     }
 
@@ -179,6 +195,13 @@
           "[ApplicationEntityConfig] getApplicationById error:",
           result && result.error
         );
+        try {
+          console.log("[ApplicationHydrationDebug] loadEntity error result", {
+            id: id,
+            mode: mode,
+            error: result && result.error,
+          });
+        } catch (_) {}
         if (
           window.IESupabase &&
           typeof window.IESupabase.showError === "function"
@@ -194,12 +217,27 @@
         return { entity: null, mode: mode };
       }
 
+      try {
+        console.log("[ApplicationHydrationDebug] loadEntity success", {
+          id: id,
+          mode: mode,
+          application: result && result.data,
+        });
+      } catch (_) {}
+
       return { entity: result.data || null, mode: mode };
     } catch (err) {
       console.error(
         "[ApplicationEntityConfig] getApplicationById exception:",
         err
       );
+      try {
+        console.log("[ApplicationHydrationDebug] loadEntity exception", {
+          id: id,
+          mode: mode,
+          error: err,
+        });
+      } catch (_) {}
       if (
         window.IESupabase &&
         typeof window.IESupabase.showError === "function"
