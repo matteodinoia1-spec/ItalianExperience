@@ -536,8 +536,6 @@
         return;
       }
 
-      pipelineBoardEl.innerHTML = "";
-
       var queryFilters = {
         status: "",
         jobOfferId: filters.jobOfferId || undefined,
@@ -560,7 +558,19 @@
             );
             return;
           }
-          var rows = Array.isArray(result.data) ? result.data : [];
+          var rows = Array.isArray(result.data) ? result.data.slice() : [];
+          if (!rows.length) {
+            pipelineBoardEl.innerHTML = "";
+            return;
+          }
+
+          function normalizeStatus(status) {
+            var s = (status || "").toString().toLowerCase();
+            if (s === "new") return "applied";
+            if (s === "offered") return "offer";
+            return s;
+          }
+
           var columns = {
             applied: [],
             screening: [],
@@ -568,76 +578,186 @@
             offer: [],
             hired: [],
           };
+          var appById = {};
           rows.forEach(function (app) {
-            var s = (app.status || "").toLowerCase();
-            if (s === "new") s = "applied";
-            if (s === "offered") s = "offer";
+            if (!app || !app.id) return;
+            appById[String(app.id)] = app;
+            var s = normalizeStatus(app.status);
             if (!columns[s]) return;
             columns[s].push(app);
           });
 
-          Object.keys(columns).forEach(function (statusKey) {
-            var col = document.createElement("div");
-            col.className = "space-y-3";
-            var title = document.createElement("div");
-            title.className =
-              "text-xs font-semibold uppercase tracking-widest text-gray-500";
-            title.textContent = statusKey;
-            col.appendChild(title);
+          function renderBoard() {
+            pipelineBoardEl.innerHTML = "";
 
-            var items = columns[statusKey];
-            if (!items.length) {
-              var empty = document.createElement("div");
-              empty.className =
-                "text-xs text-gray-400 italic border border-dashed border-gray-200 rounded-xl p-3 text-center";
-              empty.textContent = "No applications";
-              col.appendChild(empty);
-            } else {
-              items.forEach(function (app) {
-                var card = document.createElement("div");
-                card.className =
-                  "bg-white rounded-xl border border-gray-100 p-3 shadow-sm cursor-pointer hover:border-emerald-300 hover:shadow-md transition";
-                var name = document.createElement("div");
-                name.className =
-                  "text-sm font-semibold text-gray-900 truncate";
-                name.textContent = app.candidate_name || "—";
-                card.appendChild(name);
+            Object.keys(columns).forEach(function (statusKey) {
+              var col = document.createElement("div");
+              col.className = "space-y-3";
+              col.setAttribute("data-pipeline-status", statusKey);
 
-                var job = document.createElement("div");
-                job.className = "text-xs text-gray-600 truncate";
-                job.textContent = app.job_offer_title || "—";
-                card.appendChild(job);
+              var title = document.createElement("div");
+              title.className =
+                "text-xs font-semibold uppercase tracking-widest text-gray-500 flex items-center justify-between gap-2";
 
-                card.addEventListener("click", function () {
-                  var href;
-                  if (
-                    window.IEPortal &&
-                    window.IEPortal.links &&
-                    typeof window.IEPortal.links.applicationView ===
-                      "function"
-                  ) {
-                    href = window.IEPortal.links.applicationView(app.id);
-                  } else {
-                    href =
-                      "application.html?id=" +
-                      encodeURIComponent(String(app.id));
-                  }
-                  if (
-                    window.IERouter &&
-                    typeof window.IERouter.navigateTo === "function"
-                  ) {
-                    window.IERouter.navigateTo(href);
-                  } else {
-                    window.location.href = href;
-                  }
+              var labelSpan = document.createElement("span");
+              labelSpan.textContent = statusKey;
+              var countSpan = document.createElement("span");
+              countSpan.className =
+                "inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-gray-100 text-[10px] font-semibold text-gray-700";
+              countSpan.textContent = String(columns[statusKey].length);
+
+              title.appendChild(labelSpan);
+              title.appendChild(countSpan);
+              col.appendChild(title);
+
+              var items = columns[statusKey];
+              if (!items.length) {
+                var empty = document.createElement("div");
+                empty.className =
+                  "text-xs text-gray-400 italic border border-dashed border-gray-200 rounded-xl p-3 text-center";
+                empty.textContent = "No applications";
+                col.appendChild(empty);
+              } else {
+                items.forEach(function (app) {
+                  var card = document.createElement("div");
+                  card.className =
+                    "bg-white rounded-xl border border-gray-100 p-3 shadow-sm cursor-pointer hover:border-emerald-300 hover:shadow-md transition";
+                  card.setAttribute("data-application-id", String(app.id));
+                  card.setAttribute(
+                    "data-application-status",
+                    normalizeStatus(app.status)
+                  );
+                  card.draggable = true;
+
+                  var name = document.createElement("div");
+                  name.className =
+                    "text-sm font-semibold text-gray-900 truncate";
+                  name.textContent = app.candidate_name || "—";
+                  card.appendChild(name);
+
+                  var job = document.createElement("div");
+                  job.className = "text-xs text-gray-600 truncate";
+                  job.textContent = app.job_offer_title || "—";
+                  card.appendChild(job);
+
+                  card.addEventListener("click", function (event) {
+                    if (event.defaultPrevented) return;
+                    var href;
+                    if (
+                      window.IEPortal &&
+                      window.IEPortal.links &&
+                      typeof window.IEPortal.links.applicationView ===
+                        "function"
+                    ) {
+                      href = window.IEPortal.links.applicationView(app.id);
+                    } else {
+                      href =
+                        "application.html?id=" +
+                        encodeURIComponent(String(app.id));
+                    }
+                    if (
+                      window.IERouter &&
+                      typeof window.IERouter.navigateTo === "function"
+                    ) {
+                      window.IERouter.navigateTo(href);
+                    } else {
+                      window.location.href = href;
+                    }
+                  });
+
+                  card.addEventListener("dragstart", function (e) {
+                    try {
+                      e.dataTransfer.effectAllowed = "move";
+                      e.dataTransfer.setData(
+                        "text/plain",
+                        String(app.id)
+                      );
+                    } catch (_) {}
+                    card.classList.add("opacity-60");
+                  });
+                  card.addEventListener("dragend", function () {
+                    card.classList.remove("opacity-60");
+                  });
+
+                  col.appendChild(card);
                 });
+              }
 
-                col.appendChild(card);
+              col.addEventListener("dragover", function (e) {
+                e.preventDefault();
+                if (e.dataTransfer) {
+                  e.dataTransfer.dropEffect = "move";
+                }
+                col.classList.add(
+                  "ring-2",
+                  "ring-emerald-300",
+                  "ring-offset-1"
+                );
               });
-            }
+              col.addEventListener("dragleave", function () {
+                col.classList.remove(
+                  "ring-2",
+                  "ring-emerald-300",
+                  "ring-offset-1"
+                );
+              });
+              col.addEventListener("drop", function (e) {
+                e.preventDefault();
+                col.classList.remove(
+                  "ring-2",
+                  "ring-emerald-300",
+                  "ring-offset-1"
+                );
+                var appId = null;
+                try {
+                  appId = e.dataTransfer
+                    ? e.dataTransfer.getData("text/plain")
+                    : null;
+                } catch (_) {}
+                if (!appId) return;
+                var app = appById[String(appId)];
+                if (!app || !app.id) return;
 
-            pipelineBoardEl.appendChild(col);
-          });
+                var currentStatus = normalizeStatus(app.status);
+                var newStatus = statusKey;
+                if (!newStatus || newStatus === currentStatus) return;
+
+                // Optimistic UI update.
+                app.status = newStatus;
+                Object.keys(columns).forEach(function (key) {
+                  columns[key] = columns[key].filter(function (a) {
+                    return String(a.id) !== String(app.id);
+                  });
+                });
+                if (!columns[newStatus]) {
+                  columns[newStatus] = [];
+                }
+                columns[newStatus].push(app);
+                renderBoard();
+
+                // Persist status change.
+                if (
+                  window.IEQueries &&
+                  window.IEQueries.applications &&
+                  typeof window.IEQueries.applications
+                    .updateApplicationStatus === "function"
+                ) {
+                  window.IEQueries.applications
+                    .updateApplicationStatus(app.id, newStatus)
+                    .catch(function (err) {
+                      console.error(
+                        "[Applications] updateApplicationStatus error (pipeline drag & drop):",
+                        err
+                      );
+                    });
+                }
+              });
+
+              pipelineBoardEl.appendChild(col);
+            });
+          }
+
+          renderBoard();
         })
         .catch(function (err) {
           console.error(

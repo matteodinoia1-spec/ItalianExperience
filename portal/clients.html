@@ -80,12 +80,32 @@
                             <span>Filters</span>
                         </button>
                     </div>
+            <!-- Clients Bulk Toolbar (appears when rows are selected) -->
+            <div class="mb-4 hidden" data-ie-clients-bulkbar>
+                <div class="flex flex-col md:flex-row items-center justify-between gap-3 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-100 text-sm">
+                    <p class="text-emerald-900 font-medium">
+                        <span data-ie-clients-bulk-count>0</span> clients selected
+                    </p>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button type="button" data-action="clients-bulk-archive" class="ie-btn ie-btn-danger">
+                            Archive
+                        </button>
+                        <button type="button" data-action="clients-bulk-clear" class="ie-btn ie-btn-secondary">
+                            Clear selection
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Customers Table Section -->
             <div class="glass-card ie-card rounded-2xl overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="ie-table">
                         <thead class="bg-gray-50/80">
                             <tr>
+                                <th class="ie-table-th w-10">
+                                    <input type="checkbox" class="ie-table-checkbox" data-ie-clients-select-all>
+                                </th>
                                 <th class="ie-table-th">Company</th>
                                 <th class="ie-table-th">City</th>
                                 <th class="ie-table-th">Active Offers</th>

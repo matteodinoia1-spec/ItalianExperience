@@ -1312,6 +1312,32 @@
       if (bulkCountEl) {
         bulkCountEl.textContent = String(count);
       }
+
+      // Keep row checkboxes in sync with selection state so that
+      // bulk actions (e.g. "select all") visibly update the table.
+      try {
+        var tbodyEl = document.querySelector("[data-ie-candidates-body]");
+        if (tbodyEl) {
+          var selectedSet = new Set(
+            (selectedIds || []).map(function (id) {
+              return String(id);
+            })
+          );
+          var checkboxes = tbodyEl.querySelectorAll(
+            "[data-ie-candidate-select]"
+          );
+          checkboxes.forEach(function (checkbox) {
+            var id = checkbox.getAttribute("data-id");
+            if (!id) return;
+            checkbox.checked = selectedSet.has(String(id));
+          });
+        }
+      } catch (syncErr) {
+        console.error(
+          "[IEListsRuntime] candidate checkbox sync error:",
+          syncErr
+        );
+      }
     });
 
     if (selectAllCheckbox) {
@@ -1405,6 +1431,123 @@
     const tbody = document.querySelector("[data-ie-joboffers-body]");
     if (!tbody) return;
 
+    const selectAllCheckbox = document.querySelector(
+      "[data-ie-joboffers-select-all]"
+    );
+    const bulkBar = document.querySelector("[data-ie-joboffers-bulkbar]");
+    const bulkCountEl = document.querySelector(
+      "[data-ie-joboffers-bulk-count]"
+    );
+    const bulkStatusSelect = document.querySelector(
+      "[data-ie-joboffers-bulk-status]"
+    );
+
+    // Local selection state for job offers (bulk actions)
+    const selection = {
+      ids: new Set(),
+      pageIds: [],
+    };
+
+    function getSelectedJobOfferIds() {
+      return Array.from(selection.ids);
+    }
+
+    function setJobOfferSelected(id, selected) {
+      if (id == null) return;
+      const key = String(id);
+      const next = new Set(selection.ids);
+      if (selected) {
+        next.add(key);
+      } else {
+        next.delete(key);
+      }
+      selection.ids = next;
+      syncJobOfferSelectionUI();
+    }
+
+    function setJobOfferPageIds(ids) {
+      selection.pageIds = (ids || []).map(function (id) {
+        return id == null ? id : String(id);
+      });
+      // Reset selection when a new page is rendered
+      if (selection.ids.size > 0) {
+        selection.ids = new Set();
+      }
+      syncJobOfferSelectionUI();
+    }
+
+    function clearJobOfferSelection() {
+      if (selection.ids.size === 0) return;
+      selection.ids = new Set();
+      syncJobOfferSelectionUI();
+    }
+
+    function selectAllJobOffersOnCurrentPage() {
+      selection.ids = new Set(selection.pageIds);
+      syncJobOfferSelectionUI();
+    }
+
+    function syncJobOfferSelectionUI() {
+      const pageIds = selection.pageIds || [];
+      const selectedIds = Array.from(selection.ids);
+
+      if (selectAllCheckbox) {
+        if (!pageIds.length) {
+          selectAllCheckbox.checked = false;
+          selectAllCheckbox.indeterminate = false;
+        } else {
+          const selectedSet = new Set(
+            selectedIds.map(function (id) {
+              return String(id);
+            })
+          );
+          const allOnPageSelected = pageIds.every(function (id) {
+            return selectedSet.has(String(id));
+          });
+          const anyOnPageSelected = pageIds.some(function (id) {
+            return selectedSet.has(String(id));
+          });
+          selectAllCheckbox.checked = allOnPageSelected;
+          selectAllCheckbox.indeterminate =
+            !allOnPageSelected && anyOnPageSelected;
+        }
+      }
+
+      const count = selectedIds.length;
+      if (bulkBar) {
+        if (count > 0) {
+          bulkBar.classList.remove("hidden");
+        } else {
+          bulkBar.classList.add("hidden");
+        }
+      }
+      if (bulkCountEl) {
+        bulkCountEl.textContent = String(count);
+      }
+
+      // Keep row checkboxes in sync with selection state
+      try {
+        const tableBody = document.querySelector("[data-ie-joboffers-body]");
+        if (tableBody) {
+          const selectedSet = new Set(
+            selectedIds.map(function (id) {
+              return String(id);
+            })
+          );
+          const checkboxes = tableBody.querySelectorAll(
+            "[data-ie-joboffer-select]"
+          );
+          checkboxes.forEach(function (checkbox) {
+            const id = checkbox.getAttribute("data-id");
+            if (!id) return;
+            checkbox.checked = selectedSet.has(String(id));
+          });
+        }
+      } catch (err) {
+        console.error("[IEListsRuntime] job offer checkbox sync error:", err);
+      }
+    }
+
     const table = tbody.closest("table");
     const headerRow = table?.querySelector("thead tr");
     const candidatesTh = headerRow ? Array.from(headerRow.children).find(function (th) {
@@ -1486,7 +1629,11 @@
       clientSelect.innerHTML = "";
       clientSelect.appendChild(defaultOpt);
       if (window.IESupabase && window.IESupabase.fetchClientsPaginated) {
-        window.IESupabase.fetchClientsPaginated({ filters: { archived: "active" }, page: 1, limit: 500 })
+        window.IESupabase.fetchClientsPaginated({
+          filters: { archived: "active" },
+          page: 1,
+          limit: 500,
+        })
           .then(function (res) {
             const list = res.data || [];
             list.forEach(function (client) {
@@ -1502,7 +1649,11 @@
             }
           })
           .catch(function () {});
-      } else if (typeof IE_STORE !== "undefined" && IE_STORE && Array.isArray(IE_STORE.clients)) {
+      } else if (
+        typeof IE_STORE !== "undefined" &&
+        IE_STORE &&
+        Array.isArray(IE_STORE.clients)
+      ) {
         IE_STORE.clients.forEach((client) => {
           if (client.is_archived) return;
           const opt = document.createElement("option");
@@ -1516,7 +1667,6 @@
         }
       }
     }
-
     if (titleInput) {
       titleInput.addEventListener("input", function () {
         filters.title = this.value || "";
@@ -1605,6 +1755,25 @@
       });
     }
 
+    // Row checkbox selection wiring (delegated to tbody)
+    tbody.addEventListener("change", function (event) {
+      const checkbox = event.target.closest("[data-ie-joboffer-select]");
+      if (!checkbox) return;
+      const id = checkbox.getAttribute("data-id");
+      if (!id) return;
+      setJobOfferSelected(id, checkbox.checked);
+    });
+
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener("change", function () {
+        if (selectAllCheckbox.checked) {
+          selectAllJobOffersOnCurrentPage();
+        } else {
+          clearJobOfferSelection();
+        }
+      });
+    }
+
     tbody.addEventListener("click", function (event) {
       const target = event.target;
 
@@ -1630,6 +1799,189 @@
         return;
       }
     });
+
+    function showJobOfferBulkSummaryMessage(kind, message) {
+      try {
+        if (
+          window.IESupabase &&
+          typeof window.IESupabase.showSuccess === "function" &&
+          kind === "success"
+        ) {
+          window.IESupabase.showSuccess(message);
+          return;
+        }
+        if (
+          window.IESupabase &&
+          typeof window.IESupabase.showError === "function" &&
+          kind === "error"
+        ) {
+          window.IESupabase.showError(message, "jobOffersBulk");
+          return;
+        }
+      } catch (err) {
+        console.error("[IEListsRuntime] job offers bulk message error:", err);
+      }
+      if (kind === "error") {
+        window.alert(message);
+      } else {
+        console.log(message);
+      }
+    }
+
+    async function runJobOfferBulkArchive(selectedIds) {
+      const ids = Array.isArray(selectedIds) ? selectedIds : [];
+      if (!ids.length) return;
+      if (
+        !window.IESupabase ||
+        typeof window.IESupabase.archiveJobOffer !== "function"
+      ) {
+        showJobOfferBulkSummaryMessage(
+          "error",
+          "Archive operation is not available."
+        );
+        return;
+      }
+      let success = 0;
+      let failed = 0;
+      for (let i = 0; i < ids.length; i++) {
+        const id = ids[i];
+        try {
+          const res = await window.IESupabase.archiveJobOffer(id);
+          if (res && !res.error) {
+            success++;
+          } else {
+            failed++;
+          }
+        } catch (err) {
+          console.error(
+            "[IEListsRuntime] archiveJobOffer bulk error:",
+            err
+          );
+          failed++;
+        }
+      }
+      if (success && !failed) {
+        showJobOfferBulkSummaryMessage(
+          "success",
+          "Archived " + success + " job offers."
+        );
+      } else if (success && failed) {
+        showJobOfferBulkSummaryMessage(
+          "error",
+          "Archived " + success + " job offers, " + failed + " failed."
+        );
+      } else {
+        showJobOfferBulkSummaryMessage(
+          "error",
+          "Failed to archive selected job offers."
+        );
+      }
+      clearJobOfferSelection();
+      renderOffers();
+    }
+
+    async function runJobOfferBulkChangeStatus(selectedIds, newStatus) {
+      const ids = Array.isArray(selectedIds) ? selectedIds : [];
+      if (!ids.length || !newStatus) return;
+      if (
+        !window.IESupabase ||
+        typeof window.IESupabase.updateJobOffer !== "function"
+      ) {
+        showJobOfferBulkSummaryMessage(
+          "error",
+          "Status update operation is not available."
+        );
+        return;
+      }
+      let success = 0;
+      let failed = 0;
+      for (let i = 0; i < ids.length; i++) {
+        const id = ids[i];
+        try {
+          const res = await window.IESupabase.updateJobOffer(id, {
+            status: newStatus,
+          });
+          if (res && !res.error) {
+            success++;
+          } else {
+            failed++;
+          }
+        } catch (err) {
+          console.error(
+            "[IEListsRuntime] updateJobOffer bulk status error:",
+            err
+          );
+          failed++;
+        }
+      }
+      if (success && !failed) {
+        showJobOfferBulkSummaryMessage(
+          "success",
+          "Updated status for " + success + " job offers."
+        );
+      } else if (success && failed) {
+        showJobOfferBulkSummaryMessage(
+          "error",
+          "Updated status for " + success + " job offers, " + failed + " failed."
+        );
+      } else {
+        showJobOfferBulkSummaryMessage(
+          "error",
+          "Failed to update status for selected job offers."
+        );
+      }
+      clearJobOfferSelection();
+      renderOffers();
+    }
+
+    if (bulkBar) {
+      bulkBar.addEventListener("click", function (event) {
+        const archiveBtn = event.target.closest(
+          "[data-action='joboffers-bulk-archive']"
+        );
+        const clearBtn = event.target.closest(
+          "[data-action='joboffers-bulk-clear']"
+        );
+        const applyStatusBtn = event.target.closest(
+          "[data-action='joboffers-bulk-apply-status']"
+        );
+
+        if (archiveBtn) {
+          const idsForArchive = getSelectedJobOfferIds();
+          if (!idsForArchive.length) return;
+          archiveBtn.disabled = true;
+          runJobOfferBulkArchive(idsForArchive).finally(function () {
+            archiveBtn.disabled = false;
+          });
+          return;
+        }
+
+        if (clearBtn) {
+          clearJobOfferSelection();
+          return;
+        }
+
+        if (applyStatusBtn) {
+          const statusValue = bulkStatusSelect ? bulkStatusSelect.value : "";
+          if (!statusValue) {
+            showJobOfferBulkSummaryMessage(
+              "error",
+              "Please select a status to apply."
+            );
+            return;
+          }
+          const idsForStatus = getSelectedJobOfferIds();
+          if (!idsForStatus.length) return;
+          applyStatusBtn.disabled = true;
+          runJobOfferBulkChangeStatus(
+            idsForStatus,
+            statusValue
+          ).finally(function () {
+            applyStatusBtn.disabled = false;
+          });
+        }
+      });
+    }
 
     function mapJobOfferRow(r) {
       const location =
@@ -1727,6 +2079,14 @@
         var clientCellHtml = row.client_id
           ? '<span class="entity-link ie-text-muted" data-entity-type="client" data-entity-id="' + (window.escapeHtml ? window.escapeHtml(String(row.client_id)) : String(row.client_id)) + '">' + (window.escapeHtml ? window.escapeHtml(clientValue) : clientValue) + "</span>"
           : '<span class="ie-text-muted">' + (window.escapeHtml ? window.escapeHtml(clientValue) : clientValue) + "</span>";
+
+        var selectionCellHtml =
+          '<input type="checkbox" class="ie-table-checkbox" data-ie-joboffer-select data-id="' +
+          (window.escapeHtml ? window.escapeHtml(String(row.id != null ? row.id : "")) : String(row.id != null ? row.id : "")) +
+          '"' +
+          (selection.ids.has(String(row.id)) ? " checked" : "") +
+          ">";
+
         const tr = renderEntityRow({
           entityType: "job_offer",
           id: row.id,
@@ -1736,7 +2096,7 @@
           isArchived: row.is_archived,
           archivedList: false,
           actionCellOpts: { showPreviewButton: false, editTitle: "Edit job offer", archiveTitle: "Archive job offer" },
-          leadingCells: [],
+          leadingCells: [selectionCellHtml],
           middleCells: [
             '<span class="ie-text-muted">' + (window.escapeHtml ? window.escapeHtml(row.position || "—") : (row.position || "—")) + "</span>",
             clientCellHtml,
@@ -1758,6 +2118,9 @@
         ?.closest(".glass-card")
         ?.querySelector("[data-ie-pagination]");
 
+      // Reset selection whenever the list is being (re)loaded
+      clearJobOfferSelection();
+
       if (window.IESupabase && window.IESupabase.fetchJobOffersPaginated) {
         tbody.innerHTML = "<tr><td colspan=\"9\" class=\"px-6 py-8 text-center text-gray-400\">Loading...</td></tr>";
         window.IESupabase.fetchJobOffersPaginated({
@@ -1773,6 +2136,18 @@
             renderOffers();
             return;
           }
+
+          // Track IDs present on this page for header "select all"
+          setJobOfferPageIds(
+            rows
+              .map(function (row) {
+                return row && row.id;
+              })
+              .filter(function (id) {
+                return id != null;
+              })
+          );
+
           await renderOfferRows(rows, tbody);
           updatePaginationUI(paginationContainer, totalCount, currentPage, limit, rows.length);
         }).catch(function (err) {
@@ -1791,6 +2166,17 @@
           if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
           const start = (currentPage - 1) * limit;
           const pageRows = rows.slice(start, start + limit);
+
+          setJobOfferPageIds(
+            pageRows
+              .map(function (row) {
+                return row && row.id;
+              })
+              .filter(function (id) {
+                return id != null;
+              })
+          );
+
           await renderOfferRows(pageRows, tbody);
           updatePaginationUI(paginationContainer, totalCount, currentPage, limit, pageRows.length);
         });
@@ -1809,6 +2195,128 @@
   function initApplicationsPage() {
     const tbody = document.querySelector("[data-ie-applications-body]");
     if (!tbody) return;
+
+    const selectAllCheckbox = document.querySelector(
+      "[data-ie-applications-select-all]"
+    );
+    const bulkBar = document.querySelector(
+      "[data-ie-applications-bulkbar]"
+    );
+    const bulkCountEl = document.querySelector(
+      "[data-ie-applications-bulk-count]"
+    );
+    const bulkStatusSelect = document.querySelector(
+      "[data-ie-applications-bulk-status]"
+    );
+
+    // Local selection state for applications (bulk actions)
+    var applicationSelection = {
+      ids: new Set(),
+      pageIds: [],
+    };
+
+    function getSelectedApplicationIds() {
+      return Array.from(applicationSelection.ids);
+    }
+
+    function setApplicationSelected(id, selected) {
+      if (id == null) return;
+      var key = String(id);
+      var next = new Set(applicationSelection.ids);
+      if (selected) {
+        next.add(key);
+      } else {
+        next.delete(key);
+      }
+      applicationSelection.ids = next;
+      syncApplicationSelectionUI();
+    }
+
+    function setApplicationPageIds(ids) {
+      applicationSelection.pageIds = (ids || []).map(function (id) {
+        return id == null ? id : String(id);
+      });
+      // Reset selection when a new page is rendered
+      if (applicationSelection.ids.size > 0) {
+        applicationSelection.ids = new Set();
+      }
+      syncApplicationSelectionUI();
+    }
+
+    function clearApplicationSelection() {
+      if (applicationSelection.ids.size === 0) return;
+      applicationSelection.ids = new Set();
+      syncApplicationSelectionUI();
+    }
+
+    function selectAllApplicationsOnCurrentPage() {
+      applicationSelection.ids = new Set(applicationSelection.pageIds);
+      syncApplicationSelectionUI();
+    }
+
+    function syncApplicationSelectionUI() {
+      var pageIds = applicationSelection.pageIds || [];
+      var selectedIds = Array.from(applicationSelection.ids);
+
+      if (selectAllCheckbox) {
+        if (!pageIds.length) {
+          selectAllCheckbox.checked = false;
+          selectAllCheckbox.indeterminate = false;
+        } else {
+          var selectedSet = new Set(
+            selectedIds.map(function (id) {
+              return String(id);
+            })
+          );
+          var allOnPageSelected = pageIds.every(function (id) {
+            return selectedSet.has(String(id));
+          });
+          var anyOnPageSelected = pageIds.some(function (id) {
+            return selectedSet.has(String(id));
+          });
+          selectAllCheckbox.checked = allOnPageSelected;
+          selectAllCheckbox.indeterminate =
+            !allOnPageSelected && anyOnPageSelected;
+        }
+      }
+
+      var count = selectedIds.length;
+      if (bulkBar) {
+        if (count > 0) {
+          bulkBar.classList.remove("hidden");
+        } else {
+          bulkBar.classList.add("hidden");
+        }
+      }
+      if (bulkCountEl) {
+        bulkCountEl.textContent = String(count);
+      }
+
+      // Sync row checkboxes with selection state
+      try {
+        var tableBody = document.querySelector("[data-ie-applications-body]");
+        if (tableBody) {
+          var selectedSetForRows = new Set(
+            selectedIds.map(function (id) {
+              return String(id);
+            })
+          );
+          var checkboxes = tableBody.querySelectorAll(
+            "[data-ie-application-select]"
+          );
+          checkboxes.forEach(function (checkbox) {
+            var id = checkbox.getAttribute("data-id");
+            if (!id) return;
+            checkbox.checked = selectedSetForRows.has(String(id));
+          });
+        }
+      } catch (err) {
+        console.error(
+          "[IEListsRuntime] application checkbox sync error:",
+          err
+        );
+      }
+    }
 
     const filters = {
       status: "",
@@ -1955,9 +2463,229 @@
       }
     }
 
+    // Row checkbox selection wiring (delegated to tbody)
+    tbody.addEventListener("change", function (event) {
+      const checkbox = event.target.closest("[data-ie-application-select]");
+      if (!checkbox) return;
+      const id = checkbox.getAttribute("data-id");
+      if (!id) return;
+      setApplicationSelected(id, checkbox.checked);
+    });
+
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener("change", function () {
+        if (selectAllCheckbox.checked) {
+          selectAllApplicationsOnCurrentPage();
+        } else {
+          clearApplicationSelection();
+        }
+      });
+    }
+
+    function showApplicationsBulkSummaryMessage(kind, message) {
+      try {
+        if (
+          window.IESupabase &&
+          typeof window.IESupabase.showSuccess === "function" &&
+          kind === "success"
+        ) {
+          window.IESupabase.showSuccess(message);
+          return;
+        }
+        if (
+          window.IESupabase &&
+          typeof window.IESupabase.showError === "function" &&
+          kind === "error"
+        ) {
+          window.IESupabase.showError(message, "applicationsBulk");
+          return;
+        }
+      } catch (err) {
+        console.error(
+          "[IEListsRuntime] applications bulk message error:",
+          err
+        );
+      }
+      if (kind === "error") {
+        window.alert(message);
+      } else {
+        console.log(message);
+      }
+    }
+
+    async function runApplicationsBulkArchive(selectedIds) {
+      const ids = Array.isArray(selectedIds) ? selectedIds : [];
+      if (!ids.length) return;
+      if (
+        !window.IEQueries ||
+        !window.IEQueries.applications ||
+        typeof window.IEQueries.applications.updateApplicationStatus !==
+          "function"
+      ) {
+        showApplicationsBulkSummaryMessage(
+          "error",
+          "Archive operation is not available."
+        );
+        return;
+      }
+      let success = 0;
+      let failed = 0;
+      for (let i = 0; i < ids.length; i++) {
+        const id = ids[i];
+        try {
+          const res =
+            await window.IEQueries.applications.updateApplicationStatus(
+              id,
+              "withdrawn",
+              {}
+            );
+          if (res && !res.error) {
+            success++;
+          } else {
+            failed++;
+          }
+        } catch (err) {
+          console.error(
+            "[IEListsRuntime] updateApplicationStatus bulk archive error:",
+            err
+          );
+          failed++;
+        }
+      }
+      if (success && !failed) {
+        showApplicationsBulkSummaryMessage(
+          "success",
+          "Archived " + success + " applications."
+        );
+      } else if (success && failed) {
+        showApplicationsBulkSummaryMessage(
+          "error",
+          "Archived " + success + " applications, " + failed + " failed."
+        );
+      } else {
+        showApplicationsBulkSummaryMessage(
+          "error",
+          "Failed to archive selected applications."
+        );
+      }
+      clearApplicationSelection();
+      renderApplications();
+    }
+
+    async function runApplicationsBulkChangeStatus(selectedIds, newStatus) {
+      const ids = Array.isArray(selectedIds) ? selectedIds : [];
+      if (!ids.length || !newStatus) return;
+      if (
+        !window.IEQueries ||
+        !window.IEQueries.applications ||
+        typeof window.IEQueries.applications.updateApplicationStatus !==
+          "function"
+      ) {
+        showApplicationsBulkSummaryMessage(
+          "error",
+          "Status update operation is not available."
+        );
+        return;
+      }
+      let success = 0;
+      let failed = 0;
+      for (let i = 0; i < ids.length; i++) {
+        const id = ids[i];
+        try {
+          const res =
+            await window.IEQueries.applications.updateApplicationStatus(
+              id,
+              newStatus,
+              {}
+            );
+          if (res && !res.error) {
+            success++;
+          } else {
+            failed++;
+          }
+        } catch (err) {
+          console.error(
+            "[IEListsRuntime] updateApplicationStatus bulk status error:",
+            err
+          );
+          failed++;
+        }
+      }
+      if (success && !failed) {
+        showApplicationsBulkSummaryMessage(
+          "success",
+          "Updated status for " + success + " applications."
+        );
+      } else if (success && failed) {
+        showApplicationsBulkSummaryMessage(
+          "error",
+          "Updated status for " + success + " applications, " + failed + " failed."
+        );
+      } else {
+        showApplicationsBulkSummaryMessage(
+          "error",
+          "Failed to update status for selected applications."
+        );
+      }
+      clearApplicationSelection();
+      renderApplications();
+    }
+
+    if (bulkBar) {
+      bulkBar.addEventListener("click", function (event) {
+        const archiveBtn = event.target.closest(
+          "[data-action='applications-bulk-archive']"
+        );
+        const clearBtn = event.target.closest(
+          "[data-action='applications-bulk-clear']"
+        );
+        const applyStatusBtn = event.target.closest(
+          "[data-action='applications-bulk-apply-status']"
+        );
+
+        if (archiveBtn) {
+          const idsForArchive = getSelectedApplicationIds();
+          if (!idsForArchive.length) return;
+          archiveBtn.disabled = true;
+          runApplicationsBulkArchive(idsForArchive).finally(function () {
+            archiveBtn.disabled = false;
+          });
+          return;
+        }
+
+        if (clearBtn) {
+          clearApplicationSelection();
+          return;
+        }
+
+        if (applyStatusBtn) {
+          const statusValue = bulkStatusSelect ? bulkStatusSelect.value : "";
+          if (!statusValue) {
+            showApplicationsBulkSummaryMessage(
+              "error",
+              "Please select a status to apply."
+            );
+            return;
+          }
+          const idsForStatus = getSelectedApplicationIds();
+          if (!idsForStatus.length) return;
+          applyStatusBtn.disabled = true;
+          runApplicationsBulkChangeStatus(
+            idsForStatus,
+            statusValue
+          ).finally(function () {
+            applyStatusBtn.disabled = false;
+          });
+        }
+      });
+    }
+
     function renderApplications() {
+      // Reset selection whenever the list is being (re)loaded
+      clearApplicationSelection();
+
       if (!window.IESupabase || !window.IESupabase.fetchApplicationsPaginated) {
-        tbody.innerHTML = "<tr><td colspan=\"5\" class=\"px-6 py-8 text-center text-gray-400\">Applications not available.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan=\"6\" class=\"px-6 py-8 text-center text-gray-400\">Applications not available.</td></tr>";
         if (paginationContainer) updatePaginationUI(paginationContainer, 0, 1, limit, 0);
         return;
       }
@@ -1971,7 +2699,7 @@
         date_to: filters.date_to ? filters.date_to + "T23:59:59Z" : undefined,
       };
 
-      tbody.innerHTML = "<tr><td colspan=\"5\" class=\"px-6 py-8 text-center text-gray-400\">Loading...</td></tr>";
+      tbody.innerHTML = "<tr><td colspan=\"6\" class=\"px-6 py-8 text-center text-gray-400\">Loading...</td></tr>";
 
       window.IESupabase.fetchApplicationsPaginated(filterPayload, { page: currentPage, limit: limit })
         .then(function (result) {
@@ -1990,13 +2718,23 @@
             });
           }
           tbody.innerHTML = "";
+
+          setApplicationPageIds(
+            rows
+              .map(function (row) {
+                return row && row.id;
+              })
+              .filter(function (id) {
+                return id != null;
+              })
+          );
           const candidateViewUrl = window.IEPortal && window.IEPortal.links && typeof window.IEPortal.links.candidateView === "function"
             ? window.IEPortal.links.candidateView
             : function (id) { return "candidate.html?id=" + encodeURIComponent(String(id || "")); };
           const escapeHtml = window.escapeHtml || function (s) { return (s == null ? "" : String(s)).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); };
 
           if (rows.length === 0) {
-            tbody.innerHTML = "<tr><td colspan=\"5\" class=\"px-6 py-8 text-center text-gray-400\">No applications found.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan=\"6\" class=\"px-6 py-8 text-center text-gray-400\">No applications found.</td></tr>";
           } else {
             rows.forEach(function (row) {
               const tr = document.createElement("tr");
@@ -2004,7 +2742,17 @@
               tr.setAttribute("data-entity", "application");
               tr.setAttribute("data-id", String(row.id || ""));
               const candidateUrl = candidateViewUrl(row.candidate_id);
+              const selectionCellHtml =
+                "<td class=\"ie-table-cell w-10\">" +
+                '<input type="checkbox" class="ie-table-checkbox" data-ie-application-select data-id="' +
+                escapeHtml(String(row.id || "")) +
+                '"' +
+                (applicationSelection.ids.has(String(row.id)) ? " checked" : "") +
+                ">" +
+                "</td>";
+
               tr.innerHTML =
+                selectionCellHtml +
                 "<td class=\"ie-table-cell ie-table-cell--primary\"><a href=\"" + escapeHtml(candidateUrl) + "\" class=\"table-link\" data-entity-type=\"candidate\" data-entity-id=\"" + escapeHtml(String(row.candidate_id || "")) + "\">" + escapeHtml(row.candidate_name || "—") + "</a></td>" +
                 "<td class=\"ie-table-cell ie-table-cell--secondary\">" + escapeHtml(row.job_offer_title || "—") + "</td>" +
                 "<td class=\"ie-table-cell ie-table-cell--secondary\">" + escapeHtml(row.client_name || "—") + "</td>" +
@@ -2017,7 +2765,7 @@
         })
         .catch(function (err) {
           console.error("[ItalianExperience] fetchApplicationsPaginated error:", err);
-          tbody.innerHTML = "<tr><td colspan=\"5\" class=\"px-6 py-8 text-center text-red-500\">Loading error. Please try again later.</td></tr>";
+          tbody.innerHTML = "<tr><td colspan=\"6\" class=\"px-6 py-8 text-center text-red-500\">Loading error. Please try again later.</td></tr>";
           updatePaginationUI(paginationContainer, 0, 1, limit, 0);
         });
     }
@@ -2032,6 +2780,120 @@
   function initClientsPage() {
     const tbody = document.querySelector("[data-ie-clients-body]");
     if (!tbody) return;
+
+    const selectAllCheckbox = document.querySelector(
+      "[data-ie-clients-select-all]"
+    );
+    const bulkBar = document.querySelector("[data-ie-clients-bulkbar]");
+    const bulkCountEl = document.querySelector(
+      "[data-ie-clients-bulk-count]"
+    );
+
+    // Local selection state for clients (bulk actions)
+    var clientSelection = {
+      ids: new Set(),
+      pageIds: [],
+    };
+
+    function getSelectedClientIds() {
+      return Array.from(clientSelection.ids);
+    }
+
+    function setClientSelected(id, selected) {
+      if (id == null) return;
+      var key = String(id);
+      var next = new Set(clientSelection.ids);
+      if (selected) {
+        next.add(key);
+      } else {
+        next.delete(key);
+      }
+      clientSelection.ids = next;
+      syncClientSelectionUI();
+    }
+
+    function setClientPageIds(ids) {
+      clientSelection.pageIds = (ids || []).map(function (id) {
+        return id == null ? id : String(id);
+      });
+      // Reset selection when a new page is rendered
+      if (clientSelection.ids.size > 0) {
+        clientSelection.ids = new Set();
+      }
+      syncClientSelectionUI();
+    }
+
+    function clearClientSelection() {
+      if (clientSelection.ids.size === 0) return;
+      clientSelection.ids = new Set();
+      syncClientSelectionUI();
+    }
+
+    function selectAllClientsOnCurrentPage() {
+      clientSelection.ids = new Set(clientSelection.pageIds);
+      syncClientSelectionUI();
+    }
+
+    function syncClientSelectionUI() {
+      var pageIds = clientSelection.pageIds || [];
+      var selectedIds = Array.from(clientSelection.ids);
+
+      if (selectAllCheckbox) {
+        if (!pageIds.length) {
+          selectAllCheckbox.checked = false;
+          selectAllCheckbox.indeterminate = false;
+        } else {
+          var selectedSet = new Set(
+            selectedIds.map(function (id) {
+              return String(id);
+            })
+          );
+          var allOnPageSelected = pageIds.every(function (id) {
+            return selectedSet.has(String(id));
+          });
+          var anyOnPageSelected = pageIds.some(function (id) {
+            return selectedSet.has(String(id));
+          });
+          selectAllCheckbox.checked = allOnPageSelected;
+          selectAllCheckbox.indeterminate =
+            !allOnPageSelected && anyOnPageSelected;
+        }
+      }
+
+      var count = selectedIds.length;
+      if (bulkBar) {
+        if (count > 0) {
+          bulkBar.classList.remove("hidden");
+        } else {
+          bulkBar.classList.add("hidden");
+        }
+      }
+      if (bulkCountEl) {
+        bulkCountEl.textContent = String(count);
+      }
+
+      // Sync row checkboxes with selection state
+      try {
+        var tableBody = document.querySelector("[data-ie-clients-body]");
+        if (tableBody) {
+          var selectedSetForRows = new Set(
+            selectedIds.map(function (id) {
+              return String(id);
+            })
+          );
+          var checkboxes = tableBody.querySelectorAll(
+            "[data-ie-client-select]"
+          );
+          checkboxes.forEach(function (checkbox) {
+            var id = checkbox.getAttribute("data-id");
+            if (!id) return;
+            checkbox.checked = selectedSetForRows.has(String(id));
+          });
+        }
+      } catch (err) {
+        console.error("[IEListsRuntime] client checkbox sync error:", err);
+      }
+    }
 
     const filters = {
       name: "",
@@ -2100,6 +2962,127 @@
       }
     });
 
+    // Row checkbox selection wiring (delegated to tbody)
+    tbody.addEventListener("change", function (event) {
+      const checkbox = event.target.closest("[data-ie-client-select]");
+      if (!checkbox) return;
+      const id = checkbox.getAttribute("data-id");
+      if (!id) return;
+      setClientSelected(id, checkbox.checked);
+    });
+
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener("change", function () {
+        if (selectAllCheckbox.checked) {
+          selectAllClientsOnCurrentPage();
+        } else {
+          clearClientSelection();
+        }
+      });
+    }
+
+    function showClientBulkSummaryMessage(kind, message) {
+      try {
+        if (
+          window.IESupabase &&
+          typeof window.IESupabase.showSuccess === "function" &&
+          kind === "success"
+        ) {
+          window.IESupabase.showSuccess(message);
+          return;
+        }
+        if (
+          window.IESupabase &&
+          typeof window.IESupabase.showError === "function" &&
+          kind === "error"
+        ) {
+          window.IESupabase.showError(message, "clientsBulk");
+          return;
+        }
+      } catch (err) {
+        console.error("[IEListsRuntime] clients bulk message error:", err);
+      }
+      if (kind === "error") {
+        window.alert(message);
+      } else {
+        console.log(message);
+      }
+    }
+
+    async function runClientBulkArchive(selectedIds) {
+      const ids = Array.isArray(selectedIds) ? selectedIds : [];
+      if (!ids.length) return;
+      if (
+        !window.IESupabase ||
+        typeof window.IESupabase.archiveClient !== "function"
+      ) {
+        showClientBulkSummaryMessage(
+          "error",
+          "Archive operation is not available."
+        );
+        return;
+      }
+      let success = 0;
+      let failed = 0;
+      for (let i = 0; i < ids.length; i++) {
+        const id = ids[i];
+        try {
+          const res = await window.IESupabase.archiveClient(id);
+          if (res && !res.error) {
+            success++;
+          } else {
+            failed++;
+          }
+        } catch (err) {
+          console.error("[IEListsRuntime] archiveClient bulk error:", err);
+          failed++;
+        }
+      }
+      if (success && !failed) {
+        showClientBulkSummaryMessage(
+          "success",
+          "Archived " + success + " clients."
+        );
+      } else if (success && failed) {
+        showClientBulkSummaryMessage(
+          "error",
+          "Archived " + success + " clients, " + failed + " failed."
+        );
+      } else {
+        showClientBulkSummaryMessage(
+          "error",
+          "Failed to archive selected clients."
+        );
+      }
+      clearClientSelection();
+      renderClients();
+    }
+
+    if (bulkBar) {
+      bulkBar.addEventListener("click", function (event) {
+        const archiveBtn = event.target.closest(
+          "[data-action='clients-bulk-archive']"
+        );
+        const clearBtn = event.target.closest(
+          "[data-action='clients-bulk-clear']"
+        );
+
+        if (archiveBtn) {
+          const idsForArchive = getSelectedClientIds();
+          if (!idsForArchive.length) return;
+          archiveBtn.disabled = true;
+          runClientBulkArchive(idsForArchive).finally(function () {
+            archiveBtn.disabled = false;
+          });
+          return;
+        }
+
+        if (clearBtn) {
+          clearClientSelection();
+        }
+      });
+    }
+
     const paginationEl = document
       .querySelector("[data-ie-clients-body]")
       ?.closest(".glass-card")
@@ -2128,6 +3111,9 @@
     function renderClients() {
       const paginationContainer = paginationEl;
 
+      // Reset selection whenever the list is being (re)loaded
+      clearClientSelection();
+
       if (window.IESupabase && window.IESupabase.fetchClientsPaginated) {
         tbody.innerHTML = ""
           + "<tr>"
@@ -2154,6 +3140,17 @@
 
             tbody.innerHTML = "";
 
+            // Track IDs present on this page for header "select all"
+            setClientPageIds(
+              rows
+                .map(function (row) {
+                  return row && row.id;
+                })
+                .filter(function (id) {
+                  return id != null;
+                })
+            );
+
             if (!rows.length) {
               tbody.innerHTML =
                 '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500 text-sm">No clients found.</td></tr>';
@@ -2172,6 +3169,15 @@
                   ? '<button type="button" data-action="view-client-offers" data-id="' + (window.escapeHtml ? window.escapeHtml(row.id) : row.id) + '" class="ie-btn ie-btn-secondary !py-1 !px-2 min-w-0 font-semibold">' + (window.escapeHtml ? window.escapeHtml(String(activeOffersCount)) : String(activeOffersCount)) + "</button>"
                   : "0";
 
+              const selectionCellHtml =
+                '<input type="checkbox" class="ie-table-checkbox" data-ie-client-select data-id="' +
+                (window.escapeHtml
+                  ? window.escapeHtml(String(row.id != null ? row.id : ""))
+                  : String(row.id != null ? row.id : "")) +
+                '"' +
+                (clientSelection.ids.has(String(row.id)) ? " checked" : "") +
+                ">";
+
               const tr = renderEntityRow({
           entityType: "client",
           id: row.id,
@@ -2185,7 +3191,7 @@
           isArchived: row.is_archived,
           archivedList: false,
           actionCellOpts: { showPreviewButton: false, editTitle: "Edit client", archiveTitle: "Archive client" },
-          leadingCells: [],
+          leadingCells: [selectionCellHtml],
           middleCells: [
             '<span class="ie-text-muted">' + (window.escapeHtml ? window.escapeHtml(row.city || "—") : (row.city || "—")) + "</span>",
             activeOffersHtml,
@@ -2229,6 +3235,16 @@
           const start = (currentPage - 1) * limit;
           const pageRows = rows.slice(start, start + limit);
 
+          setClientPageIds(
+            pageRows
+              .map(function (row) {
+                return row && row.id;
+              })
+              .filter(function (id) {
+                return id != null;
+              })
+          );
+
           pageRows.forEach(function (row) {
             const activeOffersCount = (typeof IE_STORE !== "undefined" && IE_STORE && Array.isArray(IE_STORE.jobOffers) ? IE_STORE.jobOffers : []).filter(function (offer) {
               if (!offer || offer.is_archived) return false;
@@ -2240,6 +3256,15 @@
               activeOffersCount > 0
                 ? '<button type="button" data-action="view-client-offers" data-id="' + (window.escapeHtml ? window.escapeHtml(row.id) : row.id) + '" class="ie-btn ie-btn-secondary !py-1 !px-2 min-w-0 font-semibold">' + (window.escapeHtml ? window.escapeHtml(String(activeOffersCount)) : String(activeOffersCount)) + "</button>"
                 : "0";
+
+            const selectionCellHtml =
+              '<input type="checkbox" class="ie-table-checkbox" data-ie-client-select data-id="' +
+              (window.escapeHtml
+                ? window.escapeHtml(String(row.id != null ? row.id : ""))
+                : String(row.id != null ? row.id : "")) +
+              '"' +
+              (clientSelection.ids.has(String(row.id)) ? " checked" : "") +
+              ">";
 
             const tr = renderEntityRow({
               entityType: "client",
@@ -2254,7 +3279,7 @@
               isArchived: row.is_archived,
               archivedList: false,
               actionCellOpts: { showPreviewButton: false, editTitle: "Edit client", archiveTitle: "Archive client" },
-              leadingCells: [],
+              leadingCells: [selectionCellHtml],
               middleCells: [
                 '<span class="ie-text-muted">' + (window.escapeHtml ? window.escapeHtml(row.city || "—") : (row.city || "—")) + "</span>",
                 activeOffersHtml,

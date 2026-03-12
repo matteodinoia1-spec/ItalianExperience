@@ -23,6 +23,9 @@
     "add-job-offer",
     "add-client",
     "settings",
+    // Fallback: treat unknown pages (like entity detail views)
+    // as protected so that auth + profile still run.
+    "unknown",
   ]);
 
   /**

@@ -473,7 +473,7 @@
   display: block;
   overflow: visible;
   padding-top: calc(var(--portal-header-height) + var(--portal-safe-top));
-  padding-bottom: var(--portal-footer-height);
+  padding-bottom: calc(var(--portal-footer-height) + 15px);
   box-sizing: border-box;
 }
 
@@ -493,6 +493,11 @@
 
 .portal-content > * {
   position: relative;
+}
+
+/* Ensure content never visually touches the fixed footer on desktop/tablet */
+.portal-content > *:last-child {
+  margin-bottom: 15px;
 }
 
 /* Responsive foundation */

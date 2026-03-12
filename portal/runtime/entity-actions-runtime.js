@@ -717,11 +717,21 @@
       }
     });
 
-    // Row click: open main entity via router (ignore clicks on button or a).
+    // Row click: open main entity via router (ignore clicks on interactive controls).
     document.addEventListener("click", function (e) {
       var row = e.target.closest(".clickable-row");
       if (!row) return;
-      if (e.target.closest("button") || e.target.closest("a")) return;
+      // Do not treat clicks on common interactive elements as row navigation.
+      if (
+        e.target.closest("button") ||
+        e.target.closest("a") ||
+        e.target.closest("input") ||
+        e.target.closest("label") ||
+        e.target.closest("select") ||
+        e.target.closest("textarea")
+      ) {
+        return;
+      }
 
       var entity = row.dataset.entity;
       var id = row.dataset.id || row.dataset.entityId;

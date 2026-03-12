@@ -665,5 +665,12 @@ textarea[readonly]::placeholder {
   border-radius: var(--ie-radius-xl);
 }
 
+/* Job offer: Internal Notes textarea should be scrollable in view mode */
+textarea.field-display[readonly][data-field="notes"] {
+  pointer-events: auto;
+  cursor: text;
+  overflow-y: auto;
+}
+
 /* Activity timeline: see portal/components/activity-log.css */
 
