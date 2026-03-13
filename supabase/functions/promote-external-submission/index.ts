@@ -136,6 +136,9 @@ Deno.serve(async (req) => {
       });
     }
 
+    console.log("AUTH_HEADER_PRESENT", !!req.headers.get("authorization"));
+    console.log("JWT_LENGTH", jwt?.length);
+
     const admin = await requireAdmin(supabaseAdmin, jwt);
 
     const body = await readJsonBody(req);

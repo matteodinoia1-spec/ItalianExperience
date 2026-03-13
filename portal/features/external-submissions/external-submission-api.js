@@ -4,13 +4,13 @@
   var PAGE_SIZE = 20;
 
   function getSupabase() {
-    if (!window.IESupabase || !window.IESupabase.supabase) {
+    if (!window.IESupabaseClient || !window.IESupabaseClient.supabase) {
       console.error(
-        "[ExternalSubmissionsApi] IESupabase.supabase not available. Ensure core/supabase-client.js and core/supabase.js are loaded."
+        "[ExternalSubmissionsApi] IESupabaseClient.supabase not available. Ensure portal/core/supabase-client.js is loaded."
       );
       return null;
     }
-    return window.IESupabase.supabase;
+    return window.IESupabaseClient.supabase;
   }
 
   function ensureAuth() {
@@ -259,20 +259,92 @@
       return { data: null, error: new Error("Missing required payload fields") };
     }
     try {
-      var result = await supabase.functions.invoke(
-        "promote-external-submission",
-        {
-          body: payload,
+      var sessionResult = await supabase.auth.getSession();
+      var session = sessionResult &&
+        sessionResult.data &&
+        sessionResult.data.session
+          ? sessionResult.data.session
+          : null;
+      var accessToken =
+        session && session.access_token ? session.access_token : null;
+
+      if (!accessToken) {
+        if (typeof console !== "undefined" && console.debug) {
+          console.debug(
+            "[ExternalSubmissionsApi] promoteSubmission: no access token (source: session); user must sign in again."
+          );
         }
-      );
-      if (result.error) {
+        return {
+          data: null,
+          error: new Error("Not authenticated. Please sign in again."),
+        };
+      }
+
+      if (typeof console !== "undefined" && console.debug) {
+        console.debug(
+          "[ExternalSubmissionsApi] promoteSubmission: using access token from session (user id present: " +
+            (session && session.user && session.user.id ? "yes" : "no") +
+            ")."
+        );
+      }
+
+      var client = window.IESupabaseClient;
+      var functionsBase =
+        client &&
+        typeof client.getSupabaseUrl === "function" &&
+        typeof client.getSupabaseKey === "function"
+          ? client.getSupabaseUrl().replace(/\/?$/, "") + "/functions/v1"
+          : null;
+      var anonKey =
+        client && typeof client.getSupabaseKey === "function"
+          ? client.getSupabaseKey()
+          : null;
+      if (!functionsBase || !anonKey) {
+        return {
+          data: null,
+          error: new Error("Portal config missing (functions URL or key)"),
+        };
+      }
+
+      // DEBUG: JWT used for promote-external-submission (remove after diagnosis)
+      if (typeof console !== "undefined" && console.debug) {
+        console.debug("SESSION_EXISTS", !!session);
+        console.debug("TOKEN_EXISTS", !!accessToken);
+        console.debug("TOKEN_LENGTH", accessToken?.length);
+        console.debug("TOKEN_PREFIX", accessToken?.slice(0, 10));
+        console.debug("TOKEN_EQUALS_ANON", accessToken === anonKey);
+      }
+
+      var url = functionsBase + "/promote-external-submission";
+      var res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + accessToken,
+          apikey: anonKey,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      var json = await res.json().catch(function () {
+        return { ok: false, error: { message: "Invalid response", code: "parse_error" } };
+      });
+
+      if (!res.ok) {
+        var errMsg =
+          (json && json.error && json.error.message) || res.statusText || "Request failed";
+        var err = new Error(errMsg);
+        if (json && json.error && json.error.code) {
+          err.code = json.error.code;
+        }
         console.error(
           "[ExternalSubmissionsApi] promoteSubmission invoke error:",
-          result.error
+          errMsg,
+          json
         );
-        return { data: null, error: result.error };
+        return { data: null, error: err };
       }
-      return { data: result.data || null, error: null };
+      return { data: json.data !== undefined ? json.data : json, error: null };
     } catch (err) {
       console.error(
         "[ExternalSubmissionsApi] promoteSubmission invoke exception:",

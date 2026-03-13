@@ -55,6 +55,20 @@
     return "badge-open";
   }
 
+  /**
+   * Human-readable label for title/breadcrumb: "FirstName LastName" if either
+   * first_name or last_name exists; otherwise "Submission <id>".
+   */
+  function getSubmissionDisplayLabel(submission) {
+    if (!submission) return "Submission";
+    var first = (submission.first_name || "").toString().trim();
+    var last = (submission.last_name || "").toString().trim();
+    var name = (first + " " + last).trim();
+    if (name) return name;
+    var id = submission.id != null ? String(submission.id) : "";
+    return id ? "Submission " + id : "Submission";
+  }
+
   function buildJobOfferBadge(submission) {
     var jobOfferId = submission && submission.job_offer_id;
     if (!jobOfferId) {
@@ -83,13 +97,14 @@
   }
 
   function renderHeader(submission) {
-    var fullName = submission.full_name_computed || "—";
+    var displayLabel = getSubmissionDisplayLabel(submission);
     var headerNameEl = document.querySelector(
       "[data-field=\"submission-name\"]"
     );
     if (headerNameEl) {
-      headerNameEl.textContent = fullName;
+      headerNameEl.textContent = displayLabel;
     }
+    var fullName = submission.full_name_computed || "—";
 
     var statusNorm = formatStatus(submission.status);
     var statusLabel = formatStatusLabel(statusNorm);
@@ -837,7 +852,7 @@
         reviewNotesInput.disabled = isSubmitting;
       }
       if (createAppToggle) {
-        createAppToggle.disabled = isSubmitting;
+        createAppToggle.disabled = isSubmitting || !hasJobOffer;
       }
     }
 
@@ -871,6 +886,19 @@
         renderStructuredSections(submission);
         await renderFiles(submission);
         renderDuplicates(submission, state);
+        var displayLabel = getSubmissionDisplayLabel(submission);
+        window.pageMeta = window.pageMeta || {};
+        window.pageMeta.title = displayLabel;
+        window.pageMeta.subtitle = "Review external candidate submission";
+        window.pageMeta.breadcrumbs = [
+          { label: "Dashboard", entity: "dashboard" },
+          { label: "External Submissions", entity: "external-submissions" },
+          { label: displayLabel },
+        ];
+        document.title = displayLabel + " | External Submission | Italian Experience Recruitment";
+        if (window.IEPortal && typeof window.IEPortal.mountPageHeader === "function") {
+          window.IEPortal.mountPageHeader();
+        }
         var isPending = formatStatus(submission.status) === "pending_review";
         setReadOnlyMode(!isPending);
       }
@@ -893,7 +921,7 @@
           submission_id: submission.id,
           action: "approve_new_candidate",
           review_notes: getReviewNotes() || null,
-          create_application: !!getCreateApplicationFlag(),
+          create_application: hasJobOffer ? getCreateApplicationFlag() : false,
         };
         setSubmitting(true);
         window.ExternalSubmissionsApi.promoteSubmission(payload)
@@ -958,7 +986,7 @@
           action: "link_existing_candidate",
           existing_candidate_id: state.selectedCandidateId,
           review_notes: getReviewNotes() || null,
-          create_application: !!getCreateApplicationFlag(),
+          create_application: hasJobOffer ? getCreateApplicationFlag() : false,
         };
         setSubmitting(true);
         window.ExternalSubmissionsApi.promoteSubmission(payload)
@@ -1156,6 +1184,21 @@
     renderStructuredSections(submission);
     await renderFiles(submission);
     renderDuplicates(submission, state);
+
+    var displayLabel = getSubmissionDisplayLabel(submission);
+    window.pageMeta = {
+      title: displayLabel,
+      subtitle: "Review external candidate submission",
+      breadcrumbs: [
+        { label: "Dashboard", entity: "dashboard" },
+        { label: "External Submissions", entity: "external-submissions" },
+        { label: displayLabel },
+      ],
+    };
+    document.title = displayLabel + " | External Submission | Italian Experience Recruitment";
+    if (window.IEPortal && typeof window.IEPortal.mountPageHeader === "function") {
+      window.IEPortal.mountPageHeader();
+    }
 
     var isPending = formatStatus(submission.status) === "pending_review";
     setReadOnlyMode(!isPending);
