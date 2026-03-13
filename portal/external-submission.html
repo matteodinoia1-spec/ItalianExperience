@@ -279,15 +279,13 @@
   <!-- Supabase (auth + data) -->
   <script>
     (function () {
-      var params = new URLSearchParams(window.location.search || "");
-      var id = params.get("id");
       window.pageMeta = {
         title: "External Submission",
         subtitle: "Review external candidate submission",
         breadcrumbs: [
           { label: "Dashboard", entity: "dashboard" },
           { label: "External Submissions", entity: "external-submissions" },
-          { label: id ? ("Submission " + id) : "Submission" }
+          { label: "Submission" }
         ]
       };
     })();

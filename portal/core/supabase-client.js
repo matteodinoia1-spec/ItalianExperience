@@ -23,7 +23,10 @@
   }
 
   const supabaseUrl = "https://xgioojjmrjcurajgirpa.supabase.co".trim();
-  const supabaseKey = "sb_publishable_36r1oFbqjUoktzPTCvxDWg_sSwhxhzM";
+  // Must be the anon key for the same project (ref: xgioojjmrjcurajgirpa) so session JWTs
+  // are valid for this project's Edge Functions gateway. Do not use a key from another project.
+  const supabaseKey =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnaW9vamptcmpjdXJhamdpcnBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MjI3MDksImV4cCI6MjA4NzQ5ODcwOX0.fcJe-f4V_aGEaGEfD2N2el2Y-I2rqy3fO6fURu7Ennk";
   const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
   function getBasePath() {
@@ -40,9 +43,19 @@
     }
   }
 
+  function getSupabaseUrl() {
+    return supabaseUrl;
+  }
+
+  function getSupabaseKey() {
+    return supabaseKey;
+  }
+
   window.IESupabaseClient = {
     supabase,
     getBasePath,
+    getSupabaseUrl,
+    getSupabaseKey,
   };
 })();
 

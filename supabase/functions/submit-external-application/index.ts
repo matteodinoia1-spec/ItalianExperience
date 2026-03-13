@@ -74,6 +74,25 @@ Deno.serve(async (req) => {
     (privacy as Record<string, unknown>).website,
   );
 
+  const meta = isRecord(bodyUnknown.meta) ? bodyUnknown.meta : {};
+  const formStartedAt =
+    typeof (meta as Record<string, unknown>).form_started_at === "number"
+      ? ((meta as Record<string, unknown>).form_started_at as number)
+      : null;
+  if (formStartedAt != null) {
+    const elapsedMs = Date.now() - formStartedAt;
+    if (elapsedMs < 5000) {
+      return jsonResponse(400, {
+        ok: false,
+        error: {
+          message:
+            "Submission was sent too quickly. Please take your time filling the form and try again.",
+          code: "submission_too_fast",
+        },
+      });
+    }
+  }
+
   const firstName = asStringOrNull(main.first_name);
   const lastName = asStringOrNull(main.last_name);
   const email = asStringOrNull(main.email);
@@ -279,6 +298,65 @@ Deno.serve(async (req) => {
           message:
             "A pending submission already exists for this phone number.",
           code: "duplicate_pending_submission",
+        },
+      });
+    }
+  }
+
+  // Throttle extremely recent repeated submissions (same email or phone, any status)
+  const recentSince = new Date(Date.now() - 60 * 1000).toISOString();
+  if (email) {
+    const { data: recentByEmail, error: recentErrEmail } = await supabaseAdmin
+      .from("external_candidate_submissions")
+      .select("id")
+      .eq("email", email)
+      .gte("created_at", recentSince)
+      .limit(1);
+
+    if (recentErrEmail) {
+      return jsonResponse(500, {
+        ok: false,
+        error: {
+          message: recentErrEmail.message,
+          code: "duplicate_lookup_failed",
+        },
+      });
+    }
+    if (recentByEmail && recentByEmail.length > 0) {
+      return jsonResponse(429, {
+        ok: false,
+        error: {
+          message:
+            "A submission with this email was sent very recently. Please wait a moment before submitting again.",
+          code: "duplicate_recent_submission",
+        },
+      });
+    }
+  }
+  if (phone) {
+    const { data: recentByPhone, error: recentErrPhone } = await supabaseAdmin
+      .from("external_candidate_submissions")
+      .select("id")
+      .eq("phone", phone)
+      .gte("created_at", recentSince)
+      .limit(1);
+
+    if (recentErrPhone) {
+      return jsonResponse(500, {
+        ok: false,
+        error: {
+          message: recentErrPhone.message,
+          code: "duplicate_lookup_failed",
+        },
+      });
+    }
+    if (recentByPhone && recentByPhone.length > 0) {
+      return jsonResponse(429, {
+        ok: false,
+        error: {
+          message:
+            "A submission with this phone number was sent very recently. Please wait a moment before submitting again.",
+          code: "duplicate_recent_submission",
         },
       });
     }

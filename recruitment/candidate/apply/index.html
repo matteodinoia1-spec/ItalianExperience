@@ -812,6 +812,7 @@
 
   <script>
     (function () {
+      const formStartedAt = Date.now();
       const form = document.getElementById('applicationForm');
       const stepElements = {
         1: form.querySelector('[data-step="1"]'),
@@ -1463,6 +1464,9 @@
           files: {
             resume_path: filesResumePath,
             photo_path: filesPhotoPath
+          },
+          meta: {
+            form_started_at: formStartedAt
           },
           // Top-level website honeypot
           website: websiteHoneypot
