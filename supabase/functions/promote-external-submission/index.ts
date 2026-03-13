@@ -6,6 +6,7 @@ import {
   readJsonBody,
 } from "../_shared/http.ts";
 import { requireAdmin } from "../_shared/admin.ts";
+import { normalizeSource } from "../_shared/source.ts";
 
 type Action =
   | "approve_new_candidate"
@@ -112,6 +113,80 @@ function deriveYear(cert: Record<string, unknown>): number | null {
   const d = new Date(String(issueDate));
   if (Number.isNaN(d.getTime())) return null;
   return d.getUTCFullYear();
+}
+
+const EXTERNAL_FILES_BUCKET = "external-candidate-submissions";
+const CANDIDATE_FILES_BUCKET = "candidate-files";
+
+async function copyExternalFileToCandidateBucket(
+  supabaseAdmin: any,
+  params: {
+    sourcePath: string | null;
+    candidateId: string;
+    kind: "resume" | "photo";
+  },
+): Promise<string | null> {
+  const { sourcePath, candidateId } = params;
+  if (!sourcePath || !candidateId) return null;
+  const trimmed = sourcePath.trim();
+  if (!trimmed) return null;
+
+  const segments = trimmed.split("/");
+  const filename = segments[segments.length - 1] || `file-${Date.now()}`;
+  const destPath = `${candidateId}/${filename}`;
+
+  const lower = filename.toLowerCase();
+  let contentType: string | undefined;
+  if (lower.endsWith(".pdf")) {
+    contentType = "application/pdf";
+  } else if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) {
+    contentType = "image/jpeg";
+  } else if (lower.endsWith(".png")) {
+    contentType = "image/png";
+  } else if (lower.endsWith(".webp")) {
+    contentType = "image/webp";
+  }
+
+  try {
+    const { data: signed, error: signedErr } = await supabaseAdmin.storage
+      .from(EXTERNAL_FILES_BUCKET)
+      .createSignedUrl(trimmed, 60);
+    if (signedErr || !signed?.signedUrl) {
+      console.error(
+        "EXTERNAL_FILE_SIGNED_URL_FAILED",
+        signedErr?.message ?? null,
+      );
+      return null;
+    }
+
+    const res = await fetch(signed.signedUrl);
+    if (!res.ok) {
+      console.error(
+        "EXTERNAL_FILE_DOWNLOAD_FAILED",
+        res.status,
+        res.statusText,
+      );
+      return null;
+    }
+
+    const arrayBuffer = await res.arrayBuffer();
+    const { error: uploadErr } = await supabaseAdmin.storage
+      .from(CANDIDATE_FILES_BUCKET)
+      .upload(destPath, arrayBuffer, { upsert: true, contentType });
+
+    if (uploadErr) {
+      console.error(
+        "CANDIDATE_FILE_UPLOAD_FAILED",
+        uploadErr.message ?? uploadErr,
+      );
+      return null;
+    }
+
+    return destPath;
+  } catch (err) {
+    console.error("COPY_EXTERNAL_FILE_TO_CANDIDATE_FAILED", err);
+    return null;
+  }
 }
 
 Deno.serve(async (req) => {
@@ -327,6 +402,9 @@ Deno.serve(async (req) => {
 
       submissionStatus = "converted";
 
+      const submissionSource = (submission as Record<string, unknown>).source;
+      const canonicalSource = normalizeSource(submissionSource);
+
       const candidateInsert = {
         created_by: admin.userId,
         first_name: asStringOrNull(submission.first_name) ?? "",
@@ -334,7 +412,7 @@ Deno.serve(async (req) => {
         position: asStringOrNull(submission.position),
         address: asStringOrNull(submission.address),
         status: "approved" as const,
-        source: asStringOrNull(submission.source),
+        source: canonicalSource,
         notes: null as string | null,
         email: submissionEmail,
         phone: submissionPhone,
@@ -362,6 +440,63 @@ Deno.serve(async (req) => {
 
       createdCandidateId = newCandidate?.id ? String(newCandidate.id) : null;
       linkedCandidateId = createdCandidateId;
+
+      // Best-effort copy of resume/photo from external submissions storage
+      // into the canonical candidate-files bucket and patch candidate row.
+      if (createdCandidateId) {
+        const resumePath = asStringOrNull(
+          (submission as Record<string, unknown>).resume_path,
+        );
+        const photoPath = asStringOrNull(
+          (submission as Record<string, unknown>).photo_path,
+        );
+
+        if (resumePath) {
+          const cvDestPath = await copyExternalFileToCandidateBucket(
+            supabaseAdmin,
+            {
+              sourcePath: resumePath,
+              candidateId: createdCandidateId,
+              kind: "resume",
+            },
+          );
+          if (cvDestPath) {
+            const { error: cvUpdateErr } = await supabaseAdmin
+              .from("candidates")
+              .update({ cv_url: cvDestPath })
+              .eq("id", createdCandidateId);
+            if (cvUpdateErr) {
+              console.error(
+                "CANDIDATE_CV_URL_UPDATE_FAILED",
+                cvUpdateErr.message ?? cvUpdateErr,
+              );
+            }
+          }
+        }
+
+        if (photoPath) {
+          const photoDestPath = await copyExternalFileToCandidateBucket(
+            supabaseAdmin,
+            {
+              sourcePath: photoPath,
+              candidateId: createdCandidateId,
+              kind: "photo",
+            },
+          );
+          if (photoDestPath) {
+            const { error: photoUpdateErr } = await supabaseAdmin
+              .from("candidates")
+              .update({ photo_url: photoDestPath })
+              .eq("id", createdCandidateId);
+            if (photoUpdateErr) {
+              console.error(
+                "CANDIDATE_PHOTO_URL_UPDATE_FAILED",
+                photoUpdateErr.message ?? photoUpdateErr,
+              );
+            }
+          }
+        }
+      }
 
       const skills = normalizeSkillItems(submission.skills_json);
       if (skills.length && createdCandidateId) {
@@ -589,6 +724,28 @@ Deno.serve(async (req) => {
             code: "submission_update_failed",
           },
         });
+      }
+
+      if (createdCandidateId) {
+        const { error: activityErr } = await supabaseAdmin
+          .from("activity_logs")
+          .insert({
+            entity_type: "candidate",
+            entity_id: createdCandidateId,
+            event_type: "system_event",
+            message: "Candidate created from external submission",
+            metadata: {
+              external_submission_id: submissionId,
+              source: canonicalSource,
+            },
+            created_by: admin.userId,
+          });
+        if (activityErr) {
+          console.error(
+            "CANDIDATE_ACTIVITY_LOG_INSERT_FAILED",
+            activityErr.message ?? activityErr,
+          );
+        }
       }
 
       return jsonResponse(200, {

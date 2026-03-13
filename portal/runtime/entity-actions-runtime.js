@@ -33,6 +33,32 @@
   // Entity CREATE flows (extracted from app-shell.js)
   // ---------------------------------------------------------------------------
 
+  function normalizeCandidateSourceForCreate(raw) {
+    var fallback = "manual_internal";
+    var value = (raw || "").toString();
+    // Prefer shared frontend helper when available.
+    if (
+      window.IESourceRuntime &&
+      typeof window.IESourceRuntime.normalizeSource === "function"
+    ) {
+      // If no value was chosen, default to manual_internal.
+      var base = value || fallback;
+      return window.IESourceRuntime.normalizeSource(base);
+    }
+    return value || fallback;
+  }
+
+  function normalizeCandidateSourceForUpdate(raw) {
+    var value = (raw || "").toString();
+    if (
+      window.IESourceRuntime &&
+      typeof window.IESourceRuntime.normalizeSource === "function"
+    ) {
+      return window.IESourceRuntime.normalizeSource(value || null);
+    }
+    return value || null;
+  }
+
   async function saveCandidate(formData, form) {
     var profile =
       window.IECandidateProfileRuntime &&
@@ -55,7 +81,9 @@
     // Do not persist archived as profile status; use rejected for backward compatibility
     if (status === "archived") status = "rejected";
     const notes = (formData.get("notes") || "").toString();
-    const source = (formData.get("source") || "").toString();
+    const source = normalizeCandidateSourceForCreate(
+      formData.get("source") || ""
+    );
 
     if (window.IESupabase) {
       const { data, error } = await window.IESupabase.insertCandidate({
@@ -313,13 +341,16 @@
       : rawStatusEdit;
     // Do not persist archived as profile status; use rejected for backward compatibility
     if (normalizedStatusEdit === "archived") normalizedStatusEdit = "rejected";
+    var rawSourceEdit = (formData.get("source") || "").toString();
+    var normalizedSourceEdit = normalizeCandidateSourceForUpdate(rawSourceEdit);
+
     const payload = {
       first_name: (formData.get("first_name") || "").toString().trim(),
       last_name: (formData.get("last_name") || "").toString().trim(),
       address: (formData.get("address") || "").toString().trim(),
       position: (formData.get("position") || "").toString().trim(),
       status: normalizedStatusEdit,
-      source: (formData.get("source") || "").toString(),
+      source: normalizedSourceEdit,
       notes: (formData.get("notes") || "").toString(),
       email: profile.email || null,
       phone: profile.phone || null,

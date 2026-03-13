@@ -4,6 +4,7 @@ import {
   jsonResponse,
   readJsonBody,
 } from "../_shared/http.ts";
+import { normalizeSource } from "../_shared/source.ts";
 
 type SubmissionType = "spontaneous" | "job_offer";
 
@@ -242,7 +243,7 @@ Deno.serve(async (req) => {
   const resumePath = asStringOrNull(files.resume_path);
   const photoPath = asStringOrNull(files.photo_path);
 
-  const source = asStringOrNull(context.source) ?? "public_form";
+  const source = normalizeSource(context.source);
 
   // Soft duplicate check (pending_review on email / phone)
   if (email) {

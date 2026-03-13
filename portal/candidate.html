@@ -85,14 +85,20 @@
                             <span data-hero-source-view>
                                 <span data-field="hero-source" data-hero-source>—</span>
                             </span>
-                            <input
-                                type="text"
-                                class="form-input field-display text-xs md:text-sm text-gray-700 w-32 md:w-40 hidden"
+                            <select
+                                class="form-input field-display text-xs md:text-sm text-gray-700 w-32 md:w-44 hidden"
                                 data-field="source"
                                 data-hero-source-input
-                                placeholder="Source"
-                                readonly
                             >
+                                <option value="">Select source</option>
+                                <option value="public_form">Public Form</option>
+                                <option value="linkedin">LinkedIn</option>
+                                <option value="facebook">Facebook</option>
+                                <option value="direct_email">Direct Email</option>
+                                <option value="job_application">Job Application</option>
+                                <option value="manual_internal">Manual Internal</option>
+                                <option value="other">Other</option>
+                            </select>
                         </span>
                     </div>
                     <!-- Right: availability, action buttons -->
@@ -600,6 +606,7 @@
     <script src="core/debug.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="core/supabase-client.js"></script>
+    <script src="core/source-helpers.js"></script>
     <script src="core/data/candidates.js"></script>
     <script src="core/data/clients.js"></script>
     <script src="core/data/job-offers.js"></script>
