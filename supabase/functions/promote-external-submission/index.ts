@@ -333,7 +333,7 @@ Deno.serve(async (req) => {
         last_name: asStringOrNull(submission.last_name) ?? "",
         position: asStringOrNull(submission.position),
         address: asStringOrNull(submission.address),
-        status: "pending_review" as const,
+        status: "approved" as const,
         source: asStringOrNull(submission.source),
         notes: null as string | null,
         email: submissionEmail,
