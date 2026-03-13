@@ -450,14 +450,16 @@
     var placeholder = container.querySelector("[data-dashboard-placeholder]");
     if (placeholder) placeholder.remove();
     container.innerHTML = "";
-    var sourceLabels = {
-      linkedin: "LinkedIn",
-      email: "Email Diretta",
-      website: "Sito Web",
-      facebook: "Facebook / IG",
-      instagram: "Facebook / IG",
-      other: "Altro",
-    };
+    var sourceLabels =
+      (window.IESourceRuntime && window.IESourceRuntime.labels) || {
+        public_form: "Public Form",
+        linkedin: "LinkedIn",
+        facebook: "Facebook",
+        direct_email: "Direct Email",
+        job_application: "Job Application",
+        manual_internal: "Manual Internal",
+        other: "Other",
+      };
     var sourceColors = ["bg-blue-600", "bg-[#c5a059]", "bg-green-600", "bg-indigo-500", "bg-gray-400"];
     if (!items.length) {
       var p = document.createElement("p");
@@ -468,7 +470,15 @@
     }
     items.forEach(function (item, idx) {
       var key = (item.source || "other").toLowerCase();
-      var label = sourceLabels[key] || key;
+      var label;
+      if (
+        window.IESourceRuntime &&
+        typeof window.IESourceRuntime.sourceToLabel === "function"
+      ) {
+        label = window.IESourceRuntime.sourceToLabel(item.source || null);
+      } else {
+        label = sourceLabels[key] || key;
+      }
       var color = sourceColors[idx % sourceColors.length];
       var div = document.createElement("div");
       div.className = "space-y-2";
@@ -1364,7 +1374,17 @@
           window.IEStatusRuntime && typeof window.IEStatusRuntime.getAvailabilityBadgeClass === "function"
             ? window.IEStatusRuntime.getAvailabilityBadgeClass(availability)
             : (availability === "working" ? "badge-hired" : availability === "in_process" ? "badge-inprogress" : "badge-open");
-        const sourceLabel = (row.source || "").toUpperCase();
+        var sourceLabel = "";
+        if (
+          window.IESourceRuntime &&
+          typeof window.IESourceRuntime.sourceToLabel === "function"
+        ) {
+          sourceLabel = window.IESourceRuntime.sourceToLabel(
+            row.source || null
+          );
+        } else {
+          sourceLabel = (row.source || "").toString();
+        }
         const createdDate = row.created_at
           ? new Date(row.created_at).toLocaleDateString("it-IT")
           : "";
