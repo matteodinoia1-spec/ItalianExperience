@@ -55,6 +55,23 @@
     return "badge-open";
   }
 
+  function getCandidateViewHref(candidateId) {
+    if (!candidateId && candidateId !== 0) return null;
+    var href;
+    if (
+      window.IEPortal &&
+      window.IEPortal.links &&
+      typeof window.IEPortal.links.candidateView === "function"
+    ) {
+      href = window.IEPortal.links.candidateView(candidateId);
+    } else {
+      href =
+        "candidate.html?id=" +
+        encodeURIComponent(String(candidateId));
+    }
+    return href;
+  }
+
   /**
    * Human-readable label for title/breadcrumb: "FirstName LastName" if either
    * first_name or last_name exists; otherwise "Submission <id>".
@@ -276,6 +293,48 @@
         reviewNotesLine.classList.add("text-gray-400", "italic");
       }
     }
+  }
+
+  function renderLinkedCandidateAction(submission) {
+    var panel = document.querySelector("[data-linked-candidate-panel]");
+    if (!panel) return;
+    var button = panel.querySelector(
+      '[data-action="open-linked-candidate"]'
+    );
+    var candidateId =
+      submission && submission.linked_candidate_id != null
+        ? submission.linked_candidate_id
+        : null;
+
+    if (!candidateId) {
+      panel.classList.add("hidden");
+      panel.setAttribute("hidden", "hidden");
+      if (button) {
+        button.onclick = null;
+      }
+      return;
+    }
+
+    var href = getCandidateViewHref(candidateId);
+    if (!href || !button) {
+      panel.classList.add("hidden");
+      panel.setAttribute("hidden", "hidden");
+      return;
+    }
+
+    panel.classList.remove("hidden");
+    panel.removeAttribute("hidden");
+
+    button.onclick = function () {
+      if (
+        window.IERouter &&
+        typeof window.IERouter.navigateTo === "function"
+      ) {
+        window.IERouter.navigateTo(href);
+      } else {
+        window.location.href = href;
+      }
+    };
   }
 
   function renderStructuredSections(submission) {
@@ -886,6 +945,7 @@
         renderStructuredSections(submission);
         await renderFiles(submission);
         renderDuplicates(submission, state);
+        renderLinkedCandidateAction(submission);
         var displayLabel = getSubmissionDisplayLabel(submission);
         window.pageMeta = window.pageMeta || {};
         window.pageMeta.title = displayLabel;
@@ -1184,6 +1244,7 @@
     renderStructuredSections(submission);
     await renderFiles(submission);
     renderDuplicates(submission, state);
+    renderLinkedCandidateAction(submission);
 
     var displayLabel = getSubmissionDisplayLabel(submission);
     window.pageMeta = {

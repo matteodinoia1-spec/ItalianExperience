@@ -760,7 +760,7 @@
           <!-- Hidden context and placeholder file fields -->
           <input type="hidden" id="context_submission_type" name="context_submission_type" value="spontaneous" />
           <input type="hidden" id="context_job_offer_id" name="context_job_offer_id" value="" />
-          <input type="hidden" id="context_source" name="context_source" value="website_public_form" />
+          <input type="hidden" id="context_source" name="context_source" value="public_form" />
 
           <input type="hidden" id="files_resume_path" name="files_resume_path" value="" />
           <input type="hidden" id="files_photo_path" name="files_photo_path" value="" />
@@ -1418,8 +1418,8 @@
         const contextJobOfferId =
           (formData.get('context_job_offer_id') || '').toString().trim() || null;
         const contextSource =
-          (formData.get('context_source') || 'website_public_form').toString().trim() ||
-          'website_public_form';
+          (formData.get('context_source') || 'public_form').toString().trim() ||
+          'public_form';
 
         const filesResumePath =
           (formData.get('files_resume_path') || '').toString().trim() || null;

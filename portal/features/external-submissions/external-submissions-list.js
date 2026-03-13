@@ -572,8 +572,13 @@
       tbody.innerHTML =
         '<tr><td colspan="10" class="px-6 py-8 text-center text-gray-400">Loading...</td></tr>';
 
+      var statusFilter = filters.status;
+      if (statusFilter === "all" || statusFilter === "") {
+        statusFilter = undefined;
+      }
+
       window.ExternalSubmissionsApi.fetchSubmissions({
-        status: filters.status || undefined,
+        status: statusFilter,
         page: currentPage,
         limit: PAGE_SIZE,
       })

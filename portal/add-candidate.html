@@ -94,11 +94,12 @@
                                 <div>
                                     <label class="form-label">Source</label>
                                     <select name="source" class="form-input appearance-none">
-                                        <option value="">Select source</option>
+                                        <option value="manual_internal" selected>Manual Internal</option>
+                                        <option value="public_form">Public Form</option>
                                         <option value="linkedin">LinkedIn</option>
-                                        <option value="email">Email</option>
                                         <option value="facebook">Facebook</option>
-                                        <option value="website">Website</option>
+                                        <option value="direct_email">Direct Email</option>
+                                        <option value="job_application">Job Application</option>
                                         <option value="other">Other</option>
                                     </select>
                                 </div>
@@ -442,6 +443,7 @@
     <script src="core/debug.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="core/supabase-client.js"></script>
+    <script src="core/source-helpers.js"></script>
     <script src="core/data/candidates.js"></script>
     <script src="core/data/clients.js"></script>
     <script src="core/data/job-offers.js"></script>

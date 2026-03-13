@@ -736,7 +736,13 @@
     setField("summary", candidate.summary || "");
     setField("email", candidate.email || "");
     setField("phone", candidate.phone || "");
-    setField("source", candidate.source || "");
+
+    var normalizedSource =
+      window.IESourceRuntime &&
+      typeof window.IESourceRuntime.normalizeSource === "function"
+        ? window.IESourceRuntime.normalizeSource(candidate.source || null)
+        : candidate.source || "";
+    setField("source", normalizedSource || "");
     // Internal notes (separate from activity log)
     setField("notes", candidate.notes || "");
 
@@ -800,9 +806,20 @@
       heroPhoneWrap.style.display = "";
     }
     if (heroSourceEl && heroSourceWrap) {
-      var source = safeString(candidate.source).trim();
-      if (source) {
-        heroSourceEl.textContent = source;
+      var sourceLabel;
+      if (
+        window.IESourceRuntime &&
+        typeof window.IESourceRuntime.sourceToLabel === "function"
+      ) {
+        sourceLabel = window.IESourceRuntime.sourceToLabel(
+          candidate.source || null
+        );
+      } else {
+        sourceLabel = safeString(candidate.source).trim();
+      }
+
+      if (sourceLabel) {
+        heroSourceEl.textContent = sourceLabel;
       } else {
         heroSourceEl.textContent = "Source not specified";
       }

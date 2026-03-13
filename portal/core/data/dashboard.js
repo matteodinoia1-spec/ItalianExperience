@@ -317,8 +317,46 @@
       var list = data || [];
       var bySource = {};
       list.forEach(function (row) {
-        var s = (row.source || "other").toString().trim() || "other";
-        bySource[s] = (bySource[s] || 0) + 1;
+        var raw = row && row.source != null ? row.source : null;
+        var normalized = (function normalizeForDashboard(value) {
+          var s = value == null ? "" : value.toString().trim();
+          if (!s) return "other";
+          try {
+            if (
+              window.IESourceRuntime &&
+              typeof window.IESourceRuntime.normalizeSource === "function"
+            ) {
+              return window.IESourceRuntime.normalizeSource(s);
+            }
+          } catch (e) {
+            // Fallback to manual normalization below
+          }
+          var lowered = s.toLowerCase();
+          switch (lowered) {
+            case "website":
+            case "website form":
+            case "website public form":
+            case "public form":
+              return "public_form";
+            case "email":
+            case "direct email":
+              return "direct_email";
+            case "linkedin":
+              return "linkedin";
+            case "facebook":
+            case "instagram":
+              return "facebook";
+            case "job application":
+              return "job_application";
+            case "manual":
+            case "internal":
+            case "manual internal":
+              return "manual_internal";
+            default:
+              return "other";
+          }
+        })(raw);
+        bySource[normalized] = (bySource[normalized] || 0) + 1;
       });
       var total = list.length;
       var resultList = Object.keys(bySource).map(function (source) {
