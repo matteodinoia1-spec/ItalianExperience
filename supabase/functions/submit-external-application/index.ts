@@ -60,6 +60,88 @@ Deno.serve(async (req) => {
     });
   }
 
+  const captchaToken = asStringOrNull(
+    (bodyUnknown as Record<string, unknown>).captcha_token,
+  );
+  if (!captchaToken) {
+    return jsonResponse(400, {
+      ok: false,
+      error: { message: "captcha_token is required", code: "captcha_missing" },
+    });
+  }
+
+  const TURNSTILE_SECRET = Deno.env.get("TURNSTILE_SECRET_KEY");
+  if (!TURNSTILE_SECRET) {
+    return jsonResponse(502, {
+      ok: false,
+      error: {
+        message: "CAPTCHA verification is unavailable",
+        code: "captcha_verification_error",
+      },
+    });
+  }
+
+  let verifyResponse: Response;
+  try {
+    const formData = new URLSearchParams();
+    formData.append("secret", TURNSTILE_SECRET);
+    formData.append("response", captchaToken);
+
+    verifyResponse = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      },
+    );
+  } catch {
+    return jsonResponse(502, {
+      ok: false,
+      error: {
+        message: "Failed to verify CAPTCHA",
+        code: "captcha_verification_error",
+      },
+    });
+  }
+
+  if (!verifyResponse.ok) {
+    return jsonResponse(502, {
+      ok: false,
+      error: {
+        message: "CAPTCHA verification service error",
+        code: "captcha_verification_error",
+      },
+    });
+  }
+
+  let verifyJson: unknown;
+  try {
+    verifyJson = await verifyResponse.json();
+  } catch {
+    return jsonResponse(502, {
+      ok: false,
+      error: {
+        message: "Invalid CAPTCHA verification response",
+        code: "captcha_verification_error",
+      },
+    });
+  }
+
+  const verifyData = isRecord(verifyJson) ? verifyJson : {};
+  const successField = verifyData.success;
+  const success = typeof successField === "boolean"
+    ? successField
+    : successField === "true";
+  if (!success) {
+    return jsonResponse(403, {
+      ok: false,
+      error: { message: "Invalid CAPTCHA token", code: "captcha_invalid" },
+    });
+  }
+
   const main = isRecord(bodyUnknown.main) ? bodyUnknown.main : {};
   const profileChildren = isRecord(bodyUnknown.profile_children)
     ? bodyUnknown.profile_children

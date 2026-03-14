@@ -274,4 +274,71 @@ The **frontend** does not introduce a direct-API vulnerability: it uses the anon
 - **Observability:** No user id, email, profile, or query results in production console output.
 - **Documentation:** RLS table list and mandatory-RLS comments in code and in this report.
 
-*End of report. Section 9 added after security hardening implementation.*
+---
+
+## 10. PUBLIC APPLICATION SECURITY (EXTERNAL CANDIDATE SUBMISSIONS)
+
+### 10.1 Flow overview
+
+- **Entry point:** Public candidate application form at `recruitment/candidate/apply/index.html` on the static site.
+- **Backend endpoints:** Two Supabase Edge Functions intentionally exposed to the public internet:
+  - `prepare-external-application-upload` – validates file metadata and returns a signed upload URL/token for CV and optional photo.
+  - `submit-external-application` – validates the assembled application payload and inserts a row into `external_candidate_submissions` (plus a `privacy_consents` entry).
+- **Protection layers:**
+  - Form-level validation and honeypot fields.
+  - Server-side validation and throttling (duplicate and “too fast” submission checks).
+  - **Cloudflare Turnstile CAPTCHA** enforced for both endpoints.
+
+### 10.2 Cloudflare Turnstile protection
+
+- The public candidate form renders a Cloudflare Turnstile widget using the configured site key.
+- When the CAPTCHA challenge is solved, a token is stored in-memory on `window.turnstileToken` via a global callback (for example `onTurnstileSuccess(token)`).
+- The frontend sends this token as `captcha_token` in the JSON request body when calling both Edge Functions:
+  - `prepare-external-application-upload`
+  - `submit-external-application`
+- If the token is missing on the client, the form blocks submission and surfaces a user-friendly error instead of calling the backend.
+
+### 10.3 Server-side CAPTCHA verification
+
+- Both Edge Functions treat `captcha_token` as **required** input:
+  - Missing token → HTTP `400` with `{ error: "captcha_missing" }`.
+  - Invalid token (verification fails) → HTTP `403` with `{ error: "captcha_invalid" }`.
+  - Turnstile verification service or configuration failure → HTTP `502` with `{ error: "captcha_verification_error" }`.
+- Verification flow inside each Edge Function:
+  1. Read `captcha_token` from the parsed JSON body.
+  2. Read the secret key from the Edge Function environment:
+     - `TURNSTILE_SECRET_KEY` (configured in Supabase Edge Function secrets).
+  3. Make a `POST` request to Cloudflare Turnstile’s `siteverify` endpoint:
+     - URL: `https://challenges.cloudflare.com/turnstile/v0/siteverify`
+     - Content type: `application/x-www-form-urlencoded`
+     - Body parameters:
+       - `secret` = `TURNSTILE_SECRET_KEY`
+       - `response` = `captcha_token`
+  4. Parse the JSON response and check the `success` field.
+  5. Only if `success === true` does the function continue to the existing validation and business logic (file preparation or submission insert).
+- The Turnstile secret key is **never** hardcoded in the repository; it is read only from environment variables supplied by Supabase.
+
+### 10.4 Abuse and spam mitigation
+
+- **Direct API calls without CAPTCHA:** Any attempt to call `prepare-external-application-upload` or `submit-external-application` directly (for example via `curl` or a custom script) without a valid `captcha_token` is rejected server-side with `400` or `403`, even if the caller has the Supabase anon key.
+- **Bot and storage abuse protection:**
+  - File upload preparation requires a valid CAPTCHA token before a signed upload URL/token is issued.
+  - Submission inserts also require a valid CAPTCHA token, on top of existing throttling and duplicate checks.
+  - This significantly raises the bar for automated abuse, scripted spam, and storage misuse on the public candidate application endpoints.
+- **Token reuse:** Token reuse prevention is handled by Cloudflare Turnstile itself via its token semantics; the Edge Functions do not cache or re-issue tokens, and every request is verified with Turnstile’s `siteverify` API.
+
+### 10.5 Environment configuration
+
+- **Environment variable (backend):**
+  - `TURNSTILE_SECRET_KEY` – Cloudflare Turnstile secret, configured in Supabase Edge Function secrets; used only by server-side verification logic in the public candidate application Edge Functions.
+- **Frontend configuration:**
+  - Turnstile site key is embedded in the static form HTML and used to render the widget.
+  - No secrets are exposed in the frontend; only the site key is public.
+
+### 10.6 UX impact
+
+- The Turnstile widget appears as a lightweight “Security check” section on the candidate application form.
+- For legitimate users, the added friction is minimal: once the challenge is passed, the rest of the two-step form and upload flow remains unchanged.
+- Error messages for CAPTCHA failures are surfaced as part of the existing form error UI where possible, guiding users to retry if something goes wrong.
+
+*End of report. Sections 9–10 added after security hardening implementation and the introduction of Cloudflare Turnstile for public candidate applications.*

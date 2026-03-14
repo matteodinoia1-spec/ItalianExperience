@@ -960,6 +960,14 @@
   // DELETE / ARCHIVE HELPERS
   // ---------------------------------------------------------------------------
 
+  const ARCHIVABLE_TABLES = ["candidates", "clients", "job_offers"];
+  const PERMANENT_DELETE_TABLES = [
+    "candidates",
+    "clients",
+    "job_offers",
+    "candidate_job_associations",
+  ];
+
   /**
    * Generic soft archive helper: set is_archived = true on a single row.
    * @param {{ table: string, id: string }} params
@@ -971,6 +979,12 @@
 
     if (!table || !id) {
       const error = new Error("Missing table or id");
+      console.error("[Supabase] archiveRecord:", error, { table, id });
+      return { data: null, error };
+    }
+
+    if (ARCHIVABLE_TABLES.indexOf(table) === -1) {
+      const error = new Error("Table not allowed for archive");
       console.error("[Supabase] archiveRecord:", error, { table, id });
       return { data: null, error };
     }
@@ -1010,6 +1024,12 @@
       return { data: null, error };
     }
 
+    if (ARCHIVABLE_TABLES.indexOf(table) === -1) {
+      const error = new Error("Table not allowed for unarchive");
+      console.error("[Supabase] unarchiveRecord:", error, { table, id });
+      return { data: null, error };
+    }
+
     try {
       const { data, error } = await supabase
         .from(table)
@@ -1044,6 +1064,12 @@
 
     if (!table || !id) {
       const error = new Error("Missing table or id");
+      console.error("[Supabase] deletePermanent:", error, { table, id });
+      return { data: null, error };
+    }
+
+    if (PERMANENT_DELETE_TABLES.indexOf(table) === -1) {
+      const error = new Error("Table not allowed for permanent delete");
       console.error("[Supabase] deletePermanent:", error, { table, id });
       return { data: null, error };
     }
@@ -1089,6 +1115,12 @@
 
     if (!table || !id) {
       const error = new Error("Missing table or id");
+      console.error("[Supabase] deletePermanentRecord:", error, { table, id });
+      return { data: null, error };
+    }
+
+    if (PERMANENT_DELETE_TABLES.indexOf(table) === -1) {
+      const error = new Error("Table not allowed for permanent delete");
       console.error("[Supabase] deletePermanentRecord:", error, { table, id });
       return { data: null, error };
     }

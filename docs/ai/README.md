@@ -20,5 +20,5 @@ Workflow rules for AI changes:
 
 - **No new hardcoded `/ItalianExperience` in runtime code**: All runtime URL and path logic must be derived from `window.IEConfig` (for example `IEConfig.BASE_PATH`, `IEConfig.PORTAL_PATH`, and `IEConfig.SITE_URL`). Do not introduce new fallbacks such as `(window.IEConfig && window.IEConfig.BASE_PATH) || "/ItalianExperience"` in JS.
 - **Runtime vs static HTML**: Runtime path fixes should be implemented only in JS/TS using `window.IEConfig`. Static HTML templates and their hardcoded `/ItalianExperience/...` links will be normalized in a **separate dedicated phase**; do not pre‑empt that work by editing HTML paths ad‑hoc.
-- **See also**: `docs/architecture/WEBSITE-URL-AND-PATH-CONVENTIONS.md` for the authoritative description of BASE_PATH, PORTAL_PATH, SITE_URL, and runtime path conventions.
+- **See also**: `docs/architecture/WEBSITE-URL-AND-PATH-CONVENTIONS.md` for the authoritative description of BASE_PATH, PORTAL_PATH, SITE_URL, and runtime path conventions, and `docs/architecture/TARGET-REPO-LAYOUT.md` for the canonical future repo layout and system ownership.
 

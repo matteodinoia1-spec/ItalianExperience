@@ -306,15 +306,6 @@
         };
       }
 
-      // DEBUG: JWT used for promote-external-submission (remove after diagnosis)
-      if (typeof console !== "undefined" && console.debug) {
-        console.debug("SESSION_EXISTS", !!session);
-        console.debug("TOKEN_EXISTS", !!accessToken);
-        console.debug("TOKEN_LENGTH", accessToken?.length);
-        console.debug("TOKEN_PREFIX", accessToken?.slice(0, 10));
-        console.debug("TOKEN_EQUALS_ANON", accessToken === anonKey);
-      }
-
       var url = functionsBase + "/promote-external-submission";
       var res = await fetch(url, {
         method: "POST",

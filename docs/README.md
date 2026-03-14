@@ -17,6 +17,7 @@ When adding new docs, prefer placing:
 
 ### Key architecture docs
 
+- **Target repository layout**: see `docs/architecture/TARGET-REPO-LAYOUT.md` for the canonical future repo structure and ownership model.
 - **Website structure and base path**: see `docs/architecture/WEBSITE-STRUCTURE.md`.
 - **Website file map and routes**: see `docs/architecture/WEBSITE-FILE-MAP.md`.
 - **Website URL and path conventions** (BASE_PATH, PORTAL_PATH, SITE_URL, and runtime rules): see `docs/architecture/WEBSITE-URL-AND-PATH-CONVENTIONS.md`.
