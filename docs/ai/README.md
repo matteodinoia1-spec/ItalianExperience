@@ -16,3 +16,9 @@ Workflow rules for AI changes:
 - **Then implement**: Only after audit + plan are stable, make behavior‑preserving changes that respect the runtime boundaries and ownership documented in `docs/refactor/`.
 - **Update docs after major refactors**: Any substantial change to routing, bootstrap ownership, list runtimes, or shared helpers must be reflected in the refactor and architecture docs under `docs/refactor/` and `docs/architecture/`.
 
+### Path and base‑path rules for AI changes
+
+- **No new hardcoded `/ItalianExperience` in runtime code**: All runtime URL and path logic must be derived from `window.IEConfig` (for example `IEConfig.BASE_PATH`, `IEConfig.PORTAL_PATH`, and `IEConfig.SITE_URL`). Do not introduce new fallbacks such as `(window.IEConfig && window.IEConfig.BASE_PATH) || "/ItalianExperience"` in JS.
+- **Runtime vs static HTML**: Runtime path fixes should be implemented only in JS/TS using `window.IEConfig`. Static HTML templates and their hardcoded `/ItalianExperience/...` links will be normalized in a **separate dedicated phase**; do not pre‑empt that work by editing HTML paths ad‑hoc.
+- **See also**: `docs/architecture/WEBSITE-URL-AND-PATH-CONVENTIONS.md` for the authoritative description of BASE_PATH, PORTAL_PATH, SITE_URL, and runtime path conventions.
+

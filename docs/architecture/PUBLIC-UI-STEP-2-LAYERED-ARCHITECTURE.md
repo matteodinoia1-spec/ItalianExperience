@@ -1,6 +1,6 @@
 ## Public UI layered architecture model (static site, public routes only)
 
-This document defines the **future layered UI architecture** for the static public site (excluding `portal/**`). It builds directly on the duplication analysis in `docs/refactor/PUBLIC-UI-STEP-1-CURRENT-DUPLICATION.md` and the constraints of the current stack: static HTML pages, partial injection via `assets/js/bootstrap.js`, shared `assets/css/site.css`, Tailwind utilities from `assets/css/tailwind.css`, and no framework rewrite.
+This document defines the **future layered UI architecture** for the static public site (excluding `portal/**`). It builds directly on the duplication analysis in `docs/refactor/PUBLIC-UI-STEP-1-CURRENT-DUPLICATION.md` and the constraints of the current stack: static HTML pages, partial injection via `assets/js/bootstrap.js`, shared `assets/css/site.css`, Tailwind utilities from `assets/css/tailwind.css`, and no framework rewrite. For URL/base‑path ownership (BASE_PATH, PORTAL_PATH, SITE_URL), see `docs/architecture/WEBSITE-URL-AND-PATH-CONVENTIONS.md`.
 
 The goal is to **centralize shared behavior**, **stabilize class contracts**, and make future changes **predictable and low-risk**, while remaining fully compatible with the existing static site.
 

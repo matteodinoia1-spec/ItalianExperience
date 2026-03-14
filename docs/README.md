@@ -2,7 +2,7 @@
 
 This repository’s documentation is organized to keep the portal refactor and architecture work developer‑focused and easy to navigate.
 
-- **architecture/**: High‑level system shape and structure, including website layout, file maps, and canonical UI architecture documents.
+- **architecture/**: High‑level system shape and structure, including website layout, file maps, canonical UI architecture documents, and base‑path/url conventions.
 - **refactor/**: Governance, audits, plans, and logs for the portal refactor (audit, master plan, roadmap, and execution log, plus related UI refactor steps).
 - **ai/**: Notes and guidance for AI‑assisted development workflows in this repo, including how AI agents should reason about the architecture and refactor phases.
 - **_private-transfer/**: Temporary holding area for internal/sensitive documents (schema, workflow, caching, and audit material) that should be migrated to a private workspace such as Notion and **not** treated as public docs.
@@ -14,6 +14,12 @@ When adding new docs, prefer placing:
 - Architecture or structural decisions under `architecture/`
 - Refactor plans, audits, or logs under `refactor/`
 - AI‑facing guidance or prompts under `ai/`
+
+### Key architecture docs
+
+- **Website structure and base path**: see `docs/architecture/WEBSITE-STRUCTURE.md`.
+- **Website file map and routes**: see `docs/architecture/WEBSITE-FILE-MAP.md`.
+- **Website URL and path conventions** (BASE_PATH, PORTAL_PATH, SITE_URL, and runtime rules): see `docs/architecture/WEBSITE-URL-AND-PATH-CONVENTIONS.md`.
 
 ### Migration note (private workspace)
 

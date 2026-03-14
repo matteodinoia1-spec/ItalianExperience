@@ -7,7 +7,13 @@
 
   function getPublicPostingUrl(slug) {
     if (!slug || !String(slug).trim()) return null;
-    var base = (window.IEConfig && window.IEConfig.BASE_PATH) || "/ItalianExperience";
+    if (!window.IEConfig || !window.IEConfig.BASE_PATH) {
+      console.error(
+        "[ItalianExperience] IEConfig.BASE_PATH is required for public job posting URLs (job-postings list)."
+      );
+      return null;
+    }
+    var base = window.IEConfig.BASE_PATH;
     base = String(base).replace(/\/$/, "");
     return window.location.origin + base + "/recruitment/jobs/?slug=" + encodeURIComponent(String(slug).trim());
   }

@@ -522,8 +522,13 @@
 
   function getPublicJobPostingUrl(slug) {
     if (!slug || !String(slug).trim()) return null;
-    var base =
-      (window.IEConfig && window.IEConfig.BASE_PATH) || "/ItalianExperience";
+    if (!window.IEConfig || !window.IEConfig.BASE_PATH) {
+      console.error(
+        "[ItalianExperience] IEConfig.BASE_PATH is required for public job posting URLs (dashboard)."
+      );
+      return null;
+    }
+    var base = window.IEConfig.BASE_PATH;
     base = String(base).replace(/\/$/, "");
     return (
       window.location.origin +

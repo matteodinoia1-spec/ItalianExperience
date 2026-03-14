@@ -1,5 +1,13 @@
 ;(function () {
-  const base = (window.IEConfig && window.IEConfig.BASE_PATH) || '/ItalianExperience';
+  function getBasePath() {
+    if (!window.IEConfig || !window.IEConfig.BASE_PATH) {
+      console.error(
+        "[ItalianExperience] IEConfig.BASE_PATH is required for bootstrap.js runtime."
+      );
+      return null;
+    }
+    return String(window.IEConfig.BASE_PATH).replace(/\/$/, "");
+  }
 
   function inject(el, html) {
     if (el) el.innerHTML = html;
@@ -17,6 +25,9 @@
   }
 
   async function initPage(doc) {
+    const base = getBasePath();
+    if (!base) return;
+
     const d = doc || document;
     const headerMount = d.getElementById('site-header');
     const footerMount = d.getElementById('site-footer');

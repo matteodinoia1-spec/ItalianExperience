@@ -859,6 +859,17 @@
           }
         }
 
+        function getCandidateApplyBasePathFromConfig() {
+          if (!window.IEConfig || !window.IEConfig.BASE_PATH) {
+            console.error(
+              "[ItalianExperience] IEConfig.BASE_PATH is required for candidate apply URLs (recruitment jobs)."
+            );
+            return null;
+          }
+          var base = String(window.IEConfig.BASE_PATH).replace(/\/$/, "");
+          return base + "/recruitment/candidate/apply/";
+        }
+
         if (applyCta && applyCtaLabel && applyNote && applySummary) {
           if (lifecycle.applyOpen) {
             applyCta.className = "apply-cta apply-cta--open";
@@ -869,7 +880,8 @@
             applyNote.textContent =
               "Click Apply to open the application form on this page.";
             applyCta.onclick = function () {
-              var basePath = "/ItalianExperience/recruitment/candidate/apply/";
+              var basePath = getCandidateApplyBasePathFromConfig();
+              if (!basePath) return;
               var applyUrl;
               try {
                 var url = new URL(basePath, window.location.origin);
