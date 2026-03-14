@@ -2,12 +2,12 @@
 
 This repository contains a static marketing website at the root of the project, plus a separate `portal/` web application. This document describes only the static website portion outside `portal/`, without proposing any refactors or changes. For BASE_PATH, PORTAL_PATH, and runtime URL rules, see also `docs/architecture/WEBSITE-URL-AND-PATH-CONVENTIONS.md`.
 
-The static website is deployed under a `/ItalianExperience` base path. Internal links between pages and references to shared CSS, JS, and image assets use absolute URLs such as `/ItalianExperience/recruitment/employer/` and `/ItalianExperience/assets/css/site.css`. When running a local static file server for preview, the site must be served in a way that preserves this base path; serving the repository directly at `/` without a `/ItalianExperience` prefix will cause requests like `/ItalianExperience/recruitment/employer/` to return `Cannot GET` errors even though the underlying files (for example `recruitment/employer/index.html`) are present. The archival move of the legacy `_stage1_backup` subtree into `archive/website/assets-img-stage1/` did not change these HTML routes or live asset paths.
+The static website is deployed under a `/ItalianExperience` base path. Internal links between pages and references to shared CSS, JS, and image assets use absolute URLs such as `/ItalianExperience/recruitment/employer/` and `/ItalianExperience/assets/css/site.css`. When running a local static file server for preview, the site must be served in a way that preserves this base path; serving the repository directly at `/` without a `/ItalianExperience` prefix will cause requests like `/ItalianExperience/recruitment/employer/` to return `Cannot GET` errors even though the underlying files (for example `recruitment/employer/index.html`) are present. The archival move of the legacy `_stage1_backup` subtree into `archive/site/assets-img-stage1/` (previously `archive/website/assets-img-stage1/`) did not change these HTML routes or live asset paths.
 
 ## Website Reorganization Summary
 
-- Legacy backup assets previously stored under `assets/img/_stage1_backup/` have been moved into `archive/website/assets-img-stage1/` as non-runtime backups.
-- Clearly unused test assets that were confirmed to have no references in HTML, CSS, or JavaScript have been moved into `archive/website/assets-unused/`.
+- Legacy backup assets previously stored under `assets/img/_stage1_backup/` have been moved into `archive/site/assets-img-stage1/` (previously `archive/website/assets-img-stage1/`) as non-runtime backups.
+- Clearly unused test assets that were confirmed to have no references in HTML, CSS, or JavaScript have been moved into `archive/site/assets-unused/` (previously `archive/website/assets-unused/`).
 - All production assets remain under `assets/img/`, and no live HTML, CSS, or JS paths were modified as part of this reorganization.
 - No runtime behavior, layout, or visuals were changed; only archive locations and documentation were updated.
 
@@ -15,8 +15,9 @@ The static website is deployed under a `/ItalianExperience` base path. Internal 
 
 - **Static marketing site at repo root**: The static website lives at the repository root under the `/ItalianExperience` base path and is composed of a small set of HTML entry points (`index.html`, `404.html`) plus section folders for `contact/`, `estates/`, `flavors/`, `recruitment/`, and `travel/`, each with its own `index.html`.
 - **Shared assets and partials**: All runtime CSS, JavaScript, and image assets used by the static site live under `assets/` (`assets/css/`, `assets/js/`, `assets/img/`), and shared header/footer markup is centralized in `partials/header.html` and `partials/footer.html` and included from the static pages.
-- **Archive separation**: Legacy backup content and explicitly unused assets have been moved out of the live `assets/img/` tree into `archive/website/assets-img-stage1/` and `archive/website/assets-unused/`; these archived files are preserved for reference but are not part of the production asset tree and do not change any existing HTML routes or asset paths.
+- **Archive separation**: Legacy backup content and explicitly unused assets have been moved out of the live `assets/img/` tree into `archive/site/assets-img-stage1/` and `archive/site/assets-unused/` (previously under `archive/website/`); these archived files are preserved for reference but are not part of the production asset tree and do not change any existing HTML routes or asset paths.
 - **Portal isolation**: The `portal/` directory continues to host a separate, app-like web application with its own assets and documentation; it remains architecturally and operationally separate from the static marketing website described in this document.
+- **Public candidate application security**: The public candidate application form under `recruitment/candidate/apply/` uses Cloudflare Turnstile on the frontend and requires a valid CAPTCHA token for the Supabase Edge Functions that prepare uploads and submit external applications; verification happens server-side using a secret key stored only in Edge Function environment variables.
 
 ## Root-level website structure (excluding `portal/`)
 
@@ -60,12 +61,12 @@ The static website is deployed under a `/ItalianExperience` base path. Internal 
 - **JavaScript (`assets/js/`)**
   - `assets/js/site.js` – single shared JavaScript entry for the static website, included by the HTML pages.
 
-- **Images (`assets/img/` and `archive/website/`)**
+- **Images (`assets/img/` and `archive/site/`)**
   - `assets/img/` – root for all static site images that are part of the live static website.
   - Production images are organized into subfolders by domain/section (for example: home, estates, flavors, recruitment, travel and their subfolders).
-  - `archive/website/` – root for website archives that are **not** part of the production asset tree.
-    - `archive/website/assets-img-stage1/` – archive location containing the former `assets/img/_stage1_backup/` legacy/backup subtree with older HTML snapshots and images; this archive is explicitly skipped by tooling scripts.
-    - `archive/website/assets-unused/` – holding area for explicitly confirmed-unused assets that have been moved out of `assets/img/` after verification that they are not referenced anywhere.
+  - `archive/site/` – root for website archives that are **not** part of the production asset tree (previously `archive/website/`).
+    - `archive/site/assets-img-stage1/` – archive location containing the former `assets/img/_stage1_backup/` legacy/backup subtree with older HTML snapshots and images; this archive is explicitly skipped by tooling scripts.
+    - `archive/site/assets-unused/` – holding area for explicitly confirmed-unused assets that have been moved out of `assets/img/` after verification that they are not referenced anywhere.
 
 ## Partials
 
@@ -78,9 +79,9 @@ These partials are referenced from static HTML pages to keep the header and foot
 
 The static website uses Node-based scripts under the `scripts/` directory:
 
-- `scripts/check-links.mjs` – scans HTML pages and checks links. It is configured to ignore the archived backup tree under `archive/website/assets-img-stage1/` (and the historical `assets/img/_stage1_backup/` path).
+- `scripts/check-links.mjs` – scans HTML pages and checks links. It is configured to ignore the archived backup tree under `archive/site/assets-img-stage1/` (and the historical `assets/img/_stage1_backup/` path).
 - `scripts/add-image-dimensions.mjs` – walks `assets/img/` to inject image dimensions into HTML (it operates only on live production assets and does not touch the archived backup tree).
-- `scripts/generate-all-avif.mjs` – generates AVIF variants for images under `assets/img/`, skipping archived backup content under `archive/website/assets-img-stage1/` (and the historical `_stage1_backup` path, if present).
+- `scripts/generate-all-avif.mjs` – generates AVIF variants for images under `assets/img/`, skipping archived backup content under `archive/site/assets-img-stage1/` (and the historical `_stage1_backup` path, if present).
 - `scripts/generate-gapyear-avif.mjs` – AVIF generator focused on gap year travel images.
 
 These scripts operate on the existing layout and paths; they are part of tooling only and do not change the static site’s runtime structure by themselves.

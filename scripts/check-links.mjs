@@ -6,7 +6,7 @@ const skipDirs = new Set([
   'node_modules',
   '.git',
   'assets/img/_stage1_backup',
-  'archive/website/assets-img-stage1'
+  'archive/site/assets-img-stage1'
 ]);
 const htmlFiles = [];
 const problems = [];

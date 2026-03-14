@@ -523,7 +523,7 @@ Legend for systems:
 
 ### 1.16 Additional Public Routes
 
-Repo scan revealed additional HTML in `archive/website/assets-img-stage1/**`. These:
+Repo scan revealed additional HTML in `archive/site/assets-img-stage1/**` (previously `archive/website/assets-img-stage1/**`). These:
 
 - Are **archive / staging artifacts**, not part of the current public route map.
 - Should **not** be treated as active routes for template mapping.

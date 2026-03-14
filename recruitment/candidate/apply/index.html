@@ -445,6 +445,7 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 
 <body>
@@ -786,6 +787,20 @@
             </label>
           </div>
 
+          <!-- Cloudflare Turnstile CAPTCHA -->
+          <div class="field" style="margin-top: 1.2rem;">
+            <div class="field-label" style="margin-bottom: 0.5rem;">
+              <span>Security check</span><span class="field-label-required">*</span>
+            </div>
+            <div
+              class="cf-turnstile"
+              data-sitekey="0x4AAAAAACq4OcjcA1zYVM3J"
+              data-callback="onTurnstileSuccess"
+              data-theme="dark"
+              data-size="compact"
+            ></div>
+          </div>
+
           <div class="apply-actions">
             <div class="apply-actions-left">
               <span>Step <span id="stepCounter">1</span> of 2</span>
@@ -819,6 +834,13 @@
     <div id="site-footer"></div>
   </div>
 
+  <script>
+    // Cloudflare Turnstile CAPTCHA token (set via global callback)
+    window.turnstileToken = null;
+    function onTurnstileSuccess(token) {
+      window.turnstileToken = token;
+    }
+  </script>
   <script>
     (function () {
       const urlParams = new URLSearchParams(window.location.search || "");
@@ -1527,6 +1549,11 @@
       }
 
       async function prepareExternalApplicationUpload(fileKind, file) {
+        if (!window.turnstileToken) {
+          throw new Error(
+            'Please complete the security check (CAPTCHA) before uploading your files.'
+          );
+        }
         const { functionsBase, anonKey } = getRuntimeConfig();
         if (!functionsBase || !anonKey) {
           throw new Error(
@@ -1541,7 +1568,8 @@
           file_kind: fileKind,
           filename: file.name,
           content_type: file.type || 'application/octet-stream',
-          size_bytes: file.size
+          size_bytes: file.size,
+          captcha_token: window.turnstileToken
         };
 
         let response;
@@ -1705,6 +1733,17 @@
         const trimmedBase = functionsBase.replace(/\/+$/, '');
         const url = trimmedBase + '/submit-external-application';
 
+        if (!window.turnstileToken) {
+          throw new Error(
+            'Please complete the security check (CAPTCHA) before submitting your application.'
+          );
+        }
+
+        const requestBody = {
+          ...payload,
+          captcha_token: window.turnstileToken
+        };
+
         let response;
         try {
           response = await fetch(url, {
@@ -1714,7 +1753,7 @@
               apikey: anonKey,
               Authorization: 'Bearer ' + anonKey,
             },
-            body: JSON.stringify(payload),
+            body: JSON.stringify(requestBody),
           });
         } catch (networkError) {
           console.error('Application submission network error:', networkError);

@@ -624,10 +624,10 @@
         window.IESupabase &&
         typeof window.IESupabase.deletePermanentRecord === "function"
       ) {
-        result = await window.IESupabase.deletePermanentRecord(
-          "candidate_job_associations",
-          id
-        );
+        result = await window.IESupabase.deletePermanentRecord({
+          table: "candidate_job_associations",
+          id: id,
+        });
       } else {
         result = await supabase
           .from("candidate_job_associations")
