@@ -341,6 +341,14 @@
       navigateTo(target);
     }
 
+    function onCancel() {
+      if (!config.route || typeof config.route.getViewUrl !== "function") {
+        return;
+      }
+      var target = config.route.getViewUrl(state.id);
+      navigateTo(target);
+    }
+
     function createOnSave() {
       if (state.mode !== "edit") {
         return undefined;
@@ -408,7 +416,11 @@
             return;
           }
           var target = config.route.getViewUrl(state.id);
-          navigateTo(target);
+          if (config.entityType === "job_offer") {
+            window.location.href = target;
+          } else {
+            navigateTo(target);
+          }
         };
       }
 
@@ -443,33 +455,29 @@
       };
     }
 
+    var onClose = null;
+    if (typeof config.lifecycle.close === "function") {
+      onClose = async function () {
+        try {
+          var res = await config.lifecycle.close(state.id);
+          if (res && res.error) return;
+          window.location.reload();
+        } catch (err) {
+          console.error(
+            "[EntityPageShell] lifecycle.close error:",
+            err
+          );
+        }
+      };
+    }
+
     var onReopen = null;
     if (typeof config.lifecycle.reopen === "function") {
       onReopen = async function () {
         try {
           var res = await config.lifecycle.reopen(state.id);
           if (res && res.error) return;
-
-          // Refresh toolbar with active status
-          var updatedStatus = getStatus(state.entity);
-          try {
-            window.renderEntityToolbar({
-              entityType: config.entityType,
-              entityId: state.id,
-              status: updatedStatus,
-              mode: state.mode,
-              containerId: containerId,
-              onEdit: onEdit,
-              onArchive: onArchive,
-              onReopen: onReopen,
-              onSave: createOnSave(),
-            });
-          } catch (errToolbar) {
-            console.error(
-              "[EntityPageShell] toolbar re-render error:",
-              errToolbar
-            );
-          }
+          window.location.reload();
         } catch (err) {
           console.error(
             "[EntityPageShell] lifecycle.reopen error:",
@@ -487,6 +495,8 @@
         mode: state.mode,
         containerId: containerId,
         onEdit: onEdit,
+        onCancel: onCancel,
+        onClose: onClose,
         onArchive: onArchive,
         onReopen: onReopen,
         onSave: createOnSave(),

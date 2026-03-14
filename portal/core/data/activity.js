@@ -573,6 +573,10 @@
         "rejection",
         "system_event",
         "status_changed",
+        "application_created",
+        "application_rejected",
+        "application_hired",
+        "application_withdrawn",
       ];
       var eventType = payload && payload.event_type;
       if (allowedEventTypes.indexOf(eventType) === -1) {

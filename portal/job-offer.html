@@ -73,19 +73,31 @@
 
                 <!-- Right: status + toolbar -->
                 <div class="flex flex-col items-start md:items-end gap-2 shrink-0">
-                  <div class="flex items-center gap-2">
-                    <span class="text-[10px] uppercase tracking-widest text-gray-400 font-semibold">Status</span>
-                    <span class="badge badge-open" data-field="status">—</span>
-                    <select
-                      class="form-input hidden text-xs py-1 px-2 rounded-lg border border-gray-200 bg-white"
-                      data-field="status"
-                      aria-label="Job offer status"
-                    >
-                      <option value="active">Active</option>
-                      <option value="open">Open</option>
-                      <option value="inprogress">In Progress</option>
-                      <option value="closed">Closed</option>
-                    </select>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-[10px] uppercase tracking-widest text-gray-400 font-semibold">Status</span>
+                      <span class="badge badge-open" data-field="status">—</span>
+                      <select
+                        class="form-input hidden text-xs py-1 px-2 rounded-lg border border-gray-200 bg-white"
+                        data-field="status"
+                        aria-label="Job offer status"
+                      >
+                        <option value="open">Open</option>
+                        <option value="inprogress">In Progress</option>
+                        <option value="closed">Closed</option>
+                        <option value="archived">Archived</option>
+                      </select>
+                    </div>
+                    <span class="hidden md:inline text-gray-300" aria-hidden="true">·</span>
+                    <div class="flex items-center gap-2" id="jobOfferPublicStatusWrap">
+                      <span class="text-[10px] uppercase tracking-widest text-gray-400 font-semibold">Public</span>
+                      <span
+                        id="jobOfferPublicStatusBadge"
+                        data-ie-hero-public-status
+                        class="badge bg-gray-100 text-gray-600"
+                        aria-label="Public job posting status"
+                      >—</span>
+                    </div>
                   </div>
                   <div id="jobOfferActions" class="page-detail-actions mt-0.5"></div>
                 </div>
@@ -95,6 +107,7 @@
             <!-- Main grid -->
             <div id="jobOfferProfileRoot" class="w-full space-y-6">
               <!-- Compact applications pipeline -->
+              <!-- Single operational view: applications pipeline (Board or List, not both) -->
               <section
                 class="ie-card glass-card p-4 rounded-3xl"
                 data-ie-joboffer-pipeline-section
@@ -109,11 +122,50 @@
                       No applications for this job offer yet.
                     </p>
                   </div>
+                  <div class="flex flex-wrap items-center gap-2" data-ie-joboffer-pipeline-actions role="group" aria-label="Pipeline view and actions">
+                    <button type="button" data-ie-pipeline-view="board" class="ie-btn ie-btn-secondary !py-1.5 !px-3 text-xs font-medium" aria-pressed="true">Board</button>
+                    <button type="button" data-ie-pipeline-view="list" class="ie-btn ie-btn-secondary !py-1.5 !px-3 text-xs font-medium" aria-pressed="false">List</button>
+                    <span class="hidden md:inline w-px h-5 bg-gray-200" aria-hidden="true"></span>
+                    <div data-ie-joboffer-pipeline-add-candidate-slot></div>
+                    <!-- Bulk actions (List view only) -->
+                    <div class="hidden flex items-center gap-2" data-ie-joboffer-pipeline-bulk-actions>
+                      <span class="text-xs text-gray-500" data-ie-pipeline-bulk-count>0 selected</span>
+                      <select class="form-input !py-1 !px-2 text-xs w-auto" data-ie-pipeline-bulk-status aria-label="Bulk status change">
+                        <option value="">Change status…</option>
+                        <option value="applied">Applied</option>
+                        <option value="screening">Screening</option>
+                        <option value="interview">Interview</option>
+                        <option value="offer">Offer</option>
+                        <option value="hired">Hired</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="withdrawn">Withdrawn</option>
+                        <option value="not_selected">Not selected</option>
+                      </select>
+                      <button type="button" class="ie-btn ie-btn-secondary !py-1 !px-2 text-xs" data-ie-pipeline-bulk-apply>Apply</button>
+                    </div>
+                  </div>
                 </div>
                 <div
                   class="grid grid-cols-1 md:grid-cols-5 gap-3"
                   data-ie-joboffer-pipeline-board
                 ></div>
+                <div class="overflow-x-auto hidden" data-ie-joboffer-pipeline-list>
+                  <table class="ie-table w-full text-left text-sm">
+                    <thead class="bg-gray-50/80">
+                      <tr>
+                        <th class="ie-table-th w-10">
+                          <input type="checkbox" class="rounded border-gray-300" data-ie-pipeline-select-all aria-label="Select all rows" />
+                        </th>
+                        <th class="ie-table-th">Name</th>
+                        <th class="ie-table-th">Position</th>
+                        <th class="ie-table-th">Status</th>
+                        <th class="ie-table-th">Updated</th>
+                        <th class="ie-table-th text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100" data-ie-joboffer-pipeline-list-body></tbody>
+                  </table>
+                </div>
               </section>
 
               <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-6">
@@ -230,6 +282,238 @@
                       </div>
                     </div>
                   </section>
+
+                  <!-- Public Job Posting (Phase 2 – create + edit public fields) -->
+                  <section
+                    class="ie-card glass-card p-6 rounded-3xl"
+                    data-ie-jobposting-card
+                  >
+                    <h3 class="serif text-xl font-bold text-[#1b4332] section-title">
+                      Public Job Posting
+                    </h3>
+
+                    <!-- No posting state: visible by default so card is operational before async load -->
+                    <div
+                      class="mt-3 space-y-3"
+                      data-ie-jobposting-empty-state
+                    >
+                      <p class="text-sm text-gray-600">
+                        No public job posting exists for this job offer yet.
+                      </p>
+                      <p class="text-xs text-gray-500">
+                        Create a curated public-facing posting from this internal job offer.
+                        You can edit the public content here before it is published or used for applications.
+                      </p>
+                      <p class="text-[11px] text-gray-500 font-medium mt-1">
+                        Workflow: Create → Review/Edit → Publish → Open Apply. Public content is separate from internal job offer data.
+                      </p>
+                      <div class="mt-2">
+                        <button
+                          type="button"
+                          class="ie-btn ie-btn-primary w-full text-sm"
+                          data-ie-jobposting-create
+                        >
+                          Create Public Job Posting
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Existing posting state: compact summary (view) + full editor (edit mode only) -->
+                    <div
+                      class="mt-3 space-y-4"
+                      data-ie-jobposting-existing-state
+                      style="display: none;"
+                    >
+                      <!-- Compact summary: always visible when a posting exists (includes lifecycle switches in view and edit) -->
+                      <div class="space-y-3" data-ie-jobposting-summary>
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                          <p
+                            class="text-sm font-medium text-gray-900 truncate min-w-0"
+                            data-ie-jobposting-title
+                          >
+                            —
+                          </p>
+                          <a
+                            href="#"
+                            class="text-xs font-medium text-[#1b4332] hover:underline shrink-0"
+                            data-ie-jobposting-edit-link
+                            aria-label="Edit public job posting"
+                          >
+                            Edit
+                          </a>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                          <span
+                            class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold"
+                            data-ie-jobposting-publish-status
+                          >
+                            —
+                          </span>
+                          <span
+                            class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold"
+                            data-ie-jobposting-apply-status
+                          >
+                            —
+                          </span>
+                        </div>
+                        <!-- Published / Applications Open: visible in view and edit as quick actions -->
+                        <div class="space-y-3 rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                          <div class="flex items-center justify-between gap-4">
+                            <div class="min-w-0">
+                              <p class="text-sm font-medium text-gray-800">Published</p>
+                              <p class="text-[11px] text-gray-500 mt-0.5" id="ie-jobposting-publish-desc">Posting is visible on the public job page when on.</p>
+                            </div>
+                            <label class="ie-switch-wrap shrink-0" aria-describedby="ie-jobposting-publish-desc">
+                              <input type="checkbox" class="ie-switch-input" data-ie-jobposting-publish-toggle aria-label="Published" />
+                              <span class="ie-switch-track" aria-hidden="true"></span>
+                            </label>
+                          </div>
+                          <div class="flex items-center justify-between gap-4" data-ie-jobposting-apply-switch-wrap>
+                            <div class="min-w-0">
+                              <p class="text-sm font-medium text-gray-800">Applications Open</p>
+                              <p class="text-[11px] text-gray-500 mt-0.5" id="ie-jobposting-apply-desc">Candidates can submit applications when on.</p>
+                              <p class="text-[11px] text-amber-700 mt-1 hidden" data-ie-jobposting-apply-disabled-reason></p>
+                            </div>
+                            <label class="ie-switch-wrap shrink-0" data-ie-jobposting-apply-label>
+                              <input type="checkbox" class="ie-switch-input" data-ie-jobposting-apply-toggle aria-label="Applications Open" aria-describedby="ie-jobposting-apply-desc" />
+                              <span class="ie-switch-track" aria-hidden="true"></span>
+                            </label>
+                          </div>
+                          <p class="text-[11px] text-gray-500" data-ie-jobposting-apply-deadline-note></p>
+                        </div>
+                        <p
+                          class="text-xs font-mono text-gray-600 break-all"
+                          data-ie-jobposting-slug
+                        >
+                          —
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            class="ie-btn ie-btn-secondary text-sm py-1.5 px-3"
+                            data-ie-jobposting-copy-link
+                            title="Copy public job posting URL to clipboard"
+                          >
+                            Copy link
+                          </button>
+                          <button
+                            type="button"
+                            class="ie-btn ie-btn-secondary text-sm py-1.5 px-3"
+                            data-ie-jobposting-open-public
+                            title="Open the public job posting page in a new tab"
+                          >
+                            Open public page
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Full editor: form fields only — visible only in edit mode -->
+                      <div
+                        class="border-t border-gray-200 pt-4 mt-4 space-y-4"
+                        data-ie-jobposting-editor
+                        style="display: none;"
+                      >
+                        <p class="text-[11px] text-gray-500">
+                          The public posting deadline (below) is independent from the internal job offer deadline.
+                          When set, applications close automatically at end of day (23:59:59 America/New_York) on that date.
+                        </p>
+
+                        <!-- Inline edit form for public-facing fields -->
+                        <form
+                          class="space-y-4"
+                          data-ie-jobposting-form
+                        >
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">
+                            Public Title
+                          </p>
+                          <input
+                            type="text"
+                            class="form-input text-sm w-full"
+                            data-ie-jobposting-field="public_title"
+                            placeholder="Public title shown on the posting"
+                          >
+                        </div>
+
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">
+                            Public Location
+                          </p>
+                          <input
+                            type="text"
+                            class="form-input text-sm w-full"
+                            data-ie-jobposting-field="public_location"
+                            placeholder="e.g. Venice, VE"
+                          >
+                        </div>
+
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">
+                            Public Description
+                          </p>
+                          <textarea
+                            class="form-input text-sm leading-relaxed whitespace-pre-line w-full resize-none"
+                            rows="4"
+                            data-ie-jobposting-field="public_description"
+                            placeholder="Description shown to candidates on the public posting"
+                          ></textarea>
+                        </div>
+
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">
+                            Public Requirements
+                          </p>
+                          <textarea
+                            class="form-input text-sm leading-relaxed whitespace-pre-line w-full resize-none"
+                            rows="4"
+                            data-ie-jobposting-field="public_requirements"
+                            placeholder="Key requirements shown on the public posting"
+                          ></textarea>
+                        </div>
+
+                        <div>
+                          <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">
+                            Public Benefits
+                          </p>
+                          <textarea
+                            class="form-input text-sm leading-relaxed whitespace-pre-line w-full resize-none"
+                            rows="3"
+                            data-ie-jobposting-field="public_benefits"
+                            placeholder="Optional benefits/perks you want to show publicly"
+                          ></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">
+                              Slug
+                            </p>
+                            <input
+                              type="text"
+                              class="form-input text-xs font-mono w-full"
+                              data-ie-jobposting-field="slug"
+                              placeholder="auto-generated URL slug (you can adjust)"
+                            >
+                          </div>
+                          <div>
+                            <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">
+                              Apply Deadline (optional)
+                            </p>
+                            <input
+                              type="date"
+                              class="form-input text-sm w-full"
+                              data-ie-jobposting-field="apply_deadline"
+                            >
+                            <p class="mt-1 text-[11px] text-gray-500">
+                              Interpreted as end of day (23:59:59 America/New_York). Applications close after that moment.
+                            </p>
+                          </div>
+                        </div>
+
+                        </form>
+                      </div>
+                    </div>
+                  </section>
                 </div>
 
                 <!-- Right: notes + activity -->
@@ -259,6 +543,8 @@
     </main>
   </div>
 
+  <!-- Config: must be loaded before Supabase client boot -->
+  <script src="../assets/js/config.js"></script>
   <script>
     window.pageMeta = {
       title: "Job Offer",
@@ -278,6 +564,8 @@
   <script src="core/data/candidates.js"></script>
   <script src="core/data/clients.js"></script>
   <script src="core/data/job-offers.js"></script>
+  <script src="core/job-posting-deadline.js"></script>
+  <script src="core/data/job-postings.js"></script>
   <script src="core/data/applications.js"></script>
   <script src="core/data/activity.js"></script>
   <script src="core/supabase.js"></script>
@@ -296,6 +584,7 @@
   <script src="runtime/candidate-runtime.js"></script>
   <script src="runtime/client-runtime.js"></script>
   <script src="runtime/job-offer-runtime.js"></script>
+  <script src="runtime/shared-formatters-runtime.js"></script>
   <script src="runtime/header-runtime.js"></script>
   <script src="runtime/global-header-actions-runtime.js"></script>
   <script src="runtime/entity-actions-runtime.js"></script>

@@ -295,6 +295,81 @@
   }
 
   /**
+   * Job offers with client name and their job_posting (if any).
+   * Used by dashboard Live Offers card; caller filters by effective live using
+   * window.isEffectiveLive(offer, posting) (same rule as hero badge and job-offers list).
+   * @returns {Promise<{ data: Array<{ offer: object, posting: object | null }>, error: object | null }>}
+   */
+  async function getJobOffersWithPostingsForDashboard() {
+    try {
+      var offersResult = await supabase
+        .from("job_offers")
+        .select("id, title, position, status, client_id, clients(id, name)")
+        .or("is_archived.is.null,is_archived.eq.false")
+        .order("created_at", { ascending: false })
+        .limit(100);
+      var offersRows = offersResult && offersResult.data ? offersResult.data : [];
+      var offersError = offersResult ? offersResult.error : null;
+      if (offersError) {
+        console.error(
+          "[Supabase] getJobOffersWithPostingsForDashboard offers error:",
+          offersError.message || offersError,
+          offersError
+        );
+        return { data: [], error: offersError };
+      }
+      var offers = (offersRows || []).map(function (r) {
+        var client = r.clients || null;
+        var clientName = (client && client.name) || null;
+        return {
+          id: r.id,
+          title: r.title,
+          position: r.position,
+          status: r.status,
+          client_id: r.client_id,
+          client_name: clientName,
+        };
+      });
+      var ids = offers.map(function (o) { return o.id; }).filter(Boolean);
+      if (ids.length === 0) {
+        return { data: offers.map(function (o) { return { offer: o, posting: null }; }), error: null };
+      }
+      var postingsResult = await supabase
+        .from("job_postings")
+        .select("id, job_offer_id, is_published, apply_enabled, apply_deadline, slug")
+        .in("job_offer_id", ids);
+      var postingsList = (postingsResult && postingsResult.data) ? postingsResult.data : [];
+      var postingsError = postingsResult ? postingsResult.error : null;
+      if (postingsError) {
+        console.error(
+          "[Supabase] getJobOffersWithPostingsForDashboard postings error:",
+          postingsError.message || postingsError,
+          postingsError
+        );
+      }
+      var postingsByOfferId = {};
+      (postingsList || []).forEach(function (p) {
+        if (p && p.job_offer_id) {
+          postingsByOfferId[String(p.job_offer_id)] = p;
+        }
+      });
+      var data = offers.map(function (offer) {
+        return {
+          offer: offer,
+          posting: postingsByOfferId[String(offer.id)] || null,
+        };
+      });
+      return { data: data, error: null };
+    } catch (err) {
+      console.error(
+        "[Supabase] getJobOffersWithPostingsForDashboard exception:",
+        err
+      );
+      return { data: [], error: err };
+    }
+  }
+
+  /**
    * Candidates grouped by source. Returns array of { source: string, count: number }.
    * @returns {Promise<{ data: array, error: object | null }>}
    */
@@ -391,6 +466,7 @@
     getRecentCandidates: getRecentCandidates,
     getCandidatesBySource: getCandidatesBySource,
     getPendingExternalSubmissionsPreview: getPendingExternalSubmissionsPreview,
+    getJobOffersWithPostingsForDashboard: getJobOffersWithPostingsForDashboard,
   };
 })();
 

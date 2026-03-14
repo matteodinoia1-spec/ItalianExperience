@@ -45,6 +45,13 @@
   }
 
   function normalizeStatus(value) {
+    if (
+      window.IEStatusRuntime &&
+      typeof window.IEStatusRuntime.normalizeApplicationStatusForDisplay ===
+        "function"
+    ) {
+      return window.IEStatusRuntime.normalizeApplicationStatusForDisplay(value);
+    }
     var s = (value || "").toString().toLowerCase();
     if (s === "new") return "applied";
     if (s === "offered") return "offer";

@@ -1,7 +1,7 @@
 ## Public UI – Template Mapping (Step 5)
 
 **Scope**: Static public site under `/ItalianExperience` (excluding `portal/**`).  
-**Inputs**: `PUBLIC-UI-STEP-1–4`, `assets/css/site.css`, public HTML routes discovered via `docs/WEBSITE-FILE-MAP.md` and repo scan.  
+**Inputs**: `PUBLIC-UI-STEP-1–4`, `assets/css/site.css`, public HTML routes discovered via `docs/architecture/WEBSITE-FILE-MAP.md` and repo scan.
 **Goal**: For each public route, map its **target template**, **hero variant**, **canonical systems**, **local exceptions**, **normalization targets**, and whether it is a **baseline**, **strong reference**, **acceptable**, or **outlier**.
 
 Template types and canonical systems come from Steps 2–4:

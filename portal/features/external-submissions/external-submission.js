@@ -25,12 +25,26 @@
   }
 
   function formatStatus(status) {
+    if (
+      window.IEStatusRuntime &&
+      typeof window.IEStatusRuntime.normalizeExternalSubmissionStatus ===
+        "function"
+    ) {
+      return window.IEStatusRuntime.normalizeExternalSubmissionStatus(status);
+    }
     var s = (status || "").toString().toLowerCase();
     if (!s) return "pending_review";
     return s;
   }
 
   function formatStatusLabel(status) {
+    if (
+      window.IEStatusRuntime &&
+      typeof window.IEStatusRuntime.formatExternalSubmissionStatusLabel ===
+        "function"
+    ) {
+      return window.IEStatusRuntime.formatExternalSubmissionStatusLabel(status);
+    }
     var s = formatStatus(status);
     switch (s) {
       case "pending_review":
@@ -47,6 +61,15 @@
   }
 
   function getStatusBadgeClass(status) {
+    if (
+      window.IEStatusRuntime &&
+      typeof window.IEStatusRuntime.getExternalSubmissionStatusBadgeClass ===
+        "function"
+    ) {
+      return window.IEStatusRuntime.getExternalSubmissionStatusBadgeClass(
+        status
+      );
+    }
     var s = formatStatus(status);
     if (s === "pending_review") return "badge-open";
     if (s === "converted") return "badge-hired";
@@ -1161,7 +1184,7 @@
         window.IERouter &&
         typeof window.IERouter.navigateTo === "function"
       ) {
-        window.IERouter.navigateTo("external-submissions.html");
+        window.IERouter.navigateTo("external-submissions");
       } else {
         window.location.href = "external-submissions.html";
       }
@@ -1221,7 +1244,7 @@
               window.IERouter &&
               typeof window.IERouter.navigateTo === "function"
             ) {
-              window.IERouter.navigateTo("external-submissions.html");
+              window.IERouter.navigateTo("external-submissions");
             } else {
               window.location.href = "external-submissions.html";
             }

@@ -297,6 +297,8 @@
             setTimeout(() => { box.classList.add('hidden'); }, 4000);
         }
     </script>
+    <!-- Config: must be loaded before Supabase client boot -->
+    <script src="../assets/js/config.js"></script>
     <!-- Supabase JS v2 (publishable key only) -->
     <script src="core/debug.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

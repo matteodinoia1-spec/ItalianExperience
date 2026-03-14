@@ -165,6 +165,8 @@
     </div>
 
     <!-- Supabase (auth + data) -->
+    <!-- Config: must be loaded before Supabase client boot -->
+    <script src="../assets/js/config.js"></script>
     <script>
       window.pageMeta = {
         title: "Candidates",
@@ -197,6 +199,7 @@
     <script src="runtime/candidate-runtime.js"></script>
     <script src="runtime/client-runtime.js"></script>
     <script src="runtime/job-offer-runtime.js"></script>
+    <script src="runtime/shared-formatters-runtime.js"></script>
     <script src="runtime/header-runtime.js"></script>
     <script src="runtime/global-header-actions-runtime.js"></script>
     <script src="runtime/entity-actions-runtime.js"></script>
@@ -204,6 +207,8 @@
     <script src="components/page-header.js"></script>
     <script src="core/entity-toolbar.js"></script>
     <script src="runtime/candidate-import-runtime.js"></script>
+    <script src="runtime/lists/shared-list-helpers.js"></script>
+    <script src="runtime/lists/candidates-list.js"></script>
     <script src="core/lists-runtime.js"></script>
     <script src="core/session/session.js"></script>
     <script src="core/ui/modals.js"></script>

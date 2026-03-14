@@ -5,9 +5,9 @@
 
 This step assumes the layered model and responsibility matrix in:
 
-- `docs/PUBLIC-UI-STEP-1-CURRENT-DUPLICATION.md`
-- `docs/PUBLIC-UI-STEP-2-LAYERED-ARCHITECTURE.md`
-- `docs/PUBLIC-UI-STEP-3-GLOBAL-VS-LOCAL.md`
+- `docs/refactor/PUBLIC-UI-STEP-1-CURRENT-DUPLICATION.md`
+- `docs/architecture/PUBLIC-UI-STEP-2-LAYERED-ARCHITECTURE.md`
+- `docs/architecture/PUBLIC-UI-STEP-3-GLOBAL-VS-LOCAL.md`
 
 It focuses on **what the shared systems are**, **what they own**, and **how legacy classes map into them or are deprecated**. No HTML/CSS changes are made yet; this is a **source-of-truth contract** for the migration.
 

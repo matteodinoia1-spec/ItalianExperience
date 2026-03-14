@@ -16,16 +16,22 @@
     var titles = {
       dashboard: "Dashboard",
       candidates: "Candidates",
-      clients: "Clients",
-      "job-offers": "Job Offers",
+      candidate: "Candidate",
       applications: "Applications",
+      application: "Application",
+      clients: "Clients",
+      client: "Client",
+      "job-offers": "Job Offers",
+      "job-offer": "Job Offer",
+      "job-postings": "Job Postings",
+      "job-posting": "Job Posting",
+      "external-submissions": "External Submissions",
+      "external-submission": "External Submission",
       archived: "Archived",
       profile: "User Profile",
       "add-candidate": "Add New Candidate",
       "add-job-offer": "Create New Job Offer",
       "add-client": "Add Client",
-      candidate: "Candidate",
-      application: "Application",
     };
     return titles[key] || "Dashboard";
   }
@@ -38,9 +44,17 @@
     var subtitles = {
       dashboard: "Overview of your recruitment activity and key metrics.",
       candidates: "Manage and track talent in your exclusive network.",
-      clients: "Manage your network of companies and partners.",
-      "job-offers": "Manage open positions for clients in your network.",
+      candidate: "View and manage candidate details.",
       applications: "All candidate applications.",
+      application: "View and manage application details.",
+      clients: "Manage your network of companies and partners.",
+      client: "View and manage client details.",
+      "job-offers": "Manage open positions for clients in your network.",
+      "job-offer": "View and manage job offer details.",
+      "job-postings": "Public job postings linked to job offers.",
+      "job-posting": "View job posting details and deadline.",
+      "external-submissions": "Review submissions from the public application form.",
+      "external-submission": "View and manage external submission details.",
       archived: "Review archived candidates, job offers, and clients.",
       profile: "Manage your personal information and your role in the portal.",
       "add-candidate":
@@ -48,7 +62,6 @@
       "add-job-offer":
         "Define the parameters for the new hiring search.",
       "add-client": "Enter the company or partner details.",
-      candidate: "View and manage candidate details.",
     };
     return subtitles[key] || "";
   }
@@ -70,6 +83,10 @@
         return [dashboard, { label: "Clients" }];
       case "job-offers":
         return [dashboard, { label: "Job Offers" }];
+      case "job-postings":
+        return [dashboard, { label: "Job Offers", path: "job-offers.html" }, { label: "Job Postings" }];
+      case "job-posting":
+        return [dashboard, { label: "Job Offers", path: "job-offers.html" }, { label: "Job Postings", path: "job-postings.html" }, { label: "Job Posting" }];
       case "archived":
         return [dashboard, { label: "Archived" }];
       case "add-candidate":
@@ -98,6 +115,32 @@
           { label: "Candidates", path: "candidates.html" },
           { label: "Candidate" },
         ];
+      case "client":
+        return [
+          dashboard,
+          { label: "Clients", path: "clients.html" },
+          { label: "Client" },
+        ];
+      case "application":
+        return [
+          dashboard,
+          { label: "Applications", path: "applications.html" },
+          { label: "Application" },
+        ];
+      case "job-offer":
+        return [
+          dashboard,
+          { label: "Job Offers", path: "job-offers.html" },
+          { label: "Job Offer" },
+        ];
+      case "external-submissions":
+        return [dashboard, { label: "External Submissions" }];
+      case "external-submission":
+        return [
+          dashboard,
+          { label: "External Submissions", path: "external-submissions.html" },
+          { label: "Submission" },
+        ];
       default:
         return [{ label: "Dashboard", path: "dashboard.html" }];
     }
@@ -112,6 +155,8 @@
       applications: "applications.html",
       clients: "clients.html",
       "job-offers": "job-offers.html",
+      "job-postings": "job-postings.html",
+      "external-submissions": "external-submissions.html",
       archived: "archived.html",
       profile: "profile.html",
     };
@@ -125,8 +170,11 @@
   }
 
   function escapeHtml(text) {
+    if (window.IEFormatters && typeof window.IEFormatters.escapeHtml === "function") {
+      return window.IEFormatters.escapeHtml(text);
+    }
     var div = document.createElement("div");
-    div.textContent = text;
+    div.textContent = text == null ? "" : String(text);
     return div.innerHTML;
   }
 
@@ -196,11 +244,17 @@
     candidate: "candidates",
     "add-candidate": "candidates",
     "job-offers": "job-offers",
+    "job-postings": "job-offers",
+    "job-offer": "job-offers",
+    "job-posting": "job-offers",
     "add-job-offer": "job-offers",
     applications: "applications",
     application: "applications",
     clients: "clients",
+    client: "clients",
     "add-client": "clients",
+    "external-submissions": "candidates",
+    "external-submission": "candidates",
     archived: "archived",
   };
 
@@ -240,6 +294,7 @@
       "external-submissions.html": "external-submissions.html",
       "add-candidate.html": "add-candidate.html",
       "job-offers.html": "job-offers.html",
+      "job-postings.html": "job-postings.html",
       "add-job-offer.html": "add-job-offer.html",
       "applications.html": "applications.html",
       "clients.html": "clients.html",
@@ -273,9 +328,18 @@
     }
   }
 
+  function closeJobOffersSubmenu() {
+    var wrap = document.querySelector("[data-nav-job-offers-wrap]");
+    if (wrap) {
+      wrap.classList.remove("portal-header-nav__item-with-sub--open");
+      wrap.setAttribute("aria-expanded", "false");
+    }
+  }
+
   function closeAllMenus() {
     closeUserMenu();
     closeCandidatesSubmenu();
+    closeJobOffersSubmenu();
   }
 
   var headerNavGlobalListenersBound = false;
@@ -289,12 +353,14 @@
       var insideHeader = e.target.closest(".portal-header");
       var insideUserArea = e.target.closest(".portal-header-user-area");
       var insideCandidatesWrap = e.target.closest("[data-nav-candidates-wrap]");
+      var insideJobOffersWrap = e.target.closest("[data-nav-job-offers-wrap]");
       if (!insideHeader) {
         closeAllMenus();
         return;
       }
       if (insideUserArea) return;
       if (!insideCandidatesWrap) closeCandidatesSubmenu();
+      if (!insideJobOffersWrap) closeJobOffersSubmenu();
     });
 
     document.addEventListener("keydown", function (e) {
@@ -420,10 +486,70 @@
     });
   }
 
+  function initJobOffersSubmenu() {
+    var wrap = document.querySelector("[data-nav-job-offers-wrap]");
+    var menu = document.querySelector("[data-nav-job-offers-menu]");
+    if (!wrap || !menu) return;
+
+    var closeTimeout = null;
+
+    function openSubmenu() {
+      if (closeTimeout) {
+        clearTimeout(closeTimeout);
+        closeTimeout = null;
+      }
+      wrap.classList.add("portal-header-nav__item-with-sub--open");
+      wrap.setAttribute("aria-expanded", "true");
+    }
+
+    function scheduleClose() {
+      if (closeTimeout) {
+        clearTimeout(closeTimeout);
+      }
+      closeTimeout = setTimeout(function () {
+        closeJobOffersSubmenu();
+      }, 120);
+    }
+
+    wrap.addEventListener("mouseenter", openSubmenu);
+    menu.addEventListener("mouseenter", openSubmenu);
+    wrap.addEventListener("mouseleave", scheduleClose);
+    menu.addEventListener("mouseleave", scheduleClose);
+
+    var supportsHover =
+      window.matchMedia &&
+      window.matchMedia("(hover: hover)").matches;
+    if (!supportsHover) {
+      var triggerLink = wrap.querySelector(
+        ".portal-header-nav__link[data-nav-group='job-offers']"
+      );
+      if (triggerLink) {
+        triggerLink.addEventListener("click", function (e) {
+          e.preventDefault();
+          var isOpen = wrap.classList.contains(
+            "portal-header-nav__item-with-sub--open"
+          );
+          if (isOpen) {
+            closeJobOffersSubmenu();
+          } else {
+            openSubmenu();
+          }
+        });
+      }
+    }
+
+    menu.querySelectorAll("[data-nav-submenu-item]").forEach(function (link) {
+      link.addEventListener("click", function () {
+        closeJobOffersSubmenu();
+      });
+    });
+  }
+
   function initHeaderNavBehavior() {
     normalizeHeaderLinks();
     applyHeaderActiveState();
     initCandidatesSubmenu();
+    initJobOffersSubmenu();
     initUserMenu();
     initHeaderLogout();
     ensureGlobalMenuListeners();
@@ -500,6 +626,7 @@
     getDefaultBreadcrumbs: getDefaultBreadcrumbs,
     applyHeaderActiveState: applyHeaderActiveState,
     closeCandidatesSubmenu: closeCandidatesSubmenu,
+    closeJobOffersSubmenu: closeJobOffersSubmenu,
   };
 
   // Ensure header behavior is wired even when the header

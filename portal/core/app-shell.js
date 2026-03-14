@@ -666,39 +666,8 @@
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Page-specific data views (tables + filters)
-  // ---------------------------------------------------------------------------
-
-  function initDataViews() {
-    const pageKey = window.IERouterRuntime.getPageKey();
-    if (pageKey === "dashboard") {
-      // Dashboard data is loaded via Supabase helpers (lists runtime module).
-      if (window.IEListsRuntime && typeof IEListsRuntime.initDashboardPage === "function") {
-        IEListsRuntime.initDashboardPage();
-      }
-      return;
-    }
-    if (pageKey === "candidates") {
-      if (window.IEListsRuntime && typeof IEListsRuntime.initCandidatesPage === "function") {
-        IEListsRuntime.initCandidatesPage();
-      }
-    } else if (pageKey === "job-offers") {
-      if (window.IEListsRuntime && typeof IEListsRuntime.initJobOffersPage === "function") {
-        IEListsRuntime.initJobOffersPage();
-      }
-    } else if (pageKey === "applications") {
-      if (window.IEListsRuntime && typeof IEListsRuntime.initApplicationsPage === "function") {
-        IEListsRuntime.initApplicationsPage();
-      }
-    } else if (pageKey === "clients") {
-      if (window.IEListsRuntime && typeof IEListsRuntime.initClientsPage === "function") {
-        IEListsRuntime.initClientsPage();
-      }
-    } else if (pageKey === "profile") {
-      initProfileMyActivitySection();
-    }
-  }
+  // List and dashboard initialization is owned by runtime/page-bootstrap.js
+  // runDataViews(pageKey). initDataViews was removed as dead code (never called).
 
   // Inline association UI helpers (debounce, createInlineBadge, renderInlineCandidateRow,
   // renderInlineOfferRow) moved to runtime/associations-runtime.js.
@@ -821,7 +790,6 @@
     initInactivityTimer: initInactivityTimer,
     initBackButton: initBackButton,
     initButtons: initButtons,
-    initDataViews: initDataViews,
   };
 
   window.IEPortal.links = {

@@ -23,7 +23,10 @@ function listKeyToPath(key) {
   var k = (key || "").toString();
   if (k === "candidates") return "candidates.html";
   if (k === "jobOffers" || k === "job-offers") return "job-offers.html";
+  if (k === "job-postings") return "job-postings.html";
   if (k === "clients") return "clients.html";
+  if (k === "applications") return "applications.html";
+  if (k === "external-submissions") return "external-submissions.html";
   return k.indexOf(".html") !== -1 ? k : k + ".html";
 }
 

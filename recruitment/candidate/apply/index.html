@@ -459,6 +459,15 @@
           <p class="apply-subtitle">
             Share your profile with our recruitment team. We review every submission with care and will contact you if there is a strong alignment with our open searches.
           </p>
+          <div
+            id="jobOfferContextBanner"
+            class="mt-3 px-3 py-2 rounded-2xl border border-emerald-500/30 bg-emerald-950/40 text-xs text-emerald-100"
+            style="display: none;"
+          >
+            <p id="jobOfferContextBannerLine">
+              You are submitting a general application.
+            </p>
+          </div>
         </header>
 
         <div class="apply-step-indicator" aria-hidden="true">
@@ -812,6 +821,13 @@
 
   <script>
     (function () {
+      const urlParams = new URLSearchParams(window.location.search || "");
+      const submissionTypeFromUrl = (urlParams.get("submission_type") || "").toString().trim().toLowerCase();
+      const jobOfferIdFromUrl = (urlParams.get("job_offer_id") || "").toString().trim();
+      const sourceFromUrl = (urlParams.get("source") || "").toString().trim().toLowerCase();
+      const jobTitleFromUrl = (urlParams.get("job_title") || "").toString().trim();
+      const isJobOfferMode = submissionTypeFromUrl === "job_offer" && !!jobOfferIdFromUrl;
+
       const formStartedAt = Date.now();
       const form = document.getElementById('applicationForm');
       const stepElements = {
@@ -832,6 +848,29 @@
       const cvLabel = document.getElementById('cvFileLabel');
       const photoInput = document.getElementById('photo_file');
       const photoLabel = document.getElementById('photoFileLabel');
+
+      const contextSubmissionTypeEl = document.getElementById('context_submission_type');
+      const contextJobOfferIdEl = document.getElementById('context_job_offer_id');
+      const contextSourceEl = document.getElementById('context_source');
+      const jobOfferContextBanner = document.getElementById('jobOfferContextBanner');
+      const jobOfferContextBannerLine = document.getElementById('jobOfferContextBannerLine');
+
+      if (isJobOfferMode) {
+        if (contextSubmissionTypeEl) {
+          contextSubmissionTypeEl.value = 'job_offer';
+        }
+        if (contextJobOfferIdEl) {
+          contextJobOfferIdEl.value = jobOfferIdFromUrl;
+        }
+        if (contextSourceEl) {
+          contextSourceEl.value = 'job_application';
+        }
+        if (jobOfferContextBanner && jobOfferContextBannerLine) {
+          const titleForBanner = jobTitleFromUrl || 'this opportunity';
+          jobOfferContextBannerLine.textContent = 'You are applying for: ' + titleForBanner;
+          jobOfferContextBanner.style.display = '';
+        }
+      }
 
       let currentStep = 1;
 

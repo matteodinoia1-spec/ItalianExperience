@@ -22,6 +22,9 @@
   }
 
   function formatDateTime(value) {
+    if (window.IEFormatters && typeof window.IEFormatters.formatDateTime === "function") {
+      return window.IEFormatters.formatDateTime(value) || "";
+    }
     if (!value) return "";
     try {
       var d = new Date(value);
@@ -33,6 +36,9 @@
   }
 
   function formatDate(value) {
+    if (window.IEFormatters && typeof window.IEFormatters.formatDate === "function") {
+      return window.IEFormatters.formatDate(value) || "";
+    }
     if (!value) return "";
     try {
       var d = new Date(value);

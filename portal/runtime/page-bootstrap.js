@@ -83,6 +83,14 @@
           window.IEJobOfferRuntime.initJobOfferPage();
         }
         break;
+      case "job-posting":
+        if (
+          window.IEJobPostingRuntime &&
+          typeof window.IEJobPostingRuntime.initJobPostingPage === "function"
+        ) {
+          window.IEJobPostingRuntime.initJobPostingPage();
+        }
+        break;
       case "profile":
         if (
           window.IECandidateProfileRuntime &&
@@ -158,6 +166,22 @@
         typeof window.IEListsRuntime.initClientsPage === "function"
       ) {
         window.IEListsRuntime.initClientsPage();
+      }
+    } else if (pageKey === "job-postings") {
+      if (
+        window.IEJobPostingsListRuntime &&
+        typeof window.IEJobPostingsListRuntime.initJobPostingsListPage ===
+          "function"
+      ) {
+        window.IEJobPostingsListRuntime.initJobPostingsListPage();
+      }
+    } else if (pageKey === "external-submissions") {
+      if (
+        window.IEExternalSubmissionsListRuntime &&
+        typeof window.IEExternalSubmissionsListRuntime
+          .initExternalSubmissionsListPage === "function"
+      ) {
+        window.IEExternalSubmissionsListRuntime.initExternalSubmissionsListPage();
       }
     } else if (pageKey === "profile") {
       if (

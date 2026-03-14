@@ -792,6 +792,35 @@
     var populateFormFromOffer = callbacks && callbacks.populateFormFromOffer;
     var renderActionButtons = callbacks && callbacks.renderActionButtons;
 
+    // Pipeline-only mode: job-offer entity page has a single Applications pipeline section.
+    // Only inject the "Add candidate" button into the pipeline actions; do not create the duplicate table.
+    var pipelineSection = document.querySelector("[data-ie-joboffer-pipeline-section]");
+    var addCandidateSlot = pipelineSection ? pipelineSection.querySelector("[data-ie-joboffer-pipeline-add-candidate-slot]") : null;
+    if (pipelineSection && addCandidateSlot) {
+      addCandidateSlot.innerHTML = "";
+      var addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "ie-btn ie-btn-secondary !py-1.5 !px-3 text-xs font-medium flex items-center gap-1";
+      addBtn.innerHTML = "<span class=\"text-lg leading-none\">+</span> Add candidate";
+      addBtn.addEventListener("click", function () {
+        var existingWrap = pipelineSection.querySelector("[data-assoc-inline-wrap='joboffer-add-candidate']");
+        if (existingWrap) {
+          existingWrap.remove();
+          addBtn.setAttribute("aria-expanded", "false");
+          return;
+        }
+        showAddCandidateInlinePanel(pipelineSection, addBtn, jobOfferId, associatedCandidateIds, function () {
+          renderAssociatedCandidates(jobOfferId, offer, callbacks);
+          if (callbacks && typeof callbacks.onPipelineRefresh === "function") {
+            callbacks.onPipelineRefresh();
+          }
+        }, callbacks);
+        addBtn.setAttribute("aria-expanded", "true");
+      });
+      addCandidateSlot.appendChild(addBtn);
+      return;
+    }
+
     var container = document.getElementById("associated-candidates-container");
     if (!container) {
       container = document.createElement("div");
@@ -804,7 +833,14 @@
         formActions.parentNode.appendChild(container);
       } else {
         var form = document.getElementById("jobOfferForm");
-        if (form) form.appendChild(container);
+        if (form) {
+          form.appendChild(container);
+        } else {
+          var profileRoot = document.getElementById("jobOfferProfileRoot");
+          if (profileRoot) {
+            profileRoot.insertBefore(container, profileRoot.firstChild);
+          }
+        }
       }
     }
     container.innerHTML = "";
@@ -1014,6 +1050,9 @@
                     throw new Error(hireRes.error.message || "Error updating status.");
                   }
                   await renderAssociatedCandidates(jobOfferId, updatedOffer, callbacks);
+                  if (callbacks && typeof callbacks.onPipelineRefresh === "function") {
+                    callbacks.onPipelineRefresh();
+                  }
                 },
               });
             }
@@ -1044,6 +1083,9 @@
           if (newStatus !== "rejected") {
             removeRejectionButton();
           }
+          if (callbacks && typeof callbacks.onPipelineRefresh === "function") {
+            callbacks.onPipelineRefresh();
+          }
         });
         tdChange.appendChild(select);
         tr.appendChild(tdChange);
@@ -1059,6 +1101,9 @@
           var result = await unlinkCandidateFromJobOffer(associationId);
           if (!result.error) {
             await renderAssociatedCandidates(jobOfferId, offer, callbacks);
+            if (callbacks && typeof callbacks.onPipelineRefresh === "function") {
+              callbacks.onPipelineRefresh();
+            }
           } else {
             if (window.IESupabase.showError) window.IESupabase.showError(result.error.message || "Error removing.");
           }

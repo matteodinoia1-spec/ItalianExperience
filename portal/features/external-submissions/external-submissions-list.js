@@ -7,6 +7,9 @@
     20;
 
   function formatDate(value) {
+    if (window.IEFormatters && typeof window.IEFormatters.formatDate === "function") {
+      return window.IEFormatters.formatDate(value) || "";
+    }
     if (
       window.ExternalSubmissionFormatters &&
       typeof window.ExternalSubmissionFormatters.formatDate === "function"
@@ -24,12 +27,26 @@
   }
 
   function formatStatus(status) {
+    if (
+      window.IEStatusRuntime &&
+      typeof window.IEStatusRuntime.normalizeExternalSubmissionStatus ===
+        "function"
+    ) {
+      return window.IEStatusRuntime.normalizeExternalSubmissionStatus(status);
+    }
     var s = (status || "").toString().toLowerCase();
     if (!s) return "pending_review";
     return s;
   }
 
   function formatStatusLabel(status) {
+    if (
+      window.IEStatusRuntime &&
+      typeof window.IEStatusRuntime.formatExternalSubmissionStatusLabel ===
+        "function"
+    ) {
+      return window.IEStatusRuntime.formatExternalSubmissionStatusLabel(status);
+    }
     var s = formatStatus(status);
     switch (s) {
       case "pending_review":
@@ -46,6 +63,15 @@
   }
 
   function getStatusBadgeClass(status) {
+    if (
+      window.IEStatusRuntime &&
+      typeof window.IEStatusRuntime.getExternalSubmissionStatusBadgeClass ===
+        "function"
+    ) {
+      return window.IEStatusRuntime.getExternalSubmissionStatusBadgeClass(
+        status
+      );
+    }
     var s = formatStatus(status);
     if (s === "pending_review") return "badge-open";
     if (s === "converted") return "badge-hired";
@@ -139,7 +165,7 @@
     td.className = "ie-table-cell";
     td.innerHTML =
       '<span class="ie-text-muted text-xs font-medium">' +
-      (window.escapeHtml ? window.escapeHtml(sourceLabel || "—") : sourceLabel || "—") +
+      (window.IEFormatters && window.IEFormatters.escapeHtml ? window.IEFormatters.escapeHtml(sourceLabel || "—") : (window.escapeHtml ? window.escapeHtml(sourceLabel || "—") : sourceLabel || "—")) +
       "</span>";
     tr.appendChild(td);
 
@@ -152,7 +178,7 @@
     td.className = "ie-table-cell";
     td.innerHTML =
       '<span class="ie-table-cell--date">' +
-      (window.escapeHtml ? window.escapeHtml(createdAt || "") : createdAt || "") +
+      (window.IEFormatters && window.IEFormatters.escapeHtml ? window.IEFormatters.escapeHtml(createdAt || "") : (window.escapeHtml ? window.escapeHtml(createdAt || "") : createdAt || "")) +
       "</span>";
     tr.appendChild(td);
 
@@ -162,7 +188,7 @@
       '<span class="badge ' +
       badgeClass +
       '">' +
-      (window.escapeHtml ? window.escapeHtml(statusLabel) : statusLabel) +
+      (window.IEFormatters && window.IEFormatters.escapeHtml ? window.IEFormatters.escapeHtml(statusLabel) : (window.escapeHtml ? window.escapeHtml(statusLabel) : statusLabel)) +
       "</span>";
     tr.appendChild(td);
 
@@ -661,8 +687,10 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
-    initExternalSubmissionsListPage();
-  });
+  // List init is owned by page-bootstrap.runDataViews("external-submissions").
+  // Do not self-init here to avoid double init.
+  window.IEExternalSubmissionsListRuntime = {
+    initExternalSubmissionsListPage: initExternalSubmissionsListPage,
+  };
 })();
 

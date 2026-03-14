@@ -126,6 +126,7 @@
                                 <th class="ie-table-th">Client / Company</th>
                                 <th class="ie-table-th">Location</th>
                                 <th class="ie-table-th">Status</th>
+                                <th class="ie-table-th">Public</th>
                                 <th class="ie-table-th">Candidates</th>
                                 <th class="ie-table-th">Date Created</th>
                                 <th class="ie-table-th text-center">Actions</th>
@@ -160,6 +161,8 @@
     </div>
 
     <!-- Supabase (auth + data) -->
+    <!-- Config: must be loaded before Supabase client boot -->
+    <script src="../assets/js/config.js"></script>
     <script src="shared/header-loader.js"></script>
     <script src="core/debug.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -167,6 +170,7 @@
     <script src="core/data/candidates.js"></script>
     <script src="core/data/clients.js"></script>
     <script src="core/data/job-offers.js"></script>
+    <script src="core/data/job-postings.js"></script>
     <script src="core/data/applications.js"></script>
     <script src="core/supabase.js"></script>
     <script src="core/auth.js"></script>
@@ -182,12 +186,16 @@
     <script src="runtime/candidate-runtime.js"></script>
     <script src="runtime/client-runtime.js"></script>
     <script src="runtime/job-offer-runtime.js"></script>
+    <script src="runtime/shared-formatters-runtime.js"></script>
     <script src="runtime/header-runtime.js"></script>
     <script src="runtime/global-header-actions-runtime.js"></script>
     <script src="runtime/entity-actions-runtime.js"></script>
     <script src="runtime/page-bootstrap.js"></script>
     <script src="components/page-header.js"></script>
     <script src="core/entity-toolbar.js"></script>
+    <script src="core/job-posting-deadline.js"></script>
+    <script src="runtime/lists/shared-list-helpers.js"></script>
+    <script src="runtime/lists/job-offers-list.js"></script>
     <script src="core/lists-runtime.js"></script>
     <script src="core/session/session.js"></script>
     <script src="core/ui/modals.js"></script>

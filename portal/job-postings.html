@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Job Postings | Italian Experience Recruitment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="styles/ui.css">
+</head>
+<body class="flex min-h-screen" style="visibility: hidden;">
+
+  <div class="portal-shell">
+    <main class="portal-main portal-main--no-toolbar flex-1 flex flex-col min-w-0">
+      <div id="portal-header"></div>
+
+      <div class="page-container">
+        <div class="portal-content p-8 space-y-6">
+          <div class="max-w-6xl mx-auto w-full">
+            <h1 class="serif text-2xl font-bold text-[#1b4332] mb-2">Job Postings</h1>
+            <p class="text-sm text-gray-500 mb-6">Public job postings linked to internal job offers. Manage from each job offer detail.</p>
+
+            <div class="glass-card ie-card rounded-2xl overflow-hidden">
+              <div class="overflow-x-auto">
+                <table class="ie-table">
+                  <thead class="bg-gray-50/80">
+                    <tr>
+                      <th class="ie-table-th">Public Title</th>
+                      <th class="ie-table-th">Slug</th>
+                      <th class="ie-table-th">Linked Job Offer</th>
+                      <th class="ie-table-th">Public Status</th>
+                      <th class="ie-table-th">Apply Status</th>
+                      <th class="ie-table-th">Deadline</th>
+                      <th class="ie-table-th">Updated</th>
+                      <th class="ie-table-th text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100 text-sm" data-ie-jobpostings-body>
+                    <tr>
+                      <td colspan="8" class="ie-table-td text-center text-gray-500 py-8">Loading…</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="px-4 py-3 border-t border-gray-100 text-xs text-gray-500" data-ie-jobpostings-summary>
+                — postings
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Config: must be loaded before Supabase client boot -->
+  <script src="../assets/js/config.js"></script>
+  <script>
+    window.pageMeta = {
+      title: "Job Postings",
+      subtitle: "Public job postings",
+      breadcrumbs: [
+        { label: "Dashboard", path: "dashboard.html" },
+        { label: "Job Offers", path: "job-offers.html" },
+        { label: "Job Postings" },
+      ],
+    };
+  </script>
+  <script src="shared/header-loader.js"></script>
+  <script src="core/debug.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="core/supabase-client.js"></script>
+  <script src="core/data/job-offers.js"></script>
+  <script src="core/data/job-postings.js"></script>
+  <script src="core/supabase.js"></script>
+  <script src="core/job-posting-deadline.js"></script>
+  <script src="core/auth.js"></script>
+  <script src="core/session-ready.js"></script>
+  <script src="core/router.js"></script>
+  <script src="runtime/router-runtime.js"></script>
+  <script src="runtime/shared-formatters-runtime.js"></script>
+  <script src="runtime/header-runtime.js"></script>
+  <script src="runtime/page-bootstrap.js"></script>
+  <script src="components/page-header.js"></script>
+  <script src="core/app-shell.js"></script>
+  <script src="runtime/job-postings-list-runtime.js"></script>
+</body>
+</html>
