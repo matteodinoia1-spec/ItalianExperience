@@ -1,6 +1,6 @@
 ## Website file map (static site only)
 
-This file map lists the static website pages and shared files that live at the repository root, excluding the `portal/` application. Paths are documented as they exist today, without proposing any changes.
+This file map lists the static website pages and shared files that live at the repository root, excluding the `portal/` application. Paths are documented as they exist today, without proposing any changes. For how these routes relate to BASE_PATH/PORTAL_PATH and runtime path conventions, see `docs/architecture/WEBSITE-URL-AND-PATH-CONVENTIONS.md`.
 
 ## FINAL ARCHITECTURE SUMMARY
 

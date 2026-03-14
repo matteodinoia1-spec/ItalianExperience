@@ -4,10 +4,23 @@
  * Exposes IECookieConsent.hasAccepted() for future analytics.
  */
 (function () {
-  var BASE_PATH =
-    (window.IEConfig && window.IEConfig.BASE_PATH) || '/ItalianExperience';
+  function getBasePath() {
+    if (!window.IEConfig || !window.IEConfig.BASE_PATH) {
+      console.error(
+        "[ItalianExperience] IEConfig.BASE_PATH is required for cookie-consent runtime."
+      );
+      return null;
+    }
+    return String(window.IEConfig.BASE_PATH).replace(/\/$/, "");
+  }
+
+  function getBannerUrl() {
+    var base = getBasePath();
+    if (!base) return null;
+    return base + '/partials/cookie-banner.html';
+  }
+
   var STORAGE_KEY = 'cookie_consent';
-  var BANNER_URL = BASE_PATH + '/partials/cookie-banner.html';
   var MOUNT_ID = 'cookie-banner-mount';
   var bannerInjected = false;
   var fetchStarted = false;
@@ -82,12 +95,15 @@
   }
 
   function reopenBanner() {
+    var bannerUrl = getBannerUrl();
+    if (!bannerUrl) return;
+
     var banner = document.getElementById('cookie-banner');
     if (banner) {
       showBanner(banner);
       return;
     }
-    fetch(BANNER_URL)
+    fetch(bannerUrl)
       .then(function (res) { return res.ok ? res.text() : Promise.reject(new Error('Not ok')); })
       .then(function (html) {
         var mount = getOrCreateMount();
@@ -107,11 +123,14 @@
   }
 
   function init() {
+    var bannerUrl = getBannerUrl();
+    if (!bannerUrl) return;
+
     if (getConsent() !== null) return;
     if (fetchStarted) return;
     fetchStarted = true;
 
-    fetch(BANNER_URL)
+    fetch(bannerUrl)
       .then(function (res) { return res.ok ? res.text() : Promise.reject(new Error('Not ok')); })
       .then(function (html) {
         if (getConsent() !== null) return; /* User might have chosen on another tab */

@@ -1,6 +1,6 @@
 ## Static website overview
 
-This repository contains a static marketing website at the root of the project, plus a separate `portal/` web application. This document describes only the static website portion outside `portal/`, without proposing any refactors or changes.
+This repository contains a static marketing website at the root of the project, plus a separate `portal/` web application. This document describes only the static website portion outside `portal/`, without proposing any refactors or changes. For BASE_PATH, PORTAL_PATH, and runtime URL rules, see also `docs/architecture/WEBSITE-URL-AND-PATH-CONVENTIONS.md`.
 
 The static website is deployed under a `/ItalianExperience` base path. Internal links between pages and references to shared CSS, JS, and image assets use absolute URLs such as `/ItalianExperience/recruitment/employer/` and `/ItalianExperience/assets/css/site.css`. When running a local static file server for preview, the site must be served in a way that preserves this base path; serving the repository directly at `/` without a `/ItalianExperience` prefix will cause requests like `/ItalianExperience/recruitment/employer/` to return `Cannot GET` errors even though the underlying files (for example `recruitment/employer/index.html`) are present. The archival move of the legacy `_stage1_backup` subtree into `archive/website/assets-img-stage1/` did not change these HTML routes or live asset paths.
 
