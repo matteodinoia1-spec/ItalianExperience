@@ -74,3 +74,57 @@
     min-height: 44px;
   }
 }
+
+/* Toggle switch (e.g. Public Job Posting Published / Applications Open) */
+.ie-switch-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+.ie-switch-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.ie-switch-track {
+  display: inline-flex;
+  align-items: center;
+  width: 2.5rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  background: var(--border-subtle, #e5e7eb);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+.ie-switch-track::after {
+  content: "";
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  margin-left: 0.125rem;
+  transition: transform 0.2s ease;
+}
+.ie-switch-input:checked + .ie-switch-track {
+  background: var(--gold, #c5a059);
+}
+.ie-switch-input:checked + .ie-switch-track::after {
+  transform: translateX(1.25rem);
+}
+.ie-switch-input:focus-visible + .ie-switch-track {
+  box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.4);
+}
+.ie-switch-input:disabled + .ie-switch-track {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.ie-switch-wrap:has(.ie-switch-input:disabled) {
+  cursor: not-allowed;
+}

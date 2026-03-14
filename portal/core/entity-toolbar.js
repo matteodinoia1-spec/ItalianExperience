@@ -1,5 +1,19 @@
 function normalizeStatus(status) {
-  const s = (status || "active").toString().toLowerCase();
+  var raw = (status || "active").toString().toLowerCase();
+  var s = raw;
+
+  if (
+    typeof window !== "undefined" &&
+    window.IEStatusRuntime &&
+    typeof window.IEStatusRuntime.normalizeOfferStatus === "function"
+  ) {
+    try {
+      s = window.IEStatusRuntime.normalizeOfferStatus(raw);
+    } catch (_) {
+      s = raw;
+    }
+  }
+
   if (s === "open" || s === "inprogress" || s === "active") return "active";
   if (s === "closed") return "closed";
   if (s === "archived") return "archived";

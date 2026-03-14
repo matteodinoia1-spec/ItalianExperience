@@ -265,28 +265,35 @@
     }
 
     function getApplicationStatusBadgeClass(status) {
-      var s = (status || "").toString().toLowerCase();
-      if (s === "new") s = "applied";
-      if (s === "offered") s = "offer";
-      switch (s) {
-        case "applied":
-          return "badge-applied";
-        case "screening":
-          return "badge-screening";
-        case "interview":
-          return "badge-interview";
-        case "offer":
-          return "badge-offered";
-        case "hired":
-          return "badge-hired";
-        case "rejected":
-          return "badge-rejected";
-        case "withdrawn":
-        case "not_selected":
-          return "badge-neutral";
-        default:
-          return "badge-applied";
-      }
+    if (
+      window.IEStatusRuntime &&
+      typeof window.IEStatusRuntime.getApplicationStatusBadgeClass ===
+        "function"
+    ) {
+      return window.IEStatusRuntime.getApplicationStatusBadgeClass(status);
+    }
+    var s = (status || "").toString().toLowerCase();
+    if (s === "new") s = "applied";
+    if (s === "offered") s = "offer";
+    switch (s) {
+      case "applied":
+        return "badge-applied";
+      case "screening":
+        return "badge-screening";
+      case "interview":
+        return "badge-interview";
+      case "offer":
+        return "badge-offered";
+      case "hired":
+        return "badge-hired";
+      case "rejected":
+        return "badge-rejected";
+      case "withdrawn":
+      case "not_selected":
+        return "badge-neutral";
+      default:
+        return "badge-applied";
+    }
     }
 
     function renderApplicationRows(rows) {
@@ -565,6 +572,15 @@
           }
 
           function normalizeStatus(status) {
+            if (
+              window.IEStatusRuntime &&
+              typeof window.IEStatusRuntime
+                .normalizeApplicationStatusForDisplay === "function"
+            ) {
+              return window.IEStatusRuntime.normalizeApplicationStatusForDisplay(
+                status
+              );
+            }
             var s = (status || "").toString().toLowerCase();
             if (s === "new") return "applied";
             if (s === "offered") return "offer";

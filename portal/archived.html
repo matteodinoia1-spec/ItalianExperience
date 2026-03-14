@@ -225,6 +225,8 @@
         </main>
     </div>
 
+    <!-- Config: must be loaded before Supabase client boot -->
+    <script src="../assets/js/config.js"></script>
     <script src="shared/header-loader.js"></script>
     <script src="core/debug.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -248,12 +250,14 @@
     <script src="runtime/candidate-runtime.js"></script>
     <script src="runtime/client-runtime.js"></script>
     <script src="runtime/job-offer-runtime.js"></script>
+    <script src="runtime/shared-formatters-runtime.js"></script>
     <script src="runtime/header-runtime.js"></script>
     <script src="runtime/global-header-actions-runtime.js"></script>
     <script src="runtime/entity-actions-runtime.js"></script>
     <script src="runtime/page-bootstrap.js"></script>
     <script src="components/page-header.js"></script>
     <script src="core/entity-toolbar.js"></script>
+    <script src="runtime/lists/shared-list-helpers.js"></script>
     <script src="core/lists-runtime.js"></script>
     <script src="core/session/session.js"></script>
     <script src="core/ui/modals.js"></script>

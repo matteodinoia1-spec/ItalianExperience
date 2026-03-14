@@ -19,15 +19,35 @@
     return client;
   }
 
-  var ACTIVE_STATUSES = ["applied", "screening", "interview", "offer", "hired"];
-
   function normalizeStatus(value) {
+    if (
+      window.IEStatusRuntime &&
+      typeof window.IEStatusRuntime.normalizeApplicationStatusForDisplay ===
+        "function"
+    ) {
+      return window.IEStatusRuntime.normalizeApplicationStatusForDisplay(value);
+    }
     var s = (value || "").toString().toLowerCase();
     // Legacy mapping
     if (s === "new") return "applied";
     if (s === "offered") return "offer";
     return s;
   }
+
+  var ACTIVE_STATUSES =
+    (window.IEStatusRuntime &&
+      Array.isArray(window.IEStatusRuntime.APPLICATION_STATUS_CANONICAL) &&
+      window.IEStatusRuntime.APPLICATION_STATUS_CANONICAL.filter(function (
+        s
+      ) {
+        return (
+          s === "applied" ||
+          s === "screening" ||
+          s === "interview" ||
+          s === "offer" ||
+          s === "hired"
+        );
+      })) || ["applied", "screening", "interview", "offer", "hired"];
 
   function buildApplicationsFilter(query, filters, ignoreStatusFilter) {
     var q = query;

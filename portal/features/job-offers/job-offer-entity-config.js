@@ -79,11 +79,17 @@
     );
   }
 
+  /**
+   * Toolbar lifecycle status: active (Edit + Mark as Closed), closed (Reopen), or archived (Reopen).
+   * Must use job_offer.status so Mark as Closed / Reopen stay in sync with close/reopen actions.
+   */
   function getStatus(offer) {
     if (!offer) return null;
-    // Lifecycle toolbar status is based on archive flag,
-    // not the business pipeline status field.
-    return offer.is_archived ? "archived" : "active";
+    if (offer.is_archived) return "archived";
+    var s = (offer.status || "").toString().toLowerCase().trim();
+    if (s === "closed") return "closed";
+    if (s === "archived") return "archived";
+    return "active";
   }
 
   async function archive(jobOfferId) {
@@ -113,17 +119,52 @@
     return res;
   }
 
-  async function reopen(jobOfferId) {
+  async function close(jobOfferId) {
     if (!jobOfferId) return null;
-    if (!window.IESupabase || !window.IESupabase.unarchiveJobOffer) {
+    if (!window.IESupabase || !window.IESupabase.updateJobOfferStatus) {
       return null;
     }
-
-    var res = await window.IESupabase.unarchiveJobOffer(jobOfferId);
+    var res = await window.IESupabase.updateJobOfferStatus(jobOfferId, "closed");
     if (!res || res.error) {
       return res || null;
     }
+    if (
+      window.IESupabase &&
+      typeof window.IESupabase.createAutoLog === "function"
+    ) {
+      window.IESupabase
+        .createAutoLog("job_offer", jobOfferId, {
+          event_type: "status_change",
+          message: "Job offer closed",
+          metadata: { to: "closed" },
+        })
+        .catch(function () {});
+    }
+    return res;
+  }
 
+  /**
+   * Reopen: if archived, unarchive then set status active; if closed, set status active.
+   * Caller should full-refresh the page after success (reload or refetch entity + rerender).
+   */
+  async function reopen(jobOfferId) {
+    if (!jobOfferId) return null;
+    if (!window.IESupabase || !window.IESupabase.getJobOfferById) {
+      return null;
+    }
+    var offerRes = await window.IESupabase.getJobOfferById(jobOfferId);
+    var offer = (offerRes && offerRes.data) || null;
+    if (offer && offer.is_archived && window.IESupabase.unarchiveJobOffer) {
+      var unarchiveRes = await window.IESupabase.unarchiveJobOffer(jobOfferId);
+      if (unarchiveRes && unarchiveRes.error) return unarchiveRes;
+    }
+    if (!window.IESupabase.updateJobOfferStatus) {
+      return null;
+    }
+    var res = await window.IESupabase.updateJobOfferStatus(jobOfferId, "active");
+    if (!res || res.error) {
+      return res || null;
+    }
     if (
       window.IESupabase &&
       typeof window.IESupabase.createAutoLog === "function"
@@ -131,12 +172,11 @@
       window.IESupabase
         .createAutoLog("job_offer", jobOfferId, {
           event_type: "system_event",
-          message: "Job offer restored",
+          message: "Job offer reopened",
           metadata: null,
         })
         .catch(function () {});
     }
-
     return res;
   }
 
@@ -330,6 +370,45 @@
     return edited;
   }
 
+  /**
+   * Collect job posting form values from the Public Job Posting section (when in edit mode).
+   * Returns null if no posting form or no posting id on the card.
+   */
+  function collectJobPostingFormPayload() {
+    var card = document.querySelector("[data-ie-jobposting-card]");
+    var form = document.querySelector("[data-ie-jobposting-form]");
+    if (!card || !form) return null;
+    var postingId = card.getAttribute("data-posting-id");
+    if (!postingId) return null;
+
+    function getField(key) {
+      var el = form.querySelector('[data-ie-jobposting-field="' + key + '"]');
+      return el ? el.value : "";
+    }
+
+    var titleValue = (getField("public_title") || "").trim();
+    var slugValue = (getField("slug") || "").trim();
+    if (!titleValue || !slugValue) return null;
+
+    var payload = {
+      public_title: titleValue,
+      public_location: (getField("public_location") || "").trim() || null,
+      public_description: (getField("public_description") || "").trim() || null,
+      public_requirements: (getField("public_requirements") || "").trim() || null,
+      public_benefits: (getField("public_benefits") || "").trim() || null,
+      slug: slugValue,
+    };
+
+    var rawDeadline = (getField("apply_deadline") || "").trim();
+    if (rawDeadline && window.IEJobPostingDeadline && typeof window.IEJobPostingDeadline.applyDeadlineToISOEndOfDayNY === "function") {
+      payload.apply_deadline = window.IEJobPostingDeadline.applyDeadlineToISOEndOfDayNY(rawDeadline);
+    } else {
+      payload.apply_deadline = rawDeadline || null;
+    }
+
+    return { postingId: postingId, payload: payload };
+  }
+
   function buildSavePayload(state) {
     state = state || {};
     var offer = state.entity || {};
@@ -359,9 +438,13 @@
       }
     });
 
-    return {
-      main: payload,
-    };
+    var result = { main: payload };
+    var jobPostingForm = collectJobPostingFormPayload();
+    if (jobPostingForm) {
+      result.jobPostingId = jobPostingForm.postingId;
+      result.jobPosting = jobPostingForm.payload;
+    }
+    return result;
   }
 
   async function performSave(state, payload) {
@@ -384,6 +467,8 @@
     }
 
     var main = payload.main || {};
+    var jobPostingId = payload.jobPostingId || null;
+    var jobPostingPayload = payload.jobPosting || null;
 
     try {
       var result = await window.IESupabase.updateJobOffer(jobOfferId, main);
@@ -408,6 +493,26 @@
       }
 
       var updatedOffer = result.data || currentEntity;
+
+      if (jobPostingId && jobPostingPayload && window.IESupabase && typeof window.IESupabase.updateJobPosting === "function") {
+        try {
+          var postingResult = await window.IESupabase.updateJobPosting(jobPostingId, jobPostingPayload);
+          if (postingResult && postingResult.error) {
+            console.error("[JobOffer] updateJobPosting error from entity page:", postingResult.error);
+            if (window.IESupabase.showError) {
+              window.IESupabase.showError(postingResult.error.message || "Error saving public posting.");
+            }
+          } else if (window.IESupabase.showSuccess) {
+            window.IESupabase.showSuccess("Job offer and public posting saved.");
+          }
+        } catch (postingErr) {
+          console.error("[JobOffer] updateJobPosting exception:", postingErr);
+          if (window.IESupabase.showError) {
+            window.IESupabase.showError(postingErr.message || "Error saving public posting.");
+          }
+        }
+      }
+
       return { entity: updatedOffer, haltRedirect: false };
     } catch (err) {
       console.error(
@@ -459,6 +564,17 @@
     return Promise.resolve({ applications: [] });
   }
 
+  var PIPELINE_VIEW_STORAGE_KEY = "ie-joboffer-pipeline-view";
+
+  function getStoredPipelineView() {
+    try {
+      var v = (localStorage.getItem(PIPELINE_VIEW_STORAGE_KEY) || "board").toLowerCase();
+      return v === "list" ? "list" : "board";
+    } catch (e) {
+      return "board";
+    }
+  }
+
   function renderJobOfferApplicationsSection(state, data) {
     state = state || {};
     data = data || {};
@@ -473,6 +589,10 @@
     var summaryEl = document.querySelector(
       "[data-ie-joboffer-pipeline-summary]"
     );
+    var listEl = document.querySelector("[data-ie-joboffer-pipeline-list]");
+    var listBodyEl = document.querySelector("[data-ie-joboffer-pipeline-list-body]");
+    var toggleBoardBtn = document.querySelector('[data-ie-pipeline-view="board"]');
+    var toggleListBtn = document.querySelector('[data-ie-pipeline-view="list"]');
 
     if (!sectionEl || !boardEl || !summaryEl) {
       return null;
@@ -484,10 +604,107 @@
     }
 
     function normalizeStatus(status) {
+      if (
+        window.IEStatusRuntime &&
+        typeof window.IEStatusRuntime
+          .normalizeApplicationStatusForDisplay === "function"
+      ) {
+        return window.IEStatusRuntime.normalizeApplicationStatusForDisplay(
+          status
+        );
+      }
       var s = (status || "").toString().toLowerCase();
       if (s === "new") return "applied";
       if (s === "offered") return "offer";
       return s;
+    }
+
+    function statusLabel(s) {
+      if (
+        window.IEStatusRuntime &&
+        typeof window.IEStatusRuntime.formatApplicationStatusLabel ===
+          "function"
+      ) {
+        return window.IEStatusRuntime.formatApplicationStatusLabel(s);
+      }
+      var labels = {
+        applied: "Applied",
+        screening: "Screening",
+        interview: "Interview",
+        offer: "Offer",
+        hired: "Hired",
+        rejected: "Rejected",
+        withdrawn: "Withdrawn",
+        not_selected: "Not selected",
+      };
+      return labels[s] != null
+        ? labels[s]
+        : s
+        ? s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, " ")
+        : "—";
+    }
+
+    function renderList() {
+      if (!listEl || !listBodyEl) return;
+      listBodyEl.innerHTML = "";
+      var escape = window.escapeHtml || function (x) { return x == null ? "" : String(x); };
+      apps.forEach(function (app) {
+        var tr = document.createElement("tr");
+        tr.className = "hover:bg-gray-50/80";
+        var name = (app.candidate_name || "—").toString();
+        var position = (app.candidate_position || "—").toString();
+        var normalized = normalizeStatus(app.status);
+        var status = statusLabel(normalized);
+        var updated = app.updated_at
+          ? new Date(app.updated_at).toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" })
+          : "—";
+        var badgeClass =
+          "badge " +
+          (window.IEStatusRuntime &&
+          typeof window.IEStatusRuntime.getApplicationStatusBadgeClass ===
+            "function"
+            ? window.IEStatusRuntime.getApplicationStatusBadgeClass(normalized)
+            : "badge-open");
+        var viewHref =
+          (window.IEPortal && window.IEPortal.links && typeof window.IEPortal.links.applicationView === "function")
+            ? window.IEPortal.links.applicationView(app.id)
+            : "application.html?id=" + encodeURIComponent(String(app.id));
+        tr.innerHTML =
+          "<td class=\"ie-table-cell font-medium text-gray-900\">" + escape(name) + "</td>" +
+          "<td class=\"ie-table-cell text-gray-600\">" + escape(position) + "</td>" +
+          "<td class=\"ie-table-cell\"><span class=\"" + badgeClass + " text-xs\">" + escape(status) + "</span></td>" +
+          "<td class=\"ie-table-cell text-gray-500 text-xs\">" + escape(updated) + "</td>" +
+          "<td class=\"ie-table-cell text-right\"><a href=\"" + escape(viewHref) + "\" class=\"ie-btn ie-btn-secondary !py-1 !px-2 text-xs\" data-action=\"view-application\">View</a></td>";
+        var link = tr.querySelector("[data-action=\"view-application\"]");
+        if (link && (window.IERouter && typeof window.IERouter.navigateTo === "function")) {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+            window.IERouter.navigateTo(viewHref);
+          });
+        }
+        listBodyEl.appendChild(tr);
+      });
+    }
+
+    function setPipelineView(view) {
+      var v = view === "list" ? "list" : "board";
+      try {
+        localStorage.setItem(PIPELINE_VIEW_STORAGE_KEY, v);
+      } catch (e) {}
+      sectionEl.style.display = "";
+      if (toggleBoardBtn) {
+        toggleBoardBtn.setAttribute("aria-pressed", v === "board" ? "true" : "false");
+        toggleBoardBtn.classList.toggle("!bg-[#1b4332] !text-white", v === "board");
+        toggleBoardBtn.classList.toggle("ie-btn-secondary", v !== "board");
+      }
+      if (toggleListBtn) {
+        toggleListBtn.setAttribute("aria-pressed", v === "list" ? "true" : "false");
+        toggleListBtn.classList.toggle("!bg-[#1b4332] !text-white", v === "list");
+        toggleListBtn.classList.toggle("ie-btn-secondary", v !== "list");
+      }
+      if (boardEl) boardEl.classList.toggle("hidden", v !== "board");
+      if (listEl) listEl.classList.toggle("hidden", v !== "list");
+      if (v === "list") renderList(); else renderBoard();
     }
 
     function renderBoard() {
@@ -503,6 +720,9 @@
         interview: [],
         offer: [],
         hired: [],
+        rejected: [],
+        withdrawn: [],
+        not_selected: [],
       };
 
       var appById = {};
@@ -510,15 +730,26 @@
         if (!app || !app.id) return;
         appById[String(app.id)] = app;
         var s = normalizeStatus(app.status);
-        if (!columns[s]) return;
+        if (!columns[s]) columns[s] = [];
         columns[s].push(app);
       });
 
       boardEl.innerHTML = "";
 
+      var statusLabels = {
+        applied: "Applied",
+        screening: "Screening",
+        interview: "Interview",
+        offer: "Offer",
+        hired: "Hired",
+        rejected: "Rejected",
+        withdrawn: "Withdrawn",
+        not_selected: "Not selected",
+      };
       Object.keys(columns).forEach(function (statusKey) {
-        var statusLabel =
-          statusKey.charAt(0).toUpperCase() + statusKey.slice(1);
+        var statusLabel = statusLabels[statusKey] != null
+          ? statusLabels[statusKey]
+          : statusKey.charAt(0).toUpperCase() + statusKey.slice(1).replace(/_/g, " ");
         var list = columns[statusKey];
 
         var col = document.createElement("div");
@@ -667,7 +898,19 @@
       sectionEl.style.display = "";
     }
 
-    renderBoard();
+    function bindPipelineViewToggle() {
+      if (toggleBoardBtn && !toggleBoardBtn.dataset.iePipelineToggleBound) {
+        toggleBoardBtn.dataset.iePipelineToggleBound = "true";
+        toggleBoardBtn.addEventListener("click", function () { setPipelineView("board"); });
+      }
+      if (toggleListBtn && !toggleListBtn.dataset.iePipelineToggleBound) {
+        toggleListBtn.dataset.iePipelineToggleBound = "true";
+        toggleListBtn.addEventListener("click", function () { setPipelineView("list"); });
+      }
+    }
+
+    setPipelineView(getStoredPipelineView());
+    bindPipelineViewToggle();
     return null;
   }
 
@@ -740,6 +983,7 @@
 
     lifecycle: {
       getStatus: getStatus,
+      close: close,
       archive: archive,
       reopen: reopen,
     },
@@ -758,6 +1002,28 @@
           id: "job-offer-applications-pipeline",
           load: loadJobOfferApplicationsSection,
           render: renderJobOfferApplicationsSection,
+        },
+        {
+          id: "job-offer-public-posting",
+          load: function loadPublicJobPostingSection(state) {
+            if (!state || !state.id || !window.IESupabase || typeof window.IESupabase.getJobPostingByJobOfferId !== "function") {
+              return Promise.resolve({ posting: null });
+            }
+            return window.IESupabase.getJobPostingByJobOfferId(state.id).then(function (result) {
+              return { posting: (result && result.data) || null };
+            }).catch(function () { return { posting: null }; });
+          },
+          render: function renderPublicJobPostingSection(state, data) {
+            if (!state || !state.id) return;
+            var posting = (data && data.posting) || null;
+            var pageMode = (state.mode === "edit") ? "edit" : "view";
+            if (typeof window.renderPublicJobPostingCard === "function") {
+              window.renderPublicJobPostingCard(state.id, state.entity || null, posting, pageMode);
+            }
+            if (typeof window.setJobOfferHeroPublicStatusBadge === "function" && state.entity) {
+              window.setJobOfferHeroPublicStatusBadge(state.entity, posting);
+            }
+          },
         },
       ],
     },

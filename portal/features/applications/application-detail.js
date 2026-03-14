@@ -12,7 +12,22 @@
     "not_selected",
   ];
 
+  if (
+    window.IEStatusRuntime &&
+    Array.isArray(window.IEStatusRuntime.APPLICATION_STATUS_CANONICAL)
+  ) {
+    ALLOWED_STATUSES =
+      window.IEStatusRuntime.APPLICATION_STATUS_CANONICAL.slice();
+  }
+
   function normalizeStatus(value) {
+    if (
+      window.IEStatusRuntime &&
+      typeof window.IEStatusRuntime.normalizeApplicationStatusForDisplay ===
+        "function"
+    ) {
+      return window.IEStatusRuntime.normalizeApplicationStatusForDisplay(value);
+    }
     var s = (value || "").toString().toLowerCase();
     if (s === "new") return "applied";
     if (s === "offered") return "offer";

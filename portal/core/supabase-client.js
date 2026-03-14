@@ -14,6 +14,15 @@
 (function () {
   "use strict";
 
+  if (typeof window.IEConfig === "undefined") {
+    console.error(
+      "[SupabaseClient] window.IEConfig is not defined. " +
+        "Ensure assets/js/config.js is loaded before portal/core/supabase-client.js."
+    );
+    window.IESupabaseClient = null;
+    return;
+  }
+
   if (typeof window.supabase === "undefined") {
     console.error(
       "[SupabaseClient] window.supabase not found. Include Supabase JS v2 from CDN before this script."
@@ -22,12 +31,23 @@
     return;
   }
 
-  const supabaseUrl = "https://xgioojjmrjcurajgirpa.supabase.co".trim();
-  // Must be the anon key for the same project (ref: xgioojjmrjcurajgirpa) so session JWTs
-  // are valid for this project's Edge Functions gateway. Do not use a key from another project.
-  const supabaseKey =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnaW9vamptcmpjdXJhamdpcnBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MjI3MDksImV4cCI6MjA4NzQ5ODcwOX0.fcJe-f4V_aGEaGEfD2N2el2Y-I2rqy3fO6fURu7Ennk";
-  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+  var cfg = window.IEConfig || {};
+  var supabaseUrl = (cfg && cfg.SUPABASE_URL) || null;
+  var supabaseKey = (cfg && cfg.SUPABASE_ANON_KEY) || null;
+
+  if (!supabaseUrl || !supabaseKey) {
+    console.error(
+      "[SupabaseClient] Missing SUPABASE_URL or SUPABASE_ANON_KEY in IEConfig. " +
+        "Ensure assets/js/config.js defines window.IEConfig correctly."
+    );
+    window.IESupabaseClient = null;
+    return;
+  }
+
+  const supabase = window.supabase.createClient(
+    String(supabaseUrl).trim(),
+    String(supabaseKey).trim()
+  );
 
   function getBasePath() {
     try {
@@ -43,19 +63,9 @@
     }
   }
 
-  function getSupabaseUrl() {
-    return supabaseUrl;
-  }
-
-  function getSupabaseKey() {
-    return supabaseKey;
-  }
-
   window.IESupabaseClient = {
     supabase,
     getBasePath,
-    getSupabaseUrl,
-    getSupabaseKey,
   };
 })();
 

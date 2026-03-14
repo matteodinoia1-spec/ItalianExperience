@@ -317,13 +317,14 @@
   function formatOfferStatusLabelForList(status) {
     switch ((status || "").toString().toLowerCase()) {
       case "open":
-        return "Open";
       case "active":
-        return "Active";
+        return "Open";
       case "inprogress":
         return "In Progress";
       case "closed":
         return "Closed";
+      case "archived":
+        return "Archived";
       default:
         return status || "Open";
     }
@@ -409,6 +410,50 @@
     return "Available";
   }
 
+  // ---------------------------------------------------------------------------
+  // External submission status
+  // ---------------------------------------------------------------------------
+
+  var EXTERNAL_SUBMISSION_STATUS_CANONICAL = [
+    "pending_review",
+    "rejected",
+    "linked_existing",
+    "converted",
+  ];
+
+  function normalizeExternalSubmissionStatus(status) {
+    if (status == null || status === "") return "pending_review";
+    var s = status.toString().toLowerCase().trim();
+    if (!s) return "pending_review";
+    if (EXTERNAL_SUBMISSION_STATUS_CANONICAL.indexOf(s) !== -1) return s;
+    return s;
+  }
+
+  function getExternalSubmissionStatusBadgeClass(status) {
+    var s = normalizeExternalSubmissionStatus(status);
+    if (s === "pending_review") return "badge-open";
+    if (s === "converted") return "badge-hired";
+    if (s === "linked_existing") return "badge-inprogress";
+    if (s === "rejected") return "badge-rejected";
+    return "badge-open";
+  }
+
+  function formatExternalSubmissionStatusLabel(status) {
+    var s = normalizeExternalSubmissionStatus(status);
+    switch (s) {
+      case "pending_review":
+        return "Pending Review";
+      case "rejected":
+        return "Rejected";
+      case "linked_existing":
+        return "Linked to Existing";
+      case "converted":
+        return "Converted";
+      default:
+        return s || "Pending Review";
+    }
+  }
+
   window.IEStatusRuntime = {
     // Profile status (candidates.status)
     PROFILE_STATUS_CANONICAL: PROFILE_STATUS_CANONICAL,
@@ -441,6 +486,11 @@
     computeCandidateAvailability: computeCandidateAvailability,
     getAvailabilityBadgeClass: getAvailabilityBadgeClass,
     formatAvailabilityLabel: formatAvailabilityLabel,
+    // External submissions
+    EXTERNAL_SUBMISSION_STATUS_CANONICAL: EXTERNAL_SUBMISSION_STATUS_CANONICAL,
+    normalizeExternalSubmissionStatus: normalizeExternalSubmissionStatus,
+    getExternalSubmissionStatusBadgeClass: getExternalSubmissionStatusBadgeClass,
+    formatExternalSubmissionStatusLabel: formatExternalSubmissionStatusLabel,
   };
 })();
 

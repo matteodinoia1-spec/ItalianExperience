@@ -25,3 +25,19 @@
   );
 })(window);
 
+
+;(function (window) {
+  // Ensure IEConfig also exposes a canonical SUPABASE_URL so all clients and
+  // public forms can rely on a single source of truth.
+  var cfg = window.IEConfig || {};
+  var fromConfig = cfg.SUPABASE_URL;
+  var fromFunctions =
+    cfg.SUPABASE_FUNCTIONS_URL &&
+    String(cfg.SUPABASE_FUNCTIONS_URL).replace(/\/functions\/v\d+\/?$/, '');
+  var fallback = 'https://xgioojjmrjcurajgirpa.supabase.co';
+
+  window.IEConfig = Object.assign({}, cfg, {
+    SUPABASE_URL: fromConfig || fromFunctions || fallback,
+  });
+})(window);
+

@@ -95,22 +95,52 @@
     }
     setField("deadline", deadlineText || "");
 
-    var statusValue = (offer.status || "").toString();
-    setField("status", statusValue);
+    // Canonical status: open, inprogress, closed (archived is controlled via lifecycle).
+    var normalizedStatus;
+    var statusLabel;
+    if (
+      window.IEStatusRuntime &&
+      typeof window.IEStatusRuntime.normalizeOfferStatus === "function"
+    ) {
+      normalizedStatus = window.IEStatusRuntime.normalizeOfferStatus(
+        offer.status
+      );
+      if (
+        typeof window.IEStatusRuntime.formatOfferStatusLabel === "function"
+      ) {
+        statusLabel = window.IEStatusRuntime.formatOfferStatusLabel(
+          offer.status
+        );
+      }
+    }
+    if (!normalizedStatus) {
+      var rawStatus = (offer.status || "").toString().toLowerCase().trim();
+      if (rawStatus === "active") normalizedStatus = "open";
+      else if (rawStatus === "in progress") normalizedStatus = "inprogress";
+      else normalizedStatus = rawStatus || "open";
+    }
+    if (!statusLabel) {
+      if (normalizedStatus === "open") statusLabel = "Open";
+      else if (normalizedStatus === "inprogress") statusLabel = "In Progress";
+      else if (normalizedStatus === "closed") statusLabel = "Closed";
+      else if (normalizedStatus === "archived") statusLabel = "Archived";
+      else statusLabel = normalizedStatus || "Open";
+    }
+    var statusSpan = document.querySelector('span.badge[data-field="status"]');
+    var statusSelect = document.querySelector('select[data-field="status"]');
+    if (statusSpan) statusSpan.textContent = statusLabel;
+    if (statusSelect) statusSelect.value = normalizedStatus;
 
-    // Keep the status badge styling in sync with the real status.
-    var normalizedStatus =
-      window.IEToolbar && typeof window.IEToolbar.normalizeStatus === "function"
-        ? window.IEToolbar.normalizeStatus(statusValue)
-        : (statusValue || "").toLowerCase();
     var badgeNodes = document.querySelectorAll(
       'span.badge[data-field="status"]'
     );
     badgeNodes.forEach(function (el) {
       if (!el || !el.classList) return;
-      el.classList.remove("badge-open", "badge-closed");
+      el.classList.remove("badge-open", "badge-closed", "badge-inprogress");
       if (normalizedStatus === "closed") {
         el.classList.add("badge-closed");
+      } else if (normalizedStatus === "inprogress") {
+        el.classList.add("badge-inprogress");
       } else {
         el.classList.add("badge-open");
       }

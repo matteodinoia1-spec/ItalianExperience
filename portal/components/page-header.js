@@ -24,6 +24,9 @@ function renderPageHeader(meta) {
 }
 
 function escapeHtml(text) {
+  if (typeof window !== "undefined" && window.IEFormatters && typeof window.IEFormatters.escapeHtml === "function") {
+    return window.IEFormatters.escapeHtml(text);
+  }
   if (text == null) return "";
   var div = document.createElement("div");
   div.textContent = String(text);

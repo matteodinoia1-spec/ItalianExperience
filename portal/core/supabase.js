@@ -607,6 +607,20 @@
     return window.IEData.jobOffers;
   }
 
+  // ---------------------------------------------------------------------------
+  // Job postings (V1 – public layer on top of job_offers)
+  // ---------------------------------------------------------------------------
+
+  function getJobPostingsModule() {
+    if (!window.IEData || !window.IEData.jobPostings) {
+      console.error(
+        "[Supabase] IEData.jobPostings not found. Ensure portal/core/data/job-postings.js is loaded before core/supabase.js."
+      );
+      return null;
+    }
+    return window.IEData.jobPostings;
+  }
+
   /**
    * Insert a new job offer.
    * Expects table: job_offers (id, created_by, title, position, client_id, description, requirements, notes, salary, contract_type, positions, city, state, deadline, status, created_at, ...)
@@ -688,6 +702,137 @@
       return { data: [], error: new Error("Job-offers module not available") };
     }
     return mod.fetchJobOffers();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Job postings – read helpers (V1)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Fetch a single job posting by id.
+   * Delegates to IEData.jobPostings.getJobPostingById.
+   * @param {string} id - job_postings id
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function getJobPostingById(id) {
+    const mod = getJobPostingsModule();
+    if (!mod || typeof mod.getJobPostingById !== "function") {
+      return {
+        data: null,
+        error: new Error("Job-postings module not available"),
+      };
+    }
+    return mod.getJobPostingById(id);
+  }
+
+  /**
+   * Fetch a single job posting by slug.
+   * Delegates to IEData.jobPostings.getJobPostingBySlug.
+   * This helper is neutral with respect to publication state; callers must
+   * enforce visibility rules as appropriate for their context.
+   *
+   * @param {string} slug - job_postings.slug
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function getJobPostingBySlug(slug) {
+    const mod = getJobPostingsModule();
+    if (!mod || typeof mod.getJobPostingBySlug !== "function") {
+      return {
+        data: null,
+        error: new Error("Job-postings module not available"),
+      };
+    }
+    return mod.getJobPostingBySlug(slug);
+  }
+
+  /**
+   * Fetch a published job posting by slug for public-facing reads.
+   * Delegates to IEData.jobPostings.getPublishedJobPostingBySlug, which
+   * enforces is_published = true at the query level.
+   *
+   * @param {string} slug - job_postings.slug
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function getPublishedJobPostingBySlug(slug) {
+    const mod = getJobPostingsModule();
+    if (!mod || typeof mod.getPublishedJobPostingBySlug !== "function") {
+      return {
+        data: null,
+        error: new Error("Job-postings module not available"),
+      };
+    }
+    return mod.getPublishedJobPostingBySlug(slug);
+  }
+
+  /**
+   * Fetch the (single) job posting associated with a job offer.
+   * V1 assumes a 1:1 relationship enforced by a unique constraint on job_offer_id.
+   * Delegates to IEData.jobPostings.getJobPostingByJobOfferId.
+   * @param {string} jobOfferId - job_offers id
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function getJobPostingByJobOfferId(jobOfferId) {
+    const mod = getJobPostingsModule();
+    if (!mod || typeof mod.getJobPostingByJobOfferId !== "function") {
+      return { data: null, error: new Error("Job-postings module not available") };
+    }
+    return mod.getJobPostingByJobOfferId(jobOfferId);
+  }
+
+  /**
+   * Fetch job postings for multiple job_offer_ids (for list UIs).
+   * Delegates to IEData.jobPostings.getJobPostingsByJobOfferIds.
+   * @param {string[]} jobOfferIds - job_offers.id values
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function getJobPostingsByJobOfferIds(jobOfferIds) {
+    const mod = getJobPostingsModule();
+    if (!mod || typeof mod.getJobPostingsByJobOfferIds !== "function") {
+      return { data: [], error: new Error("Job-postings module not available") };
+    }
+    return mod.getJobPostingsByJobOfferIds(jobOfferIds);
+  }
+
+  /**
+   * List all job postings (for job-postings list page).
+   * Delegates to IEData.jobPostings.listJobPostings.
+   * @returns {Promise<{ data: array, error: object | null }>}
+   */
+  async function listJobPostings() {
+    const mod = getJobPostingsModule();
+    if (!mod || typeof mod.listJobPostings !== "function") {
+      return { data: [], error: new Error("Job-postings module not available") };
+    }
+    return mod.listJobPostings();
+  }
+
+  /**
+   * Create a job posting from a job offer.
+   * - Delegates initial data copy + audit to IEData.jobPostings.createJobPostingFromJobOffer.
+   * @param {object} jobOffer - job_offers row as loaded by the portal
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function createJobPostingFromJobOffer(jobOffer) {
+    const mod = getJobPostingsModule();
+    if (!mod || typeof mod.createJobPostingFromJobOffer !== "function") {
+      return { data: null, error: new Error("Job-postings module not available") };
+    }
+    return mod.createJobPostingFromJobOffer(jobOffer);
+  }
+
+  /**
+   * Update an existing job posting by id.
+   * - Phase 2 scope: only public-facing content + slug + (optionally) apply_deadline.
+   * @param {string} id - job_postings id
+   * @param {object} payload
+   * @returns {Promise<{ data: object | null, error: object | null }>}
+   */
+  async function updateJobPosting(id, payload) {
+    const mod = getJobPostingsModule();
+    if (!mod || typeof mod.updateJobPosting !== "function") {
+      return { data: null, error: new Error("Job-postings module not available") };
+    }
+    return mod.updateJobPosting(id, payload);
   }
 
   // ---------------------------------------------------------------------------
@@ -1209,6 +1354,22 @@
   }
 
   /**
+   * Job offers with postings for dashboard Live Offers card.
+   * Caller must filter by window.isEffectiveLive(offer, posting) for canonical live state.
+   * @returns {Promise<{ data: Array<{ offer: object, posting: object | null }>, error: object | null }>}
+   */
+  async function getJobOffersWithPostingsForDashboard() {
+    const mod = getDashboardModule();
+    if (
+      !mod ||
+      typeof mod.getJobOffersWithPostingsForDashboard !== "function"
+    ) {
+      return { data: [], error: new Error("Dashboard module not available") };
+    }
+    return mod.getJobOffersWithPostingsForDashboard();
+  }
+
+  /**
    * Count of applications (candidate_job_associations) with status 'hired' updated this month.
    * Recruitment pipeline metric; source of truth is candidate_job_associations.status.
    * @returns {Promise<{ data: number, error: object | null }>}
@@ -1571,6 +1732,15 @@
     fetchJobOffers,
     fetchJobOffersPaginated,
     searchJobOffersByTitle,
+    // Job postings (V1 – read + Phase 2 writes)
+    getJobPostingById,
+    getJobPostingBySlug,
+    getPublishedJobPostingBySlug,
+    getJobPostingByJobOfferId,
+    getJobPostingsByJobOfferIds,
+    listJobPostings,
+    createJobPostingFromJobOffer,
+    updateJobPosting,
     // Clients
     insertClient,
     getClientById,
@@ -1614,6 +1784,7 @@
     getRecentCandidates,
     getCandidatesBySource,
     getPendingExternalSubmissionsPreview,
+    getJobOffersWithPostingsForDashboard,
     // Deletes / archive helpers
     deletePermanentRecord: deletePermanentRecord,
     // Helpers

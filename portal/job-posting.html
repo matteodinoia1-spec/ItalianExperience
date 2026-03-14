@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Job Posting | Italian Experience Recruitment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="styles/ui.css">
+</head>
+<body class="flex min-h-screen" style="visibility: hidden;">
+
+  <div class="portal-shell">
+    <main class="portal-main portal-main--no-toolbar flex-1 flex flex-col min-w-0">
+      <div id="portal-header"></div>
+
+      <div class="page-container">
+        <div class="portal-content p-8">
+          <div class="job-posting-page-layout max-w-5xl mx-auto w-full space-y-6">
+
+            <!-- Hero -->
+            <section class="ie-card glass-card p-5 md:p-6 rounded-3xl relative" data-ie-jobposting-hero>
+              <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div class="min-w-0 space-y-2">
+                  <h1 class="serif text-2xl md:text-3xl font-bold text-[#1b4332] truncate" data-ie-posting-title>—</h1>
+                  <p class="text-sm text-gray-500 flex flex-wrap items-center gap-2">
+                    <span class="inline-flex items-center gap-1">
+                      <span class="text-gray-400 text-xs uppercase tracking-widest font-semibold">Slug</span>
+                      <span class="font-mono text-xs" data-ie-posting-slug>—</span>
+                    </span>
+                    <span class="hidden md:inline text-gray-300">•</span>
+                    <span class="inline-flex items-center gap-1">
+                      <span class="text-gray-400 text-xs uppercase tracking-widest font-semibold">Linked offer</span>
+                      <a href="#" class="text-[#1b4332] hover:underline" data-ie-posting-offer-link>—</a>
+                    </span>
+                  </p>
+                  <p class="text-xs text-gray-500 flex flex-wrap items-center gap-3">
+                    <span class="inline-flex items-center gap-1">
+                      <span class="text-gray-400 uppercase tracking-widest font-semibold">Public</span>
+                      <span data-ie-posting-public-status>—</span>
+                    </span>
+                    <span class="hidden md:inline text-gray-300">•</span>
+                    <span class="inline-flex items-center gap-1">
+                      <span class="text-gray-400 uppercase tracking-widest font-semibold">Apply</span>
+                      <span data-ie-posting-apply-status>—</span>
+                    </span>
+                    <span class="hidden md:inline text-gray-300">•</span>
+                    <span class="inline-flex items-center gap-1">
+                      <span class="text-gray-400 uppercase tracking-widest font-semibold">Deadline</span>
+                      <span data-ie-posting-deadline>—</span>
+                    </span>
+                  </p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 shrink-0" data-ie-jobposting-hero-actions></div>
+              </div>
+              <!-- Hero switches: same logic as Public Job Posting card (Published / Applications Open) -->
+              <div class="mt-4 pt-4 border-t border-gray-100 flex flex-wrap items-center gap-6" data-ie-jobposting-hero-switches>
+                <div class="flex items-center gap-3">
+                  <span class="text-sm font-medium text-gray-800">Published</span>
+                  <label class="ie-switch-wrap shrink-0" aria-describedby="ie-posting-hero-publish-desc">
+                    <input type="checkbox" class="ie-switch-input" data-ie-posting-hero-publish-toggle aria-label="Published" />
+                    <span class="ie-switch-track" aria-hidden="true"></span>
+                  </label>
+                  <span class="text-[11px] text-gray-500" id="ie-posting-hero-publish-desc">Visible on public page when on.</span>
+                </div>
+                <div class="flex items-center gap-3" data-ie-posting-hero-apply-wrap>
+                  <span class="text-sm font-medium text-gray-800">Applications Open</span>
+                  <label class="ie-switch-wrap shrink-0">
+                    <input type="checkbox" class="ie-switch-input" data-ie-posting-hero-apply-toggle aria-label="Applications Open" aria-describedby="ie-posting-hero-apply-desc" />
+                    <span class="ie-switch-track" aria-hidden="true"></span>
+                  </label>
+                  <span class="text-[11px] text-gray-500" id="ie-posting-hero-apply-desc">Candidates can submit when on.</span>
+                  <p class="text-[11px] text-amber-700 hidden" data-ie-posting-hero-apply-disabled-reason></p>
+                </div>
+              </div>
+            </section>
+
+            <!-- Two-column row: posting content (left) | applications summary (right) -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <!-- Posting content summary (what is live publicly) -->
+              <section class="ie-card glass-card p-6 rounded-3xl lg:col-span-2" data-ie-jobposting-content>
+              <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Posting content (public view)</h3>
+              <div class="mt-4 space-y-4">
+                <div>
+                  <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Public title</p>
+                  <p class="text-gray-800 text-sm" data-ie-content-public-title>—</p>
+                </div>
+                <div>
+                  <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Public location</p>
+                  <p class="text-gray-800 text-sm" data-ie-content-public-location>—</p>
+                </div>
+                <div>
+                  <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Description</p>
+                  <div class="text-gray-800 text-sm whitespace-pre-line" data-ie-content-public-description>—</div>
+                </div>
+                <div>
+                  <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Requirements</p>
+                  <div class="text-gray-800 text-sm whitespace-pre-line" data-ie-content-public-requirements>—</div>
+                </div>
+                <div>
+                  <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Benefits</p>
+                  <div class="text-gray-800 text-sm whitespace-pre-line" data-ie-content-public-benefits>—</div>
+                </div>
+              </div>
+            </section>
+
+              <!-- Mini dashboard: counts by linked job offer -->
+              <section class="ie-card glass-card p-6 rounded-3xl" data-ie-jobposting-dashboard>
+                <h3 class="serif text-xl font-bold text-[#1b4332] section-title">Applications (linked job offer)</h3>
+                <div class="mt-4 flex flex-wrap gap-4" data-ie-jobposting-counts>
+                  <div class="flex items-center gap-2">
+                    <span class="text-2xl font-bold text-[#1b4332]" data-ie-count-total>0</span>
+                    <span class="text-sm text-gray-600">total</span>
+                  </div>
+                  <div class="flex flex-wrap gap-3 text-xs" data-ie-jobposting-counts-by-status></div>
+                </div>
+              </section>
+            </div>
+
+            <!-- Pipeline: full width below (same Board/List as job-offer, keyed by linked job_offer_id) -->
+            <section
+              class="ie-card glass-card p-4 rounded-3xl"
+              data-ie-joboffer-pipeline-section
+              style="display: none;"
+            >
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-widest text-gray-500">Applications pipeline</p>
+                  <p class="text-xs text-gray-500" data-ie-joboffer-pipeline-summary>No applications for this job offer yet.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2" data-ie-joboffer-pipeline-actions role="group" aria-label="Pipeline view and actions">
+                  <button type="button" data-ie-pipeline-view="board" class="ie-btn ie-btn-secondary !py-1.5 !px-3 text-xs font-medium" aria-pressed="true">Board</button>
+                  <button type="button" data-ie-pipeline-view="list" class="ie-btn ie-btn-secondary !py-1.5 !px-3 text-xs font-medium" aria-pressed="false">List</button>
+                  <span class="hidden md:inline w-px h-5 bg-gray-200" aria-hidden="true"></span>
+                  <div data-ie-joboffer-pipeline-add-candidate-slot></div>
+                  <div class="hidden flex items-center gap-2" data-ie-joboffer-pipeline-bulk-actions>
+                    <span class="text-xs text-gray-500" data-ie-pipeline-bulk-count>0 selected</span>
+                    <select class="form-input !py-1 !px-2 text-xs w-auto" data-ie-pipeline-bulk-status aria-label="Bulk status change">
+                      <option value="">Change status…</option>
+                      <option value="applied">Applied</option>
+                      <option value="screening">Screening</option>
+                      <option value="interview">Interview</option>
+                      <option value="offer">Offer</option>
+                      <option value="hired">Hired</option>
+                      <option value="rejected">Rejected</option>
+                      <option value="withdrawn">Withdrawn</option>
+                      <option value="not_selected">Not selected</option>
+                    </select>
+                    <button type="button" class="ie-btn ie-btn-secondary !py-1 !px-2 text-xs" data-ie-pipeline-bulk-apply>Apply</button>
+                  </div>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-5 gap-3" data-ie-joboffer-pipeline-board></div>
+              <div class="overflow-x-auto hidden" data-ie-joboffer-pipeline-list>
+                <table class="ie-table w-full text-left text-sm">
+                  <thead class="bg-gray-50/80">
+                    <tr>
+                      <th class="ie-table-th w-10">
+                        <input type="checkbox" class="rounded border-gray-300" data-ie-pipeline-select-all aria-label="Select all rows" />
+                      </th>
+                      <th class="ie-table-th">Name</th>
+                      <th class="ie-table-th">Position</th>
+                      <th class="ie-table-th">Status</th>
+                      <th class="ie-table-th">Updated</th>
+                      <th class="ie-table-th text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100" data-ie-joboffer-pipeline-list-body></tbody>
+                </table>
+              </div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Config: must be loaded before Supabase client boot -->
+  <script src="../assets/js/config.js"></script>
+  <script>
+    window.pageMeta = {
+      title: "Job Posting",
+      subtitle: "Internal job posting detail",
+      breadcrumbs: [
+        { label: "Dashboard", path: "dashboard.html" },
+        { label: "Job Offers", path: "job-offers.html" },
+        { label: "Job Postings", path: "job-postings.html" },
+        { label: "Job Posting" },
+      ],
+    };
+  </script>
+  <script src="shared/header-loader.js"></script>
+  <script src="core/debug.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="core/supabase-client.js"></script>
+  <script src="core/data/job-offers.js"></script>
+  <script src="core/data/job-postings.js"></script>
+  <script src="core/supabase.js"></script>
+  <script src="core/job-posting-deadline.js"></script>
+  <script src="core/auth.js"></script>
+  <script src="core/session-ready.js"></script>
+  <script src="core/router.js"></script>
+  <script src="runtime/router-runtime.js"></script>
+  <script src="runtime/shared-formatters-runtime.js"></script>
+  <script src="runtime/header-runtime.js"></script>
+  <script src="runtime/page-bootstrap.js"></script>
+  <script src="components/page-header.js"></script>
+  <script src="runtime/status-runtime.js"></script>
+  <script src="core/app-shell.js"></script>
+  <script src="runtime/job-offer-runtime.js"></script>
+  <script src="runtime/associations-runtime.js"></script>
+  <script src="queries/applications.queries.js"></script>
+  <script src="runtime/job-posting-runtime.js"></script>
+</body>
+</html>

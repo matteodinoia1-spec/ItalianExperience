@@ -104,6 +104,9 @@
   }
 
   function escapeHtml(s) {
+    if (window.IEFormatters && typeof window.IEFormatters.escapeHtml === "function") {
+      return window.IEFormatters.escapeHtml(s);
+    }
     if (s == null) return "";
     var str = String(s);
     return str

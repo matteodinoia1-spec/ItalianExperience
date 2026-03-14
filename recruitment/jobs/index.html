@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <title>Job Opportunity | Italian Experience Recruitment</title>
+
+  <meta name="description" content="Discover curated hospitality job opportunities with Italian Experience Recruitment." />
+  <meta name="robots" content="index, follow" />
+
+  <link rel="canonical" href="https://www.italianexp.com/recruitment/jobs/" />
+
+  <link rel="stylesheet" href="/ItalianExperience/assets/css/tailwind.css" />
+  <link rel="stylesheet" href="/ItalianExperience/assets/css/site.css" />
+  <link rel="stylesheet" href="/ItalianExperience/assets/css/cookie-banner.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700&family=Inter:wght@300;400;600&family=Great+Vibes&family=Montserrat:wght@900&display=swap" />
+
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--brand-obsidian, #080808);
+      color: #fff;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .job-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--brand-obsidian, #080808);
+    }
+
+    .job-main {
+      flex: 1;
+      padding: clamp(3rem, 7vw, 5rem) 1.5rem 4rem 1.5rem;
+    }
+
+    .job-card {
+      max-width: 960px;
+      margin: 0 auto;
+      background: rgba(8, 8, 8, 0.95);
+      border-radius: 32px;
+      border: 1px solid rgba(197, 160, 89, 0.25);
+      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+    }
+
+    .job-hero {
+      position: relative;
+      padding: 2.4rem 2.4rem 2rem 2.4rem;
+      background: linear-gradient(to bottom, rgba(197, 160, 89, 0.06) 0%, transparent 50%);
+      border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+    }
+
+    .job-hero-eyebrow {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      color: var(--brand-gold, #c5a059);
+      margin-bottom: 0.75rem;
+    }
+
+    .job-hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 3vw, 2.5rem);
+      line-height: 1.1;
+      margin-bottom: 0.4rem;
+      word-break: break-word;
+      color: #fff;
+    }
+
+    .job-hero-location {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.75);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .job-meta-row {
+      margin-top: 1.2rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .job-pill {
+      border-radius: 999px;
+      border: 1px solid rgba(197, 160, 89, 0.5);
+      padding: 0.2rem 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-size: 0.7rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      white-space: nowrap;
+    }
+
+    .job-pill--open {
+      border-color: rgba(197, 160, 89, 0.7);
+      color: var(--brand-gold, #c5a059);
+      background: rgba(197, 160, 89, 0.12);
+    }
+
+    .job-pill--closed {
+      border-color: rgba(255, 255, 255, 0.35);
+      color: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .job-pill-tag {
+      border-radius: 999px;
+      padding: 0.18rem 0.7rem;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: rgba(255, 255, 255, 0.75);
+      white-space: nowrap;
+    }
+
+    .job-body {
+      padding: 2.1rem 2.4rem 2.2rem 2.4rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1.1fr);
+      gap: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .job-main {
+        padding-inline: 1.25rem;
+      }
+
+      .job-card {
+        border-radius: 26px;
+      }
+
+      .job-hero,
+      .job-body {
+        padding-inline: 1.6rem;
+      }
+
+      .job-body {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .job-main {
+        padding-inline: 1rem;
+      }
+
+      .job-card {
+        border-radius: 22px;
+      }
+
+      .job-hero,
+      .job-body {
+        padding-inline: 1.4rem;
+      }
+    }
+
+    .job-section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      margin-bottom: 0.9rem;
+      color: #e5e7eb;
+    }
+
+    .job-copy {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.88);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .job-copy--muted {
+      color: rgba(255, 255, 255, 0.6);
+      font-style: italic;
+    }
+
+    .job-sidebar-card {
+      border-radius: 20px;
+      border: 1px solid rgba(197, 160, 89, 0.25);
+      background: rgba(8, 8, 8, 0.6);
+      padding: 1.4rem 1.5rem 1.5rem 1.5rem;
+    }
+
+    .apply-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      width: 100%;
+      margin-top: 0.5rem;
+      border-radius: 999px;
+      padding: 0.78rem 1.4rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      border: none;
+      cursor: default;
+      transition: transform 90ms ease, box-shadow 120ms ease, filter 120ms ease, opacity 160ms ease;
+    }
+
+    .apply-cta--open {
+      cursor: pointer;
+      background: var(--brand-gold, #c5a059);
+      color: var(--brand-obsidian, #080808);
+      box-shadow: 0 16px 40px rgba(197, 160, 89, 0.35);
+    }
+
+    .apply-cta--open:hover {
+      filter: brightness(1.08);
+      box-shadow: 0 22px 55px rgba(197, 160, 89, 0.45);
+    }
+
+    .apply-cta--open:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 10px 35px rgba(197, 160, 89, 0.35);
+    }
+
+    .apply-cta--closed {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: rgba(255, 255, 255, 0.7);
+      cursor: not-allowed;
+      opacity: 0.85;
+    }
+
+    .apply-note {
+      margin-top: 0.6rem;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .job-notice {
+      max-width: 720px;
+      margin: 0 auto;
+      border-radius: 26px;
+      border: 1px solid rgba(197, 160, 89, 0.3);
+      padding: 2rem 2.2rem;
+      background: rgba(8, 8, 8, 0.95);
+      text-align: center;
+    }
+
+    .job-notice-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      margin-bottom: 0.6rem;
+      color: #e5e7eb;
+    }
+
+    .job-notice-copy {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 42rem;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    .job-notice-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      border-radius: 999px;
+      border: 1px solid rgba(197, 160, 89, 0.4);
+      padding: 0.28rem 0.9rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      color: var(--brand-gold, #c5a059);
+      margin-bottom: 0.9rem;
+    }
+
+    .job-loading {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.8);
+      text-align: center;
+      padding: 4rem 0;
+    }
+
+    .job-debug-panel {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      z-index: 50;
+      max-width: 380px;
+      font-size: 0.75rem;
+      line-height: 1.4;
+      background: rgba(15, 23, 42, 0.98);
+      border-radius: 0.75rem;
+      border: 1px solid rgba(251, 191, 36, 0.8);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      color: #f9fafb;
+      padding: 0.8rem 0.9rem;
+    }
+
+    .job-debug-panel-header {
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #facc15;
+      margin-bottom: 0.4rem;
+    }
+
+    .job-debug-panel-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.4rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .job-debug-panel-label {
+      min-width: 8.4rem;
+      font-weight: 500;
+      color: rgba(209, 213, 219, 0.95);
+    }
+
+    .job-debug-panel-value {
+      flex: 1;
+      word-break: break-all;
+      color: rgba(209, 213, 219, 0.9);
+    }
+
+    .job-debug-panel-code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+        "Courier New", monospace;
+      font-size: 0.7rem;
+    }
+
+    .job-debug-panel-section-title {
+      margin-top: 0.35rem;
+      margin-bottom: 0.15rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: rgba(248, 250, 252, 0.9);
+    }
+
+    .job-debug-panel-footer {
+      margin-top: 0.4rem;
+      font-size: 0.68rem;
+      color: rgba(148, 163, 184, 0.9);
+      font-style: italic;
+    }
+
+    .job-inline-apply {
+      border-top: 1px solid rgba(197, 160, 89, 0.25);
+      padding: 1.5rem 2.4rem 2rem 2.4rem;
+      background: rgba(8, 8, 8, 0.6);
+      scroll-margin-top: 1.5rem;
+    }
+
+    .job-inline-apply-inner {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .job-inline-apply-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .job-inline-apply-header .job-section-title {
+      margin-bottom: 0;
+    }
+
+    .job-inline-apply-close {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 999px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: border-color 140ms ease, color 140ms ease, background 140ms ease;
+    }
+
+    .job-inline-apply-close:hover {
+      border-color: rgba(197, 160, 89, 0.6);
+      color: var(--brand-gold, #c5a059);
+      background: rgba(197, 160, 89, 0.1);
+    }
+
+    .job-inline-apply-iframe {
+      width: 100%;
+      min-height: 640px;
+      border: 1px solid rgba(197, 160, 89, 0.2);
+      border-radius: 20px;
+      background: rgba(8, 8, 8, 0.95);
+    }
+
+    @media (max-width: 900px) {
+      .job-inline-apply {
+        padding-inline: 1.6rem;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .job-inline-apply {
+        padding-inline: 1.4rem;
+      }
+
+      .job-inline-apply-iframe {
+        min-height: 520px;
+      }
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+  <div id="site-header"></div>
+
+  <div class="job-shell">
+    <main class="job-main">
+      <div id="job-loading" class="job-loading">Loading opportunity…</div>
+
+      <article id="job-card" class="job-card" style="display: none;" aria-live="polite">
+        <header class="job-hero">
+          <div class="job-hero-eyebrow">Italian Experience · Recruitment</div>
+          <h1 id="job-title" class="job-hero-title">Job opportunity</h1>
+          <p id="job-location" class="job-hero-location">Location to be defined</p>
+
+          <div class="job-meta-row">
+            <span id="job-status-pill" class="job-pill job-pill--closed">
+              <span id="job-status-label">Status</span>
+            </span>
+            <span id="job-deadline-pill" class="job-pill-tag" style="display: none;"></span>
+          </div>
+        </header>
+
+        <div class="job-body">
+          <section aria-labelledby="job-description-heading">
+            <h2 id="job-description-heading" class="job-section-title">Role overview</h2>
+            <p id="job-description" class="job-copy job-copy--muted">
+              Details for this opportunity will be shared soon.
+            </p>
+
+            <div class="mt-8 space-y-6">
+              <section aria-labelledby="job-requirements-heading">
+                <h3 id="job-requirements-heading" class="job-section-title">Requirements</h3>
+                <p id="job-requirements" class="job-copy job-copy--muted">
+                  Requirements will be discussed with shortlisted candidates.
+                </p>
+              </section>
+
+              <section aria-labelledby="job-benefits-heading">
+                <h3 id="job-benefits-heading" class="job-section-title">Benefits</h3>
+                <p id="job-benefits" class="job-copy job-copy--muted">
+                  Benefits and conditions are tailored to each opportunity.
+                </p>
+              </section>
+            </div>
+          </section>
+
+          <aside aria-label="Application status">
+            <div class="job-sidebar-card">
+              <h2 class="job-section-title">Applications</h2>
+              <p id="job-apply-summary" class="job-copy job-copy--muted">
+                Final application route from this page will be enabled in a later phase.
+              </p>
+
+              <button
+                id="apply-cta"
+                type="button"
+                class="apply-cta apply-cta--closed"
+                aria-disabled="true"
+              >
+                <span id="apply-cta-label">Applications closed</span>
+              </button>
+
+              <p id="apply-note" class="apply-note">
+                When applications are open, this button will guide you to the full external form.
+              </p>
+            </div>
+          </aside>
+        </div>
+
+        <section id="inline-apply-section" class="job-inline-apply" style="display: none;" aria-labelledby="inline-apply-heading">
+          <div class="job-inline-apply-inner">
+            <div class="job-inline-apply-header">
+              <h2 id="inline-apply-heading" class="job-section-title">Apply for this role</h2>
+              <button type="button" id="inline-apply-close" class="job-inline-apply-close" aria-label="Close application form">Close</button>
+            </div>
+            <iframe id="inline-apply-iframe" title="Application form" class="job-inline-apply-iframe"></iframe>
+          </div>
+        </section>
+      </article>
+
+      <section id="job-not-found" class="job-notice" style="display: none;" aria-live="polite">
+        <div class="job-notice-pill">
+          <span>Recruitment</span>
+          <span aria-hidden="true">·</span>
+          <span>Job posting</span>
+        </div>
+        <h1 class="job-notice-title">This job posting is not available.</h1>
+        <p class="job-notice-copy">
+          The link you followed may point to a posting that is no longer published, or the address
+          may be incomplete. If you received this link directly from our team, you can contact us
+          to confirm whether the role is still active.
+        </p>
+      </section>
+    </main>
+
+    <div id="site-footer"></div>
+  </div>
+
+  <!-- Config / bootstrap – support both root and /ItalianExperience paths -->
+  <script src="/assets/js/config.js"></script>
+  <script src="/ItalianExperience/assets/js/config.js"></script>
+
+  <script src="/assets/js/bootstrap.js"></script>
+  <script src="/ItalianExperience/assets/js/bootstrap.js"></script>
+
+  <script defer src="/assets/js/cookie-consent.js"></script>
+  <script defer src="/ItalianExperience/assets/js/cookie-consent.js"></script>
+
+  <script>
+    (function () {
+      var slug = (function getSlugFromQuery() {
+        try {
+          var params = new URLSearchParams(window.location.search);
+          var raw = params.get("slug");
+          return raw ? String(raw).trim() : "";
+        } catch (_) {
+          return "";
+        }
+      })();
+
+      // Debug overlay was used during initial rollout; now permanently disabled.
+      var debugEnabled = false;
+
+      var debugState = {
+        slugFromUrl: slug || "",
+        hasIEConfig: typeof window.IEConfig !== "undefined",
+        supabaseUrl: null,
+        hasAnonKey: false,
+        clientCreated: false,
+        queryStatus: "idle",
+        queryErrorMessage: null,
+        rowSummary: null,
+      };
+
+      var debugPanelEl = null;
+
+      function getDebugBooleanLabel(value) {
+        return value ? "yes" : "no";
+      }
+
+      function getDebugStatusLabel(status) {
+        if (status === "loading") return "loading";
+        if (status === "success_row_found") return "success (row found)";
+        if (status === "success_no_row") return "success (no row)";
+        if (status === "error") return "error";
+        return status || "idle";
+      }
+
+      function renderDebugPanel() {
+        if (!debugEnabled) return;
+
+        if (!debugPanelEl) {
+          debugPanelEl = document.createElement("aside");
+          debugPanelEl.id = "ie-job-debug-panel";
+          debugPanelEl.className = "job-debug-panel";
+          document.body.appendChild(debugPanelEl);
+        }
+
+        var statusLabel = getDebugStatusLabel(debugState.queryStatus);
+
+        var rowSummaryHtml = "";
+        if (debugState.rowSummary) {
+          rowSummaryHtml =
+            '<div class="job-debug-panel-row"><div class="job-debug-panel-label">Row slug</div><div class="job-debug-panel-value job-debug-panel-code">' +
+            String(debugState.rowSummary.slug || "") +
+            "</div></div>" +
+            '<div class="job-debug-panel-row"><div class="job-debug-panel-label">Row published</div><div class="job-debug-panel-value job-debug-panel-code">' +
+            getDebugBooleanLabel(!!debugState.rowSummary.is_published) +
+            "</div></div>" +
+            '<div class="job-debug-panel-row"><div class="job-debug-panel-label">Row title</div><div class="job-debug-panel-value job-debug-panel-code">' +
+            String(debugState.rowSummary.public_title || "") +
+            "</div></div>";
+        } else {
+          rowSummaryHtml =
+            '<div class="job-debug-panel-row"><div class="job-debug-panel-label">Row</div><div class="job-debug-panel-value job-debug-panel-code">none</div></div>';
+        }
+
+        var errorMessageHtml = debugState.queryErrorMessage
+          ? String(debugState.queryErrorMessage)
+          : "none";
+
+        var supabaseUrlDisplay = debugState.supabaseUrl || "(null)";
+
+        debugPanelEl.innerHTML =
+          '<div class="job-debug-panel-header">Public job posting debug (temporary)</div>' +
+          '<div class="job-debug-panel-row"><div class="job-debug-panel-label">Slug (URL)</div><div class="job-debug-panel-value job-debug-panel-code">' +
+          String(debugState.slugFromUrl || "") +
+          "</div></div>" +
+          '<div class="job-debug-panel-row"><div class="job-debug-panel-label">IEConfig</div><div class="job-debug-panel-value job-debug-panel-code">' +
+          getDebugBooleanLabel(!!debugState.hasIEConfig) +
+          "</div></div>" +
+          '<div class="job-debug-panel-row"><div class="job-debug-panel-label">supabaseUrl</div><div class="job-debug-panel-value job-debug-panel-code">' +
+          supabaseUrlDisplay +
+          "</div></div>" +
+          '<div class="job-debug-panel-row"><div class="job-debug-panel-label">Anon key present</div><div class="job-debug-panel-value job-debug-panel-code">' +
+          getDebugBooleanLabel(!!debugState.hasAnonKey) +
+          "</div></div>" +
+          '<div class="job-debug-panel-row"><div class="job-debug-panel-label">Client created</div><div class="job-debug-panel-value job-debug-panel-code">' +
+          getDebugBooleanLabel(!!debugState.clientCreated) +
+          "</div></div>" +
+          '<div class="job-debug-panel-section-title">Query</div>' +
+          '<div class="job-debug-panel-row"><div class="job-debug-panel-label">Status</div><div class="job-debug-panel-value job-debug-panel-code">' +
+          statusLabel +
+          "</div></div>" +
+          '<div class="job-debug-panel-row"><div class="job-debug-panel-label">Error</div><div class="job-debug-panel-value job-debug-panel-code">' +
+          errorMessageHtml +
+          "</div></div>" +
+          '<div class="job-debug-panel-section-title">Returned row</div>' +
+          rowSummaryHtml +
+          '<div class="job-debug-panel-footer">Debug-only overlay. Remove when investigation is complete.</div>';
+      }
+
+      function updateDebugState(patch) {
+        if (!debugEnabled) return;
+        debugState = Object.assign({}, debugState, patch || {});
+        try {
+          renderDebugPanel();
+        } catch (_) {
+          // non-fatal
+        }
+      }
+
+      if (debugEnabled) {
+        renderDebugPanel();
+      }
+
+      var loadingEl = document.getElementById("job-loading");
+      var cardEl = document.getElementById("job-card");
+      var notFoundEl = document.getElementById("job-not-found");
+
+      if (!slug) {
+        if (loadingEl) loadingEl.style.display = "none";
+        if (notFoundEl) notFoundEl.style.display = "";
+        return;
+      }
+
+      function getRuntimeConfig() {
+        var cfg = window.IEConfig || {};
+        var functionsBase =
+          (cfg && (cfg.SUPABASE_FUNCTIONS_URL || cfg.SUPABASE_FUNCTIONS_BASE_URL)) || null;
+        var anonKey = (cfg && cfg.SUPABASE_ANON_KEY) || null;
+        var supabaseUrl = (cfg && cfg.SUPABASE_URL) || null;
+        if (!supabaseUrl && functionsBase) {
+          supabaseUrl = String(functionsBase).replace(/\/functions\/v\d+\/?$/, "");
+        }
+        if (debugEnabled) {
+          updateDebugState({
+            hasIEConfig: typeof window.IEConfig !== "undefined",
+            supabaseUrl: supabaseUrl || null,
+            hasAnonKey: !!anonKey,
+          });
+        }
+        return { functionsBase: functionsBase, anonKey: anonKey, supabaseUrl: supabaseUrl };
+      }
+
+      function getSupabaseClient() {
+        var cfg = getRuntimeConfig();
+        if (!cfg.supabaseUrl || !cfg.anonKey || typeof window.supabase === "undefined") {
+          if (debugEnabled) {
+            updateDebugState({ clientCreated: false });
+          }
+          return null;
+        }
+        try {
+          var client = window.supabase.createClient(cfg.supabaseUrl, cfg.anonKey);
+          if (debugEnabled) {
+            updateDebugState({ clientCreated: !!client });
+          }
+          return client;
+        } catch (_) {
+          if (debugEnabled) {
+            updateDebugState({ clientCreated: false });
+          }
+          return null;
+        }
+      }
+
+      function setLoading(state) {
+        if (loadingEl) {
+          loadingEl.style.display = state ? "" : "none";
+        }
+      }
+
+      function showNotFound() {
+        if (cardEl) cardEl.style.display = "none";
+        if (loadingEl) loadingEl.style.display = "none";
+        if (notFoundEl) notFoundEl.style.display = "";
+      }
+
+      function formatDateYMD(dateStr) {
+        if (!dateStr) return "";
+        try {
+          var d = new Date(dateStr);
+          if (isNaN(d.getTime())) return "";
+          var y = d.getFullYear();
+          var m = String(d.getMonth() + 1).padStart(2, "0");
+          var day = String(d.getDate()).padStart(2, "0");
+          return y + "-" + m + "-" + day;
+        } catch (_) {
+          return "";
+        }
+      }
+
+      /** Must match portal computeEffectiveApplyState: only open/active allow apply; closed/archived/inprogress do not. */
+      function isJobOfferOpenForExternalApply(posting) {
+        var jo = posting.job_offers || null;
+        var status = (jo && jo.status) ? String(jo.status).toLowerCase() : "";
+        return status === "active" || status === "open";
+      }
+
+      /** Apply deadline: date-only = end of day 23:59:59 America/New_York. */
+      function getSecondSundayMarch(y) {
+        var d = new Date(y, 2, 1);
+        return (((8 - d.getDay()) % 7) || 7) + 7;
+      }
+      function getFirstSundayNovember(y) {
+        var d = new Date(y, 11, 1);
+        return ((8 - d.getDay()) % 7) || 7;
+      }
+      function isDSTEastern(y, m, d) {
+        if (m < 3) return false;
+        if (m > 11) return false;
+        if (m === 3) return d >= getSecondSundayMarch(y);
+        if (m === 11) return d < getFirstSundayNovember(y);
+        return true;
+      }
+      function parseApplyDeadlineEndOfDayNY(dateOnlyStr) {
+        if (!dateOnlyStr || typeof dateOnlyStr !== "string") return null;
+        var match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateOnlyStr.trim());
+        if (!match) return null;
+        var y = parseInt(match[1], 10), m = parseInt(match[2], 10), d = parseInt(match[3], 10);
+        if (m < 1 || m > 12 || d < 1 || d > 31) return null;
+        var offset = isDSTEastern(y, m, d) ? -4 : -5;
+        var hourUTC = 23 - offset;
+        var dayOffset = hourUTC >= 24 ? 1 : 0;
+        if (hourUTC >= 24) hourUTC -= 24;
+        return new Date(Date.UTC(y, m - 1, d + dayOffset, hourUTC, 59, 59, 999));
+      }
+      function isApplyDeadlinePassed(applyDeadlineValue) {
+        if (!applyDeadlineValue) return false;
+        var s = String(applyDeadlineValue).trim();
+        if (!s) return false;
+        var deadlineMs;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+          var endOfDay = parseApplyDeadlineEndOfDayNY(s);
+          deadlineMs = endOfDay ? endOfDay.getTime() : 0;
+        } else {
+          var d = new Date(s);
+          deadlineMs = isNaN(d.getTime()) ? 0 : d.getTime();
+        }
+        return deadlineMs > 0 && deadlineMs < Date.now();
+      }
+
+      function computeApplyLifecycle(posting) {
+        var isPublished = !!posting.is_published;
+        var applyEnabled = !!posting.apply_enabled;
+        var deadlineStr = posting.apply_deadline || null;
+        var hasDeadline = !!deadlineStr;
+        var deadlineInPast = hasDeadline ? isApplyDeadlinePassed(deadlineStr) : false;
+
+        var postingApplyOpen = isPublished && applyEnabled && (!hasDeadline || !deadlineInPast);
+        var offerAllowsApply = isJobOfferOpenForExternalApply(posting);
+        var applyOpen = offerAllowsApply && postingApplyOpen;
+        var blockedByJobOffer = postingApplyOpen && !offerAllowsApply;
+
+        return {
+          isPublished: isPublished,
+          applyEnabled: applyEnabled,
+          hasDeadline: hasDeadline,
+          deadlineInPast: deadlineInPast,
+          applyOpen: applyOpen,
+          blockedByJobOffer: blockedByJobOffer,
+        };
+      }
+
+      function hydratePage(posting) {
+        if (!posting || !posting.is_published) {
+          showNotFound();
+          return;
+        }
+
+        var lifecycle = computeApplyLifecycle(posting);
+
+        var title = posting.public_title || "Job opportunity";
+        var loc = posting.public_location || "Location to be defined";
+        var jobOfferId = posting.job_offer_id || null;
+
+        var titleEl = document.getElementById("job-title");
+        var locEl = document.getElementById("job-location");
+        if (titleEl) titleEl.textContent = title;
+        if (locEl) locEl.textContent = loc;
+
+        if (typeof document !== "undefined") {
+          var headTitle = document.querySelector("title");
+          if (headTitle) {
+            headTitle.textContent = title + " | Italian Experience Recruitment";
+          }
+        }
+
+        var statusPill = document.getElementById("job-status-pill");
+        var statusLabel = document.getElementById("job-status-label");
+        var applySummary = document.getElementById("job-apply-summary");
+        var deadlinePill = document.getElementById("job-deadline-pill");
+        var applyCta = document.getElementById("apply-cta");
+        var applyCtaLabel = document.getElementById("apply-cta-label");
+        var applyNote = document.getElementById("apply-note");
+
+        if (statusPill && statusLabel) {
+          if (lifecycle.applyOpen) {
+            statusPill.className = "job-pill job-pill--open";
+            statusLabel.textContent = "Applications Open";
+          } else {
+            statusPill.className = "job-pill job-pill--closed";
+            statusLabel.textContent = "Applications Closed";
+          }
+        }
+
+        if (deadlinePill) {
+          if (lifecycle.hasDeadline) {
+            var formatted = formatDateYMD(posting.apply_deadline);
+            deadlinePill.textContent = formatted
+              ? "Deadline " + formatted
+              : "Deadline in effect";
+            deadlinePill.style.display = "";
+          } else {
+            deadlinePill.style.display = "none";
+          }
+        }
+
+        if (applyCta && applyCtaLabel && applyNote && applySummary) {
+          if (lifecycle.applyOpen) {
+            applyCta.className = "apply-cta apply-cta--open";
+            applyCta.setAttribute("aria-disabled", "false");
+            applyCtaLabel.textContent = "Apply now";
+            applySummary.textContent =
+              "This posting is currently open for applications. You can submit your profile for this opportunity using the form below.";
+            applyNote.textContent =
+              "Click Apply to open the application form on this page.";
+            applyCta.onclick = function () {
+              var basePath = "/ItalianExperience/recruitment/candidate/apply/";
+              var applyUrl;
+              try {
+                var url = new URL(basePath, window.location.origin);
+                url.searchParams.set("submission_type", "job_offer");
+                if (jobOfferId) {
+                  url.searchParams.set("job_offer_id", String(jobOfferId));
+                }
+                url.searchParams.set("source", "job_application");
+                if (posting.slug) {
+                  url.searchParams.set("slug", String(posting.slug));
+                }
+                if (title) {
+                  url.searchParams.set("job_title", String(title));
+                }
+                applyUrl = url.toString();
+              } catch (e) {
+                applyUrl = basePath + "?submission_type=job_offer" +
+                  (jobOfferId ? "&job_offer_id=" + encodeURIComponent(String(jobOfferId)) : "") +
+                  "&source=job_application" +
+                  (posting.slug ? "&slug=" + encodeURIComponent(String(posting.slug)) : "") +
+                  (title ? "&job_title=" + encodeURIComponent(String(title)) : "");
+              }
+              var section = document.getElementById("inline-apply-section");
+              var iframe = document.getElementById("inline-apply-iframe");
+              if (section && iframe) {
+                iframe.src = applyUrl;
+                section.style.display = "";
+                section.scrollIntoView({ behavior: "smooth", block: "start" });
+              }
+            };
+          } else {
+            applyCta.className = "apply-cta apply-cta--closed";
+            applyCta.setAttribute("aria-disabled", "true");
+            applyCtaLabel.textContent = "Applications closed";
+            if (lifecycle.blockedByJobOffer) {
+              applySummary.textContent =
+                "This role is not currently accepting applications. The position may be on hold or the search may have closed.";
+              applyNote.textContent =
+                "If the search reopens, the apply button will be enabled here. You can follow our recruitment channels for future openings.";
+            } else if (lifecycle.deadlineInPast) {
+              applySummary.textContent =
+                "Applications for this opportunity are now closed. If a similar role reopens, a new posting will be published.";
+              applyNote.textContent =
+                "The deadline for new applications has passed. You can still review the role description for reference.";
+            } else {
+              applySummary.textContent =
+                "Applications are not currently open for this posting. If the search reopens, the apply button will be re-enabled here.";
+              applyNote.textContent =
+                "You can follow our recruitment channels for future openings that match this profile.";
+            }
+            applyCta.onclick = null;
+          }
+        }
+
+        var descEl = document.getElementById("job-description");
+        var reqEl = document.getElementById("job-requirements");
+        var benEl = document.getElementById("job-benefits");
+
+        if (descEl) {
+          if (posting.public_description) {
+            descEl.textContent = posting.public_description;
+            descEl.classList.remove("job-copy--muted");
+          } else {
+            descEl.textContent =
+              "Additional details about this opportunity will be shared directly with shortlisted candidates.";
+            descEl.classList.add("job-copy--muted");
+          }
+        }
+
+        if (reqEl) {
+          if (posting.public_requirements) {
+            reqEl.textContent = posting.public_requirements;
+            reqEl.classList.remove("job-copy--muted");
+          } else {
+            reqEl.textContent =
+              "Core requirements will be aligned with the needs of the property and discussed during the selection process.";
+            reqEl.classList.add("job-copy--muted");
+          }
+        }
+
+        if (benEl) {
+          if (posting.public_benefits) {
+            benEl.textContent = posting.public_benefits;
+            benEl.classList.remove("job-copy--muted");
+          } else {
+            benEl.textContent =
+              "Benefits and conditions are tailored to each role and will be presented during the formal offer stage.";
+            benEl.classList.add("job-copy--muted");
+          }
+        }
+
+        if (loadingEl) loadingEl.style.display = "none";
+        if (notFoundEl) notFoundEl.style.display = "none";
+        if (cardEl) cardEl.style.display = "";
+      }
+
+      async function loadJobPosting() {
+        setLoading(true);
+
+        if (debugEnabled) {
+          updateDebugState({
+            queryStatus: "loading",
+            queryErrorMessage: null,
+            rowSummary: null,
+          });
+        }
+
+        var client = getSupabaseClient();
+        if (!client) {
+          console.error("[JobPostingPublic] Supabase client not available.");
+          if (debugEnabled) {
+            updateDebugState({
+              queryStatus: "error",
+              queryErrorMessage: "Supabase client not available",
+            });
+          }
+          showNotFound();
+          return;
+        }
+
+        try {
+          var query = client
+            .from("job_postings")
+            .select(
+              "slug, public_title, public_location, public_description, public_requirements, public_benefits, is_published, apply_enabled, apply_deadline, job_offer_id, job_offers(status)"
+            )
+            .eq("slug", slug)
+            .eq("is_published", true)
+            .maybeSingle();
+
+          var result = await query;
+          if (result.error) {
+            console.error(
+              "[JobPostingPublic] Supabase error:",
+              result.error.message || result.error
+            );
+            if (debugEnabled) {
+              updateDebugState({
+                queryStatus: "error",
+                queryErrorMessage:
+                  (result.error && result.error.message) || String(result.error),
+              });
+            }
+            showNotFound();
+            return;
+          }
+
+          var posting = result.data || null;
+          if (!posting) {
+            if (debugEnabled) {
+              updateDebugState({
+                queryStatus: "success_no_row",
+                queryErrorMessage: null,
+                rowSummary: null,
+              });
+            }
+            showNotFound();
+            return;
+          }
+
+          if (debugEnabled) {
+            updateDebugState({
+              queryStatus: "success_row_found",
+              queryErrorMessage: null,
+              rowSummary: {
+                slug: posting.slug || null,
+                is_published: !!posting.is_published,
+                public_title: posting.public_title || null,
+              },
+            });
+          }
+          hydratePage(posting);
+        } catch (e) {
+          console.error("[JobPostingPublic] Exception while loading posting:", e);
+          if (debugEnabled) {
+            updateDebugState({
+              queryStatus: "error",
+              queryErrorMessage: e && e.message ? e.message : String(e),
+            });
+          }
+          showNotFound();
+        }
+      }
+
+      var closeApplyEl = document.getElementById("inline-apply-close");
+      var inlineApplySection = document.getElementById("inline-apply-section");
+      var inlineApplyIframe = document.getElementById("inline-apply-iframe");
+      if (closeApplyEl && inlineApplySection) {
+        closeApplyEl.addEventListener("click", function () {
+          inlineApplySection.style.display = "none";
+          if (inlineApplyIframe) {
+            inlineApplyIframe.src = "about:blank";
+          }
+        });
+      }
+
+      loadJobPosting();
+    })();
+  </script>
+</body>
+</html>
+

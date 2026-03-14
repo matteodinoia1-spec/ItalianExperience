@@ -1,6 +1,6 @@
 ## Public UI layered architecture model (static site, public routes only)
 
-This document defines the **future layered UI architecture** for the static public site (excluding `portal/**`). It builds directly on the duplication analysis in `docs/PUBLIC-UI-STEP-1-CURRENT-DUPLICATION.md` and the constraints of the current stack: static HTML pages, partial injection via `assets/js/bootstrap.js`, shared `assets/css/site.css`, Tailwind utilities from `assets/css/tailwind.css`, and no framework rewrite.
+This document defines the **future layered UI architecture** for the static public site (excluding `portal/**`). It builds directly on the duplication analysis in `docs/refactor/PUBLIC-UI-STEP-1-CURRENT-DUPLICATION.md` and the constraints of the current stack: static HTML pages, partial injection via `assets/js/bootstrap.js`, shared `assets/css/site.css`, Tailwind utilities from `assets/css/tailwind.css`, and no framework rewrite.
 
 The goal is to **centralize shared behavior**, **stabilize class contracts**, and make future changes **predictable and low-risk**, while remaining fully compatible with the existing static site.
 
@@ -378,7 +378,7 @@ Each template:
 
 ### Template taxonomy and baseline pages
 
-These template types are derived from `docs/PUBLIC-UI-STEP-1-CURRENT-DUPLICATION.md` and current routes.
+These template types are derived from `docs/refactor/PUBLIC-UI-STEP-1-CURRENT-DUPLICATION.md` and current routes.
 
 - **Home Template**
   - **Baseline**: `index.html`.
