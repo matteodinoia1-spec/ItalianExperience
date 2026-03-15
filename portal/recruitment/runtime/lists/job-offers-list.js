@@ -192,7 +192,6 @@
     var hasClientFilter = !!clientFilter;
     if (hasClientFilter) {
       filters.clientId = clientFilter;
-      filters.offerStatus = "active";
     }
 
     function goToPage(page) {
@@ -325,7 +324,7 @@
     }
 
     if (hasClientFilter) {
-      if (statusSelect) statusSelect.value = "active";
+      // Keep existing status filter value; only client filter is enforced from URL.
     }
 
     if (clearClientFilterBtn) {

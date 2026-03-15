@@ -426,18 +426,23 @@
             }
 
             rows.forEach(function (row) {
-              var activeOffersCount = (row.job_offers || []).filter(
-                function (o) {
-                  if (!o || o.is_archived) return false;
-                  var status = o.status || "";
-                  return (
-                    status === "active" ||
-                    status === "open" ||
-                    status === "inprogress" ||
-                    status === "in progress"
-                  );
-                }
-              ).length;
+              var normalizeStatus =
+                (typeof window.normalizeJobOfferStatus === "function"
+                  ? window.normalizeJobOfferStatus
+                  : function (status) {
+                      if (status == null || status === "") return "open";
+                      var s = (status || "").toString().toLowerCase().trim();
+                      if (s === "active") return "open";
+                      if (s === "in progress") return "inprogress";
+                      return s;
+                    });
+              var activeOffersCount = (row.job_offers || []).filter(function (
+                o
+              ) {
+                if (!o || o.is_archived) return false;
+                var canonical = normalizeStatus(o.status);
+                return canonical === "open" || canonical === "inprogress";
+              }).length;
               var activeOffersHtml =
                 activeOffersCount > 0
                   ? '<button type="button" data-action="view-client-offers" data-id="' +
@@ -587,18 +592,23 @@
           );
 
           pageRows.forEach(function (row) {
-            var activeOffersCount = (row.job_offers || []).filter(
-              function (o) {
-                if (!o || o.is_archived) return false;
-                var status = o.status || "";
-                return (
-                  status === "active" ||
-                  status === "open" ||
-                  status === "inprogress" ||
-                  status === "in progress"
-                );
-              }
-            ).length;
+            var normalizeStatus =
+              (typeof window.normalizeJobOfferStatus === "function"
+                ? window.normalizeJobOfferStatus
+                : function (status) {
+                    if (status == null || status === "") return "open";
+                    var s = (status || "").toString().toLowerCase().trim();
+                    if (s === "active") return "open";
+                    if (s === "in progress") return "inprogress";
+                    return s;
+                  });
+            var activeOffersCount = (row.job_offers || []).filter(function (
+              o
+            ) {
+              if (!o || o.is_archived) return false;
+              var canonical = normalizeStatus(o.status);
+              return canonical === "open" || canonical === "inprogress";
+            }).length;
             var activeOffersHtml =
               activeOffersCount > 0
                 ? '<button type="button" data-action="view-client-offers" data-id="' +
