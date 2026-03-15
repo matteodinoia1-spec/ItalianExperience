@@ -708,6 +708,63 @@
   // Candidate file storage helpers (Supabase Storage)
   // ---------------------------------------------------------------------------
 
+  /** Max length for candidate-files object key (bytes / chars). */
+  var CANDIDATE_FILES_PATH_MAX_LENGTH = 512;
+
+  /**
+   * Allowed path patterns for the candidate-files bucket (object keys only).
+   * - <candidateId>/photo.<ext>  | <candidateId>/cv.pdf
+   * - temp/<tempId>/photo.<ext>  | temp/<tempId>/cv.pdf
+   * ID segment: [a-zA-Z0-9\-]+. Photo ext: jpg, jpeg, png, webp. CV ext: pdf.
+   */
+  var CANDIDATE_FILES_PATH_PATTERNS = [
+    /^[a-zA-Z0-9\-]+\/photo\.(jpg|jpeg|png|webp)$/,
+    /^[a-zA-Z0-9\-]+\/cv\.pdf$/,
+    /^temp\/[a-zA-Z0-9\-]+\/photo\.(jpg|jpeg|png|webp)$/,
+    /^temp\/[a-zA-Z0-9\-]+\/cv\.pdf$/,
+  ];
+
+  /**
+   * Strict validation for candidate-files bucket object paths.
+   * Rejects: empty/whitespace, leading '/', '..', over max length, non-matching format.
+   * @param {string} path - object key to validate
+   * @returns {{ valid: true } | { valid: false, message: string }}
+   */
+  function validateCandidateFilePath(path) {
+    if (path === null || path === undefined) {
+      return { valid: false, message: "Candidate-files path is required" };
+    }
+    var s = (path + "").trim();
+    if (s.length === 0) {
+      return { valid: false, message: "Candidate-files path is empty" };
+    }
+    if (s.indexOf("..") !== -1) {
+      return { valid: false, message: "Candidate-files path must not contain '..'" };
+    }
+    if (s.charAt(0) === "/") {
+      return { valid: false, message: "Candidate-files path must not start with '/'" };
+    }
+    if (s.length > CANDIDATE_FILES_PATH_MAX_LENGTH) {
+      return {
+        valid: false,
+        message:
+          "Candidate-files path exceeds maximum length (" +
+          CANDIDATE_FILES_PATH_MAX_LENGTH +
+          ")",
+      };
+    }
+    for (var i = 0; i < CANDIDATE_FILES_PATH_PATTERNS.length; i++) {
+      if (CANDIDATE_FILES_PATH_PATTERNS[i].test(s)) {
+        return { valid: true };
+      }
+    }
+    return {
+      valid: false,
+      message:
+        "Candidate-files path must match: <id>/photo.<ext>, <id>/cv.pdf, temp/<id>/photo.<ext>, or temp/<id>/cv.pdf (photo: jpg,jpeg,png,webp; cv: pdf)",
+    };
+  }
+
   /**
    * Upload a candidate-related file to the private "candidate-files" bucket.
    * @param {string} path - object key inside the bucket (e.g. "123/photo.jpg")
@@ -719,6 +776,12 @@
     if (!path || !file) {
       const err = new Error("Missing path or file");
       console.error("[Supabase Storage] uploadCandidateFile:", err, { path });
+      return { data: null, error: err };
+    }
+    var pathValidation = validateCandidateFilePath(path);
+    if (!pathValidation.valid) {
+      var err = new Error(pathValidation.message);
+      console.error("[Supabase Storage] uploadCandidateFile path validation:", pathValidation.message, { path });
       return { data: null, error: err };
     }
     try {
@@ -753,6 +816,11 @@
    */
   async function createSignedCandidateUrl(path, expiresInSeconds) {
     if (!path) return null;
+    var pathValidation = validateCandidateFilePath(path);
+    if (!pathValidation.valid) {
+      console.error("[Supabase Storage] createSignedCandidateUrl path validation:", pathValidation.message, { path });
+      return null;
+    }
     const ttl =
       typeof expiresInSeconds === "number" && expiresInSeconds > 0
         ? expiresInSeconds
@@ -797,6 +865,21 @@
     if (!keys.length) {
       return { data: null, error: null };
     }
+    var invalid = [];
+    for (var k = 0; k < keys.length; k++) {
+      var v = validateCandidateFilePath(keys[k]);
+      if (!v.valid) invalid.push({ path: keys[k], message: v.message });
+    }
+    if (invalid.length) {
+      var errMsg =
+        "Invalid candidate-files path(s): " +
+        invalid.map(function (x) {
+          return x.path + " (" + x.message + ")";
+        }).join("; ");
+      var err = new Error(errMsg);
+      console.error("[Supabase Storage] deleteCandidateFiles path validation:", errMsg, { keys: keys });
+      return { data: null, error: err };
+    }
     try {
       const { data, error } = await supabase.storage
         .from("candidate-files")
@@ -834,6 +917,18 @@
         toPath,
       });
       return { data: null, error: err };
+    }
+    var fromVal = validateCandidateFilePath(fromPath);
+    if (!fromVal.valid) {
+      var errFrom = new Error("fromPath: " + fromVal.message);
+      console.error("[Supabase Storage] moveCandidateFile path validation:", fromVal.message, { fromPath, toPath });
+      return { data: null, error: errFrom };
+    }
+    var toVal = validateCandidateFilePath(toPath);
+    if (!toVal.valid) {
+      var errTo = new Error("toPath: " + toVal.message);
+      console.error("[Supabase Storage] moveCandidateFile path validation:", toVal.message, { fromPath, toPath });
+      return { data: null, error: errTo };
     }
     try {
       const { data, error } = await supabase.storage

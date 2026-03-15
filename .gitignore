@@ -24,10 +24,14 @@ $RECYCLE.BIN/
 
 # Node / JS tooling
 node_modules/
+dist/
 
 # Environment files
 .env
 .env.local
+
+# Local runtime config (JS)
+env.local.js
 
 # Private / local-only docs
 docs/_private-transfer/

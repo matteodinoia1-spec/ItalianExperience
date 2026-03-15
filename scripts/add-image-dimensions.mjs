@@ -27,8 +27,16 @@ const srcRegex = /\bsrc="([^"]+)"/i;
 
 async function getImageSize(src) {
   if (!src || /^https?:\/\//i.test(src) || src.startsWith('data:')) return null;
-  if (!src.startsWith('/ItalianExperience/')) return null;
-  const relPath = src.replace(/^\/ItalianExperience\//, '');
+  let relPath;
+
+  if (src.startsWith('/ItalianExperience/')) {
+    relPath = src.replace(/^\/ItalianExperience\//, '');
+  } else if (src.startsWith('/')) {
+    relPath = src.replace(/^\//, '');
+  } else {
+    return null;
+  }
+
   const absPath = path.join(root, relPath);
 
   try {

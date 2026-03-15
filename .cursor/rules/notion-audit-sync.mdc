@@ -1,0 +1,38 @@
+---
+description: Notion audit is high-level project memory; sync only on material changes or explicit request
+alwaysApply: true
+---
+
+# Notion audit: memoria di progetto ad alto livello
+
+Lo spazio Notion **"Italian Experience – Audit progetto"** è la **memoria ad alto livello** del progetto: struttura, schema Supabase, Edge Functions, flussi. Non è un changelog. Le pagine esistenti sono lo snapshot di riferimento; **non riscrivere, eliminare o riorganizzare** le pagine Notion.
+
+## Quando aggiornare (solo in questi casi)
+
+Aggiorna **docs/AUDIT-COMPLETO-PROGETTO-NOTION.md** e le **pagine corrispondenti in Notion** (via Notion MCP) **solo** quando si verifica uno dei seguenti:
+
+- **Cambio di architettura materiale**: nuova area/modulo significativo, cambi sostanziali alla struttura del repo (nuove cartelle o file che cambiano il ruolo documentato).
+- **Cambio di schema DB materiale**: nuove tabelle/colonne, migrazioni che modificano lo schema documentato.
+- **RLS / Storage / Edge Functions**: policy RLS o storage modificate in modo sostanziale; nuovo comportamento o input/output delle Edge Functions (prepare/submit/promote o shared).
+- **Nuovo modulo o area di sistema maggiore**: aggiunta di un sottosistema documentabile (es. nuovo flusso backend o area portal).
+- **Cambio di un flusso di business core**: candidatura pubblica, revisione submission, auth portal, job postings, path/base path — solo se il flusso documentato non è più corretto.
+- **Richiesta esplicita dell’utente**: l’utente chiede esplicitamente di sincronizzare l’audit su Notion.
+
+## Quando NON aggiornare
+
+**Non** aggiornare Notion (né l’audit markdown per Notion) per:
+
+- modifiche minori al codice;
+- modifiche a UI o stili (CSS, markup cosmetrico);
+- correzioni di battitura (typo);
+- modifiche solo a commenti;
+- piccole modifiche di wording al README o ad altri doc;
+- refactor piccoli che non cambiano l’architettura documentata.
+
+## Workflow (quando un trigger sopra si applica)
+
+1. Modifica **AUDIT-COMPLETO-PROGETTO-NOTION.md** (sezioni 2–7) in base a cosa è cambiato.
+2. Sincronizza il contenuto su **Notion** solo per le pagine toccate (Albero, Audit file, Supabase, Logica, Env, ecc.).
+3. Non considerare il task concluso finché markdown e Notion non sono allineati per quelle sezioni.
+
+Dettaglio pagine e convenzioni: **docs/NOTION-SYNC-CONVENTIONS.md**.
