@@ -66,15 +66,15 @@
     var base = window.IERouter.derivePortalBasePath();
 
     var linkMap = {
-      "dashboard.html": "dashboard.html",
-      "candidates.html": "candidates.html",
-      "add-candidate.html": "add-candidate.html",
-      "job-offers.html": "job-offers.html",
-      "add-job-offer.html": "add-job-offer.html",
-      "applications.html": "applications.html",
-      "clients.html": "clients.html",
-      "add-client.html": "add-client.html",
-      "archived.html": "archived.html",
+      "dashboard.html": "recruitment/dashboard.html",
+      "candidates.html": "recruitment/candidates.html",
+      "add-candidate.html": "recruitment/add-candidate.html",
+      "job-offers.html": "recruitment/job-offers.html",
+      "add-job-offer.html": "recruitment/add-job-offer.html",
+      "applications.html": "recruitment/applications.html",
+      "clients.html": "recruitment/clients.html",
+      "add-client.html": "recruitment/add-client.html",
+      "archived.html": "recruitment/archived.html",
       "profile.html": "profile.html",
       "index.html": "index.html",
     };

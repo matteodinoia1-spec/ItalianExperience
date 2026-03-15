@@ -71,7 +71,7 @@
       window.IERouterRuntime && typeof window.IERouterRuntime.getPageKey === "function"
         ? window.IERouterRuntime.getPageKey()
         : "dashboard";
-    var dashboard = { label: "Dashboard", path: "dashboard.html" };
+    var dashboard = { label: "Dashboard", path: "recruitment/dashboard.html" };
     switch (key) {
       case "dashboard":
         return [{ label: "Dashboard" }];
@@ -84,27 +84,27 @@
       case "job-offers":
         return [dashboard, { label: "Job Offers" }];
       case "job-postings":
-        return [dashboard, { label: "Job Offers", path: "job-offers.html" }, { label: "Job Postings" }];
+        return [dashboard, { label: "Job Offers", path: "recruitment/job-offers.html" }, { label: "Job Postings" }];
       case "job-posting":
-        return [dashboard, { label: "Job Offers", path: "job-offers.html" }, { label: "Job Postings", path: "job-postings.html" }, { label: "Job Posting" }];
+        return [dashboard, { label: "Job Offers", path: "recruitment/job-offers.html" }, { label: "Job Postings", path: "recruitment/job-postings.html" }, { label: "Job Posting" }];
       case "archived":
         return [dashboard, { label: "Archived" }];
       case "add-candidate":
         return [
           dashboard,
-          { label: "Candidates", path: "candidates.html" },
+          { label: "Candidates", path: "recruitment/candidates.html" },
           { label: "Add Candidate" },
         ];
       case "add-job-offer":
         return [
           dashboard,
-          { label: "Job Offers", path: "job-offers.html" },
+          { label: "Job Offers", path: "recruitment/job-offers.html" },
           { label: "Create Job Offer" },
         ];
       case "add-client":
         return [
           dashboard,
-          { label: "Clients", path: "clients.html" },
+          { label: "Clients", path: "recruitment/clients.html" },
           { label: "Add Client" },
         ];
       case "profile":
@@ -112,25 +112,25 @@
       case "candidate":
         return [
           dashboard,
-          { label: "Candidates", path: "candidates.html" },
+          { label: "Candidates", path: "recruitment/candidates.html" },
           { label: "Candidate" },
         ];
       case "client":
         return [
           dashboard,
-          { label: "Clients", path: "clients.html" },
+          { label: "Clients", path: "recruitment/clients.html" },
           { label: "Client" },
         ];
       case "application":
         return [
           dashboard,
-          { label: "Applications", path: "applications.html" },
+          { label: "Applications", path: "recruitment/applications.html" },
           { label: "Application" },
         ];
       case "job-offer":
         return [
           dashboard,
-          { label: "Job Offers", path: "job-offers.html" },
+          { label: "Job Offers", path: "recruitment/job-offers.html" },
           { label: "Job Offer" },
         ];
       case "external-submissions":
@@ -138,11 +138,11 @@
       case "external-submission":
         return [
           dashboard,
-          { label: "External Submissions", path: "external-submissions.html" },
+          { label: "External Submissions", path: "recruitment/external-submissions.html" },
           { label: "Submission" },
         ];
       default:
-        return [{ label: "Dashboard", path: "dashboard.html" }];
+        return [{ label: "Dashboard", path: "recruitment/dashboard.html" }];
     }
   }
 
@@ -150,14 +150,14 @@
     if (!seg || !seg.label) return null;
     if (seg.path) return { label: seg.label, path: seg.path };
     var pathMap = {
-      dashboard: "dashboard.html",
-      candidates: "candidates.html",
-      applications: "applications.html",
-      clients: "clients.html",
-      "job-offers": "job-offers.html",
-      "job-postings": "job-postings.html",
-      "external-submissions": "external-submissions.html",
-      archived: "archived.html",
+      dashboard: "recruitment/dashboard.html",
+      candidates: "recruitment/candidates.html",
+      applications: "recruitment/applications.html",
+      clients: "recruitment/clients.html",
+      "job-offers": "recruitment/job-offers.html",
+      "job-postings": "recruitment/job-postings.html",
+      "external-submissions": "recruitment/external-submissions.html",
+      archived: "recruitment/archived.html",
       profile: "profile.html",
     };
     var path = pathMap[(seg.entity || "").toString()];
@@ -288,18 +288,18 @@
     var header = document.querySelector(".portal-header");
     if (!header) return;
     var linkMap = {
-      "dashboard.html": "dashboard.html",
-      "candidates.html": "candidates.html",
-      "candidates.html?status=pending_review": "candidates.html?status=pending_review",
-      "external-submissions.html": "external-submissions.html",
-      "add-candidate.html": "add-candidate.html",
-      "job-offers.html": "job-offers.html",
-      "job-postings.html": "job-postings.html",
-      "add-job-offer.html": "add-job-offer.html",
-      "applications.html": "applications.html",
-      "clients.html": "clients.html",
-      "add-client.html": "add-client.html",
-      "archived.html": "archived.html",
+      "dashboard.html": "recruitment/dashboard.html",
+      "candidates.html": "recruitment/candidates.html",
+      "candidates.html?status=pending_review": "recruitment/candidates.html?status=pending_review",
+      "external-submissions.html": "recruitment/external-submissions.html",
+      "add-candidate.html": "recruitment/add-candidate.html",
+      "job-offers.html": "recruitment/job-offers.html",
+      "job-postings.html": "recruitment/job-postings.html",
+      "add-job-offer.html": "recruitment/add-job-offer.html",
+      "applications.html": "recruitment/applications.html",
+      "clients.html": "recruitment/clients.html",
+      "add-client.html": "recruitment/add-client.html",
+      "archived.html": "recruitment/archived.html",
       "profile.html": "profile.html",
     };
     header.querySelectorAll("a[href]").forEach(function (a) {

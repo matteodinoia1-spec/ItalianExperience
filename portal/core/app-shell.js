@@ -152,7 +152,7 @@
       backButton.addEventListener("click", function (event) {
         event.preventDefault();
 
-        var defaultHref = backButton.getAttribute("href") || "dashboard.html";
+        var defaultHref = backButton.getAttribute("href") || "recruitment/dashboard.html";
 
         var path = window.location.pathname || "";
         var lastSegment = path.split("/").filter(Boolean).pop() || "";
@@ -160,21 +160,21 @@
         var targetPath = (function () {
           // Entity detail & editor pages should always go back to their listing.
           if (pageKey === "add-candidate" || lastSegment.indexOf("candidate") !== -1) {
-            return "candidates.html";
+            return "recruitment/candidates.html";
           }
           if (pageKey === "add-client" || lastSegment.indexOf("client") !== -1) {
-            return "clients.html";
+            return "recruitment/clients.html";
           }
           if (pageKey === "add-job-offer" || lastSegment.indexOf("job-offer") !== -1) {
-            return "job-offers.html";
+            return "recruitment/job-offers.html";
           }
 
-          if (pageKey === "candidates") return "candidates.html";
-          if (pageKey === "clients") return "clients.html";
-          if (pageKey === "job-offers") return "job-offers.html";
-          if (pageKey === "applications") return "applications.html";
-          if (pageKey === "archived") return "archived.html";
-          if (pageKey === "dashboard") return "dashboard.html";
+          if (pageKey === "candidates") return "recruitment/candidates.html";
+          if (pageKey === "clients") return "recruitment/clients.html";
+          if (pageKey === "job-offers") return "recruitment/job-offers.html";
+          if (pageKey === "applications") return "recruitment/applications.html";
+          if (pageKey === "archived") return "recruitment/archived.html";
+          if (pageKey === "dashboard") return "recruitment/dashboard.html";
 
           return defaultHref.replace(/^\.\//, "");
         })();
@@ -204,7 +204,7 @@
     if (addCandidateBtn) {
       addCandidateBtn.addEventListener("click", function (event) {
         event.preventDefault();
-        IERouter.navigateTo("add-candidate.html");
+        IERouter.navigateTo("recruitment/add-candidate.html");
       });
     }
 
@@ -215,7 +215,7 @@
     if (addOfferBtn) {
       addOfferBtn.addEventListener("click", function (event) {
         event.preventDefault();
-        IERouter.navigateTo("add-job-offer.html?mode=create");
+        IERouter.navigateTo("recruitment/add-job-offer.html?mode=create");
       });
     }
 
@@ -223,7 +223,7 @@
     if (addClientBtn) {
       addClientBtn.addEventListener("click", function (event) {
         event.preventDefault();
-        IERouter.navigateTo("add-client.html");
+        IERouter.navigateTo("recruitment/add-client.html");
       });
     }
 
@@ -235,11 +235,11 @@
         event.preventDefault();
         if (window.IERouter && typeof window.IERouter.navigateTo === "function") {
           window.IERouter.navigateTo(
-            "external-submissions.html?status=pending_review"
+            "recruitment/external-submissions.html?status=pending_review"
           );
         } else {
           window.location.href =
-            "external-submissions.html?status=pending_review";
+            "recruitment/external-submissions.html?status=pending_review";
         }
       });
     }
@@ -794,41 +794,41 @@
 
   window.IEPortal.links = {
     candidateView: function (id) {
-      return "candidate.html?id=" + encodeURIComponent(String(id || ""));
+      return "recruitment/candidate.html?id=" + encodeURIComponent(String(id || ""));
     },
     candidateEdit: function (id) {
       return (
-        "candidate.html?id=" + encodeURIComponent(String(id || "")) + "&mode=edit"
+        "recruitment/candidate.html?id=" + encodeURIComponent(String(id || "")) + "&mode=edit"
       );
     },
     clientView: function (id) {
       return (
-        "client.html?id=" +
+        "recruitment/client.html?id=" +
         encodeURIComponent(String(id || "")) +
         "&mode=view"
       );
     },
     clientEdit: function (id) {
       return (
-        "client.html?id=" + encodeURIComponent(String(id || "")) + "&mode=edit"
+        "recruitment/client.html?id=" + encodeURIComponent(String(id || "")) + "&mode=edit"
       );
     },
     offerView: function (id) {
       return (
-        "job-offer.html?id=" + encodeURIComponent(String(id || "")) + "&mode=view"
+        "recruitment/job-offer.html?id=" + encodeURIComponent(String(id || "")) + "&mode=view"
       );
     },
     offerEdit: function (id) {
       return (
-        "job-offer.html?id=" + encodeURIComponent(String(id || "")) + "&mode=edit"
+        "recruitment/job-offer.html?id=" + encodeURIComponent(String(id || "")) + "&mode=edit"
       );
     },
     applicationView: function (id) {
-      return "application.html?id=" + encodeURIComponent(String(id || ""));
+      return "recruitment/application.html?id=" + encodeURIComponent(String(id || ""));
     },
     applicationEdit: function (id) {
       return (
-        "application.html?id=" +
+        "recruitment/application.html?id=" +
         encodeURIComponent(String(id || "")) +
         "&mode=edit"
       );
