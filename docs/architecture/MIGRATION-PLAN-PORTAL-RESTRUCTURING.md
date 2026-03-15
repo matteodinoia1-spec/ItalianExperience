@@ -1,5 +1,20 @@
 ## Portal Restructuring – Migration Plan (Technical)
 
+> **STATO: Steps 1–9 completati** (branch `portal-typography-refinement`, marzo 2025).
+> Rimane solo lo Step 10 (verifica end-to-end finale e commit di consolidamento).
+>
+> Commit chiave:
+> - Step 1 (cartelle): `fece330`
+> - Step 2 (HTML spostati): `9530f95`
+> - Step 3 (path relativi HTML): `ef8d8c1`
+> - Step 4 (moduli JS spostati): `1a6734f`
+> - Step 5 (router): `524936f`
+> - Step 6 (layout header/bottom-nav): `10564f3`
+> - Step 7 (main dashboard + redirect): `d0bde38`
+> - Step 8 (link sito pubblico): nessuna modifica necessaria
+> - Fix navigazione JS runtime: `ddef711`
+> - Step 9 (documentazione): questo commit
+
 **Obiettivo**: spostare tutte le pagine e i moduli specifici del recruitment sotto `portal/recruitment/` senza cambiare funzionalità. Nessuna feature nuova, solo riorganizzazione di file e path.
 
 **Ambito**:
