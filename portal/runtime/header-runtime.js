@@ -293,6 +293,7 @@
       "candidates.html": "recruitment/candidates.html",
       "candidates.html?status=pending_review": "recruitment/candidates.html?status=pending_review",
       "external-submissions.html": "recruitment/external-submissions.html",
+      "external-submissions.html?status=pending_review": "recruitment/external-submissions.html?status=pending_review",
       "add-candidate.html": "recruitment/add-candidate.html",
       "job-offers.html": "recruitment/job-offers.html",
       "job-postings.html": "recruitment/job-postings.html",
