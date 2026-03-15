@@ -288,6 +288,7 @@
     var header = document.querySelector(".portal-header");
     if (!header) return;
     var linkMap = {
+      "hub-dashboard.html": "dashboard.html",
       "dashboard.html": "recruitment/dashboard.html",
       "candidates.html": "recruitment/candidates.html",
       "candidates.html?status=pending_review": "recruitment/candidates.html?status=pending_review",

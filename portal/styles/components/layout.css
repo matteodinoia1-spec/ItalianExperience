@@ -91,6 +91,65 @@
   overflow: visible;
 }
 
+/* Hub back-link: "← Portal" — subtle, unobtrusive, left of the main nav */
+.portal-header-hub-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ie-color-muted, #6b7280);
+  text-decoration: none;
+  padding: 0.25rem 0.625rem 0.25rem 0.375rem;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.portal-header-hub-link:hover {
+  color: var(--ie-color-primary, #1b4332);
+  background: rgba(27, 67, 50, 0.06);
+  border-color: rgba(27, 67, 50, 0.12);
+}
+
+.portal-header-hub-link__icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+/* Separator line between hub link and recruitment nav (desktop only) */
+@media (min-width: 1024px) {
+  .portal-header-hub-link {
+    margin-right: 0.25rem;
+    padding-right: 0.875rem;
+    border-right: 1px solid var(--ie-color-border-subtle, rgba(15, 23, 42, 0.08));
+    border-radius: 0;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    border-left: 1px solid transparent;
+  }
+  .portal-header-hub-link:hover {
+    background: none;
+    border-right-color: var(--ie-color-border-subtle, rgba(15, 23, 42, 0.08));
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+  }
+}
+
+/* Mobile: icon only to save space */
+@media (max-width: 1023px) {
+  .portal-header-hub-link__text {
+    display: none;
+  }
+}
+
 /* User/profile group: strictly right-aligned */
 .portal-header__right {
   flex-shrink: 0;
