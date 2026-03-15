@@ -20,7 +20,11 @@ async function loadPortalHeader() {
   const main = document.querySelector(".portal-main");
 
   if (headerContainer) {
-    const response = await fetch(base + "layout/header.html");
+    var headerFile =
+      window.IE_HEADER_VARIANT === "hub"
+        ? "layout/header-hub.html"
+        : "layout/header.html";
+    const response = await fetch(base + headerFile);
     const html = await response.text();
     headerContainer.innerHTML = html;
   }
