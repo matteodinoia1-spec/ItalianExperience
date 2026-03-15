@@ -779,11 +779,11 @@
           listViewBtn.onclick = function () { setPipelineView("list"); };
         }
         if (selectAllCheckbox && listBody) {
-          selectAllCheckbox.onclick = function () {
+          selectAllCheckbox.addEventListener("change", function () {
             var checked = selectAllCheckbox.checked;
             listBody.querySelectorAll(".ie-pipeline-row-checkbox").forEach(function (cb) { cb.checked = checked; });
             updateBulkState();
-          };
+          });
         }
         listBody.addEventListener("change", function () { updateBulkState(); });
         if (bulkApplyBtn && bulkStatusSelect) {

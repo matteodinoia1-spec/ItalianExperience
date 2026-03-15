@@ -513,10 +513,7 @@
                       : row.phone || "—") +
                     "</span>",
                 ],
-                rowTitle:
-                  typeof formatLastUpdatedMeta === "function"
-                    ? formatLastUpdatedMeta(row)
-                    : "",
+                rowTitle: "",
               });
               tbody.appendChild(tr);
             });
@@ -679,10 +676,7 @@
                     : row.phone || "—") +
                   "</span>",
               ],
-              rowTitle:
-                typeof formatLastUpdatedMeta === "function"
-                  ? formatLastUpdatedMeta(row)
-                  : "",
+              rowTitle: "",
             });
             tbody.appendChild(tr);
           });

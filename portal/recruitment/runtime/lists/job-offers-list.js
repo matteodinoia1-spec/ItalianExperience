@@ -884,10 +884,7 @@
                 : createdAtValue) +
               "</span>",
           ],
-          rowTitle:
-            typeof formatLastUpdatedMeta === "function"
-              ? formatLastUpdatedMeta(row)
-              : "",
+          rowTitle: "",
         });
         targetBody.appendChild(tr);
       });
