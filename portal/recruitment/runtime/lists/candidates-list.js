@@ -25,6 +25,9 @@
   var setCandidatePageIds =
     shared.setCandidatePageIds ||
     function () {};
+  var selectAllCandidatesOnCurrentPage =
+    shared.selectAllCandidatesOnCurrentPage ||
+    function () {};
 
   var CANDIDATES_PAGE_SIZE = 10;
 
@@ -959,12 +962,7 @@
     if (selectAllCheckbox) {
       selectAllCheckbox.addEventListener("change", function () {
         if (selectAllCheckbox.checked) {
-          var snapshot =
-            (window.IEListsRuntime &&
-              window.IEListsRuntime.getCandidateSelectionState &&
-              window.IEListsRuntime.getCandidateSelectionState()) ||
-            { pageIds: [] };
-          setCandidatePageIds(snapshot.pageIds || []);
+          selectAllCandidatesOnCurrentPage();
         } else {
           clearCandidateSelection();
         }
