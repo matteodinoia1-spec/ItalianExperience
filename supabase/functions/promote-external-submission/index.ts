@@ -189,15 +189,47 @@ async function copyExternalFileToCandidateBucket(
   }
 }
 
+/** Best-effort delete of an object in external-candidate-submissions. Never throws. */
+async function tryDeleteExternalFile(
+  supabaseAdmin: any,
+  sourcePath: string | null,
+): Promise<void> {
+  const trimmed = sourcePath?.trim();
+  if (!trimmed) return;
+  try {
+    const { error } = await supabaseAdmin.storage
+      .from(EXTERNAL_FILES_BUCKET)
+      .remove([trimmed]);
+    if (error) {
+      console.warn(
+        "EXTERNAL_SUBMISSION_FILE_DELETE_FAILED",
+        trimmed,
+        error.message ?? error,
+      );
+    }
+  } catch (err) {
+    console.warn(
+      "EXTERNAL_SUBMISSION_FILE_DELETE_ERROR",
+      trimmed,
+      err instanceof Error ? err.message : String(err),
+    );
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: CORS_HEADERS });
   }
   if (req.method !== "POST") {
-    return jsonResponse(405, {
-      ok: false,
-      error: { message: "Method not allowed", code: "method_not_allowed" },
-    });
+    return jsonResponse(
+      405,
+      {
+        ok: false,
+        error: { message: "Method not allowed", code: "method_not_allowed" },
+      },
+      {},
+      req,
+    );
   }
 
   const supabaseAdmin = createSupabaseAdminClient();
@@ -205,10 +237,15 @@ Deno.serve(async (req) => {
   try {
     const jwt = getBearerToken(req);
     if (!jwt) {
-      return jsonResponse(401, {
-        ok: false,
-        error: { message: "Missing bearer token", code: "missing_auth" },
-      });
+      return jsonResponse(
+        401,
+        {
+          ok: false,
+          error: { message: "Missing bearer token", code: "missing_auth" },
+        },
+        {},
+        req,
+      );
     }
 
     console.log("AUTH_HEADER_PRESENT", !!req.headers.get("authorization"));
@@ -218,10 +255,15 @@ Deno.serve(async (req) => {
 
     const body = await readJsonBody(req);
     if (!isRecord(body)) {
-      return jsonResponse(400, {
-        ok: false,
-        error: { message: "Invalid JSON body", code: "bad_request" },
-      });
+      return jsonResponse(
+        400,
+        {
+          ok: false,
+          error: { message: "Invalid JSON body", code: "bad_request" },
+        },
+        {},
+        req,
+      );
     }
 
     const submissionId = asStringOrNull(body.submission_id);
@@ -237,29 +279,44 @@ Deno.serve(async (req) => {
       "reject_submission",
     ];
     if (!submissionId) {
-      return jsonResponse(400, {
-        ok: false,
-        error: {
-          message: "submission_id is required",
-          code: "missing_submission_id",
+      return jsonResponse(
+        400,
+        {
+          ok: false,
+          error: {
+            message: "submission_id is required",
+            code: "missing_submission_id",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
     if (!action || !allowedActions.includes(action)) {
-      return jsonResponse(400, {
-        ok: false,
-        error: { message: "Invalid action", code: "invalid_action" },
-      });
+      return jsonResponse(
+        400,
+        {
+          ok: false,
+          error: { message: "Invalid action", code: "invalid_action" },
+        },
+        {},
+        req,
+      );
     }
     if (action === "link_existing_candidate" && !existingCandidateId) {
-      return jsonResponse(400, {
-        ok: false,
-        error: {
-          message:
-            "existing_candidate_id is required for link_existing_candidate",
-          code: "missing_existing_candidate_id",
+      return jsonResponse(
+        400,
+        {
+          ok: false,
+          error: {
+            message:
+              "existing_candidate_id is required for link_existing_candidate",
+            code: "missing_existing_candidate_id",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
 
     const { data: submissionRow, error: submissionErr } = await supabaseAdmin
@@ -269,22 +326,32 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (submissionErr) {
-      return jsonResponse(500, {
-        ok: false,
-        error: {
-          message: submissionErr.message,
-          code: "submission_lookup_failed",
+      return jsonResponse(
+        500,
+        {
+          ok: false,
+          error: {
+            message: submissionErr.message,
+            code: "submission_lookup_failed",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
     if (!submissionRow) {
-      return jsonResponse(404, {
-        ok: false,
-        error: {
-          message: "Submission not found",
-          code: "submission_not_found",
+      return jsonResponse(
+        404,
+        {
+          ok: false,
+          error: {
+            message: "Submission not found",
+            code: "submission_not_found",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
 
     const submission = submissionRow as Record<string, unknown> & {
@@ -292,14 +359,19 @@ Deno.serve(async (req) => {
     };
 
     if (submission.status !== "pending_review") {
-      return jsonResponse(400, {
-        ok: false,
-        error: {
-          message: "Submission is not in pending_review state",
-          code: "invalid_submission_state",
+      return jsonResponse(
+        400,
+        {
+          ok: false,
+          error: {
+            message: "Submission is not in pending_review state",
+            code: "invalid_submission_state",
+          },
+          current_status: submission.status ?? null,
         },
-        current_status: submission.status ?? null,
-      });
+        {},
+        req,
+      );
     }
 
     const reviewedAt = new Date().toISOString();
@@ -323,24 +395,34 @@ Deno.serve(async (req) => {
         .eq("id", submissionId);
 
       if (updErr) {
-        return jsonResponse(500, {
-          ok: false,
-          error: {
-            message: updErr.message,
-            code: "submission_update_failed",
+        return jsonResponse(
+          500,
+          {
+            ok: false,
+            error: {
+              message: updErr.message,
+              code: "submission_update_failed",
+            },
           },
-        });
+          {},
+          req,
+        );
       }
 
-      return jsonResponse(200, {
-        ok: true,
-        action,
-        submission_id: submissionId,
-        submission_status: submissionStatus,
-        linked_candidate_id: null,
-        created_candidate_id: null,
-        created_association_id: null,
-      });
+      return jsonResponse(
+        200,
+        {
+          ok: true,
+          action,
+          submission_id: submissionId,
+          submission_status: submissionStatus,
+          linked_candidate_id: null,
+          created_candidate_id: null,
+          created_association_id: null,
+        },
+        {},
+        req,
+      );
     }
 
     const submissionEmail = asStringOrNull(submission.email);
@@ -355,23 +437,33 @@ Deno.serve(async (req) => {
           .eq("email", submissionEmail)
           .maybeSingle();
         if (dupErr) {
-          return jsonResponse(500, {
-            ok: false,
-            error: {
-              message: dupErr.message,
-              code: "duplicate_lookup_failed",
+          return jsonResponse(
+            500,
+            {
+              ok: false,
+              error: {
+                message: dupErr.message,
+                code: "duplicate_lookup_failed",
+              },
             },
-          });
+            {},
+            req,
+          );
         }
         if (existingByEmail) {
-          return jsonResponse(409, {
-            ok: false,
-            error: {
-              message: "Possible duplicate candidate found (email match).",
-              code: "candidate_possible_duplicate",
+          return jsonResponse(
+            409,
+            {
+              ok: false,
+              error: {
+                message: "Possible duplicate candidate found (email match).",
+                code: "candidate_possible_duplicate",
+              },
+              duplicate_candidate_id: existingByEmail.id,
             },
-            duplicate_candidate_id: existingByEmail.id,
-          });
+            {},
+            req,
+          );
         }
       } else if (submissionPhone) {
         const { data: existingByPhone, error: dupErr } = await supabaseAdmin
@@ -380,23 +472,33 @@ Deno.serve(async (req) => {
           .eq("phone", submissionPhone)
           .maybeSingle();
         if (dupErr) {
-          return jsonResponse(500, {
-            ok: false,
-            error: {
-              message: dupErr.message,
-              code: "duplicate_lookup_failed",
+          return jsonResponse(
+            500,
+            {
+              ok: false,
+              error: {
+                message: dupErr.message,
+                code: "duplicate_lookup_failed",
+              },
             },
-          });
+            {},
+            req,
+          );
         }
         if (existingByPhone) {
-          return jsonResponse(409, {
-            ok: false,
-            error: {
-              message: "Possible duplicate candidate found (phone match).",
-              code: "candidate_possible_duplicate",
+          return jsonResponse(
+            409,
+            {
+              ok: false,
+              error: {
+                message: "Possible duplicate candidate found (phone match).",
+                code: "candidate_possible_duplicate",
+              },
+              duplicate_candidate_id: existingByPhone.id,
             },
-            duplicate_candidate_id: existingByPhone.id,
-          });
+            {},
+            req,
+          );
         }
       }
 
@@ -429,13 +531,18 @@ Deno.serve(async (req) => {
         .single();
 
       if (newCandErr) {
-        return jsonResponse(500, {
-          ok: false,
-          error: {
-            message: newCandErr.message,
-            code: "candidate_create_failed",
+        return jsonResponse(
+          500,
+          {
+            ok: false,
+            error: {
+              message: newCandErr.message,
+              code: "candidate_create_failed",
+            },
           },
-        });
+          {},
+          req,
+        );
       }
 
       createdCandidateId = newCandidate?.id ? String(newCandidate.id) : null;
@@ -471,6 +578,7 @@ Deno.serve(async (req) => {
                 cvUpdateErr.message ?? cvUpdateErr,
               );
             }
+            await tryDeleteExternalFile(supabaseAdmin, resumePath);
           }
         }
 
@@ -494,6 +602,7 @@ Deno.serve(async (req) => {
                 photoUpdateErr.message ?? photoUpdateErr,
               );
             }
+            await tryDeleteExternalFile(supabaseAdmin, photoPath);
           }
         }
       }
@@ -508,13 +617,18 @@ Deno.serve(async (req) => {
           })),
         );
         if (error) {
-          return jsonResponse(500, {
-            ok: false,
-            error: {
-              message: error.message,
-              code: "skills_insert_failed",
+          return jsonResponse(
+            500,
+            {
+              ok: false,
+              error: {
+                message: error.message,
+                code: "skills_insert_failed",
+              },
             },
-          });
+            {},
+            req,
+          );
         }
       }
 
@@ -531,13 +645,18 @@ Deno.serve(async (req) => {
             })),
           );
         if (error) {
-          return jsonResponse(500, {
-            ok: false,
-            error: {
-              message: error.message,
-              code: "languages_insert_failed",
+          return jsonResponse(
+            500,
+            {
+              ok: false,
+              error: {
+                message: error.message,
+                code: "languages_insert_failed",
+              },
             },
-          });
+            {},
+            req,
+          );
         }
       }
 
@@ -556,13 +675,18 @@ Deno.serve(async (req) => {
           .from("candidate_experience")
           .insert(rows);
         if (error) {
-          return jsonResponse(500, {
-            ok: false,
-            error: {
-              message: error.message,
-              code: "experience_insert_failed",
+          return jsonResponse(
+            500,
+            {
+              ok: false,
+              error: {
+                message: error.message,
+                code: "experience_insert_failed",
+              },
             },
-          });
+            {},
+            req,
+          );
         }
       }
 
@@ -583,13 +707,18 @@ Deno.serve(async (req) => {
           .from("candidate_education")
           .insert(rows);
         if (error) {
-          return jsonResponse(500, {
-            ok: false,
-            error: {
-              message: error.message,
-              code: "education_insert_failed",
+          return jsonResponse(
+            500,
+            {
+              ok: false,
+              error: {
+                message: error.message,
+                code: "education_insert_failed",
+              },
             },
-          });
+            {},
+            req,
+          );
         }
       }
 
@@ -606,13 +735,18 @@ Deno.serve(async (req) => {
           .from("candidate_certifications")
           .insert(rows);
         if (error) {
-          return jsonResponse(500, {
-            ok: false,
-            error: {
-              message: error.message,
-              code: "certifications_insert_failed",
+          return jsonResponse(
+            500,
+            {
+              ok: false,
+              error: {
+                message: error.message,
+                code: "certifications_insert_failed",
+              },
             },
-          });
+            {},
+            req,
+          );
         }
       }
 
@@ -628,13 +762,18 @@ Deno.serve(async (req) => {
             })),
           );
         if (error) {
-          return jsonResponse(500, {
-            ok: false,
-            error: {
-              message: error.message,
-              code: "hobbies_insert_failed",
+          return jsonResponse(
+            500,
+            {
+              ok: false,
+              error: {
+                message: error.message,
+                code: "hobbies_insert_failed",
+              },
             },
-          });
+            {},
+            req,
+          );
         }
       }
 
@@ -643,14 +782,19 @@ Deno.serve(async (req) => {
         const effectiveJobOfferId =
           submissionJobOfferId ?? bodyJobOfferId ?? null;
         if (!effectiveJobOfferId) {
-          return jsonResponse(400, {
-            ok: false,
-            error: {
-              message:
-                "job_offer_id is required when create_application = true",
-              code: "missing_job_offer_id",
+          return jsonResponse(
+            400,
+            {
+              ok: false,
+              error: {
+                message:
+                  "job_offer_id is required when create_application = true",
+                code: "missing_job_offer_id",
+              },
             },
-          });
+            {},
+            req,
+          );
         }
 
         const { data: existingAssoc, error: assocCheckErr } = await supabaseAdmin
@@ -662,23 +806,33 @@ Deno.serve(async (req) => {
           .maybeSingle();
 
         if (assocCheckErr) {
-          return jsonResponse(500, {
-            ok: false,
-            error: {
-              message: assocCheckErr.message,
-              code: "association_duplicate_check_failed",
+          return jsonResponse(
+            500,
+            {
+              ok: false,
+              error: {
+                message: assocCheckErr.message,
+                code: "association_duplicate_check_failed",
+              },
             },
-          });
+            {},
+            req,
+          );
         }
         if (existingAssoc) {
-          return jsonResponse(409, {
-            ok: false,
-            error: {
-              message:
-                "This candidate already has an active application for this job offer.",
-              code: "DUPLICATE_APPLICATION",
+          return jsonResponse(
+            409,
+            {
+              ok: false,
+              error: {
+                message:
+                  "This candidate already has an active application for this job offer.",
+                code: "DUPLICATE_APPLICATION",
+              },
             },
-          });
+            {},
+            req,
+          );
         }
 
         const { data: assoc, error: assocErr } = await supabaseAdmin
@@ -694,13 +848,18 @@ Deno.serve(async (req) => {
           .single();
 
         if (assocErr) {
-          return jsonResponse(500, {
-            ok: false,
-            error: {
-              message: assocErr.message,
-              code: "association_create_failed",
+          return jsonResponse(
+            500,
+            {
+              ok: false,
+              error: {
+                message: assocErr.message,
+                code: "association_create_failed",
+              },
             },
-          });
+            {},
+            req,
+          );
         }
         createdAssociationId = assoc?.id ? String(assoc.id) : null;
       }
@@ -717,13 +876,18 @@ Deno.serve(async (req) => {
         .eq("id", submissionId);
 
       if (submissionUpdateErr) {
-        return jsonResponse(500, {
-          ok: false,
-          error: {
-            message: submissionUpdateErr.message,
-            code: "submission_update_failed",
+        return jsonResponse(
+          500,
+          {
+            ok: false,
+            error: {
+              message: submissionUpdateErr.message,
+              code: "submission_update_failed",
+            },
           },
-        });
+          {},
+          req,
+        );
       }
 
       if (createdCandidateId) {
@@ -748,15 +912,20 @@ Deno.serve(async (req) => {
         }
       }
 
-      return jsonResponse(200, {
-        ok: true,
-        action,
-        submission_id: submissionId,
-        submission_status: submissionStatus,
-        linked_candidate_id: linkedCandidateId,
-        created_candidate_id: createdCandidateId,
-        created_association_id: createdAssociationId,
-      });
+      return jsonResponse(
+        200,
+        {
+          ok: true,
+          action,
+          submission_id: submissionId,
+          submission_status: submissionStatus,
+          linked_candidate_id: linkedCandidateId,
+          created_candidate_id: createdCandidateId,
+          created_association_id: createdAssociationId,
+        },
+        {},
+        req,
+      );
     }
 
     // link_existing_candidate
@@ -767,19 +936,32 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (candErr) {
-      return jsonResponse(500, {
-        ok: false,
-        error: {
-          message: candErr.message,
-          code: "candidate_lookup_failed",
+      return jsonResponse(
+        500,
+        {
+          ok: false,
+          error: {
+            message: candErr.message,
+            code: "candidate_lookup_failed",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
     if (!candidateRow) {
-      return jsonResponse(404, {
-        ok: false,
-        error: { message: "Candidate not found", code: "candidate_not_found" },
-      });
+      return jsonResponse(
+        404,
+        {
+          ok: false,
+          error: {
+            message: "Candidate not found",
+            code: "candidate_not_found",
+          },
+        },
+        {},
+        req,
+      );
     }
 
     linkedCandidateId = String(candidateRow.id);
@@ -790,13 +972,19 @@ Deno.serve(async (req) => {
       const effectiveJobOfferId =
         submissionJobOfferId ?? bodyJobOfferId ?? null;
       if (!effectiveJobOfferId) {
-        return jsonResponse(400, {
-          ok: false,
-          error: {
-            message: "job_offer_id is required when create_application = true",
-            code: "missing_job_offer_id",
+        return jsonResponse(
+          400,
+          {
+            ok: false,
+            error: {
+              message:
+                "job_offer_id is required when create_application = true",
+              code: "missing_job_offer_id",
+            },
           },
-        });
+          {},
+          req,
+        );
       }
 
       const { data: existingAssoc, error: assocCheckErr } = await supabaseAdmin
@@ -808,23 +996,33 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (assocCheckErr) {
-        return jsonResponse(500, {
-          ok: false,
-          error: {
-            message: assocCheckErr.message,
-            code: "association_duplicate_check_failed",
+        return jsonResponse(
+          500,
+          {
+            ok: false,
+            error: {
+              message: assocCheckErr.message,
+              code: "association_duplicate_check_failed",
+            },
           },
-        });
+          {},
+          req,
+        );
       }
       if (existingAssoc) {
-        return jsonResponse(409, {
-          ok: false,
-          error: {
-            message:
-              "This candidate already has an active application for this job offer.",
-            code: "DUPLICATE_APPLICATION",
+        return jsonResponse(
+          409,
+          {
+            ok: false,
+            error: {
+              message:
+                "This candidate already has an active application for this job offer.",
+              code: "DUPLICATE_APPLICATION",
+            },
           },
-        });
+          {},
+          req,
+        );
       }
 
       const { data: assoc, error: assocErr } = await supabaseAdmin
@@ -840,13 +1038,18 @@ Deno.serve(async (req) => {
         .single();
 
       if (assocErr) {
-        return jsonResponse(500, {
-          ok: false,
-          error: {
-            message: assocErr.message,
-            code: "association_create_failed",
+        return jsonResponse(
+          500,
+          {
+            ok: false,
+            error: {
+              message: assocErr.message,
+              code: "association_create_failed",
+            },
           },
-        });
+          {},
+          req,
+        );
       }
       createdAssociationId = assoc?.id ? String(assoc.id) : null;
     }
@@ -863,33 +1066,48 @@ Deno.serve(async (req) => {
       .eq("id", submissionId);
 
     if (updErr) {
-      return jsonResponse(500, {
-        ok: false,
-        error: {
-          message: updErr.message,
-          code: "submission_update_failed",
+      return jsonResponse(
+        500,
+        {
+          ok: false,
+          error: {
+            message: updErr.message,
+            code: "submission_update_failed",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
 
-    return jsonResponse(200, {
-      ok: true,
-      action,
-      submission_id: submissionId,
-      submission_status: submissionStatus,
-      linked_candidate_id: linkedCandidateId,
-      created_candidate_id: null,
-      created_association_id: createdAssociationId,
-    });
+    return jsonResponse(
+      200,
+      {
+        ok: true,
+        action,
+        submission_id: submissionId,
+        submission_status: submissionStatus,
+        linked_candidate_id: linkedCandidateId,
+        created_candidate_id: null,
+        created_association_id: createdAssociationId,
+      },
+      {},
+      req,
+    );
   } catch (e) {
     const err = e as { message?: string; status?: number };
     const status =
       err?.status && Number.isFinite(err.status) ? (err.status as number) : 500;
     const message = err?.message || "Unexpected error";
-    return jsonResponse(status, {
-      ok: false,
-      error: { message, code: "unexpected_error" },
-    });
+    return jsonResponse(
+      status,
+      {
+        ok: false,
+        error: { message, code: "unexpected_error" },
+      },
+      {},
+      req,
+    );
   }
 });
 

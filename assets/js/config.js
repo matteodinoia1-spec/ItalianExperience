@@ -1,30 +1,33 @@
 ;(function (window) {
   // Public runtime configuration for Italian Experience.
   // - Values here are safe to expose to the browser.
-  // - For production, prefer overriding these via an inline script
-  //   before this file, or via a build step that injects environment
-  //   variables, rather than committing live keys into the repo.
+  // - Supabase-related values (URL, anon key, functions URL) are safe to
+  //   expose as publishable client configuration (RLS-enforced on Supabase).
+  var existing = window.IEConfig || {};
+
+  var defaultBasePath = existing.BASE_PATH || '/ItalianExperience';
+  var defaultPortalPath = existing.PORTAL_PATH || defaultBasePath;
+  var defaultSiteUrl = existing.SITE_URL || 'https://www.italianexp.com';
+
   window.IEConfig = Object.assign(
     {
-      BASE_PATH: '/ItalianExperience',
-      PORTAL_PATH: '/ItalianExperience',
-      SITE_URL: 'https://www.italianexp.com',
-      // Optional: Supabase Edge Functions base URL for public forms.
-      // These defaults target the live Supabase project, but can be
-      // safely overridden at runtime by defining window.IEConfig earlier.
+      BASE_PATH: defaultBasePath,
+      PORTAL_PATH: defaultPortalPath,
+      SITE_URL: defaultSiteUrl,
+      // Supabase defaults (can be overridden by an earlier IEConfig if needed)
+      SUPABASE_URL:
+        existing.SUPABASE_URL ||
+        'https://xgioojjmrjcurajgirpa.supabase.co',
       SUPABASE_FUNCTIONS_URL:
-        window.IEConfig && window.IEConfig.SUPABASE_FUNCTIONS_URL
-          ? window.IEConfig.SUPABASE_FUNCTIONS_URL
-          : 'https://xgioojjmrjcurajgirpa.supabase.co/functions/v1',
+        existing.SUPABASE_FUNCTIONS_URL ||
+        'https://xgioojjmrjcurajgirpa.supabase.co/functions/v1',
       SUPABASE_ANON_KEY:
-        window.IEConfig && window.IEConfig.SUPABASE_ANON_KEY
-          ? window.IEConfig.SUPABASE_ANON_KEY
-          : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnaW9vamptcmpjdXJhamdpcnBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MjI3MDksImV4cCI6MjA4NzQ5ODcwOX0.fcJe-f4V_aGEaGEfD2N2el2Y-I2rqy3fO6fURu7Ennk',
+        existing.SUPABASE_ANON_KEY ||
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnaW9vamptcmpjdXJhamdpcnBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MjI3MDksImV4cCI6MjA4NzQ5ODcwOX0.fcJe-f4V_aGEaGEfD2N2el2Y-I2rqy3fO6fURu7Ennk',
     },
-    window.IEConfig || {}
+    existing
   );
 })(window);
-
 
 ;(function (window) {
   // Ensure IEConfig also exposes a canonical SUPABASE_URL so all clients and
@@ -34,10 +37,13 @@
   var fromFunctions =
     cfg.SUPABASE_FUNCTIONS_URL &&
     String(cfg.SUPABASE_FUNCTIONS_URL).replace(/\/functions\/v\d+\/?$/, '');
-  var fallback = 'https://xgioojjmrjcurajgirpa.supabase.co';
+
+  // NOTE: SUPABASE_URL is normally provided by the defaults above, but can still
+  // be overridden or derived from SUPABASE_FUNCTIONS_URL if needed.
+  var computedSupabaseUrl = fromConfig || fromFunctions || undefined;
 
   window.IEConfig = Object.assign({}, cfg, {
-    SUPABASE_URL: fromConfig || fromFunctions || fallback,
+    SUPABASE_URL: computedSupabaseUrl,
   });
 })(window);
 

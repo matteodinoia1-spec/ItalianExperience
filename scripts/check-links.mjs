@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
+const CURRENT_BASE_PATH = '/ItalianExperience';
 const skipDirs = new Set([
   'node_modules',
   '.git',
@@ -39,8 +40,11 @@ function collectHtmlFiles(dir) {
 function normalizeTarget(link) {
   let clean = link.split('#')[0].split('?')[0];
   if (!clean) return null;
-  if (clean.startsWith('/ItalianExperience/')) clean = clean.replace('/ItalianExperience/', '/');
-  if (clean === '/ItalianExperience') clean = '/';
+  if (clean.startsWith(`${CURRENT_BASE_PATH}/`)) {
+    clean = clean.replace(CURRENT_BASE_PATH + '/', '/');
+  } else if (clean === CURRENT_BASE_PATH) {
+    clean = '/';
+  }
   return clean;
 }
 

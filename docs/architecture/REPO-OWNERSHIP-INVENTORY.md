@@ -91,7 +91,7 @@ Folder / Group | Risk Level | Reason
 `tailwind.config.*`, `postcss.config.*` | LOW RISK MOVE | Build-time tooling; moves require build script/config updates.
 `netlify.toml` | HIGH RISK MOVE | Deployment routing, headers, and caching; moves can break production routing if not coordinated.
 Root HTML pages (`index.html`, `404.html`) | HIGH RISK MOVE | Public entry points tied to `/ItalianExperience` deployment paths.
-Section folders (`contact/`, `estates/`, `flavors/`, `recruitment/`, `travel/`) | HIGH RISK MOVE | Public-facing routes; moves affect live URLs and SEO; must be coordinated with BASE_PATH rules and Netlify config.
+Section folders (`contact/`, `estates/`, `flavors/`, `recruitment/`, `travel/`) | HIGH RISK MOVE | Public-facing routes; moves affect live URLs and SEO; must be coordinated with BASE_PATH rules and static host config (GitHub Pages, Netlify, etc.).
 `assets/js/config.js` | HIGH RISK MOVE | Defines `window.IEConfig` for both static site and portal; tightly coupled to runtime URL construction.
 `portal/` (overall) | HIGH RISK MOVE | App-like runtime with routing, Supabase client, and IE runtime modules; moves impact portal routes and internal imports.
 `portal/core/` | HIGH RISK MOVE | Router, app shell, and list runtime orchestration; moves require widespread import and routing updates.
@@ -169,7 +169,7 @@ This plan is intentionally **documentation-first** and **low risk**, aligned wit
   - Keep the physical locations for existing files (for example `assets/js/config.js`, `portal/runtime/status-runtime.js`) until shared APIs are stable and well tested.
 - **Why it is safe**
   - Behavior-preserving refactors within portal runtime, guarded by existing docs and portal audits.
-  - No Netlify route changes or static site restructuring; only JS imports and internal wiring change.
+  - No static host route changes or static site restructuring; only JS imports and internal wiring change.
 
 #### Phase 4 – Scripts and tooling restructuring
 

@@ -2,6 +2,12 @@
   "plugins": {
     "supabase": {
       "enabled": true
+    },
+    "cloudflare": {
+      "enabled": true
+    },
+    "notion-workspace": {
+      "enabled": true
     }
   }
 }

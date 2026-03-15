@@ -43,6 +43,7 @@ High‑level layout (paths are relative to the repo root):
 
 - **Documentation**
   - `docs/` – internal design and migration docs for the public UI, including:
+  - **Notion audit**: the project has a mirror audit on Notion (“Italian Experience – Audit progetto”) with structure, file inventory, Supabase (DB, RLS, storage, Edge Functions), and flows. **By default, that Notion space is kept up to date** when the repo or backend changes (automation / convention).
     - `PUBLIC-UI-STEP-1-CURRENT-DUPLICATION.md`
     - `PUBLIC-UI-STEP-2-LAYERED-ARCHITECTURE.md`
     - `PUBLIC-UI-STEP-3-GLOBAL-VS-LOCAL.md`
@@ -51,7 +52,7 @@ High‑level layout (paths are relative to the repo root):
     - `PUBLIC-UI-STEP-6-MIGRATION-PLAN.md`
 
 - **Tooling / configuration**
-  - `_headers` – extra Netlify‑style or CDN header configuration for the public site.
+- `_headers` – extra Netlify‑style or CDN header configuration for the public site.
   - `node_modules/` – Node.js dependencies for build tooling (e.g., Tailwind CSS).
   - Misc root configuration files (e.g., `.gitignore`, package manager files if present).
 
@@ -105,18 +106,41 @@ This backend is consumed primarily by the portal, and potentially by future APIs
 
 ---
 
-## Deployment
+## Deploy
+
+### Build and publish (GitHub Pages)
+
+- **Publish directory:** GitHub Pages is configured to publish from the **repository root** (`.`). See `netlify.toml`: `[build] publish = "."`. By default the site is served from the root (e.g. `index.html`, `contact/`, `partials/`, `assets/`, `portal/`, etc.).
+- **Build command:** There is no build command required for GitHub Pages. If you want to deploy the **base-path–compiled** site (see below) to another static host, run `node scripts/replace-base-path.mjs` locally and publish the generated `dist/` directory.
+
+### Script `scripts/replace-base-path.mjs`
+
+- **Role:** Build-time script for the base-path migration. It does **not** change any source file.
+- **Behavior:**
+  - Reads a fixed list of HTML files from the **project root** (e.g. `index.html`, `partials/header.html`, `contact/index.html`, `travel/*`, `recruitment/*`, `flavors/*`, `estates/index.html`, `404.html`, `privacy/index.html`).
+  - Writes **compiled** versions into **`dist/`**, keeping the same relative paths (e.g. `index.html` → `dist/index.html`, `contact/index.html` → `dist/contact/index.html`).
+  - In the **output files only**, replaces the literal placeholder `%%BASE_PATH%%` with the production base path (e.g. `/ItalianExperience`).
+- **Idempotent:** Running it multiple times just overwrites `dist/` with the same result.
+- **When to use:** Run before deploy if you publish from `dist/` and need the production base path in HTML (links, asset URLs, etc.). If you publish from the root, you can omit this script (and the repo root is served as-is).
+
+### Commands
+
+- **Build only (compile HTML into `dist/`):**
+  ```bash
+  node scripts/replace-base-path.mjs
+  ```
+- **Deploy on GitHub Pages:** Push to the default branch configured for Pages; GitHub Pages will serve from the repository root (no build command). For alternative static hosts, you can either deploy from the root or from `dist/` if you run the base‑path replacement script locally.
+- **Check links (no deploy):**
+  ```bash
+  npm run check:links
+  ```
+
+### Rest of deployment (unchanged)
 
 The project is designed to be deployed as a static frontend (public website + portal) plus a Supabase backend:
-- **Public website**:
-  - Served from the built/static contents of this repo (e.g., via a static host such as Netlify, Vercel, or an S3/CDN bucket).
-  - `_headers` and the partials system (`partials/header.html`, `partials/footer.html`) are leveraged by `bootstrap.js` for consistent navigation and footer across pages.
-- **Portal**:
-  - Served alongside the public site under `/portal/`, using its own JS bootstrap and Supabase integration.
-- **Supabase**:
-  - Managed via the `supabase/` directory and deployed/configured following Supabase documentation.
-
-Exact deployment commands and CI setup will depend on your hosting provider and are expected to be maintained outside the scope of Phase 1.
+- **Public website**: Served from the built/static contents (e.g. GitHub Pages, Vercel, S3/CDN). `_headers` and the partials system are used by `bootstrap.js` for header/footer.
+- **Portal**: Served under `/portal/` with its own JS bootstrap and Supabase.
+- **Supabase**: Managed via `supabase/` and deployed/configured per Supabase documentation.
 
 ---
 

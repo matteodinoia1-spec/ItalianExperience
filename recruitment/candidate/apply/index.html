@@ -443,9 +443,34 @@
       opacity: 0;
       pointer-events: none;
     }
+
+    /* Embedded mode: hide site chrome and redundant intro when inside iframe on job posting page */
+    html.apply-embedded #site-header,
+    html.apply-embedded #site-footer {
+      display: none !important;
+    }
+    html.apply-embedded .apply-card > header {
+      display: none !important;
+    }
+    html.apply-embedded .apply-main {
+      padding: clamp(1rem, 3vw, 1.5rem) 1rem;
+      align-items: flex-start;
+    }
+    html.apply-embedded .apply-card {
+      padding: clamp(1.25rem, 3vw, 1.75rem);
+      box-shadow: none;
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script>
+    (function () {
+      var p = typeof URLSearchParams !== 'undefined' ? new URLSearchParams(window.location.search || '') : null;
+      if (p && (p.get('embed') === '1' || (p.get('mode') || '').toLowerCase() === 'embedded')) {
+        document.documentElement.classList.add('apply-embedded');
+      }
+    })();
+  </script>
 </head>
 
 <body>
@@ -797,7 +822,8 @@
               data-sitekey="0x4AAAAAACq4OcjcA1zYVM3J"
               data-callback="onTurnstileSuccess"
               data-theme="dark"
-              data-size="compact"
+              data-size="flexible"
+              style="width: 100%;"
             ></div>
           </div>
 
@@ -848,6 +874,7 @@
       const jobOfferIdFromUrl = (urlParams.get("job_offer_id") || "").toString().trim();
       const sourceFromUrl = (urlParams.get("source") || "").toString().trim().toLowerCase();
       const jobTitleFromUrl = (urlParams.get("job_title") || "").toString().trim();
+      const isEmbedded = (urlParams.get("embed") === "1" || (urlParams.get("mode") || "").toLowerCase() === "embedded");
       const isJobOfferMode = submissionTypeFromUrl === "job_offer" && !!jobOfferIdFromUrl;
 
       const formStartedAt = Date.now();
@@ -887,7 +914,7 @@
         if (contextSourceEl) {
           contextSourceEl.value = 'job_application';
         }
-        if (jobOfferContextBanner && jobOfferContextBannerLine) {
+        if (jobOfferContextBanner && jobOfferContextBannerLine && !isEmbedded) {
           const titleForBanner = jobTitleFromUrl || 'this opportunity';
           jobOfferContextBannerLine.textContent = 'You are applying for: ' + titleForBanner;
           jobOfferContextBanner.style.display = '';

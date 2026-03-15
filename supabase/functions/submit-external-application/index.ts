@@ -1,10 +1,12 @@
 import { createSupabaseAdminClient } from "../_shared/supabase.ts";
 import {
   CORS_HEADERS,
+  getClientIp,
   jsonResponse,
   readJsonBody,
 } from "../_shared/http.ts";
 import { normalizeSource } from "../_shared/source.ts";
+import { isValidSubmissionObjectPath } from "../_shared/storage.ts";
 
 type SubmissionType = "spontaneous" | "job_offer";
 
@@ -34,10 +36,15 @@ Deno.serve(async (req) => {
   }
 
   if (req.method !== "POST") {
-    return jsonResponse(405, {
-      ok: false,
-      error: { message: "Method not allowed", code: "method_not_allowed" },
-    });
+    return jsonResponse(
+      405,
+      {
+        ok: false,
+        error: { message: "Method not allowed", code: "method_not_allowed" },
+      },
+      {},
+      req,
+    );
   }
 
   const supabaseAdmin = createSupabaseAdminClient();
@@ -46,39 +53,77 @@ Deno.serve(async (req) => {
   let bodyUnknown: unknown;
   try {
     bodyUnknown = await readJsonBody(req);
-  } catch {
-    return jsonResponse(400, {
-      ok: false,
-      error: { message: "Invalid or missing JSON body", code: "invalid_json" },
-    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "";
+    if (msg === "Request body too large") {
+      return jsonResponse(
+        400,
+        {
+          ok: false,
+          error: { message: "Request body too large", code: "body_too_large" },
+        },
+        {},
+        req,
+      );
+    }
+    return jsonResponse(
+      400,
+      {
+        ok: false,
+        error: {
+          message: "Invalid or missing JSON body",
+          code: "invalid_json",
+        },
+      },
+      {},
+      req,
+    );
   }
 
   if (!isRecord(bodyUnknown)) {
-    return jsonResponse(400, {
-      ok: false,
-      error: { message: "Invalid JSON body", code: "bad_request" },
-    });
+    return jsonResponse(
+      400,
+      {
+        ok: false,
+        error: { message: "Invalid JSON body", code: "bad_request" },
+      },
+      {},
+      req,
+    );
   }
 
   const captchaToken = asStringOrNull(
     (bodyUnknown as Record<string, unknown>).captcha_token,
   );
   if (!captchaToken) {
-    return jsonResponse(400, {
-      ok: false,
-      error: { message: "captcha_token is required", code: "captcha_missing" },
-    });
+    return jsonResponse(
+      400,
+      {
+        ok: false,
+        error: {
+          message: "captcha_token is required",
+          code: "captcha_missing",
+        },
+      },
+      {},
+      req,
+    );
   }
 
   const TURNSTILE_SECRET = Deno.env.get("TURNSTILE_SECRET_KEY");
   if (!TURNSTILE_SECRET) {
-    return jsonResponse(502, {
-      ok: false,
-      error: {
-        message: "CAPTCHA verification is unavailable",
-        code: "captcha_verification_error",
+    return jsonResponse(
+      502,
+      {
+        ok: false,
+        error: {
+          message: "CAPTCHA verification is unavailable",
+          code: "captcha_verification_error",
+        },
       },
-    });
+      {},
+      req,
+    );
   }
 
   let verifyResponse: Response;
@@ -86,6 +131,8 @@ Deno.serve(async (req) => {
     const formData = new URLSearchParams();
     formData.append("secret", TURNSTILE_SECRET);
     formData.append("response", captchaToken);
+    const remoteIp = getClientIp(req);
+    if (remoteIp) formData.append("remoteip", remoteIp);
 
     verifyResponse = await fetch(
       "https://challenges.cloudflare.com/turnstile/v0/siteverify",
@@ -98,36 +145,51 @@ Deno.serve(async (req) => {
       },
     );
   } catch {
-    return jsonResponse(502, {
-      ok: false,
-      error: {
-        message: "Failed to verify CAPTCHA",
-        code: "captcha_verification_error",
+    return jsonResponse(
+      502,
+      {
+        ok: false,
+        error: {
+          message: "Failed to verify CAPTCHA",
+          code: "captcha_verification_error",
+        },
       },
-    });
+      {},
+      req,
+    );
   }
 
   if (!verifyResponse.ok) {
-    return jsonResponse(502, {
-      ok: false,
-      error: {
-        message: "CAPTCHA verification service error",
-        code: "captcha_verification_error",
+    return jsonResponse(
+      502,
+      {
+        ok: false,
+        error: {
+          message: "CAPTCHA verification service error",
+          code: "captcha_verification_error",
+        },
       },
-    });
+      {},
+      req,
+    );
   }
 
   let verifyJson: unknown;
   try {
     verifyJson = await verifyResponse.json();
   } catch {
-    return jsonResponse(502, {
-      ok: false,
-      error: {
-        message: "Invalid CAPTCHA verification response",
-        code: "captcha_verification_error",
+    return jsonResponse(
+      502,
+      {
+        ok: false,
+        error: {
+          message: "Invalid CAPTCHA verification response",
+          code: "captcha_verification_error",
+        },
       },
-    });
+      {},
+      req,
+    );
   }
 
   const verifyData = isRecord(verifyJson) ? verifyJson : {};
@@ -182,85 +244,125 @@ Deno.serve(async (req) => {
   const phone = asStringOrNull(main.phone);
 
   if (honeypotTop || honeypotPrivacy) {
-    return jsonResponse(400, {
-      ok: false,
-      error: {
-        message: "Submission rejected as spam.",
-        code: "spam_detected",
+    return jsonResponse(
+      400,
+      {
+        ok: false,
+        error: {
+          message: "Submission rejected as spam.",
+          code: "spam_detected",
+        },
       },
-    });
+      {},
+      req,
+    );
   }
 
   if (!firstName) {
-    return jsonResponse(400, {
-      ok: false,
-      error: {
-        message: "main.first_name is required",
-        code: "missing_first_name",
+    return jsonResponse(
+      400,
+      {
+        ok: false,
+        error: {
+          message: "main.first_name is required",
+          code: "missing_first_name",
+        },
       },
-    });
+      {},
+      req,
+    );
   }
   if (!lastName) {
-    return jsonResponse(400, {
-      ok: false,
-      error: {
-        message: "main.last_name is required",
-        code: "missing_last_name",
+    return jsonResponse(
+      400,
+      {
+        ok: false,
+        error: {
+          message: "main.last_name is required",
+          code: "missing_last_name",
+        },
       },
-    });
+      {},
+      req,
+    );
   }
 
   if (!email && !phone) {
-    return jsonResponse(400, {
-      ok: false,
-      error: {
-        message: "At least one contact (email or phone) is required",
-        code: "missing_contact",
+    return jsonResponse(
+      400,
+      {
+        ok: false,
+        error: {
+          message: "At least one contact (email or phone) is required",
+          code: "missing_contact",
+        },
       },
-    });
+      {},
+      req,
+    );
   }
 
   if (email && !isValidEmail(email)) {
-    return jsonResponse(400, {
-      ok: false,
-      error: {
-        message: "Invalid email address format",
-        code: "invalid_email",
+    return jsonResponse(
+      400,
+      {
+        ok: false,
+        error: {
+          message: "Invalid email address format",
+          code: "invalid_email",
+        },
       },
-    });
+      {},
+      req,
+    );
   }
 
   const consentPrivacy = privacy.consent_privacy === true;
   if (!consentPrivacy) {
-    return jsonResponse(400, {
-      ok: false,
-      error: {
-        message: "Privacy consent is required",
-        code: "privacy_consent_required",
+    return jsonResponse(
+      400,
+      {
+        ok: false,
+        error: {
+          message: "Privacy consent is required",
+          code: "privacy_consent_required",
+        },
       },
-    });
+      {},
+      req,
+    );
   }
 
   const submissionTypeRaw = asStringOrNull(context.submission_type);
   if (!submissionTypeRaw) {
-    return jsonResponse(400, {
-      ok: false,
-      error: {
-        message: "context.submission_type is required",
-        code: "missing_submission_type",
+    return jsonResponse(
+      400,
+      {
+        ok: false,
+        error: {
+          message: "context.submission_type is required",
+          code: "missing_submission_type",
+        },
       },
-    });
+      {},
+      req,
+    );
   }
 
   const allowedTypes: SubmissionType[] = ["spontaneous", "job_offer"];
   if (!allowedTypes.includes(submissionTypeRaw as SubmissionType)) {
-    return jsonResponse(400, {
-      ok: false,
-      error: {
-        message: "Invalid submission_type",
-        code: "invalid_submission_type",
+    return jsonResponse(
+      400,
+      {
+        ok: false,
+        error: {
+          message: "Invalid submission_type",
+          code: "invalid_submission_type",
+        },
       },
-    });
+      {},
+      req,
+    );
   }
 
   const submissionType = submissionTypeRaw as SubmissionType;
@@ -271,13 +373,19 @@ Deno.serve(async (req) => {
   if (submissionType === "job_offer") {
     const jobOfferIdStr = asStringOrNull(jobOfferIdRaw);
     if (!jobOfferIdStr) {
-      return jsonResponse(400, {
-        ok: false,
-        error: {
-          message: "job_offer_id is required when submission_type = job_offer",
-          code: "missing_job_offer_id",
+      return jsonResponse(
+        400,
+        {
+          ok: false,
+          error: {
+            message:
+              "job_offer_id is required when submission_type = job_offer",
+            code: "missing_job_offer_id",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
     jobOfferId = jobOfferIdStr;
 
@@ -288,22 +396,32 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (jobOfferErr) {
-      return jsonResponse(500, {
-        ok: false,
-        error: {
-          message: jobOfferErr.message,
-          code: "job_offer_lookup_failed",
+      return jsonResponse(
+        500,
+        {
+          ok: false,
+          error: {
+            message: jobOfferErr.message,
+            code: "job_offer_lookup_failed",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
     if (!jobOffer) {
-      return jsonResponse(400, {
-        ok: false,
-        error: {
-          message: "job_offer_id does not reference an existing job offer",
-          code: "invalid_job_offer_id",
+      return jsonResponse(
+        400,
+        {
+          ok: false,
+          error: {
+            message: "job_offer_id does not reference an existing job offer",
+            code: "invalid_job_offer_id",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
   } else {
     jobOfferId = null;
@@ -325,6 +443,35 @@ Deno.serve(async (req) => {
   const resumePath = asStringOrNull(files.resume_path);
   const photoPath = asStringOrNull(files.photo_path);
 
+  if (resumePath !== null && !isValidSubmissionObjectPath(resumePath, "resume")) {
+    return jsonResponse(
+      400,
+      {
+        ok: false,
+        error: {
+          message: "Invalid resume path format",
+          code: "invalid_resume_path",
+        },
+      },
+      {},
+      req,
+    );
+  }
+  if (photoPath !== null && !isValidSubmissionObjectPath(photoPath, "photo")) {
+    return jsonResponse(
+      400,
+      {
+        ok: false,
+        error: {
+          message: "Invalid photo path format",
+          code: "invalid_photo_path",
+        },
+      },
+      {},
+      req,
+    );
+  }
+
   const source = normalizeSource(context.source);
 
   // Soft duplicate check (pending_review on email / phone)
@@ -337,23 +484,33 @@ Deno.serve(async (req) => {
       .limit(1);
 
     if (dupErrEmail) {
-      return jsonResponse(500, {
-        ok: false,
-        error: {
-          message: dupErrEmail.message,
-          code: "duplicate_lookup_failed",
+      return jsonResponse(
+        500,
+        {
+          ok: false,
+          error: {
+            message: dupErrEmail.message,
+            code: "duplicate_lookup_failed",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
     if (existingByEmail && existingByEmail.length > 0) {
-      return jsonResponse(409, {
-        ok: false,
-        error: {
-          message:
-            "A pending submission already exists for this email address.",
-          code: "duplicate_pending_submission",
+      return jsonResponse(
+        409,
+        {
+          ok: false,
+          error: {
+            message:
+              "A pending submission already exists for this email address.",
+            code: "duplicate_pending_submission",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
   }
 
@@ -366,23 +523,33 @@ Deno.serve(async (req) => {
       .limit(1);
 
     if (dupErrPhone) {
-      return jsonResponse(500, {
-        ok: false,
-        error: {
-          message: dupErrPhone.message,
-          code: "duplicate_lookup_failed",
+      return jsonResponse(
+        500,
+        {
+          ok: false,
+          error: {
+            message: dupErrPhone.message,
+            code: "duplicate_lookup_failed",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
     if (existingByPhone && existingByPhone.length > 0) {
-      return jsonResponse(409, {
-        ok: false,
-        error: {
-          message:
-            "A pending submission already exists for this phone number.",
-          code: "duplicate_pending_submission",
+      return jsonResponse(
+        409,
+        {
+          ok: false,
+          error: {
+            message:
+              "A pending submission already exists for this phone number.",
+            code: "duplicate_pending_submission",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
   }
 
@@ -397,23 +564,33 @@ Deno.serve(async (req) => {
       .limit(1);
 
     if (recentErrEmail) {
-      return jsonResponse(500, {
-        ok: false,
-        error: {
-          message: recentErrEmail.message,
-          code: "duplicate_lookup_failed",
+      return jsonResponse(
+        500,
+        {
+          ok: false,
+          error: {
+            message: recentErrEmail.message,
+            code: "duplicate_lookup_failed",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
     if (recentByEmail && recentByEmail.length > 0) {
-      return jsonResponse(429, {
-        ok: false,
-        error: {
-          message:
-            "A submission with this email was sent very recently. Please wait a moment before submitting again.",
-          code: "duplicate_recent_submission",
+      return jsonResponse(
+        429,
+        {
+          ok: false,
+          error: {
+            message:
+              "A submission with this email was sent very recently. Please wait a moment before submitting again.",
+            code: "duplicate_recent_submission",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
   }
   if (phone) {
@@ -425,23 +602,33 @@ Deno.serve(async (req) => {
       .limit(1);
 
     if (recentErrPhone) {
-      return jsonResponse(500, {
-        ok: false,
-        error: {
-          message: recentErrPhone.message,
-          code: "duplicate_lookup_failed",
+      return jsonResponse(
+        500,
+        {
+          ok: false,
+          error: {
+            message: recentErrPhone.message,
+            code: "duplicate_lookup_failed",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
     if (recentByPhone && recentByPhone.length > 0) {
-      return jsonResponse(429, {
-        ok: false,
-        error: {
-          message:
-            "A submission with this phone number was sent very recently. Please wait a moment before submitting again.",
-          code: "duplicate_recent_submission",
+      return jsonResponse(
+        429,
+        {
+          ok: false,
+          error: {
+            message:
+              "A submission with this phone number was sent very recently. Please wait a moment before submitting again.",
+            code: "duplicate_recent_submission",
+          },
         },
-      });
+        {},
+        req,
+      );
     }
   }
 
@@ -476,26 +663,36 @@ Deno.serve(async (req) => {
     .single();
 
   if (insertErr) {
-    return jsonResponse(500, {
-      ok: false,
-      error: {
-        message: insertErr.message,
-        code: "submission_insert_failed",
+    return jsonResponse(
+      500,
+      {
+        ok: false,
+        error: {
+          message: insertErr.message,
+          code: "submission_insert_failed",
+        },
       },
-    });
+      {},
+      req,
+    );
   }
 
   const submissionId = inserted?.id ?? null;
   const submissionStatus = inserted?.status ?? "pending_review";
 
   if (!submissionId) {
-    return jsonResponse(500, {
-      ok: false,
-      error: {
-        message: "Failed to determine created submission id",
-        code: "missing_submission_id",
+    return jsonResponse(
+      500,
+      {
+        ok: false,
+        error: {
+          message: "Failed to determine created submission id",
+          code: "missing_submission_id",
+        },
       },
-    });
+      {},
+      req,
+    );
   }
 
   const { error: privacyInsertErr } = await supabaseAdmin.from(
@@ -518,20 +715,30 @@ Deno.serve(async (req) => {
       .delete()
       .eq("id", submissionId);
 
-    return jsonResponse(500, {
-      ok: false,
-      error: {
-        message: privacyInsertErr.message,
-        code: "privacy_consent_insert_failed",
+    return jsonResponse(
+      500,
+      {
+        ok: false,
+        error: {
+          message: privacyInsertErr.message,
+          code: "privacy_consent_insert_failed",
+        },
       },
-    });
+      {},
+      req,
+    );
   }
 
-  return jsonResponse(201, {
-    ok: true,
-    submission_id: submissionId,
-    submission_status: submissionStatus,
-    message: "Application submitted successfully.",
-  });
+  return jsonResponse(
+    201,
+    {
+      ok: true,
+      submission_id: submissionId,
+      submission_status: submissionStatus,
+      message: "Application submitted successfully.",
+    },
+    {},
+    req,
+  );
 });
 
