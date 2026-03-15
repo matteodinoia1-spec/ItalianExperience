@@ -639,7 +639,7 @@
               ? window.IEPortal.links.candidateView
               : function (id) {
                   return (
-                    "candidate.html?id=" +
+                    "recruitment/candidate.html?id=" +
                     encodeURIComponent(String(id || ""))
                   );
                 };

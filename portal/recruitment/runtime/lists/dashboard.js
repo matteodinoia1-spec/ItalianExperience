@@ -573,7 +573,7 @@
         window.IEPortal.links &&
         typeof window.IEPortal.links.offerView === "function"
           ? window.IEPortal.links.offerView(offerId)
-          : "job-offer.html?id=" +
+          : "recruitment/job-offer.html?id=" +
             encodeURIComponent(String(offerId)) +
             "&mode=view";
 

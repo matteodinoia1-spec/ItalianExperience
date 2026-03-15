@@ -470,7 +470,7 @@
                   window.IEPortal.links &&
                   typeof window.IEPortal.links.clientView === "function"
                     ? window.IEPortal.links.clientView(row.id)
-                    : "client.html?id=" +
+                    : "recruitment/client.html?id=" +
                       encodeURIComponent(String(row.id)) +
                       "&mode=view",
                 editUrl:
@@ -478,7 +478,7 @@
                   window.IEPortal.links &&
                   typeof window.IEPortal.links.clientEdit === "function"
                     ? window.IEPortal.links.clientEdit(row.id)
-                    : "client.html?id=" +
+                    : "recruitment/client.html?id=" +
                       encodeURIComponent(String(row.id)) +
                       "&mode=edit",
                 title: row.name || "—",
@@ -631,7 +631,7 @@
                 window.IEPortal.links &&
                 typeof window.IEPortal.links.clientView === "function"
                   ? window.IEPortal.links.clientView(row.id)
-                  : "client.html?id=" +
+                  : "recruitment/client.html?id=" +
                     encodeURIComponent(String(row.id)) +
                     "&mode=view",
               editUrl:
@@ -639,7 +639,7 @@
                 window.IEPortal.links &&
                 typeof window.IEPortal.links.clientEdit === "function"
                   ? window.IEPortal.links.clientEdit(row.id)
-                  : "client.html?id=" +
+                  : "recruitment/client.html?id=" +
                     encodeURIComponent(String(row.id)) +
                     "&mode=edit",
               title: row.name || "—",

@@ -732,7 +732,7 @@
             window.IEPortal.links &&
             typeof window.IEPortal.links.candidateView === "function"
               ? window.IEPortal.links.candidateView(mapped.id)
-              : "candidate.html?id=" +
+              : "recruitment/candidate.html?id=" +
                 encodeURIComponent(String(mapped.id)) +
                 "&mode=view",
           editUrl:
@@ -740,7 +740,7 @@
             window.IEPortal.links &&
             typeof window.IEPortal.links.candidateEdit === "function"
               ? window.IEPortal.links.candidateEdit(mapped.id)
-              : "candidate.html?id=" +
+              : "recruitment/candidate.html?id=" +
                 encodeURIComponent(String(mapped.id)) +
                 "&mode=edit",
           title: fullName,

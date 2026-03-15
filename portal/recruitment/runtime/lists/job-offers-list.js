@@ -808,7 +808,7 @@
           window.IEPortal.links &&
           typeof window.IEPortal.links.offerView === "function"
             ? window.IEPortal.links.offerView(row.id)
-            : "job-offer.html?id=" +
+            : "recruitment/job-offer.html?id=" +
               encodeURIComponent(String(row.id)) +
               "&mode=view";
         var clientCellHtml = row.client_id
