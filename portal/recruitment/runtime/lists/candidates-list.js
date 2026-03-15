@@ -25,6 +25,9 @@
   var setCandidatePageIds =
     shared.setCandidatePageIds ||
     function () {};
+  var selectAllCandidatesOnCurrentPage =
+    shared.selectAllCandidatesOnCurrentPage ||
+    function () {};
 
   var CANDIDATES_PAGE_SIZE = 10;
 
@@ -729,7 +732,7 @@
             window.IEPortal.links &&
             typeof window.IEPortal.links.candidateView === "function"
               ? window.IEPortal.links.candidateView(mapped.id)
-              : "candidate.html?id=" +
+              : "recruitment/candidate.html?id=" +
                 encodeURIComponent(String(mapped.id)) +
                 "&mode=view",
           editUrl:
@@ -737,7 +740,7 @@
             window.IEPortal.links &&
             typeof window.IEPortal.links.candidateEdit === "function"
               ? window.IEPortal.links.candidateEdit(mapped.id)
-              : "candidate.html?id=" +
+              : "recruitment/candidate.html?id=" +
                 encodeURIComponent(String(mapped.id)) +
                 "&mode=edit",
           title: fullName,
@@ -959,12 +962,7 @@
     if (selectAllCheckbox) {
       selectAllCheckbox.addEventListener("change", function () {
         if (selectAllCheckbox.checked) {
-          var snapshot =
-            (window.IEListsRuntime &&
-              window.IEListsRuntime.getCandidateSelectionState &&
-              window.IEListsRuntime.getCandidateSelectionState()) ||
-            { pageIds: [] };
-          setCandidatePageIds(snapshot.pageIds || []);
+          selectAllCandidatesOnCurrentPage();
         } else {
           clearCandidateSelection();
         }

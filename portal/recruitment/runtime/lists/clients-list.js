@@ -201,9 +201,7 @@
           IERouter &&
           typeof IERouter.navigateTo === "function"
         ) {
-          IERouter.navigateTo(
-            "job-offers.html?client=" + encodeURIComponent(clientId)
-          );
+          IERouter.navigateTo("job-offers", { client: clientId });
         }
       }
     });
@@ -428,18 +426,23 @@
             }
 
             rows.forEach(function (row) {
-              var activeOffersCount = (row.job_offers || []).filter(
-                function (o) {
-                  if (!o || o.is_archived) return false;
-                  var status = o.status || "";
-                  return (
-                    status === "active" ||
-                    status === "open" ||
-                    status === "inprogress" ||
-                    status === "in progress"
-                  );
-                }
-              ).length;
+              var normalizeStatus =
+                (typeof window.normalizeJobOfferStatus === "function"
+                  ? window.normalizeJobOfferStatus
+                  : function (status) {
+                      if (status == null || status === "") return "open";
+                      var s = (status || "").toString().toLowerCase().trim();
+                      if (s === "active") return "open";
+                      if (s === "in progress") return "inprogress";
+                      return s;
+                    });
+              var activeOffersCount = (row.job_offers || []).filter(function (
+                o
+              ) {
+                if (!o || o.is_archived) return false;
+                var canonical = normalizeStatus(o.status);
+                return canonical === "open" || canonical === "inprogress";
+              }).length;
               var activeOffersHtml =
                 activeOffersCount > 0
                   ? '<button type="button" data-action="view-client-offers" data-id="' +
@@ -472,7 +475,7 @@
                   window.IEPortal.links &&
                   typeof window.IEPortal.links.clientView === "function"
                     ? window.IEPortal.links.clientView(row.id)
-                    : "client.html?id=" +
+                    : "recruitment/client.html?id=" +
                       encodeURIComponent(String(row.id)) +
                       "&mode=view",
                 editUrl:
@@ -480,7 +483,7 @@
                   window.IEPortal.links &&
                   typeof window.IEPortal.links.clientEdit === "function"
                     ? window.IEPortal.links.clientEdit(row.id)
-                    : "client.html?id=" +
+                    : "recruitment/client.html?id=" +
                       encodeURIComponent(String(row.id)) +
                       "&mode=edit",
                 title: row.name || "—",
@@ -510,10 +513,7 @@
                       : row.phone || "—") +
                     "</span>",
                 ],
-                rowTitle:
-                  typeof formatLastUpdatedMeta === "function"
-                    ? formatLastUpdatedMeta(row)
-                    : "",
+                rowTitle: "",
               });
               tbody.appendChild(tr);
             });
@@ -589,18 +589,23 @@
           );
 
           pageRows.forEach(function (row) {
-            var activeOffersCount = (row.job_offers || []).filter(
-              function (o) {
-                if (!o || o.is_archived) return false;
-                var status = o.status || "";
-                return (
-                  status === "active" ||
-                  status === "open" ||
-                  status === "inprogress" ||
-                  status === "in progress"
-                );
-              }
-            ).length;
+            var normalizeStatus =
+              (typeof window.normalizeJobOfferStatus === "function"
+                ? window.normalizeJobOfferStatus
+                : function (status) {
+                    if (status == null || status === "") return "open";
+                    var s = (status || "").toString().toLowerCase().trim();
+                    if (s === "active") return "open";
+                    if (s === "in progress") return "inprogress";
+                    return s;
+                  });
+            var activeOffersCount = (row.job_offers || []).filter(function (
+              o
+            ) {
+              if (!o || o.is_archived) return false;
+              var canonical = normalizeStatus(o.status);
+              return canonical === "open" || canonical === "inprogress";
+            }).length;
             var activeOffersHtml =
               activeOffersCount > 0
                 ? '<button type="button" data-action="view-client-offers" data-id="' +
@@ -633,7 +638,7 @@
                 window.IEPortal.links &&
                 typeof window.IEPortal.links.clientView === "function"
                   ? window.IEPortal.links.clientView(row.id)
-                  : "client.html?id=" +
+                  : "recruitment/client.html?id=" +
                     encodeURIComponent(String(row.id)) +
                     "&mode=view",
               editUrl:
@@ -641,7 +646,7 @@
                 window.IEPortal.links &&
                 typeof window.IEPortal.links.clientEdit === "function"
                   ? window.IEPortal.links.clientEdit(row.id)
-                  : "client.html?id=" +
+                  : "recruitment/client.html?id=" +
                     encodeURIComponent(String(row.id)) +
                     "&mode=edit",
               title: row.name || "—",
@@ -671,10 +676,7 @@
                     : row.phone || "—") +
                   "</span>",
               ],
-              rowTitle:
-                typeof formatLastUpdatedMeta === "function"
-                  ? formatLastUpdatedMeta(row)
-                  : "",
+              rowTitle: "",
             });
             tbody.appendChild(tr);
           });

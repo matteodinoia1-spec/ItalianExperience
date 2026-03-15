@@ -1,24 +1,30 @@
 <header class="portal-header h-[72px] bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between">
   <div class="portal-header__inner">
     <div class="portal-header__left">
+      <a href="hub-dashboard.html" class="portal-header-hub-link" aria-label="Back to Portal">
+        <svg class="portal-header-hub-link__icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        <span class="portal-header-hub-link__text">Portal</span>
+      </a>
       <span class="portal-header__page-title" id="portal-header-page-title" aria-hidden="true"></span>
       <nav class="portal-header-nav hidden lg:flex items-center" aria-label="Primary navigation">
-        <a href="dashboard.html" class="portal-header-nav__link" data-nav-group="dashboard">Dashboard</a>
+        <a href="recruitment/dashboard.html" class="portal-header-nav__link" data-nav-group="dashboard">Dashboard</a>
         <span class="portal-header-nav__item-with-sub" data-nav-candidates-wrap aria-haspopup="true" aria-expanded="false">
-          <a href="candidates.html" class="portal-header-nav__link" data-nav-group="candidates">Candidates</a>
+          <a href="recruitment/candidates.html" class="portal-header-nav__link" data-nav-group="candidates">Candidates</a>
           <div class="portal-header-nav__submenu" role="menu" aria-label="Candidates" data-nav-candidates-menu>
-            <a href="external-submissions.html?status=pending_review" class="portal-header-nav__submenu-item" role="menuitem" data-nav-submenu-item>Inbound Submissions</a>
+            <a href="recruitment/external-submissions.html?status=pending_review" class="portal-header-nav__submenu-item" role="menuitem" data-nav-submenu-item>Inbound Submissions</a>
           </div>
         </span>
         <span class="portal-header-nav__item-with-sub" data-nav-job-offers-wrap aria-haspopup="true" aria-expanded="false">
-          <a href="job-offers.html" class="portal-header-nav__link" data-nav-group="job-offers">Job Offers</a>
+          <a href="recruitment/job-offers.html" class="portal-header-nav__link" data-nav-group="job-offers">Job Offers</a>
           <div class="portal-header-nav__submenu" role="menu" aria-label="Job Offers" data-nav-job-offers-menu>
-            <a href="job-postings.html" class="portal-header-nav__submenu-item" role="menuitem" data-nav-submenu-item>Job Postings</a>
+            <a href="recruitment/job-postings.html" class="portal-header-nav__submenu-item" role="menuitem" data-nav-submenu-item>Job Postings</a>
           </div>
         </span>
-        <a href="applications.html" class="portal-header-nav__link" data-nav-group="applications">Applications</a>
-        <a href="clients.html" class="portal-header-nav__link" data-nav-group="clients">Clients</a>
-        <a href="archived.html" class="portal-header-nav__link" data-nav-group="archived">Archived</a>
+        <a href="recruitment/applications.html" class="portal-header-nav__link" data-nav-group="applications">Applications</a>
+        <a href="recruitment/clients.html" class="portal-header-nav__link" data-nav-group="clients">Clients</a>
+        <a href="recruitment/archived.html" class="portal-header-nav__link" data-nav-group="archived">Archived</a>
       </nav>
     </div>
     <div class="portal-header__right">
@@ -33,9 +39,9 @@
             <span class="portal-header-actions__add-label">+ Add</span>
           </button>
           <div class="portal-header-actions__add-menu" role="menu" aria-label="Add menu" hidden>
-            <a href="add-candidate.html" class="portal-header-actions__add-item" role="menuitem" data-action="add-candidate">Add Candidate</a>
-            <a href="add-job-offer.html" class="portal-header-actions__add-item" role="menuitem" data-action="add-job-offer">Add Job Offer</a>
-            <a href="add-client.html" class="portal-header-actions__add-item" role="menuitem" data-action="add-client">Add Client</a>
+            <a href="recruitment/add-candidate.html" class="portal-header-actions__add-item" role="menuitem" data-action="add-candidate">Add Candidate</a>
+            <a href="recruitment/add-job-offer.html" class="portal-header-actions__add-item" role="menuitem" data-action="add-job-offer">Add Job Offer</a>
+            <a href="recruitment/add-client.html" class="portal-header-actions__add-item" role="menuitem" data-action="add-client">Add Client</a>
           </div>
         </div>
       </div>

@@ -181,29 +181,39 @@ ItalianExperience/
 
 ### 3.5 Portal – HTML
 
+> **Struttura aggiornata**: a seguito della migrazione (branch `portal-typography-refinement`), tutte le pagine specifiche del recruitment sono state spostate in `portal/recruitment/`. Le pagine di autenticazione, profilo e la nuova main dashboard restano in `portal/`.
+
+**Pagine root del portal (`portal/`)**
+
 | File | Ruolo |
 |------|--------|
-| `portal/index.html` | Landing/redirect portal (es. dopo login). |
-| `portal/dashboard.html` | Dashboard ATS. |
+| `portal/index.html` | Landing/redirect portal (login). |
+| `portal/dashboard.html` | Main portal hub: mostra card per i moduli (Recruitment, Travel, Flavors, Estates). Primo redirect post-login. |
 | `portal/forgot-password.html` | Recupero password. |
 | `portal/reset-password.html` | Reset password (link email). |
-| `portal/candidates.html` | Lista candidati. |
-| `portal/candidate.html` | Dettaglio candidato (view/edit). |
-| `portal/add-candidate.html` | Creazione candidato. |
-| `portal/clients.html` | Lista clienti. |
-| `portal/client.html` | Dettaglio cliente. |
-| `portal/add-client.html` | Creazione cliente. |
-| `portal/job-offers.html` | Lista job offer (interni). |
-| `portal/job-offer.html` | Dettaglio job offer. |
-| `portal/add-job-offer.html` | Creazione job offer. |
-| `portal/job-postings.html` | Lista job posting (pubblici). |
-| `portal/job-posting.html` | Dettaglio job posting (titolo, slug, scadenza, publish). |
-| `portal/applications.html` | Lista applicazioni (candidato–job). |
-| `portal/application.html` | Dettaglio applicazione. |
-| `portal/external-submissions.html` | Lista submission esterne (pending_review, ecc.). |
-| `portal/external-submission.html` | Dettaglio submission: approve new candidate / link existing / reject (chiama Edge Function promote). |
 | `portal/profile.html` | Profilo utente loggato. |
-| `portal/archived.html` | Vista archiviati. |
+
+**Pagine recruitment (`portal/recruitment/`)**
+
+| File | Ruolo |
+|------|--------|
+| `portal/recruitment/dashboard.html` | Dashboard ATS recruitment (statistiche, submission in ingresso, live offers). |
+| `portal/recruitment/candidates.html` | Lista candidati. |
+| `portal/recruitment/candidate.html` | Dettaglio candidato (view/edit). |
+| `portal/recruitment/add-candidate.html` | Creazione candidato. |
+| `portal/recruitment/clients.html` | Lista clienti. |
+| `portal/recruitment/client.html` | Dettaglio cliente. |
+| `portal/recruitment/add-client.html` | Creazione cliente. |
+| `portal/recruitment/job-offers.html` | Lista job offer (interni). |
+| `portal/recruitment/job-offer.html` | Dettaglio job offer. |
+| `portal/recruitment/add-job-offer.html` | Creazione job offer. |
+| `portal/recruitment/job-postings.html` | Lista job posting (pubblici). |
+| `portal/recruitment/job-posting.html` | Dettaglio job posting (titolo, slug, scadenza, publish). |
+| `portal/recruitment/applications.html` | Lista applicazioni (candidato–job). |
+| `portal/recruitment/application.html` | Dettaglio applicazione. |
+| `portal/recruitment/external-submissions.html` | Lista submission esterne (pending_review, ecc.). |
+| `portal/recruitment/external-submission.html` | Dettaglio submission: approve new candidate / link existing / reject (chiama Edge Function promote). |
+| `portal/recruitment/archived.html` | Vista archiviati. |
 
 ---
 

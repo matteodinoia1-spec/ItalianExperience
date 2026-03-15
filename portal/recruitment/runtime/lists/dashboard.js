@@ -573,7 +573,7 @@
         window.IEPortal.links &&
         typeof window.IEPortal.links.offerView === "function"
           ? window.IEPortal.links.offerView(offerId)
-          : "job-offer.html?id=" +
+          : "recruitment/job-offer.html?id=" +
             encodeURIComponent(String(offerId)) +
             "&mode=view";
 
@@ -729,7 +729,7 @@
 
     function navigateToExternalSubmissionDetail(id) {
       var href =
-        "external-submission.html?id=" + encodeURIComponent(String(id));
+        "recruitment/external-submission.html?id=" + encodeURIComponent(String(id));
       if (
         window.IERouter &&
         typeof window.IERouter.navigateTo === "function"

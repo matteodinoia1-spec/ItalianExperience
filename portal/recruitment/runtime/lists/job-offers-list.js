@@ -192,7 +192,6 @@
     var hasClientFilter = !!clientFilter;
     if (hasClientFilter) {
       filters.clientId = clientFilter;
-      filters.offerStatus = "active";
     }
 
     function goToPage(page) {
@@ -325,7 +324,7 @@
     }
 
     if (hasClientFilter) {
-      if (statusSelect) statusSelect.value = "active";
+      // Keep existing status filter value; only client filter is enforced from URL.
     }
 
     if (clearClientFilterBtn) {
@@ -383,9 +382,7 @@
           IERouter &&
           typeof IERouter.navigateTo === "function"
         ) {
-          IERouter.navigateTo(
-            "candidates.html?offer=" + encodeURIComponent(offerId)
-          );
+          IERouter.navigateTo("candidates", { offer: offerId });
         }
         return;
       }
@@ -810,7 +807,7 @@
           window.IEPortal.links &&
           typeof window.IEPortal.links.offerView === "function"
             ? window.IEPortal.links.offerView(row.id)
-            : "job-offer.html?id=" +
+            : "recruitment/job-offer.html?id=" +
               encodeURIComponent(String(row.id)) +
               "&mode=view";
         var clientCellHtml = row.client_id
@@ -887,10 +884,7 @@
                 : createdAtValue) +
               "</span>",
           ],
-          rowTitle:
-            typeof formatLastUpdatedMeta === "function"
-              ? formatLastUpdatedMeta(row)
-              : "",
+          rowTitle: "",
         });
         targetBody.appendChild(tr);
       });

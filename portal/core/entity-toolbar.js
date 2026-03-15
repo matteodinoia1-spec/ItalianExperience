@@ -139,8 +139,8 @@ function getEntityViewUrl(entityType, entityId) {
 
   if (type === "candidate") {
     return hasId
-      ? "candidate.html?id=" + encodeURIComponent(String(entityId))
-      : "candidates.html";
+      ? "recruitment/candidate.html?id=" + encodeURIComponent(String(entityId))
+      : "recruitment/candidates.html";
   }
   if (type === "job-offer") {
     if (
@@ -153,8 +153,8 @@ function getEntityViewUrl(entityType, entityId) {
       return window.IEPortal.links.offerView(entityId);
     }
     return hasId
-      ? "job-offer.html?id=" + encodeURIComponent(String(entityId)) + "&mode=view"
-      : "job-offers.html";
+      ? "recruitment/job-offer.html?id=" + encodeURIComponent(String(entityId)) + "&mode=view"
+      : "recruitment/job-offers.html";
   }
   if (type === "client") {
     if (
@@ -167,13 +167,13 @@ function getEntityViewUrl(entityType, entityId) {
       return window.IEPortal.links.clientView(entityId);
     }
     return hasId
-      ? "client.html?id=" + encodeURIComponent(String(entityId)) + "&mode=view"
-      : "clients.html";
+      ? "recruitment/client.html?id=" + encodeURIComponent(String(entityId)) + "&mode=view"
+      : "recruitment/clients.html";
   }
   if (type === "application") {
     return hasId
-      ? "application.html?id=" + encodeURIComponent(String(entityId))
-      : "applications.html";
+      ? "recruitment/application.html?id=" + encodeURIComponent(String(entityId))
+      : "recruitment/applications.html";
   }
 
   return null;

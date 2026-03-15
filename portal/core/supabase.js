@@ -185,7 +185,12 @@
    * Redirect to login.
    */
   function redirectToLogin() {
-    const base = getBasePath();
+    let base = getBasePath();
+    // Normalize to portal root: if inside a sub-directory (e.g. /recruitment/),
+    // walk up one level so we always land on portal/index.html.
+    if (base.includes("/recruitment/")) {
+      try { base = new URL("../", base).href; } catch (e) { /* use base as-is */ }
+    }
     window.location.href = base + "index.html";
   }
 

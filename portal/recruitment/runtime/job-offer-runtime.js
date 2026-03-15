@@ -688,13 +688,14 @@
             var tdName = document.createElement("td");
             tdName.className = "ie-table-td";
             var nameLink = document.createElement("a");
-            nameLink.href = (window.IEPortal && window.IEPortal.links && window.IEPortal.links.applicationView) ? window.IEPortal.links.applicationView(app.id) : "application.html?id=" + encodeURIComponent(app.id);
+            var appPath = (window.IEPortal && window.IEPortal.links && window.IEPortal.links.applicationView) ? window.IEPortal.links.applicationView(app.id) : "recruitment/application.html?id=" + encodeURIComponent(app.id);
+            nameLink.setAttribute("href", appPath);
             nameLink.className = "text-[#1b4332] font-medium hover:underline";
             nameLink.textContent = app.candidate_name || "—";
             nameLink.addEventListener("click", function (e) {
               if (window.IERouter && typeof window.IERouter.navigateTo === "function") {
                 e.preventDefault();
-                window.IERouter.navigateTo(nameLink.href);
+                window.IERouter.navigateTo(appPath);
               }
             });
             tdName.appendChild(nameLink);
@@ -778,11 +779,11 @@
           listViewBtn.onclick = function () { setPipelineView("list"); };
         }
         if (selectAllCheckbox && listBody) {
-          selectAllCheckbox.onclick = function () {
+          selectAllCheckbox.addEventListener("change", function () {
             var checked = selectAllCheckbox.checked;
             listBody.querySelectorAll(".ie-pipeline-row-checkbox").forEach(function (cb) { cb.checked = checked; });
             updateBulkState();
-          };
+          });
         }
         listBody.addEventListener("change", function () { updateBulkState(); });
         if (bulkApplyBtn && bulkStatusSelect) {

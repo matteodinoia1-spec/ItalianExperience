@@ -91,10 +91,11 @@
       return;
     }
     try {
-      const base = (function () {
-        const url = new URL(".", window.location.href);
-        return url.href;
-      })();
+      let base = new URL(".", window.location.href).href;
+      // Normalize to portal root if inside a sub-directory (e.g. /recruitment/).
+      if (base.includes("/recruitment/")) {
+        base = new URL("../", base).href;
+      }
       window.location.href = base + "index.html";
     } catch {
       window.location.href = "index.html";

@@ -1,10 +1,17 @@
-// Compute the base path where portal HTML files live
+// Compute the base path where portal HTML files live.
+// Always resolves to the portal root (e.g. /portal/) regardless of the
+// sub-directory depth, so that listKeyToPath() prefixes work correctly
+// from any page inside portal/ or portal/recruitment/.
 function derivePortalBasePath() {
   try {
-    // new URL('.', href) restituisce sempre la directory dell'HTML corrente,
-    // includendo protocollo (http/https/file) e host se presenti.
     const url = new URL(".", window.location.href);
-    return url.href;
+    let href = url.href;
+    // If inside a portal sub-directory (e.g. /recruitment/), walk up one
+    // level to the portal root so recruitment/ prefixes resolve correctly.
+    if (href.includes("/recruitment/")) {
+      href = new URL("../", href).href;
+    }
+    return href;
   } catch (error) {
     const pathname = window.location.pathname || "";
     if (!pathname) return "";
@@ -14,19 +21,25 @@ function derivePortalBasePath() {
 
     // Strip the last segment (file name)
     segments.pop();
+    // If inside a sub-portal directory, pop one more level
+    if (segments.length && segments[segments.length - 1] === "recruitment") {
+      segments.pop();
+    }
     return "/" + segments.join("/") + (segments.length ? "/" : "");
   }
 }
 
-// Resolve list key to relative path (e.g. candidates -> candidates.html)
+// Resolve list key to path relative to portal root
+// (e.g. candidates -> recruitment/candidates.html)
 function listKeyToPath(key) {
   var k = (key || "").toString();
-  if (k === "candidates") return "candidates.html";
-  if (k === "jobOffers" || k === "job-offers") return "job-offers.html";
-  if (k === "job-postings") return "job-postings.html";
-  if (k === "clients") return "clients.html";
-  if (k === "applications") return "applications.html";
-  if (k === "external-submissions") return "external-submissions.html";
+  if (k === "candidates") return "recruitment/candidates.html";
+  if (k === "jobOffers" || k === "job-offers") return "recruitment/job-offers.html";
+  if (k === "job-postings") return "recruitment/job-postings.html";
+  if (k === "clients") return "recruitment/clients.html";
+  if (k === "applications") return "recruitment/applications.html";
+  if (k === "external-submissions") return "recruitment/external-submissions.html";
+  if (k === "archived") return "recruitment/archived.html";
   return k.indexOf(".html") !== -1 ? k : k + ".html";
 }
 
