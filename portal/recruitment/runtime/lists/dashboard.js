@@ -729,7 +729,7 @@
 
     function navigateToExternalSubmissionDetail(id) {
       var href =
-        "external-submission.html?id=" + encodeURIComponent(String(id));
+        "recruitment/external-submission.html?id=" + encodeURIComponent(String(id));
       if (
         window.IERouter &&
         typeof window.IERouter.navigateTo === "function"

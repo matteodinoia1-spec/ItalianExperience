@@ -201,9 +201,7 @@
           IERouter &&
           typeof IERouter.navigateTo === "function"
         ) {
-          IERouter.navigateTo(
-            "job-offers.html?client=" + encodeURIComponent(clientId)
-          );
+          IERouter.navigateTo("job-offers", { client: clientId });
         }
       }
     });

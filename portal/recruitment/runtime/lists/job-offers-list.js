@@ -383,9 +383,7 @@
           IERouter &&
           typeof IERouter.navigateTo === "function"
         ) {
-          IERouter.navigateTo(
-            "candidates.html?offer=" + encodeURIComponent(offerId)
-          );
+          IERouter.navigateTo("candidates", { offer: offerId });
         }
         return;
       }
